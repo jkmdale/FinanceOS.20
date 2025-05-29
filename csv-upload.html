@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinanceOS - Personal Finance Operating System</title>
+    <title>FinanceOS - CSV Upload</title>
     <style>
         * {
             margin: 0;
@@ -19,6 +19,7 @@
             overflow-x: hidden;
         }
 
+        /* Glass effect utility classes */
         .glass {
             background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(20px);
@@ -36,158 +37,35 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
 
-        .gradient-purple { background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%); }
-        .gradient-green { background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%); }
-        .gradient-blue { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%); }
-        .gradient-orange { background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%); }
-
-        .container {
-            padding: 1rem;
-            max-width: 1200px;
-            margin: 0 auto;
+        /* Gradient utility classes */
+        .gradient-purple {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
         }
 
+        .gradient-green {
+            background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+        }
+
+        .gradient-red {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+        }
+
+        .gradient-blue {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+        }
+
+        .gradient-orange {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%);
+        }
+
+        /* Header */
         .header {
+            padding: 1rem;
             text-align: center;
             margin-bottom: 2rem;
-            padding: 1rem;
         }
 
         .logo {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 1rem;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            font-weight: bold;
-            color: white;
-        }
-
-        .header h1 {
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .header p {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .login-section, .dashboard-section {
-            display: none;
-        }
-
-        .login-section.active, .dashboard-section.active {
-            display: block;
-        }
-
-        .login-form {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 2rem;
-            border-radius: 24px;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: 500;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            color: white;
-            font-size: 1rem;
-        }
-
-        .form-group input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: rgba(139, 92, 246, 0.6);
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 1rem;
-        }
-
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
-        }
-
-        .forgot-password {
-            text-align: center;
-            margin-top: 1rem;
-        }
-
-        .forgot-password a {
-            color: rgba(139, 92, 246, 0.8);
-            text-decoration: none;
-            font-size: 0.9rem;
-        }
-
-        .welcome-message {
-            text-align: center;
-            margin-bottom: 2rem;
-            padding: 1.5rem;
-            border-radius: 20px;
-        }
-
-        .welcome-message h2 {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-            color: #10b981;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .feature-card {
-            padding: 2rem;
-            border-radius: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            color: white;
-            display: block;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3);
-        }
-
-        .feature-icon {
             width: 60px;
             height: 60px;
             margin: 0 auto 1rem;
@@ -196,406 +74,47 @@
             align-items: center;
             justify-content: center;
             font-size: 24px;
-            color: white;
-        }
-
-        .feature-card h3 {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 0.75rem;
-        }
-
-        .feature-card p {
-            color: rgba(255, 255, 255, 0.8);
-            line-height: 1.5;
-            font-size: 0.9rem;
-        }
-
-        .logout-section {
-            text-align: center;
-            margin-top: 3rem;
-        }
-
-        .logout-btn {
-            padding: 0.75rem 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            background: transparent;
-            color: white;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 0.75rem;
-            }
-            
-            .header h1 {
-                font-size: 1.8rem;
-            }
-            
-            .features-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-            
-            .feature-card {
-                padding: 1.5rem;
-            }
-        }
-
-        /* NEW: Highlight the CSV Upload card */
-        .feature-card.csv-upload {
-            border: 2px solid rgba(139, 92, 246, 0.5);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-card.csv-upload::before {
-            content: "NEW!";
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: rgba(139, 92, 246, 0.8);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-
-        .feature-card.csv-upload:hover {
-            border-color: rgba(139, 92, 246, 0.8);
-            box-shadow: 0 12px 48px rgba(139, 92, 246, 0.3);
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Login Section -->
-        <div id="loginSection" class="login-section active">
-            <div class="header">
-                <div class="logo gradient-green">$</div>
-                <h1>FinanceOS</h1>
-                <p>Your Personal Finance Operating System</p>
-            </div>
-
-            <div class="login-form glass-premium">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" placeholder="Enter your username" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="Enter your password" required>
-                </div>
-                <button class="login-btn gradient-purple" onclick="handleLogin()">
-                    Enter Demo
-                </button>
-                <div class="forgot-password">
-                    <a href="#" onclick="showForgotPassword()">Forgot Password?</a>
-                </div>
-            </div>
-
-            <div style="text-align: center; margin-top: 2rem; color: rgba(255, 255, 255, 0.6); font-size: 0.9rem;">
-                Add FinanceOS to your home screen for the best experience
-            </div>
-        </div>
-
-        <!-- Dashboard Section -->
-        <div id="dashboardSection" class="dashboard-section">
-            <div class="header">
-                <div class="logo gradient-green">$</div>
-                <h1>FinanceOS</h1>
-                <p>Your Personal Finance Operating System</p>
-            </div>
-
-            <div class="welcome-message glass-premium">
-                <h2>🎉 Welcome back!</h2>
-                <p>Your financial data is ready. Choose a feature to get started.</p>
-            </div>
-
-            <div class="features-grid">
-                <a href="#" class="feature-card glass-premium" onclick="showDashboard()">
-                    <div class="feature-icon gradient-blue">📊</div>
-                    <h3>Dashboard</h3>
-                    <p>View your complete financial overview and insights</p>
-                </a>
-
-                <!-- UPDATED: CSV Upload card with NEW badge and proper link -->
-                <a href="csv-upload.html" class="feature-card glass-premium csv-upload">
-                    <div class="feature-icon gradient-purple">📄</div>
-                    <h3>Upload CSV</h3>
-                    <p>Import your bank statements and transaction data with intelligent categorization</p>
-                </a>
-
-                <a href="#" class="feature-card glass-premium" onclick="showGoals()">
-                    <div class="feature-icon gradient-green">🎯</div>
-                    <h3>Goals</h3>
-                    <p>Set and track your financial goals and milestones</p>
-                </a>
-
-                <a href="#" class="feature-card glass-premium" onclick="showAICoach()">
-                    <div class="feature-icon gradient-orange">🤖</div>
-                    <h3>AI Coach</h3>
-                    <p>Get personalized financial advice and insights</p>
-                </a>
-            </div>
-
-            <div class="logout-section">
-                <button class="logout-btn" onclick="handleLogout()">
-                    ← Logout
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Handle login
-        function handleLogin() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            if (username && password) {
-                document.getElementById('loginSection').classList.remove('active');
-                document.getElementById('dashboardSection').classList.add('active');
-            } else {
-                alert('Please enter both username and password');
-            }
-        }
-
-        // Handle logout
-        function handleLogout() {
-            document.getElementById('dashboardSection').classList.remove('active');
-            document.getElementById('loginSection').classList.add('active');
-            
-            // Clear form
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-        }
-
-        // Placeholder functions for other features
-        function showDashboard() {
-            alert('📊 Dashboard feature coming soon! This will show your complete financial overview.');
-        }
-
-        function showGoals() {
-            alert('🎯 Goals feature coming soon! Set and track your financial targets.');
-        }
-
-        function showAICoach() {
-            alert('🤖 AI Coach feature coming soon! Get personalized financial advice.');
-        }
-
-        function showForgotPassword() {
-            alert('🔐 Password recovery feature coming soon!');
-        }
-
-        // Handle enter key in login form
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('password').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    handleLogin();
-                }
-            });
-        });
-    </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinanceOS - Personal Finance Operating System</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
-            min-height: 100vh;
-            color: white;
-            overflow-x: hidden;
-        }
-
-        .glass {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
-        .glass-premium {
-            background: linear-gradient(135deg, 
-                rgba(139, 92, 246, 0.15) 0%, 
-                rgba(59, 130, 246, 0.15) 50%, 
-                rgba(147, 51, 234, 0.15) 100%);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-        }
-
-        .gradient-purple { background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%); }
-        .gradient-green { background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%); }
-        .gradient-blue { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%); }
-        .gradient-orange { background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%); }
-
-        .container {
-            padding: 1rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 2rem;
-            padding: 1rem;
-        }
-
-        .logo {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 1rem;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
             font-weight: bold;
             color: white;
         }
 
         .header h1 {
-            font-size: 2.2rem;
+            font-size: 1.8rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
         }
 
         .header p {
             color: rgba(255, 255, 255, 0.7);
-        }
-
-        .login-section, .dashboard-section {
-            display: none;
-        }
-
-        .login-section.active, .dashboard-section.active {
-            display: block;
-        }
-
-        .login-form {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 2rem;
-            border-radius: 24px;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: 500;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            color: white;
-            font-size: 1rem;
-        }
-
-        .form-group input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: rgba(139, 92, 246, 0.6);
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 1rem;
-        }
-
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
-        }
-
-        .forgot-password {
-            text-align: center;
-            margin-top: 1rem;
-        }
-
-        .forgot-password a {
-            color: rgba(139, 92, 246, 0.8);
-            text-decoration: none;
             font-size: 0.9rem;
         }
 
-        .welcome-message {
-            text-align: center;
-            margin-bottom: 2rem;
-            padding: 1.5rem;
+        /* Container */
+        .container {
+            padding: 0 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Upload Zone */
+        .upload-zone {
+            border: 2px dashed rgba(139, 92, 246, 0.5);
             border-radius: 20px;
-        }
-
-        .welcome-message h2 {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-            color: #10b981;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .feature-card {
-            padding: 2rem;
-            border-radius: 20px;
+            padding: 3rem 2rem;
             text-align: center;
-            cursor: pointer;
             transition: all 0.3s ease;
-            text-decoration: none;
-            color: white;
-            display: block;
+            cursor: pointer;
+            margin-bottom: 2rem;
         }
 
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3);
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            border-color: rgba(139, 92, 246, 0.8);
+            background: rgba(139, 92, 246, 0.1);
+            transform: translateY(-2px);
         }
 
-        .feature-icon {
+        .upload-icon {
             width: 60px;
             height: 60px;
             margin: 0 auto 1rem;
@@ -604,214 +123,1084 @@
             align-items: center;
             justify-content: center;
             font-size: 24px;
-            color: white;
         }
 
-        .feature-card h3 {
+        .upload-text h3 {
             font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.5rem;
         }
 
-        .feature-card p {
+        .upload-text p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1rem;
+        }
+
+        .supported-banks {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .bank-tag {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* File Input */
+        #fileInput {
+            display: none;
+        }
+
+        /* Upload Button */
+        .upload-btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+        }
+
+        /* Processing indicator */
+        .processing {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(139, 92, 246, 0.3);
+            border-top: 3px solid #8b5cf6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Results Section */
+        .results {
+            display: none;
+            margin-top: 2rem;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .summary-card h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-card p {
             color: rgba(255, 255, 255, 0.8);
-            line-height: 1.5;
             font-size: 0.9rem;
         }
 
-        .logout-section {
-            text-align: center;
-            margin-top: 3rem;
+        /* Transactions Table */
+        .transactions-container {
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
         }
 
-        .logout-btn {
-            padding: 0.75rem 2rem;
+        .transactions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .transactions-header h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
             border: 1px solid rgba(255, 255, 255, 0.3);
             background: transparent;
             color: white;
-            border-radius: 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
-        .logout-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
+        .filter-btn.active {
+            background: rgba(139, 92, 246, 0.5);
+            border-color: rgba(139, 92, 246, 0.8);
         }
 
-        @media (max-width: 768px) {
-            .container {
-                padding: 0.75rem;
-            }
-            
-            .header h1 {
-                font-size: 1.8rem;
-            }
-            
-            .features-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-            
-            .feature-card {
-                padding: 1.5rem;
-            }
+        .transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
         }
 
-        /* NEW: Highlight the CSV Upload card */
-        .feature-card.csv-upload {
-            border: 2px solid rgba(139, 92, 246, 0.5);
-            position: relative;
-            overflow: hidden;
+        .transactions-table th,
+        .transactions-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .feature-card.csv-upload::before {
-            content: "NEW!";
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: rgba(139, 92, 246, 0.8);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 12px;
-            font-size: 0.7rem;
+        .transactions-table th {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .amount-positive {
+            color: #10b981;
             font-weight: 600;
         }
 
-        .feature-card.csv-upload:hover {
-            border-color: rgba(139, 92, 246, 0.8);
-            box-shadow: 0 12px 48px rgba(139, 92, 246, 0.3);
+        .amount-negative {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .category-tag {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .category-food { background: rgba(249, 115, 22, 0.2); color: #fb923c; }
+        .category-transport { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+        .category-shopping { background: rgba(236, 72, 153, 0.2); color: #f472b6; }
+        .category-bills { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+        .category-income { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .category-other { background: rgba(107, 114, 128, 0.2); color: #9ca3af; }
+
+        /* Charts */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .chart-card {
+            padding: 1.5rem;
+            border-radius: 20px;
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 0.75rem;
+            }
+            
+            .upload-zone {
+                padding: 2rem 1rem;
+            }
+            
+            .transactions-table {
+                font-size: 0.8rem;
+            }
+            
+            .transactions-table th,
+            .transactions-table td {
+                padding: 0.5rem;
+            }
+            
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-buttons {
+                justify-content: center;
+            }
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6, #9333ea);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Success message styling */
+        .success-message {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.2) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #34d399;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* Critical financial alert */
+        .critical-alert {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.2) 100%);
+            border: 2px solid rgba(239, 68, 68, 0.4);
+            color: #f87171;
+            padding: 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            animation: pulse-alert 3s infinite;
+        }
+
+        @keyframes pulse-alert {
+            0%, 100% { border-color: rgba(239, 68, 68, 0.4); }
+            50% { border-color: rgba(239, 68, 68, 0.7); }
+        }
+
+        .critical-alert h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #ef4444;
+        }
+
+        .critical-alert p {
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
         }
     </style>
 </head>
 <body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo gradient-green">$</div>
+        <h1>CSV Upload</h1>
+        <p>Import your bank statements and get instant insights</p>
+    </div>
+
     <div class="container">
-        <!-- Login Section -->
-        <div id="loginSection" class="login-section active">
-            <div class="header">
-                <div class="logo gradient-green">$</div>
-                <h1>FinanceOS</h1>
-                <p>Your Personal Finance Operating System</p>
-            </div>
+        <!-- Critical Financial Alert -->
+        <div class="critical-alert glass" id="criticalAlert" style="display: none;">
+            <h3>⚠️ Financial Health Alert</h3>
+            <p id="alertMessage">Based on your financial data, we've identified areas that need immediate attention:</p>
+            <ul id="alertList" style="margin-top: 1rem; padding-left: 1.5rem;">
+                <!-- Alert items will be populated by JavaScript -->
+            </ul>
+        </div>
 
-            <div class="login-form glass-premium">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" placeholder="Enter your username" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="Enter your password" required>
-                </div>
-                <button class="login-btn gradient-purple" onclick="handleLogin()">
-                    Enter Demo
+        <!-- Upload Zone -->
+        <div class="upload-zone glass-premium" id="uploadZone">
+            <div class="upload-icon gradient-purple">📄</div>
+            <div class="upload-text">
+                <h3>Upload Your Bank Statements</h3>
+                <p>Drag and drop your CSV files here, or click to browse</p>
+                <button class="upload-btn gradient-purple" onclick="document.getElementById('fileInput').click()">
+                    Choose Files
                 </button>
-                <div class="forgot-password">
-                    <a href="#" onclick="showForgotPassword()">Forgot Password?</a>
-                </div>
             </div>
-
-            <div style="text-align: center; margin-top: 2rem; color: rgba(255, 255, 255, 0.6); font-size: 0.9rem;">
-                Add FinanceOS to your home screen for the best experience
+            <div class="supported-banks">
+                <span class="bank-tag">ANZ</span>
+                <span class="bank-tag">ASB</span>
+                <span class="bank-tag">BNZ</span>
+                <span class="bank-tag">Kiwibank</span>
+                <span class="bank-tag">Westpac</span>
             </div>
         </div>
 
-        <!-- Dashboard Section -->
-        <div id="dashboardSection" class="dashboard-section">
-            <div class="header">
-                <div class="logo gradient-green">$</div>
-                <h1>FinanceOS</h1>
-                <p>Your Personal Finance Operating System</p>
+        <input type="file" id="fileInput" accept=".csv,.xls,.xlsx" multiple>
+
+        <!-- Processing Indicator -->
+        <div class="processing glass" id="processing">
+            <div class="spinner"></div>
+            <h3>Processing Your Data...</h3>
+            <p>Analyzing transactions and categorizing spending</p>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results" id="results">
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+                <div class="summary-card glass-premium">
+                    <h3 id="totalTransactions">0</h3>
+                    <p>Transactions Processed</p>
+                </div>
+                <div class="summary-card glass gradient-green">
+                    <h3 id="totalIncome">$0</h3>
+                    <p>Total Income</p>
+                </div>
+                <div class="summary-card glass gradient-red">
+                    <h3 id="totalExpenses">$0</h3>
+                    <p>Total Expenses</p>
+                </div>
+                <div class="summary-card glass gradient-purple">
+                    <h3 id="netAmount">$0</h3>
+                    <p>Net Amount</p>
+                </div>
             </div>
 
-            <div class="welcome-message glass-premium">
-                <h2>🎉 Welcome back!</h2>
-                <p>Your financial data is ready. Choose a feature to get started.</p>
+            <!-- Transactions Table -->
+            <div class="transactions-container glass-premium">
+                <div class="transactions-header">
+                    <h3>Recent Transactions</h3>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="income">Income</button>
+                        <button class="filter-btn" data-filter="expenses">Expenses</button>
+                        <button class="filter-btn" data-filter="food">Food</button>
+                        <button class="filter-btn" data-filter="transport">Transport</button>
+                        <button class="filter-btn" data-filter="bills">Bills</button>
+                    </div>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="transactions-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsBody">
+                            <!-- Transactions will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <div class="features-grid">
-                <a href="#" class="feature-card glass-premium" onclick="showDashboard()">
-                    <div class="feature-icon gradient-blue">📊</div>
-                    <h3>Dashboard</h3>
-                    <p>View your complete financial overview and insights</p>
-                </a>
-
-                <!-- UPDATED: CSV Upload card with NEW badge and proper link -->
-                <a href="csv-upload.html" class="feature-card glass-premium csv-upload">
-                    <div class="feature-icon gradient-purple">📄</div>
-                    <h3>Upload CSV</h3>
-                    <p>Import your bank statements and transaction data with intelligent categorization</p>
-                </a>
-
-                <a href="#" class="feature-card glass-premium" onclick="showGoals()">
-                    <div class="feature-icon gradient-green">🎯</div>
-                    <h3>Goals</h3>
-                    <p>Set and track your financial goals and milestones</p>
-                </a>
-
-                <a href="#" class="feature-card glass-premium" onclick="showAICoach()">
-                    <div class="feature-icon gradient-orange">🤖</div>
-                    <h3>AI Coach</h3>
-                    <p>Get personalized financial advice and insights</p>
-                </a>
+            <!-- Category Breakdown -->
+            <div class="charts-container">
+                <div class="chart-card glass-premium">
+                    <div class="chart-title">Spending by Category</div>
+                    <div id="categoryChart">
+                        <!-- Category breakdown will go here -->
+                    </div>
+                </div>
+                
+                <div class="chart-card glass-premium">
+                    <div class="chart-title">Financial Health Insights</div>
+                    <div id="insightsChart">
+                        <!-- Financial insights will go here -->
+                    </div>
+                </div>
             </div>
 
-            <div class="logout-section">
-                <button class="logout-btn" onclick="handleLogout()">
-                    ← Logout
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="action-btn btn-primary" onclick="generateBudget()">
+                    📊 Generate Budget
+                </button>
+                <button class="action-btn btn-primary" onclick="setGoals()">
+                    🎯 Set Financial Goals
+                </button>
+                <button class="action-btn btn-secondary" onclick="exportData()">
+                    📤 Export Analysis
+                </button>
+                <button class="action-btn btn-secondary" onclick="backToDashboard()">
+                    ← Back to Dashboard
                 </button>
             </div>
         </div>
     </div>
 
     <script>
-        // Handle login
-        function handleLogin() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+        // Global variables
+        let processedTransactions = [];
+        let currentFilter = 'all';
+
+        // Bank format detection patterns
+        const bankFormats = {
+            ANZ: ['Date', 'Amount', 'Description', 'Balance'],
+            ASB: ['Date', 'Unique Id', 'Tran Type', 'Cheque Number', 'Payee', 'Memo', 'Amount'],
+            BNZ: ['Date', 'Amount', 'Payee', 'Description', 'Reference', 'Transaction Type'],
+            KIWIBANK: ['Date', 'Memo/Description', 'Amount', 'Balance'],
+            WESTPAC: ['Date', 'Amount', 'Other Party', 'Description', 'Reference', 'Particulars', 'Code', 'Reference', 'Balance']
+        };
+
+        // Enhanced categorization rules for NZ spending patterns
+        const categoryRules = {
+            'Food & Dining': [
+                'countdown', 'new world', 'paknsave', 'four square', 'fresh choice',
+                'restaurant', 'cafe', 'mcdonald', 'kfc', 'subway', 'pizza', 'dominos',
+                'uber eats', 'menulog', 'food', 'dining', 'bakery', 'butcher', 
+                'supermarket', 'grocery', 'takeaway', 'fish chips', 'sushi'
+            ],
+            'Transport': [
+                'fuel', 'petrol', 'bp', 'z energy', 'mobil', 'caltex', 'gull',
+                'parking', 'uber', 'taxi', 'bus', 'train', 'metlink', 'at hop',
+                'vehicle', 'car', 'rego', 'wof', 'aa', 'vtnz', 'mechanic'
+            ],
+            'Shopping': [
+                'warehouse', 'kmart', 'target', 'farmers', 'department', 'clothing',
+                'shoes', 'briscoes', 'harvey norman', 'noel leeming', 'jb hi-fi',
+                'shopping', 'retail', 'mall', 'store', 'online'
+            ],
+            'Bills & Utilities': [
+                'power', 'electricity', 'gas', 'water', 'contact energy', 'genesis',
+                'mercury', 'trustpower', 'internet', 'vodafone', 'spark', '2degrees',
+                'sky', 'netflix', 'spotify', 'phone', 'mobile', 'broadband',
+                'insurance', 'rates', 'council', 'auckland council', 'wellington city'
+            ],
+            'Income': [
+                'salary', 'wage', 'pay', 'income', 'transfer in', 'deposit',
+                'ird', 'working for families', 'accommodation supplement',
+                'kiwisaver', 'dividend', 'interest earned'
+            ],
+            'Banking & Fees': [
+                'fee', 'interest', 'bank', 'atm', 'overdraft', 'anz', 'asb', 
+                'bnz', 'kiwibank', 'westpac', 'service charge', 'monthly fee'
+            ],
+            'Health & Medical': [
+                'pharmacy', 'chemist', 'doctor', 'medical', 'hospital', 'dentist',
+                'unichem', 'life pharmacy', 'dis-chem', 'health', 'clinic'
+            ],
+            'Entertainment': [
+                'cinema', 'movie', 'hoyts', 'event', 'reading', 'berkley',
+                'gym', 'fitness', 'sports', 'recreation', 'games', 'hobby'
+            ],
+            'Education': [
+                'school', 'university', 'course', 'education', 'learning',
+                'books', 'stationery', 'fees', 'tuition'
+            ]
+        };
+
+        // Financial health analysis criteria
+        const financialHealthChecks = {
+            emergencyFund: {
+                threshold: 3000, // 3 months of basic expenses for NZ
+                message: "Emergency fund below $3,000 - you're at high financial risk"
+            },
+            savingsRate: {
+                threshold: 0.1, // 10% savings rate
+                message: "Savings rate below 10% - consider increasing your emergency fund contributions"
+            },
+            debtToIncome: {
+                threshold: 0.3, // 30% debt to income ratio
+                message: "Debt payments exceed 30% of income - focus on debt reduction"
+            }
+        };
+
+        // Initialize drag and drop functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadZone = document.getElementById('uploadZone');
+            const fileInput = document.getElementById('fileInput');
+
+            // Prevent default drag behaviors
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadZone.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+
+            // Highlight drop area when item is dragged over it
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadZone.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadZone.addEventListener(eventName, unhighlight, false);
+            });
+
+            // Handle dropped files
+            uploadZone.addEventListener('drop', handleDrop, false);
+
+            // Handle file input change
+            fileInput.addEventListener('change', function(e) {
+                handleFiles(e.target.files);
+            });
+
+            // Filter button handling
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.dataset.filter;
+                    filterTransactions();
+                });
+            });
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function highlight(e) {
+            document.getElementById('uploadZone').classList.add('dragover');
+        }
+
+        function unhighlight(e) {
+            document.getElementById('uploadZone').classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            if (files.length === 0) return;
+
+            // Show processing indicator
+            document.getElementById('processing').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+
+            // Process files
+            const filePromises = Array.from(files).map(file => processFile(file));
             
-            if (username && password) {
-                document.getElementById('loginSection').classList.remove('active');
-                document.getElementById('dashboardSection').classList.add('active');
-            } else {
-                alert('Please enter both username and password');
+            Promise.all(filePromises).then(results => {
+                // Combine all transactions from all files
+                processedTransactions = results.flat();
+                
+                // Show results
+                displayResults();
+                
+                // Analyze financial health
+                analyzeFinancialHealth();
+                
+                // Hide processing indicator
+                setTimeout(() => {
+                    document.getElementById('processing').style.display = 'none';
+                    document.getElementById('results').style.display = 'block';
+                }, 1500);
+            }).catch(error => {
+                console.error('Error processing files:', error);
+                alert('Error processing files. Please check the format and try again.');
+                document.getElementById('processing').style.display = 'none';
+            });
+        }
+
+        function processFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        const csv = e.target.result;
+                        const lines = csv.split('\n');
+                        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+                        
+                        // Detect bank format
+                        const bankType = detectBankFormat(headers);
+                        console.log('Detected bank:', bankType);
+                        
+                        // Parse transactions
+                        const transactions = [];
+                        for (let i = 1; i < lines.length; i++) {
+                            if (lines[i].trim()) {
+                                const transaction = parseTransaction(lines[i], bankType, headers);
+                                if (transaction) {
+                                    transactions.push(transaction);
+                                }
+                            }
+                        }
+                        
+                        resolve(transactions);
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                
+                reader.onerror = () => reject(new Error('File reading failed'));
+                reader.readAsText(file);
+            });
+        }
+
+        function detectBankFormat(headers) {
+            // Enhanced detection based on common column names
+            if (headers.some(h => h.toLowerCase().includes('memo/description'))) return 'KIWIBANK';
+            if (headers.some(h => h.toLowerCase().includes('unique id'))) return 'ASB';
+            if (headers.some(h => h.toLowerCase().includes('other party'))) return 'WESTPAC';
+            if (headers.some(h => h.toLowerCase().includes('payee')) && 
+                headers.some(h => h.toLowerCase().includes('transaction type'))) return 'BNZ';
+            return 'ANZ'; // Default fallback
+        }
+
+        function parseTransaction(line, bankType, headers) {
+            const values = parseCSVLine(line);
+            if (values.length < 3) return null;
+
+            try {
+                let transaction = {};
+
+                switch (bankType) {
+                    case 'ANZ':
+                        transaction = {
+                            date: parseDate(values[0]),
+                            amount: parseFloat(values[1]) || 0,
+                            description: values[2] || '',
+                            balance: parseFloat(values[3]) || 0
+                        };
+                        break;
+                    case 'ASB':
+                        transaction = {
+                            date: parseDate(values[0]),
+                            amount: parseFloat(values[6]) || 0,
+                            description: (values[4] || '') + ' ' + (values[5] || ''),
+                            type: values[2] || ''
+                        };
+                        break;
+                    case 'KIWIBANK':
+                        transaction = {
+                            date: parseDate(values[0]),
+                            amount: parseFloat(values[2]) || 0,
+                            description: values[1] || '',
+                            balance: parseFloat(values[3]) || 0
+                        };
+                        break;
+                    case 'BNZ':
+                        transaction = {
+                            date: parseDate(values[0]),
+                            amount: parseFloat(values[1]) || 0,
+                            description: (values[2] || '') + ' ' + (values[3] || ''),
+                            type: values[5] || ''
+                        };
+                        break;
+                    case 'WESTPAC':
+                        transaction = {
+                            date: parseDate(values[0]),
+                            amount: parseFloat(values[1]) || 0,
+                            description: (values[2] || '') + ' ' + (values[3] || ''),
+                            balance: parseFloat(values[8]) || 0
+                        };
+                        break;
+                    default:
+                        transaction = {
+                            date: parseDate(values[0]),
+                            amount: parseFloat(values[1]) || 0,
+                            description: values[2] || '',
+                            balance: values[3] ? parseFloat(values[3]) : null
+                        };
+                }
+
+                // Add category
+                transaction.category = categorizeTransaction(transaction.description);
+                
+                // Format date for display
+                transaction.displayDate = formatDate(transaction.date);
+                
+                return transaction;
+            } catch (error) {
+                console.error('Error parsing transaction:', error);
+                return null;
             }
         }
 
-        // Handle logout
-        function handleLogout() {
-            document.getElementById('dashboardSection').classList.remove('active');
-            document.getElementById('loginSection').classList.add('active');
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
             
-            // Clear form
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            
+            result.push(current.trim());
+            return result.map(item => item.replace(/"/g, ''));
         }
 
-        // Placeholder functions for other features
-        function showDashboard() {
-            alert('📊 Dashboard feature coming soon! This will show your complete financial overview.');
+        function parseDate(dateStr) {
+            // Handle various date formats common in NZ banks
+            const cleanDate = dateStr.replace(/"/g, '').trim();
+            
+            // Try different date formats
+            const formats = [
+                /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/, // DD/MM/YYYY
+                /^(\d{4})-(\d{1,2})-(\d{1,2})$/, // YYYY-MM-DD
+                /^(\d{1,2})-(\d{1,2})-(\d{4})$/, // DD-MM-YYYY
+            ];
+            
+            for (const format of formats) {
+                const match = cleanDate.match(format);
+                if (match) {
+                    if (format === formats[1]) { // YYYY-MM-DD
+                        return new Date(match[1], match[2] - 1, match[3]);
+                    } else { // DD/MM/YYYY or DD-MM-YYYY
+                        return new Date(match[3], match[2] - 1, match[1]);
+                    }
+                }
+            }
+            
+            // Fallback to Date constructor
+            return new Date(cleanDate);
         }
 
-        function showGoals() {
-            alert('🎯 Goals feature coming soon! Set and track your financial targets.');
+        function formatDate(date) {
+            if (!date || isNaN(date)) return 'Invalid Date';
+            return date.toLocaleDateString('en-NZ', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
         }
 
-        function showAICoach() {
-            alert('🤖 AI Coach feature coming soon! Get personalized financial advice.');
+        function categorizeTransaction(description) {
+            const desc = description.toLowerCase();
+            
+            for (const [category, keywords] of Object.entries(categoryRules)) {
+                for (const keyword of keywords) {
+                    if (desc.includes(keyword.toLowerCase())) {
+                        return category;
+                    }
+                }
+            }
+            
+            return 'Other';
         }
 
-        function showForgotPassword() {
-            alert('🔐 Password recovery feature coming soon!');
+        function displayResults() {
+            // Calculate summary statistics
+            const totalTransactions = processedTransactions.length;
+            const income = processedTransactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
+            const expenses = Math.abs(processedTransactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0));
+            const netAmount = income - expenses;
+
+            // Update summary cards
+            document.getElementById('totalTransactions').textContent = totalTransactions.toLocaleString();
+            document.getElementById('totalIncome').textContent = '$' + income.toLocaleString('en-NZ', { minimumFractionDigits: 2 });
+            document.getElementById('totalExpenses').textContent = '$' + expenses.toLocaleString('en-NZ', { minimumFractionDigits: 2 });
+            document.getElementById('netAmount').textContent = '$' + netAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2 });
+
+            // Display transactions
+            displayTransactions();
+            
+            // Display category breakdown
+            displayCategoryBreakdown();
+            
+            // Display financial insights
+            displayFinancialInsights();
         }
 
-        // Handle enter key in login form
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('password').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    handleLogin();
+        function analyzeFinancialHealth() {
+            const income = processedTransactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
+            const expenses = Math.abs(processedTransactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0));
+            const netAmount = income - expenses;
+            
+            const alerts = [];
+            
+            // Check if spending exceeds income (like your current situation)
+            if (netAmount < 0) {
+                alerts.push(`You're spending $${Math.abs(netAmount).toLocaleString('en-NZ', {minimumFractionDigits: 2})} more than you earn monthly`);
+            }
+            
+            // Check emergency fund (you currently have $0.17)
+            if (netAmount < financialHealthChecks.emergencyFund.threshold) {
+                alerts.push(financialHealthChecks.emergencyFund.message);
+            }
+            
+            // Check savings rate
+            const savingsRate = income > 0 ? netAmount / income : 0;
+            if (savingsRate < financialHealthChecks.savingsRate.threshold) {
+                alerts.push(financialHealthChecks.savingsRate.message);
+            }
+            
+            // Show critical alerts if any
+            if (alerts.length > 0) {
+                const alertDiv = document.getElementById('criticalAlert');
+                const alertList = document.getElementById('alertList');
+                
+                alertList.innerHTML = alerts.map(alert => `<li>${alert}</li>`).join('');
+                alertDiv.style.display = 'block';
+            }
+        }
+
+        function displayTransactions() {
+            const tbody = document.getElementById('transactionsBody');
+            tbody.innerHTML = '';
+
+            // Sort transactions by date (newest first)
+            const sortedTransactions = [...processedTransactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Show first 50 transactions
+            const displayTransactions = sortedTransactions.slice(0, 50);
+
+            displayTransactions.forEach(transaction => {
+                const row = document.createElement('tr');
+                
+                const amountClass = transaction.amount >= 0 ? 'amount-positive' : 'amount-negative';
+                const categoryClass = getCategoryClass(transaction.category);
+                
+                row.innerHTML = `
+                    <td>${transaction.displayDate}</td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${transaction.description}">
+                        ${transaction.description}
+                    </td>
+                    <td>
+                        <span class="category-tag ${categoryClass}">${transaction.category}</span>
+                    </td>
+                    <td class="${amountClass}">
+                        ${transaction.amount >= 0 ? '+' : ''}$${Math.abs(transaction.amount).toLocaleString('en-NZ', { minimumFractionDigits: 2 })}
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        function getCategoryClass(category) {
+            const classMap = {
+                'Food & Dining': 'category-food',
+                'Transport': 'category-transport',
+                'Shopping': 'category-shopping',
+                'Bills & Utilities': 'category-bills',
+                'Income': 'category-income',
+                'Banking & Fees': 'category-other'
+            };
+            return classMap[category] || 'category-other';
+        }
+
+        function displayCategoryBreakdown() {
+            const categoryTotals = {};
+            
+            processedTransactions.forEach(transaction => {
+                if (transaction.amount < 0) { // Only expenses
+                    const category = transaction.category;
+                    categoryTotals[category] = (categoryTotals[category] || 0) + Math.abs(transaction.amount);
                 }
             });
-        });
+
+            const categoryChart = document.getElementById('categoryChart');
+            categoryChart.innerHTML = '';
+
+            const sortedCategories = Object.entries(categoryTotals)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 8); // Top 8 categories
+
+            if (sortedCategories.length === 0) {
+                categoryChart.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.6);">No expense data to display</p>';
+                return;
+            }
+
+            const totalExpenses = Object.values(categoryTotals).reduce((a, b) => a + b, 0);
+
+            sortedCategories.forEach(([category, amount]) => {
+                const percentage = (amount / totalExpenses) * 100;
+                
+                const categoryItem = document.createElement('div');
+                categoryItem.style.cssText = `
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 0.75rem 0;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                `;
+                
+                categoryItem.innerHTML = `
+                    <div>
+                        <span class="category-tag ${getCategoryClass(category)}">${category}</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-weight: 600;">$${amount.toLocaleString('en-NZ', { minimumFractionDigits: 2 })}</div>
+                        <div style="font-size: 0.8rem; color: rgba(255, 255, 255, 0.6);">${percentage.toFixed(1)}%</div>
+                    </div>
+                `;
+                
+                categoryChart.appendChild(categoryItem);
+            });
+        }
+
+        function displayFinancialInsights() {
+            const insightsDiv = document.getElementById('insightsChart');
+            insightsDiv.innerHTML = '';
+
+            const income = processedTransactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
+            const expenses = Math.abs(processedTransactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0));
+            const netAmount = income - expenses;
+
+            const insights = [
+                {
+                    title: 'Monthly Cash Flow',
+                    value: `${netAmount >= 0 ? '+' : ''}$${netAmount.toLocaleString('en-NZ', {minimumFractionDigits: 2})}`,
+                    status: netAmount >= 0 ? 'positive' : 'negative',
+                    description: netAmount >= 0 ? 'Surplus' : 'Deficit'
+                },
+                {
+                    title: 'Savings Rate',
+                    value: `${income > 0 ? ((netAmount / income) * 100).toFixed(1) : '0'}%`,
+                    status: (income > 0 && (netAmount / income) >= 0.1) ? 'positive' : 'negative',
+                    description: 'of income'
+                },
+                {
+                    title: 'Avg Transaction',
+                    value: `$${expenses > 0 ? (expenses / processedTransactions.filter(t => t.amount < 0).length).toFixed(2) : '0'}`,
+                    status: 'neutral',
+                    description: 'expense size'
+                }
+            ];
+
+            insights.forEach(insight => {
+                const insightItem = document.createElement('div');
+                insightItem.style.cssText = `
+                    padding: 1rem;
+                    border-radius: 12px;
+                    margin-bottom: 1rem;
+                    background: rgba(255, 255, 255, 0.05);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                `;
+
+                const statusColor = insight.status === 'positive' ? '#10b981' : 
+                                  insight.status === 'negative' ? '#ef4444' : '#6b7280';
+
+                insightItem.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4 style="margin-bottom: 0.25rem; font-size: 0.9rem; color: rgba(255,255,255,0.8);">${insight.title}</h4>
+                            <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6);">${insight.description}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: ${statusColor};">${insight.value}</div>
+                        </div>
+                    </div>
+                `;
+
+                insightsDiv.appendChild(insightItem);
+            });
+        }
+
+        function filterTransactions() {
+            // Filter functionality for transactions table
+            const tbody = document.getElementById('transactionsBody');
+            const rows = tbody.querySelectorAll('tr');
+
+            rows.forEach(row => {
+                const categoryCell = row.cells[2];
+                const amountCell = row.cells[3];
+                
+                if (!categoryCell || !amountCell) return;
+
+                const category = categoryCell.textContent.toLowerCase();
+                const isIncome = amountCell.classList.contains('amount-positive');
+                const isExpense = amountCell.classList.contains('amount-negative');
+
+                let show = false;
+
+                switch (currentFilter) {
+                    case 'all': show = true; break;
+                    case 'income': show = isIncome; break;
+                    case 'expenses': show = isExpense; break;
+                    case 'food': show = category.includes('food'); break;
+                    case 'transport': show = category.includes('transport'); break;
+                    case 'bills': show = category.includes('bills'); break;
+                    default: show = true;
+                }
+
+                row.style.display = show ? '' : 'none';
+            });
+        }
+
+        // Action functions
+        function generateBudget() {
+            alert('🚀 Budget generation feature coming soon! This will analyze your spending patterns and create a personalized budget to fix your -$3,607 deficit.');
+        }
+
+        function setGoals() {
+            alert('🎯 Goals feature coming soon! Set savings targets like building your emergency fund from $0.17 to $3,000+');
+        }
+
+        function exportData() {
+            // Create enhanced CSV export
+            const csvContent = "data:text/csv;charset=utf-8," 
+                + "Date,Description,Category,Amount,Type\n"
+                + processedTransactions.map(t => 
+                    `"${t.displayDate}","${t.description}","${t.category}","${t.amount}","${t.amount >= 0 ? 'Income' : 'Expense'}"`
+                ).join("\n");
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `financeos_analysis_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // Show success message
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.textContent = '✅ Financial analysis exported successfully!';
+            document.querySelector('.container').insertBefore(successDiv, document.getElementById('results'));
+            
+            setTimeout(() => successDiv.remove(), 3000);
+        }
+
+        // UPDATED: Proper navigation back to dashboard
+        function backToDashboard() {
+            window.location.href = 'index.html';
+        }
     </script>
 </body>
 </html>
