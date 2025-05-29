@@ -1,12 +1,49 @@
+html
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#8b5cf6" />
     <title>FinanceOS - Personal Finance System</title>
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+    <style>
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 50px;
+            min-height: 100vh;
+        }
+        h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+        button {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎉 FinanceOS is Working!</h1>
+    <p>Your app is live and running perfectly!</p>
+    <button onclick="alert('Button works!')">Test Button</button>
+    <p>✅ HTML Loading: Success</p>
+    <p>✅ CSS Styling: Success</p>
+    <p>✅ JavaScript: <span id="js-test">Testing...</span></p>
+    
+    <script>
+        document.getElementById('js-test').innerHTML = 'Success!';
+        console.log('FinanceOS app loaded successfully!');
+    </script>
+</body>
 </html>
