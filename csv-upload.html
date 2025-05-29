@@ -1,1 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanceOS - Personal Finance Operating System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .glass-premium {
+            background: linear-gradient(135deg, 
+                rgba(139, 92, 246, 0.15) 0%, 
+                rgba(59, 130, 246, 0.15) 50%, 
+                rgba(147, 51, 234, 0.15) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .gradient-purple { background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%); }
+        .gradient-green { background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%); }
+        .gradient-blue { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%); }
+        .gradient-orange { background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%); }
+
+        .container {
+            padding: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .login-section, .dashboard-section {
+            display: none;
+        }
+
+        .login-section.active, .dashboard-section.active {
+            display: block;
+        }
+
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 2rem;
+            border-radius: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: rgba(139, 92, 246, 0.6);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .forgot-password a {
+            color: rgba(139, 92, 246, 0.8);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .welcome-message {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 20px;
+        }
+
+        .welcome-message h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #10b981;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature-card {
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: white;
+            display: block;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-card p {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.5;
+            font-size: 0.9rem;
+        }
+
+        .logout-section {
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .logout-btn {
+            padding: 0.75rem 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: transparent;
+            color: white;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0.75rem;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .feature-card {
+                padding: 1.5rem;
+            }
+        }
+
+        /* NEW: Highlight the CSV Upload card */
+        .feature-card.csv-upload {
+            border: 2px solid rgba(139, 92, 246, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card.csv-upload::before {
+            content: "NEW!";
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(139, 92, 246, 0.8);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .feature-card.csv-upload:hover {
+            border-color: rgba(139, 92, 246, 0.8);
+            box-shadow: 0 12px 48px rgba(139, 92, 246, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Section -->
+        <div id="loginSection" class="login-section active">
+            <div class="header">
+                <div class="logo gradient-green">$</div>
+                <h1>FinanceOS</h1>
+                <p>Your Personal Finance Operating System</p>
+            </div>
+
+            <div class="login-form glass-premium">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Enter your username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                </div>
+                <button class="login-btn gradient-purple" onclick="handleLogin()">
+                    Enter Demo
+                </button>
+                <div class="forgot-password">
+                    <a href="#" onclick="showForgotPassword()">Forgot Password?</a>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem; color: rgba(255, 255, 255, 0.6); font-size: 0.9rem;">
+                Add FinanceOS to your home screen for the best experience
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboardSection" class="dashboard-section">
+            <div class="header">
+                <div class="logo gradient-green">$</div>
+                <h1>FinanceOS</h1>
+                <p>Your Personal Finance Operating System</p>
+            </div>
+
+            <div class="welcome-message glass-premium">
+                <h2>🎉 Welcome back!</h2>
+                <p>Your financial data is ready. Choose a feature to get started.</p>
+            </div>
+
+            <div class="features-grid">
+                <a href="#" class="feature-card glass-premium" onclick="showDashboard()">
+                    <div class="feature-icon gradient-blue">📊</div>
+                    <h3>Dashboard</h3>
+                    <p>View your complete financial overview and insights</p>
+                </a>
+
+                <!-- UPDATED: CSV Upload card with NEW badge and proper link -->
+                <a href="csv-upload.html" class="feature-card glass-premium csv-upload">
+                    <div class="feature-icon gradient-purple">📄</div>
+                    <h3>Upload CSV</h3>
+                    <p>Import your bank statements and transaction data with intelligent categorization</p>
+                </a>
+
+                <a href="#" class="feature-card glass-premium" onclick="showGoals()">
+                    <div class="feature-icon gradient-green">🎯</div>
+                    <h3>Goals</h3>
+                    <p>Set and track your financial goals and milestones</p>
+                </a>
+
+                <a href="#" class="feature-card glass-premium" onclick="showAICoach()">
+                    <div class="feature-icon gradient-orange">🤖</div>
+                    <h3>AI Coach</h3>
+                    <p>Get personalized financial advice and insights</p>
+                </a>
+            </div>
+
+            <div class="logout-section">
+                <button class="logout-btn" onclick="handleLogout()">
+                    ← Logout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Handle login
+        function handleLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username && password) {
+                document.getElementById('loginSection').classList.remove('active');
+                document.getElementById('dashboardSection').classList.add('active');
+            } else {
+                alert('Please enter both username and password');
+            }
+        }
+
+        // Handle logout
+        function handleLogout() {
+            document.getElementById('dashboardSection').classList.remove('active');
+            document.getElementById('loginSection').classList.add('active');
+            
+            // Clear form
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        // Placeholder functions for other features
+        function showDashboard() {
+            alert('📊 Dashboard feature coming soon! This will show your complete financial overview.');
+        }
+
+        function showGoals() {
+            alert('🎯 Goals feature coming soon! Set and track your financial targets.');
+        }
+
+        function showAICoach() {
+            alert('🤖 AI Coach feature coming soon! Get personalized financial advice.');
+        }
+
+        function showForgotPassword() {
+            alert('🔐 Password recovery feature coming soon!');
+        }
+
+        // Handle enter key in login form
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('password').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    handleLogin();
+                }
+            });
+        });
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanceOS - Personal Finance Operating System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .glass-premium {
+            background: linear-gradient(135deg, 
+                rgba(139, 92, 246, 0.15) 0%, 
+                rgba(59, 130, 246, 0.15) 50%, 
+                rgba(147, 51, 234, 0.15) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .gradient-purple { background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%); }
+        .gradient-green { background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%); }
+        .gradient-blue { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%); }
+        .gradient-orange { background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%); }
+
+        .container {
+            padding: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .login-section, .dashboard-section {
+            display: none;
+        }
+
+        .login-section.active, .dashboard-section.active {
+            display: block;
+        }
+
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 2rem;
+            border-radius: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: rgba(139, 92, 246, 0.6);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .forgot-password a {
+            color: rgba(139, 92, 246, 0.8);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .welcome-message {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 20px;
+        }
+
+        .welcome-message h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #10b981;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature-card {
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: white;
+            display: block;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-card p {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.5;
+            font-size: 0.9rem;
+        }
+
+        .logout-section {
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .logout-btn {
+            padding: 0.75rem 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: transparent;
+            color: white;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0.75rem;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .feature-card {
+                padding: 1.5rem;
+            }
+        }
+
+        /* NEW: Highlight the CSV Upload card */
+        .feature-card.csv-upload {
+            border: 2px solid rgba(139, 92, 246, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card.csv-upload::before {
+            content: "NEW!";
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(139, 92, 246, 0.8);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .feature-card.csv-upload:hover {
+            border-color: rgba(139, 92, 246, 0.8);
+            box-shadow: 0 12px 48px rgba(139, 92, 246, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Section -->
+        <div id="loginSection" class="login-section active">
+            <div class="header">
+                <div class="logo gradient-green">$</div>
+                <h1>FinanceOS</h1>
+                <p>Your Personal Finance Operating System</p>
+            </div>
+
+            <div class="login-form glass-premium">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Enter your username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                </div>
+                <button class="login-btn gradient-purple" onclick="handleLogin()">
+                    Enter Demo
+                </button>
+                <div class="forgot-password">
+                    <a href="#" onclick="showForgotPassword()">Forgot Password?</a>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem; color: rgba(255, 255, 255, 0.6); font-size: 0.9rem;">
+                Add FinanceOS to your home screen for the best experience
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboardSection" class="dashboard-section">
+            <div class="header">
+                <div class="logo gradient-green">$</div>
+                <h1>FinanceOS</h1>
+                <p>Your Personal Finance Operating System</p>
+            </div>
+
+            <div class="welcome-message glass-premium">
+                <h2>🎉 Welcome back!</h2>
+                <p>Your financial data is ready. Choose a feature to get started.</p>
+            </div>
+
+            <div class="features-grid">
+                <a href="#" class="feature-card glass-premium" onclick="showDashboard()">
+                    <div class="feature-icon gradient-blue">📊</div>
+                    <h3>Dashboard</h3>
+                    <p>View your complete financial overview and insights</p>
+                </a>
+
+                <!-- UPDATED: CSV Upload card with NEW badge and proper link -->
+                <a href="csv-upload.html" class="feature-card glass-premium csv-upload">
+                    <div class="feature-icon gradient-purple">📄</div>
+                    <h3>Upload CSV</h3>
+                    <p>Import your bank statements and transaction data with intelligent categorization</p>
+                </a>
+
+                <a href="#" class="feature-card glass-premium" onclick="showGoals()">
+                    <div class="feature-icon gradient-green">🎯</div>
+                    <h3>Goals</h3>
+                    <p>Set and track your financial goals and milestones</p>
+                </a>
+
+                <a href="#" class="feature-card glass-premium" onclick="showAICoach()">
+                    <div class="feature-icon gradient-orange">🤖</div>
+                    <h3>AI Coach</h3>
+                    <p>Get personalized financial advice and insights</p>
+                </a>
+            </div>
+
+            <div class="logout-section">
+                <button class="logout-btn" onclick="handleLogout()">
+                    ← Logout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Handle login
+        function handleLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username && password) {
+                document.getElementById('loginSection').classList.remove('active');
+                document.getElementById('dashboardSection').classList.add('active');
+            } else {
+                alert('Please enter both username and password');
+            }
+        }
+
+        // Handle logout
+        function handleLogout() {
+            document.getElementById('dashboardSection').classList.remove('active');
+            document.getElementById('loginSection').classList.add('active');
+            
+            // Clear form
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        // Placeholder functions for other features
+        function showDashboard() {
+            alert('📊 Dashboard feature coming soon! This will show your complete financial overview.');
+        }
+
+        function showGoals() {
+            alert('🎯 Goals feature coming soon! Set and track your financial targets.');
+        }
+
+        function showAICoach() {
+            alert('🤖 AI Coach feature coming soon! Get personalized financial advice.');
+        }
+
+        function showForgotPassword() {
+            alert('🔐 Password recovery feature coming soon!');
+        }
+
+        // Handle enter key in login form
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('password').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    handleLogin();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
