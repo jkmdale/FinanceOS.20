@@ -5,44 +5,236 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>FinanceOS - Personal Finance System</title>
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            margin: 0;
-            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
-            color: white;
-            font-family: Arial, sans-serif;
-            padding: 50px;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
             min-height: 100vh;
-        }
-        h1 {
-            font-size: 48px;
-            margin-bottom: 20px;
-        }
-        p {
-            font-size: 24px;
-            margin-bottom: 30px;
-        }
-        button {
-            background: #10b981;
             color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            border-radius: 10px;
-            cursor: pointer;
+        }
+        .login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+        .bg-blur { position: absolute; border-radius: 50%; filter: blur(40px); }
+        .blur1 { top: 10%; left: 10%; width: 80px; height: 80px; background: rgba(139, 92, 246, 0.1); }
+        .blur2 { top: 20%; right: 15%; width: 120px; height: 120px; background: rgba(59, 130, 246, 0.1); }
+        .blur3 { bottom: 15%; left: 25%; width: 100px; height: 100px; background: rgba(16, 185, 129, 0.1); }
+        
+        .login-container { width: 100%; max-width: 400px; position: relative; z-index: 10; }
+        .logo-section { text-align: center; margin-bottom: 40px; }
+        .logo {
+            width: 120px; height: 120px; margin: 0 auto 20px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 50%, #10b981 100%);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        .logo span { font-size: 60px; color: white; font-weight: bold; }
+        .title { font-size: 36px; font-weight: bold; color: white; margin: 0 0 10px 0; }
+        .subtitle { color: rgba(255, 255, 255, 0.7); margin: 0; font-size: 16px; }
+        
+        .login-form {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px; padding: 40px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        .form-group { margin-bottom: 30px; }
+        .form-label {
+            display: block; font-size: 14px; font-weight: 500;
+            color: rgba(255, 255, 255, 0.9); margin-bottom: 8px;
+        }
+        .form-input {
+            width: 100%; background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px;
+            padding: 12px 16px; color: white; font-size: 16px; outline: none;
+        }
+        .form-input::placeholder { color: rgba(255, 255, 255, 0.5); }
+        .login-btn {
+            width: 100%; background: linear-gradient(135deg, #8b5cf6, #9333ea);
+            color: white; border: none; border-radius: 12px; padding: 16px;
+            font-size: 16px; font-weight: 600; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+            transition: all 0.3s ease; margin-bottom: 20px;
+        }
+        .login-btn:hover { transform: translateY(-2px); }
+        .forgot-btn {
+            background: none; border: none; color: #8b5cf6;
+            font-size: 14px; cursor: pointer; text-decoration: underline;
+        }
+        
+        .dashboard { display: none; }
+        .dashboard.active { display: block; }
+        .header {
+            background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15); padding: 20px;
+        }
+        .header-content {
+            display: flex; justify-content: space-between; align-items: center;
+            max-width: 1200px; margin: 0 auto;
+        }
+        .header-logo { display: flex; align-items: center; }
+        .header-icon {
+            width: 40px; height: 40px; background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            margin-right: 12px;
+        }
+        .header-title { color: white; font-size: 24px; font-weight: bold; margin: 0; }
+        .logout-btn {
+            background: rgba(239, 68, 68, 0.2); color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px;
+            padding: 8px 16px; font-size: 14px; cursor: pointer;
+        }
+        
+        .dashboard-content { padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
+        .dashboard-title {
+            color: white; font-size: 32px; font-weight: bold;
+            margin-bottom: 40px; text-align: center;
+        }
+        .cards-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        .card {
+            backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px; padding: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            cursor: pointer; transition: transform 0.3s ease;
+        }
+        .card:hover { transform: translateY(-5px); }
+        .card-icon {
+            width: 50px; height: 50px; border-radius: 12px; display: flex;
+            align-items: center; justify-content: center; margin-bottom: 16px;
+            font-size: 24px; color: white;
+        }
+        .card-title { color: white; font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+        .card-desc { color: rgba(255, 255, 255, 0.7); font-size: 14px; line-height: 1.5; }
+        
+        .card-1 { background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%); }
+        .card-1 .card-icon { background: linear-gradient(135deg, #8b5cf6, #9333ea); }
+        .card-2 { background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.15) 100%); }
+        .card-2 .card-icon { background: linear-gradient(135deg, #10b981, #059669); }
+        .card-3 { background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.15) 100%); }
+        .card-3 .card-icon { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .card-4 { background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.15) 100%); }
+        .card-4 .card-icon { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        
+        .success-msg {
+            background: rgba(16, 185, 129, 0.2); color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px;
+            padding: 16px; margin: 20px auto; max-width: 1200px; text-align: center;
+            display: none;
+        }
+        .success-msg.show { display: block; }
+        
+        @media (max-width: 768px) {
+            .login-container { max-width: 350px; }
+            .login-form { padding: 30px; }
+            .logo { width: 100px; height: 100px; }
+            .logo span { font-size: 50px; }
+            .title { font-size: 28px; }
+            .dashboard-content { padding: 20px; }
+            .dashboard-title { font-size: 24px; }
+            .cards-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <h1>🎉 FinanceOS is Working!</h1>
-    <p>Your app is live and running perfectly!</p>
-    <button onclick="alert('Button works!')">Test Button</button>
-    <p>✅ HTML Loading: Success</p>
-    <p>✅ CSS Styling: Success</p>
-    <p>✅ JavaScript: <span id="js-test">Testing...</span></p>
-    
+    <div id="loginScreen" class="login-screen">
+        <div class="bg-blur blur1"></div>
+        <div class="bg-blur blur2"></div>
+        <div class="bg-blur blur3"></div>
+        
+        <div class="login-container">
+            <div class="logo-section">
+                <div class="logo"><span>$</span></div>
+                <h1 class="title">FinanceOS</h1>
+                <p class="subtitle">Your Personal Finance Operating System</p>
+            </div>
+            
+            <div class="login-form">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-input" placeholder="Enter your username">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" placeholder="Enter your password">
+                </div>
+                <button class="login-btn" onclick="login()">Enter Demo</button>
+                <div style="text-align: center;">
+                    <button class="forgot-btn">Forgot Password?</button>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <p style="color: rgba(255, 255, 255, 0.5); font-size: 14px;">
+                    Add FinanceOS to your home screen for the best experience
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboard" class="dashboard">
+        <div class="header">
+            <div class="header-content">
+                <div class="header-logo">
+                    <div class="header-icon"><span style="color: white; font-size: 20px; font-weight: bold;">$</span></div>
+                    <h1 class="header-title">FinanceOS</h1>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+        
+        <div class="success-msg" id="successMsg">
+            🎉 Welcome to FinanceOS! You're successfully logged in.
+        </div>
+        
+        <div class="dashboard-content">
+            <h2 class="dashboard-title">Financial Dashboard</h2>
+            <div class="cards-grid">
+                <div class="card card-1">
+                    <div class="card-icon">📊</div>
+                    <h3 class="card-title">Dashboard</h3>
+                    <p class="card-desc">View your complete financial overview and insights</p>
+                </div>
+                <div class="card card-2">
+                    <div class="card-icon">📤</div>
+                    <h3 class="card-title">Upload CSV</h3>
+                    <p class="card-desc">Import your bank statements and transaction data</p>
+                </div>
+                <div class="card card-3">
+                    <div class="card-icon">🎯</div>
+                    <h3 class="card-title">Goals</h3>
+                    <p class="card-desc">Set and track your financial goals and milestones</p>
+                </div>
+                <div class="card card-4">
+                    <div class="card-icon">🤖</div>
+                    <h3 class="card-title">AI Coach</h3>
+                    <p class="card-desc">Get personalized financial advice and insights</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        document.getElementById('js-test').innerHTML = 'Success!';
-        console.log('FinanceOS app loaded successfully!');
+        function login() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboard').classList.add('active');
+            document.getElementById('successMsg').classList.add('show');
+            setTimeout(() => {
+                document.getElementById('successMsg').classList.remove('show');
+            }, 3000);
+        }
+        
+        function logout() {
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('dashboard').classList.remove('active');
+            document.getElementById('successMsg').classList.remove('show');
+        }
     </script>
 </body>
 </html>
