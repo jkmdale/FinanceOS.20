@@ -174,6 +174,84 @@
             box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
         }
 
+        /* Enhanced file display styles */
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .file-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .file-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 500;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .file-details {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 0.25rem;
+        }
+
+        .file-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .status-ready {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+        }
+
+        .status-processing {
+            background: rgba(139, 92, 246, 0.2);
+            color: #a855f7;
+        }
+
+        .status-completed {
+            background: rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        .remove-file {
+            background: rgba(239, 68, 68, 0.2);
+            border: none;
+            color: #f87171;
+            padding: 0.25rem 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .remove-file:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
         /* Processing indicator */
         .processing {
             display: none;
@@ -356,6 +434,12 @@
             .filter-buttons {
                 justify-content: center;
             }
+
+            .file-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.5rem;
+            }
         }
 
         /* Action buttons */
@@ -453,138 +537,56 @@
             </ul>
         </div>
 
+        <!-- Enhanced Upload Zone with Multi-File Support -->
         <div class="upload-zone glass-premium" id="uploadZone">
-    <div class="upload-icon gradient-purple">📄</div>
-    <div class="upload-text">
-        <h3>Upload Your Bank Statements</h3>
-        <p>Select multiple CSV files at once for complete analysis</p>
-        <button class="upload-btn gradient-purple" onclick="document.getElementById('fileInput').click()">
-            📁 Choose Multiple Files
-        </button>
-        <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 0.5rem;">
-            💡 Hold Ctrl/Cmd to select multiple files
-        </p>
-    </div>
-    <div class="supported-banks">
-        <span class="bank-tag">ANZ</span>
-        <span class="bank-tag">ASB</span>
-        <span class="bank-tag">BNZ</span>
-        <span class="bank-tag">Kiwibank</span>
-        <span class="bank-tag">Westpac</span>
-    </div>
-</div>
+            <div class="upload-icon gradient-purple">📄</div>
+            <div class="upload-text">
+                <h3>Upload Your Bank Statements</h3>
+                <p>Select multiple CSV files at once for complete analysis</p>
+                <button class="upload-btn gradient-purple" onclick="document.getElementById('fileInput').click()">
+                    📁 Choose Multiple Files
+                </button>
+                <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 0.5rem;">
+                    💡 Hold Ctrl/Cmd to select multiple files, or drag and drop here
+                </p>
+            </div>
+            <div class="supported-banks">
+                <span class="bank-tag">ANZ</span>
+                <span class="bank-tag">ASB</span>
+                <span class="bank-tag">BNZ</span>
+                <span class="bank-tag">Kiwibank</span>
+                <span class="bank-tag">Westpac</span>
+            </div>
+        </div>
 
-<!-- Selected Files Display -->
-<div class="selected-files glass" id="selectedFiles" style="display: none; margin-bottom: 2rem; padding: 1.5rem; border-radius: 16px;">
-    <h3 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-        📋 Selected Files 
-        <span id="fileCount" style="background: rgba(139, 92, 246, 0.3); padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem;"></span>
-    </h3>
-    <div id="fileList" style="max-height: 200px; overflow-y: auto;"></div>
-    <div style="margin-top: 1rem; display: flex; gap: 1rem; flex-wrap: wrap;">
-        <button class="upload-btn gradient-green" onclick="processSelectedFiles()" id="processBtn">
-            🚀 Process All Files
-        </button>
-        <button class="upload-btn" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3);" onclick="clearSelectedFiles()">
-            🗑️ Clear All
-        </button>
-        <button class="upload-btn" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3);" onclick="document.getElementById('fileInput').click()">
-            ➕ Add More Files
-        </button>
-    </div>
-</div>
+        <!-- Selected Files Display -->
+        <div class="selected-files glass" id="selectedFiles" style="display: none; margin-bottom: 2rem; padding: 1.5rem; border-radius: 16px;">
+            <h3 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                📋 Selected Files 
+                <span id="fileCount" style="background: rgba(139, 92, 246, 0.3); padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem;"></span>
+            </h3>
+            <div id="fileList" style="max-height: 200px; overflow-y: auto;"></div>
+            <div style="margin-top: 1rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button class="upload-btn gradient-green" onclick="processSelectedFiles()" id="processBtn">
+                    🚀 Process All Files
+                </button>
+                <button class="upload-btn" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3);" onclick="clearSelectedFiles()">
+                    🗑️ Clear All
+                </button>
+                <button class="upload-btn" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3);" onclick="document.getElementById('fileInput').click()">
+                    ➕ Add More Files
+                </button>
+            </div>
+        </div>
 
-<input type="file" id="fileInput" accept="*/*" multiple>
+        <input type="file" id="fileInput" accept="*/*" multiple>
 
-<!-- STEP 2: Add these CSS styles in your <style> section -->
-<style>
-/* Enhanced file display styles */
-.file-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem;
-    margin-bottom: 0.5rem;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.file-item:last-child {
-    margin-bottom: 0;
-}
-
-.file-info {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-}
-
-.file-name {
-    font-weight: 500;
-    color: white;
-    font-size: 0.9rem;
-}
-
-.file-details {
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.6);
-    margin-top: 0.25rem;
-}
-
-.file-status {
-    padding: 0.25rem 0.75rem;
-    border-radius: 15px;
-    font-size: 0.7rem;
-    font-weight: 500;
-    white-space: nowrap;
-}
-
-.status-ready {
-    background: rgba(16, 185, 129, 0.2);
-    color: #34d399;
-}
-
-.status-processing {
-    background: rgba(139, 92, 246, 0.2);
-    color: #a855f7;
-}
-
-.status-completed {
-    background: rgba(16, 185, 129, 0.3);
-    color: #10b981;
-}
-
-.status-error {
-    background: rgba(239, 68, 68, 0.2);
-    color: #f87171;
-}
-
-.remove-file {
-    background: rgba(239, 68, 68, 0.2);
-    border: none;
-    color: #f87171;
-    padding: 0.25rem 0.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.8rem;
-    margin-left: 0.5rem;
-    transition: all 0.3s ease;
-}
-
-.remove-file:hover {
-    background: rgba(239, 68, 68, 0.3);
-}
-
-/* Mobile responsive enhancements */
-@media (max-width: 768px) {
-    .file-item {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.5rem;
-    }
-}
-</style>
+        <!-- Processing Indicator -->
+        <div class="processing glass" id="processing">
+            <div class="spinner"></div>
+            <h3>Processing Your Data...</h3>
+            <p>Analyzing transactions and categorizing spending</p>
+        </div>
 
         <!-- Results Section -->
         <div class="results" id="results">
@@ -678,6 +680,8 @@
         // Global variables
         let processedTransactions = [];
         let currentFilter = 'all';
+        let selectedFiles = [];
+        let processedFileCount = 0;
 
         // Bank format detection patterns
         const bankFormats = {
@@ -738,18 +742,157 @@
         // Financial health analysis criteria
         const financialHealthChecks = {
             emergencyFund: {
-                threshold: 3000, // 3 months of basic expenses for NZ
+                threshold: 3000,
                 message: "Emergency fund below $3,000 - you're at high financial risk"
             },
             savingsRate: {
-                threshold: 0.1, // 10% savings rate
+                threshold: 0.1,
                 message: "Savings rate below 10% - consider increasing your emergency fund contributions"
             },
             debtToIncome: {
-                threshold: 0.3, // 30% debt to income ratio
+                threshold: 0.3,
                 message: "Debt payments exceed 30% of income - focus on debt reduction"
             }
         };
+
+        // Enhanced file handling
+        function handleFiles(files) {
+            if (files.length === 0) return;
+            
+            // Add new files to existing selection
+            Array.from(files).forEach(file => {
+                // Check if file already selected
+                const exists = selectedFiles.find(f => f.name === file.name && f.size === file.size);
+                if (!exists) {
+                    selectedFiles.push({
+                        file: file,
+                        id: Date.now() + Math.random(),
+                        status: 'ready',
+                        size: formatFileSize(file.size),
+                        type: detectFileType(file.name)
+                    });
+                }
+            });
+            
+            displaySelectedFiles();
+            
+            // Clear the input to allow re-selecting same files
+            document.getElementById('fileInput').value = '';
+        }
+
+        function detectFileType(filename) {
+            const ext = filename.toLowerCase().split('.').pop();
+            const types = {
+                'csv': 'CSV',
+                'xls': 'Excel',
+                'xlsx': 'Excel',
+                'txt': 'Text'
+            };
+            return types[ext] || 'Unknown';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        function displaySelectedFiles() {
+            const filesContainer = document.getElementById('selectedFiles');
+            const fileList = document.getElementById('fileList');
+            const fileCount = document.getElementById('fileCount');
+            
+            if (selectedFiles.length === 0) {
+                filesContainer.style.display = 'none';
+                return;
+            }
+            
+            filesContainer.style.display = 'block';
+            fileCount.textContent = `${selectedFiles.length} file${selectedFiles.length !== 1 ? 's' : ''}`;
+            
+            fileList.innerHTML = selectedFiles.map(fileData => `
+                <div class="file-item">
+                    <div class="file-info">
+                        <div class="file-name">${fileData.file.name}</div>
+                        <div class="file-details">${fileData.type} • ${fileData.size}</div>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <span class="file-status status-${fileData.status}">
+                            ${fileData.status === 'ready' ? '📋 Ready' : 
+                              fileData.status === 'processing' ? '⏳ Processing' :
+                              fileData.status === 'completed' ? '✅ Done' : '❌ Error'}
+                        </span>
+                        <button class="remove-file" onclick="removeFile('${fileData.id}')">✕</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function removeFile(fileId) {
+            selectedFiles = selectedFiles.filter(f => f.id !== fileId);
+            displaySelectedFiles();
+        }
+
+        function clearSelectedFiles() {
+            selectedFiles = [];
+            displaySelectedFiles();
+        }
+
+        async function processSelectedFiles() {
+            if (selectedFiles.length === 0) return;
+            
+            // Show processing indicator
+            document.getElementById('processing').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            
+            processedFileCount = 0;
+            processedTransactions = [];
+            
+            for (let i = 0; i < selectedFiles.length; i++) {
+                const fileData = selectedFiles[i];
+                
+                // Update file status
+                fileData.status = 'processing';
+                displaySelectedFiles();
+                
+                try {
+                    const transactions = await processFile(fileData.file);
+                    processedTransactions = processedTransactions.concat(transactions);
+                    
+                    fileData.status = 'completed';
+                    processedFileCount++;
+                    
+                } catch (error) {
+                    console.error('Error processing file:', fileData.file.name, error);
+                    fileData.status = 'error';
+                }
+                
+                displaySelectedFiles();
+                
+                // Small delay for visual feedback
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+            
+            // Show results
+            setTimeout(() => {
+                displayResults();
+                analyzeFinancialHealth();
+                
+                document.getElementById('processing').style.display = 'none';
+                document.getElementById('results').style.display = 'block';
+                
+                // Show success message
+                const successMsg = document.createElement('div');
+                successMsg.className = 'success-message';
+                successMsg.innerHTML = `🎉 Successfully processed ${processedFileCount} files with ${processedTransactions.length} total transactions!`;
+                document.querySelector('.container').insertBefore(successMsg, document.getElementById('results'));
+                
+                setTimeout(() => successMsg.remove(), 5000);
+                
+            }, 1000);
+        }
 
         // Initialize drag and drop functionality
         document.addEventListener('DOMContentLoaded', function() {
@@ -807,38 +950,6 @@
             const dt = e.dataTransfer;
             const files = dt.files;
             handleFiles(files);
-        }
-
-        function handleFiles(files) {
-            if (files.length === 0) return;
-
-            // Show processing indicator
-            document.getElementById('processing').style.display = 'block';
-            document.getElementById('results').style.display = 'none';
-
-            // Process files
-            const filePromises = Array.from(files).map(file => processFile(file));
-            
-            Promise.all(filePromises).then(results => {
-                // Combine all transactions from all files
-                processedTransactions = results.flat();
-                
-                // Show results
-                displayResults();
-                
-                // Analyze financial health
-                analyzeFinancialHealth();
-                
-                // Hide processing indicator
-                setTimeout(() => {
-                    document.getElementById('processing').style.display = 'none';
-                    document.getElementById('results').style.display = 'block';
-                }, 1500);
-            }).catch(error => {
-                console.error('Error processing files:', error);
-                alert('Error processing files. Please check the format and try again.');
-                document.getElementById('processing').style.display = 'none';
-            });
         }
 
         function processFile(file) {
@@ -1270,7 +1381,7 @@
 
         // Action functions
         function generateBudget() {
-            alert('🚀 Budget generation feature coming soon! This will analyze your spending patterns and create a personalized budget to fix your -$3,607 deficit.');
+            alert('🚀 Budget generation feature coming soon! This will analyze your spending patterns and create a personalized budget to fix your deficit.');
         }
 
         function setGoals() {
@@ -1302,7 +1413,7 @@
             setTimeout(() => successDiv.remove(), 3000);
         }
 
-        // UPDATED: Proper navigation back to dashboard
+        // Navigation back to dashboard
         function backToDashboard() {
             window.location.href = 'index.html';
         }
