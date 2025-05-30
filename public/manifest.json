@@ -1,0 +1,102 @@
+{
+  "name": "FinanceOS - Personal Finance Operating System",
+  "short_name": "FinanceOS",
+  "description": "Complete personal finance management with AI-powered budget analysis and goal tracking",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#8b5cf6",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["finance", "productivity", "lifestyle", "business"],
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Financial Goals",
+      "short_name": "Goals",
+      "description": "Track your financial recovery progress",
+      "url": "/goals.html",
+      "icons": [{ "src": "/icons/shortcut-goals.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Upload Statements",
+      "short_name": "Upload CSV",
+      "description": "Import and analyze bank statements",
+      "url": "/csv-upload.html",
+      "icons": [{ "src": "/icons/shortcut-upload.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Add to Emergency Fund",
+      "short_name": "Emergency Fund",
+      "description": "Quickly add money to emergency savings",
+      "url": "/goals.html#emergency-fund",
+      "icons": [{ "src": "/icons/shortcut-emergency.png", "sizes": "96x96" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/dashboard.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/screenshots/goals.png", 
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
