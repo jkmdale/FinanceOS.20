@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FinanceOS PWA Test</title>
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#8b5cf6">
     <style>
         body {
@@ -62,7 +62,7 @@
             📱 Install FinanceOS
         </button>
 
-        <button class="install-btn" onclick="window.location.href='/'">
+        <button class="install-btn" onclick="window.location.href='./'">
             ← Back to Main App
         </button>
 
@@ -123,15 +123,23 @@
             return { isHTTPS, hasSW, isInstalled, manifestLink, isChrome, isEdge, isSafari };
         }
 
-        // Register service worker
+        // Register service worker - FIXED PATH
         async function registerSW() {
             if ('serviceWorker' in navigator) {
                 try {
-                    const registration = await navigator.serviceWorker.register('/sw.js');
-                    log(`✅ Service Worker registered: ${registration.scope}`);
+                    log(`🔧 Attempting to register service worker at: ${window.location.origin}${window.location.pathname}sw.js`);
+                    
+                    // FIXED: Use relative path instead of absolute path
+                    const registration = await navigator.serviceWorker.register('./sw.js');
+                    
+                    log(`✅ Service Worker registered successfully!`);
+                    log(`📍 SW scope: ${registration.scope}`);
+                    log(`📍 SW script URL: ${registration.installing?.scriptURL || registration.waiting?.scriptURL || registration.active?.scriptURL}`);
+                    
                     return true;
                 } catch (error) {
                     log(`❌ Service Worker registration failed: ${error.message}`);
+                    log(`🔍 Error details: ${error.toString()}`);
                     return false;
                 }
             }
