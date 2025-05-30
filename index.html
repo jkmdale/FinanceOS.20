@@ -5,19 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>FinanceOS - Personal Finance Operating System</title>
     
-    <!-- PWA Meta Tags -->
-    <link rel="manifest" href="manifest.json">
+    <!-- Basic PWA Meta Tags (no external file dependencies) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="FinanceOS">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#8b5cf6">
-    
-    <!-- App Icons -->
-    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
-    <link rel="shortcut icon" href="icons/favicon.ico">
     
     <!-- App Description -->
     <meta name="description" content="Complete personal finance management with AI coaching, budget tracking, and goal management.">
@@ -251,36 +244,6 @@
                 opacity: 1;
             }
         }
-
-        /* PWA Install Button */
-        .install-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 16px 24px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 8px 32px rgba(16, 185, 129, 0.4);
-            z-index: 999;
-            transition: all 0.3s ease;
-            display: none;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .install-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 40px rgba(16, 185, 129, 0.5);
-        }
-
-        .install-btn.show {
-            display: flex;
-        }
         
         @media (max-width: 768px) {
             .login-container { max-width: 350px; }
@@ -304,13 +267,6 @@
                 left: 16px;
                 padding: 8px 12px;
                 font-size: 12px;
-            }
-
-            .install-btn {
-                bottom: 80px;
-                right: 16px;
-                padding: 12px 20px;
-                font-size: 13px;
             }
         }
     </style>
@@ -393,14 +349,6 @@
         </div>
     </div>
 
-    <!-- PWA Install Button -->
-    <button id="installButton" class="install-btn">
-        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-        </svg>
-        Install App
-    </button>
-
     <!-- Privacy Toggle Button -->
     <button id="privacyToggle" class="privacy-toggle">
         <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
@@ -440,7 +388,6 @@
             }
 
             init() {
-                // Wait for DOM to be ready
                 if (document.readyState === 'loading') {
                     document.addEventListener('DOMContentLoaded', () => this.setup());
                 } else {
@@ -459,7 +406,6 @@
                     this.markFinancialElements();
                     this.updatePrivacyState();
                     
-                    // Watch for dynamic content changes (but throttled to avoid conflicts)
                     let timeout;
                     const observer = new MutationObserver(() => {
                         clearTimeout(timeout);
@@ -479,7 +425,6 @@
             }
 
             markFinancialElements() {
-                // Only process text nodes to avoid conflicts
                 const walker = document.createTreeWalker(
                     document.body,
                     NodeFilter.SHOW_TEXT,
@@ -490,7 +435,6 @@
                 const textNodes = [];
                 let node;
                 while (node = walker.nextNode()) {
-                    // Skip script and style elements
                     if (node.parentElement.tagName === 'SCRIPT' || 
                         node.parentElement.tagName === 'STYLE') {
                         continue;
@@ -519,12 +463,12 @@
 
             isFinancialText(text) {
                 const financialPatterns = [
-                    /\$[\d,]+\.?\d*/,      // $1,234.56
-                    /-\$[\d,]+\.?\d*/,     // -$1,234.56
-                    /\+\$[\d,]+\.?\d*/,    // +$1,234.56
-                    /[\d,]+\.\d{1,2}%/,    // 6.4%
-                    /NZD\s*[\d,]+/i,       // NZD 1,234
-                    /[\d,]+\s*NZD/i        // 1,234 NZD
+                    /\$[\d,]+\.?\d*/,
+                    /-\$[\d,]+\.?\d*/,
+                    /\+\$[\d,]+\.?\d*/,
+                    /[\d,]+\.\d{1,2}%/,
+                    /NZD\s*[\d,]+/i,
+                    /[\d,]+\s*NZD/i
                 ];
 
                 return financialPatterns.some(pattern => pattern.test(text));
@@ -537,7 +481,6 @@
                 this.updatePrivacyState();
                 this.saveState();
                 
-                // Haptic feedback if available
                 if (navigator.vibrate) {
                     navigator.vibrate(50);
                 }
@@ -574,202 +517,15 @@
             }
         }
 
-        // ===== PWA FUNCTIONALITY =====
-        class FinanceOSPWA {
-            constructor() {
-                this.deferredPrompt = null;
-                this.installButton = document.getElementById('installButton');
-                this.init();
-            }
-
-            init() {
-                // Register service worker
-                this.registerServiceWorker();
-                
-                // Setup install prompt
-                this.setupInstallPrompt();
-                
-                // Check if already installed
-                this.checkInstallStatus();
-            }
-
-            async registerServiceWorker() {
-                if ('serviceWorker' in navigator) {
-                    try {
-                        const registration = await navigator.serviceWorker.register('sw.js', {
-                            scope: './'
-                        });
-                        console.log('✅ Service Worker registered:', registration.scope);
-                        
-                        // Check for updates
-                        registration.addEventListener('updatefound', () => {
-                            console.log('🔄 Service Worker update found');
-                        });
-                        
-                    } catch (error) {
-                        console.error('❌ Service Worker registration failed:', error);
-                        console.log('Creating basic service worker...');
-                        this.createBasicServiceWorker();
-                    }
-                }
-            }
-
-            createBasicServiceWorker() {
-                // Create a minimal service worker if none exists
-                const swContent = `
-                    const CACHE_NAME = 'financeos-v1';
-                    const urlsToCache = [
-                        './',
-                        './index.html',
-                        './manifest.json'
-                    ];
-
-                    self.addEventListener('install', (event) => {
-                        event.waitUntil(
-                            caches.open(CACHE_NAME)
-                                .then((cache) => cache.addAll(urlsToCache))
-                        );
-                    });
-
-                    self.addEventListener('fetch', (event) => {
-                        event.respondWith(
-                            caches.match(event.request)
-                                .then((response) => response || fetch(event.request))
-                        );
-                    });
-                `;
-                
-                console.log('ℹ️ Service worker content ready for manual creation');
-            }
-
-            setupInstallPrompt() {
-                window.addEventListener('beforeinstallprompt', (e) => {
-                    console.log('🎯 Install prompt available');
-                    e.preventDefault();
-                    this.deferredPrompt = e;
-                    this.showInstallButton();
-                });
-
-                // Handle install button click
-                this.installButton.addEventListener('click', () => {
-                    this.installApp();
-                });
-
-                // Listen for successful installation
-                window.addEventListener('appinstalled', () => {
-                    console.log('🎉 App installed successfully');
-                    this.hideInstallButton();
-                    this.deferredPrompt = null;
-                });
-            }
-
-            checkInstallStatus() {
-                // Check if already installed
-                const isInstalled = window.matchMedia('(display-mode: standalone)').matches || 
-                                  window.navigator.standalone === true;
-                
-                if (isInstalled) {
-                    console.log('📱 App already installed');
-                    this.hideInstallButton();
-                } else {
-                    // Show install button after a delay if criteria might be met
-                    setTimeout(() => {
-                        if (!this.deferredPrompt && this.canInstall()) {
-                            this.showInstallButton();
-                        }
-                    }, 3000);
-                }
-            }
-
-            canInstall() {
-                // Check basic PWA criteria
-                const hasManifest = document.querySelector('link[rel="manifest"]');
-                const isHTTPS = location.protocol === 'https:' || location.hostname === 'localhost';
-                const hasServiceWorker = 'serviceWorker' in navigator;
-                
-                console.log('PWA Install Check:', {
-                    hasManifest: !!hasManifest,
-                    isHTTPS,
-                    hasServiceWorker
-                });
-                
-                return hasManifest && isHTTPS && hasServiceWorker;
-            }
-
-            async installApp() {
-                if (!this.deferredPrompt) {
-                    console.log('❌ No install prompt available');
-                    this.showManualInstallInstructions();
-                    return;
-                }
-
-                try {
-                    this.deferredPrompt.prompt();
-                    const { outcome } = await this.deferredPrompt.userChoice;
-                    
-                    console.log('Install outcome:', outcome);
-                    
-                    if (outcome === 'accepted') {
-                        console.log('✅ User accepted install');
-                        this.hideInstallButton();
-                    } else {
-                        console.log('❌ User dismissed install');
-                    }
-                    
-                    this.deferredPrompt = null;
-                    
-                } catch (error) {
-                    console.error('Install failed:', error);
-                    this.showManualInstallInstructions();
-                }
-            }
-
-            showInstallButton() {
-                this.installButton.classList.add('show');
-                console.log('📱 Install button shown');
-            }
-
-            hideInstallButton() {
-                this.installButton.classList.remove('show');
-            }
-
-            showManualInstallInstructions() {
-                const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-                const isChrome = /chrome/i.test(navigator.userAgent);
-                
-                let instructions = '';
-                if (isSafari) {
-                    instructions = 'Tap the Share button and select "Add to Home Screen"';
-                } else if (isChrome) {
-                    instructions = 'Tap the menu (⋮) and select "Install app" or "Add to Home screen"';
-                } else {
-                    instructions = 'Use your browser menu to install this app';
-                }
-                
-                alert(`To install FinanceOS:\n\n${instructions}`);
-            }
-        }
-
         // ===== INITIALIZATION =====
         document.addEventListener('DOMContentLoaded', () => {
             console.log('🚀 FinanceOS initializing...');
-            
-            // Initialize Privacy Mode
             window.financeOSPrivacy = new FinanceOSPrivacy();
-            
-            // Initialize PWA
-            window.financeOSPWA = new FinanceOSPWA();
-            
             console.log('✅ FinanceOS ready');
         });
 
-        // ===== DEBUG INFO =====
         console.log('🔍 FinanceOS Debug Info:');
         console.log('📍 Location:', window.location.href);
-        console.log('🔒 HTTPS:', location.protocol === 'https:');
-        console.log('📱 User Agent:', navigator.userAgent);
-        console.log('💾 SW Support:', 'serviceWorker' in navigator);
-        console.log('📋 Manifest:', document.querySelector('link[rel="manifest"]')?.href);
     </script>
 </body>
 </html>
