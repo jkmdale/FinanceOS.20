@@ -12,70 +12,16 @@
   "categories": ["finance", "productivity", "lifestyle", "business", "utilities"],
   "icons": [
     {
-      "src": "/icons/icon-72x72.png",
-      "sizes": "72x72",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/icons/icon-96x96.png",
-      "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/icons/icon-128x128.png",
-      "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/icons/icon-144x144.png",
-      "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/icons/icon-152x152.png",
-      "sizes": "152x152",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/icons/icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/icons/icon-384x384.png",
-      "sizes": "384x384",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/icons/icon-512x512.png",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='115' fill='%23%238b5cf6'/%3E%3Ccircle cx='256' cy='256' r='140' fill='%23%2310b981'/%3E%3Ctext x='256' y='320' text-anchor='middle' font-size='180' font-weight='bold' fill='white'%3E%24%3C/text%3E%3C/svg%3E",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable any"
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     },
     {
-      "src": "/icons/apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icons/favicon-32x32.png",
-      "sizes": "32x32",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icons/favicon-16x16.png",
-      "sizes": "16x16",
-      "type": "image/png",
-      "purpose": "any"
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='43' fill='%23%238b5cf6'/%3E%3Ccircle cx='96' cy='96' r='52' fill='%23%2310b981'/%3E%3Ctext x='96' y='120' text-anchor='middle' font-size='68' font-weight='bold' fill='white'%3E%24%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192", 
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ],
   "shortcuts": [
@@ -83,66 +29,19 @@
       "name": "Financial Goals",
       "short_name": "Goals",
       "description": "Track your financial recovery progress and milestones",
-      "url": "/goals.html",
-      "icons": [{ "src": "/icons/shortcut-goals.png", "sizes": "96x96", "type": "image/png" }]
+      "url": "/goals.html"
     },
     {
       "name": "Upload Statements",
       "short_name": "Upload CSV",
       "description": "Import and analyze bank statements with AI insights",
-      "url": "/csv-upload.html",
-      "icons": [{ "src": "/icons/shortcut-upload.png", "sizes": "96x96", "type": "image/png" }]
+      "url": "/csv-upload.html"
     },
     {
       "name": "Add to Emergency Fund",
       "short_name": "Emergency Fund",
       "description": "Quickly add money to emergency savings",
-      "url": "/goals.html#emergency-fund",
-      "icons": [{ "src": "/icons/shortcut-emergency.png", "sizes": "96x96", "type": "image/png" }]
-    },
-    {
-      "name": "Budget Recovery Plan",
-      "short_name": "Recovery Plan",
-      "description": "View your 3-month deficit elimination strategy",
-      "url": "/goals.html#budget-recovery",
-      "icons": [{ "src": "/icons/shortcut-recovery.png", "sizes": "96x96", "type": "image/png" }]
-    },
-    {
-      "name": "Quick Transaction Entry",
-      "short_name": "Add Transaction",
-      "description": "Quickly log income or expense",
-      "url": "/?action=add-transaction",
-      "icons": [{ "src": "/icons/shortcut-transaction.png", "sizes": "96x96", "type": "image/png" }]
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "/screenshots/dashboard.png",
-      "sizes": "540x720",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "FinanceOS Dashboard with financial overview"
-    },
-    {
-      "src": "/screenshots/goals.png", 
-      "sizes": "540x720",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Financial goals tracking and progress monitoring"
-    },
-    {
-      "src": "/screenshots/csv-analysis.png", 
-      "sizes": "540x720",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "CSV upload and AI-powered transaction analysis"
-    },
-    {
-      "src": "/screenshots/desktop-dashboard.png",
-      "sizes": "1024x768",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "FinanceOS desktop experience"
+      "url": "/goals.html#emergency-fund"
     }
   ],
   "file_handlers": [
@@ -155,20 +54,11 @@
       }
     }
   ],
-  "protocol_handlers": [
-    {
-      "protocol": "web+financeos",
-      "url": "/?handler=%s"
-    }
-  ],
   "share_target": {
     "action": "/csv-upload.html",
     "method": "POST",
     "enctype": "multipart/form-data",
     "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url",
       "files": [
         {
           "name": "csv_file",
@@ -180,25 +70,8 @@
   "launch_handler": {
     "client_mode": "focus-existing"
   },
-  "edge_side_panel": {
-    "preferred_width": 400
-  },
-  "handle_links": "preferred",
-  "capture_links": "existing-client-navigate",
   "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
-  "orientation": "any",
   "related_applications": [],
   "prefer_related_applications": false,
-  "iarc_rating_id": "",
-  "version": "1.0.0",
-  "scope_extensions": [
-    {
-      "origin": "https://jkmdale.github.io"
-    }
-  ],
-  "id": "financeos-pwa",
-  "start_url_params": {
-    "utm_source": "pwa",
-    "utm_medium": "homescreen"
-  }
+  "id": "financeos-pwa"
 }
