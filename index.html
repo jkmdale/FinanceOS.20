@@ -181,7 +181,7 @@
         }
         .success-msg.show { display: block; }
 
-        /* Privacy Mode Styles - Only show in dashboard */
+        /* IMPROVED PRIVACY MODE STYLES */
         .privacy-toggle {
             position: fixed;
             top: 20px;
@@ -198,13 +198,13 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             z-index: 1000;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: none; /* Hidden by default */
+            display: none;
             align-items: center;
             gap: 8px;
         }
 
         .dashboard.active .privacy-toggle {
-            display: flex; /* Only show when dashboard is active */
+            display: flex;
         }
 
         .privacy-toggle:hover {
@@ -224,25 +224,46 @@
             animation: pulse-privacy 2s infinite;
         }
 
+        /* FIXED PRIVACY HIDING - COMPLETE REPLACEMENT */
         .financial-amount {
             transition: all 0.3s ease;
             position: relative;
+            display: inline-block;
         }
 
         .financial-amount.hidden {
             color: transparent !important;
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
             user-select: none;
+            /* Remove all text-shadow effects */
         }
 
-        .financial-amount.hidden::before {
+        .financial-amount.hidden::after {
             content: "••••";
             position: absolute;
             left: 0;
             top: 0;
-            color: rgba(255, 255, 255, 0.6);
-            text-shadow: none;
+            right: 0;
+            bottom: 0;
+            color: rgba(255, 255, 255, 0.6) !important;
+            background: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
             font-weight: bold;
+            z-index: 1;
+        }
+
+        /* Different dot counts for different amounts */
+        .financial-amount.hidden.large::after {
+            content: "••••••••";
+        }
+
+        .financial-amount.hidden.medium::after {
+            content: "••••••";
+        }
+
+        .financial-amount.hidden.small::after {
+            content: "•••";
         }
 
         .demo-badge {
@@ -267,7 +288,7 @@
             display: block;
         }
 
-        /* Larger, more prominent install button */
+        /* Enhanced install button */
         .install-btn {
             position: fixed;
             bottom: 30px;
@@ -396,7 +417,7 @@
     </div>
 
     <div id="dashboard" class="dashboard">
-        <!-- Privacy Toggle Button - Only shows in dashboard -->
+        <!-- Privacy Toggle Button -->
         <button id="privacyToggle" class="privacy-toggle">
             <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
@@ -421,37 +442,37 @@
         <div class="dashboard-content">
             <h2 class="dashboard-title">Financial Dashboard</h2>
             
-            <!-- Financial Summary with real amounts to hide -->
+            <!-- Financial Summary with amounts marked for privacy -->
             <div class="financial-summary">
                 <div class="summary-card">
                     <h3>Total Balance</h3>
-                    <div class="summary-amount positive financial-amount">$65,383.09</div>
+                    <div class="summary-amount positive financial-amount large">$65,383.09</div>
                     <div class="summary-change">+2.4% this month</div>
                 </div>
                 <div class="summary-card">
                     <h3>Monthly Budget</h3>
-                    <div class="summary-amount negative financial-amount">-$3,607.00</div>
+                    <div class="summary-amount negative financial-amount medium">-$3,607.00</div>
                     <div class="summary-change">Over budget</div>
                 </div>
                 <div class="summary-card">
                     <h3>Emergency Fund</h3>
-                    <div class="summary-amount neutral financial-amount">$0.17</div>
+                    <div class="summary-amount neutral financial-amount small">$0.17</div>
                     <div class="summary-change">Critical: Build immediately</div>
                 </div>
                 <div class="summary-card">
                     <h3>Credit Card Debt</h3>
-                    <div class="summary-amount negative financial-amount">-$3,251.30</div>
-                    <div class="summary-change">Available: <span class="financial-amount">$6,748.70</span></div>
+                    <div class="summary-amount negative financial-amount medium">-$3,251.30</div>
+                    <div class="summary-change">Available: <span class="financial-amount medium">$6,748.70</span></div>
                 </div>
                 <div class="summary-card">
                     <h3>KiwiSaver</h3>
-                    <div class="summary-amount positive financial-amount">$48,733.44</div>
+                    <div class="summary-amount positive financial-amount large">$48,733.44</div>
                     <div class="summary-change">+8.2% this year</div>
                 </div>
                 <div class="summary-card">
                     <h3>Home Loan</h3>
-                    <div class="summary-amount negative financial-amount">-$271,600.02</div>
-                    <div class="summary-change">Monthly: <span class="financial-amount">$2,070.00</span></div>
+                    <div class="summary-amount negative financial-amount large">-$271,600.02</div>
+                    <div class="summary-change">Monthly: <span class="financial-amount medium">$2,070.00</span></div>
                 </div>
             </div>
 
@@ -485,7 +506,7 @@
         👀 Demo Mode - Financials Hidden
     </div>
 
-    <!-- Larger, more prominent PWA Install Button -->
+    <!-- PWA Install Button -->
     <button id="installBtn" class="install-btn">
         <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -510,7 +531,7 @@
             document.getElementById('successMsg').classList.remove('show');
         }
 
-        // ===== PRIVACY MODE =====
+        // ===== ENHANCED PRIVACY MODE =====
         var FinanceOSPrivacy = {
             isPrivate: localStorage.getItem('financeOS_privacyMode') === 'true',
             isInitialized: false,
@@ -536,13 +557,36 @@
                     self.toggleButton.addEventListener('click', function() {
                         self.toggle();
                     });
-                    self.isInitialized = true;
                     
-                    // Initial state
+                    self.isInitialized = true;
+                    self.markFinancialElements();
                     self.updatePrivacyState();
                     
-                    console.log('✅ Privacy mode initialized');
+                    console.log('✅ Enhanced Privacy mode initialized');
                 }
+            },
+
+            markFinancialElements: function() {
+                // Mark existing financial-amount elements and classify by size
+                var existingElements = document.querySelectorAll('.financial-amount');
+                
+                for (var i = 0; i < existingElements.length; i++) {
+                    var el = existingElements[i];
+                    var text = el.textContent ? el.textContent.trim() : '';
+                    
+                    // Add size classification if not already present
+                    if (!el.classList.contains('large') && !el.classList.contains('medium') && !el.classList.contains('small')) {
+                        if (text.length > 12) {
+                            el.classList.add('large');
+                        } else if (text.length > 6) {
+                            el.classList.add('medium');
+                        } else {
+                            el.classList.add('small');
+                        }
+                    }
+                }
+                
+                console.log('💰 Marked', existingElements.length, 'financial elements for privacy');
             },
 
             toggle: function() {
@@ -552,23 +596,25 @@
                 this.updatePrivacyState();
                 this.saveState();
                 
+                // Haptic feedback
                 if (navigator.vibrate) {
                     navigator.vibrate(50);
                 }
                 
-                console.log('🔐 Privacy mode:', this.isPrivate ? 'ENABLED' : 'DISABLED');
+                console.log('🔐 Privacy mode:', this.isPrivate ? 'ENABLED (Complete hiding)' : 'DISABLED');
             },
 
             updatePrivacyState: function() {
                 if (!this.isInitialized) return;
                 
                 var financialElements = document.querySelectorAll('.financial-amount');
-                console.log('💰 Found', financialElements.length, 'financial elements');
                 
                 if (this.isPrivate) {
+                    // Hide all financial amounts with complete replacement
                     for (var i = 0; i < financialElements.length; i++) {
                         financialElements[i].classList.add('hidden');
                     }
+                    
                     this.toggleButton.classList.add('active');
                     this.privacyText.textContent = 'Show $';
                     this.demoBadge.classList.add('show');
@@ -577,15 +623,19 @@
                         document.title += ' - Demo Mode';
                     }
                 } else {
+                    // Show all financial amounts
                     for (var i = 0; i < financialElements.length; i++) {
                         financialElements[i].classList.remove('hidden');
                     }
+                    
                     this.toggleButton.classList.remove('active');
                     this.privacyText.textContent = 'Hide $';
                     this.demoBadge.classList.remove('show');
                     
                     document.title = document.title.replace(' - Demo Mode', '');
                 }
+                
+                console.log('👁️ Privacy state updated:', financialElements.length, 'elements', this.isPrivate ? 'HIDDEN' : 'VISIBLE');
             },
 
             saveState: function() {
@@ -593,7 +643,7 @@
             }
         };
 
-        // ===== PWA FUNCTIONALITY =====
+        // ===== ENHANCED PWA FUNCTIONALITY =====
         var FinanceOSPWA = {
             deferredPrompt: null,
             installButton: null,
@@ -654,11 +704,12 @@
                     console.log('📱 App already installed');
                     this.hideInstallButton();
                     this.installDismissed = true;
+                } else {
+                    console.log('📱 App not installed - will show install button');
                 }
             },
 
             showInstallButtonForTesting: function() {
-                // Always show install button for testing if not dismissed and not installed
                 if (!this.installDismissed && this.installButton) {
                     console.log('🧪 Showing install button for testing');
                     this.installButton.classList.add('show');
@@ -725,18 +776,20 @@
 
         // ===== INITIALIZATION =====
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 FinanceOS initializing...');
+            console.log('🚀 FinanceOS Enhanced initializing...');
             
             FinanceOSPrivacy.init();
             FinanceOSPWA.init();
             
-            console.log('✅ FinanceOS ready');
+            console.log('✅ FinanceOS Enhanced ready');
         });
 
+        // Debug info
         console.log('🔍 FinanceOS Debug Info:');
         console.log('📍 Location:', window.location.href);
         console.log('🔒 HTTPS:', location.protocol === 'https:');
         console.log('💾 SW Support:', 'serviceWorker' in navigator);
+        console.log('🔐 Privacy fixed: Complete text replacement');
     </script>
 </body>
 </html>
