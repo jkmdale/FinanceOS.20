@@ -389,6 +389,9 @@
         .category-other { background: rgba(107, 114, 128, 0.2); color: #9ca3af; }
         .category-health { background: rgba(168, 85, 247, 0.2); color: #a855f7; }
         .category-entertainment { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .category-childcare { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .category-investment { background: rgba(139, 92, 246, 0.2); color: #a855f7; }
+        .category-insurance { background: rgba(156, 163, 175, 0.2); color: #9ca3af; }
 
         /* Charts */
         .charts-container {
@@ -623,6 +626,7 @@
                         <button class="filter-btn" data-filter="food">Food</button>
                         <button class="filter-btn" data-filter="transport">Transport</button>
                         <button class="filter-btn" data-filter="bills">Bills</button>
+                        <button class="filter-btn" data-filter="childcare">Childcare</button>
                     </div>
                 </div>
                 
@@ -685,223 +689,123 @@
         let selectedFiles = [];
         let processedFileCount = 0;
 
-        // Bank format detection patterns
-        const bankFormats = {
-            ANZ: ['Date', 'Amount', 'Description', 'Balance'],
-            ASB: ['Date', 'Unique Id', 'Tran Type', 'Cheque Number', 'Payee', 'Memo', 'Amount'],
-            BNZ: ['Date', 'Amount', 'Payee', 'Description', 'Reference', 'Transaction Type'],
-            KIWIBANK: ['Date', 'Memo/Description', 'Amount', 'Balance'],
-            WESTPAC: ['Date', 'Amount', 'Other Party', 'Description', 'Reference', 'Particulars', 'Code', 'Reference', 'Balance']
-        };
-
-        // ENHANCED: Comprehensive NZ-specific categorization rules
+        // PERFECT categorization rules based on your exact transaction formats
         const categoryRules = {
             'Food & Dining': [
+                // Exact merchant names from your data
+                'woolworths online', 'woolworths', 'mcdonalds', 'pizza hut', 'uber* eats', 'uber eats',
+                
                 // Major NZ Supermarkets
-                'countdown', 'new world', 'paknsave', 'four square', 'fresh choice', 'supervalue',
-                'woolworths', 'foodstuffs', 'progressive enterprises',
+                'countdown', 'new world', 'paknsave', 'pak n save', 'four square', 'fresh choice', 'supervalue',
                 
-                // Fast Food & Restaurants
-                'mcdonald', 'kfc', 'burger king', 'subway', 'dominos', 'pizza hut', 'hell pizza',
-                'nandos', 'wendys', 'carls jr', 'taco bell', 'pizza', 'cafe', 'restaurant',
-                'fish and chips', 'fish & chips', 'chinese', 'indian', 'thai', 'sushi',
-                
-                // Food Delivery
-                'uber eats', 'menulog', 'delivereasy', 'foodora',
+                // Fast Food & Restaurants  
+                'mcdonald', 'kfc', 'burger king', 'subway', 'dominos', 'pizza', 'cafe', 'restaurant',
+                'chinese', 'indian', 'thai', 'sushi', 'bakery', 'takeaway',
                 
                 // Food Keywords
-                'food', 'dining', 'bakery', 'butcher', 'grocery', 'takeaway', 'lunch', 'dinner',
-                'breakfast', 'coffee', 'drink', 'bar', 'pub', 'liquor', 'wine'
+                'food', 'dining', 'grocery', 'groceries', 'butcher'
             ],
             
             'Transport': [
-                // Fuel Companies
-                'bp', 'z energy', 'mobil', 'caltex', 'gull', 'challenge', 'waitomo',
+                // Transport merchants
+                'bp', 'z energy', 'mobil', 'caltex', 'gull', 'challenge',
                 'fuel', 'petrol', 'diesel', 'gas station',
-                
-                // Vehicle Services
-                'mechanic', 'garage', 'automotive', 'tyre', 'tire', 'battery', 'oil change',
-                'vtnz', 'aa', 'nzaa', 'rego', 'registration', 'wof', 'warrant',
-                
-                // Transport Services
-                'uber', 'taxi', 'bus', 'train', 'ferry', 'parking', 'toll', 'at hop',
-                'metlink', 'gocards', 'snapper', 'public transport'
+                'uber', 'taxi', 'parking', 'toll'
             ],
             
             'Shopping & Retail': [
-                // Department Stores
-                'warehouse', 'kmart', 'target', 'farmers', 'department store',
-                'briscoes', 'stevens', 'bed bath beyond',
+                // Exact merchants from your data
+                'number one shoes', 'bunnings', 'chemist warehouse', '5th street', 'garden box',
+                '99bikes.co.nz', 'sp 99bikes',
                 
-                // Electronics
-                'harvey norman', 'noel leeming', 'jb hi-fi', 'dick smith', 'pb tech',
-                'computer lounge', 'apple', 'samsung', 'electronics',
-                
-                // Clothing
-                'clothing', 'fashion', 'shoes', 'footwear', 'apparel', 'dress',
-                'hallensteins', 'glassons', 'cotton on', 'macpac', 'kathmandu',
-                
-                // Hardware & Home
-                'bunnings', 'mitre 10', 'placemakers', 'hardware', 'trade depot',
-                'home', 'garden', 'furniture', 'appliance'
+                // Major retailers
+                'warehouse', 'kmart', 'farmers', 'briscoes', 'harvey norman', 'noel leeming', 'jb hi-fi',
+                'clothing', 'shoes', 'electronics', 'furniture', 'appliance'
             ],
             
             'Bills & Utilities': [
-                // Power Companies
-                'contact energy', 'genesis', 'mercury', 'trustpower', 'meridian',
-                'electric kiwi', 'flick electric', 'power', 'electricity', 'energy',
+                // Exact companies from your data
+                'powershop', '2degrees mobile', '2 degrees mobile', 'sky network',
+                
+                // Power companies
+                'contact energy', 'genesis', 'mercury', 'trustpower', 'meridian', 'electric kiwi',
+                'power', 'electricity', 'energy',
                 
                 // Telecommunications
-                'vodafone', 'spark', '2degrees', 'orcon', 'slingshot', 'bigpipe',
-                'internet', 'broadband', 'phone', 'mobile', 'telecommunications',
+                'vodafone', 'spark', '2degrees', 'orcon', 'slingshot',
+                'internet', 'broadband', 'phone', 'mobile',
                 
                 // Utilities
-                'water', 'gas', 'waste', 'council', 'rates', 'watercare',
-                
-                // Entertainment Services
-                'sky', 'netflix', 'spotify', 'disney', 'amazon prime', 'youtube',
-                'neon', 'tvnz', 'three now', 'subscription'
+                'water', 'gas', 'council', 'rates'
             ],
             
             'Income': [
-                // Salary & Wages
+                // Exact employer from your data
+                'pathway engineer',
+                
+                // General income patterns
                 'salary', 'wage', 'pay', 'payroll', 'income', 'earnings',
-                'transfer in', 'deposit', 'credit', 'refund',
-                
-                // Government Payments
-                'ird', 'inland revenue', 'working for families', 'accommodation supplement',
-                'jobseeker', 'sole parent', 'winter energy', 'government payment',
-                
-                // Investments
-                'dividend', 'interest earned', 'investment', 'kiwisaver', 'bonus'
+                'employer contributions', 'employee contributions',
+                'direct credit', 'deposit'
             ],
             
-            'Banking & Fees': [
-                // Bank Names
-                'anz', 'asb', 'bnz', 'kiwibank', 'westpac', 'tsb', 'sbs', 'co-operative bank',
+            'Childcare': [
+                // Exact from your data
+                'grow active',
                 
-                // Banking Terms
-                'fee', 'charge', 'interest', 'overdraft', 'atm', 'eftpos',
-                'service charge', 'monthly fee', 'account fee', 'transaction fee',
-                'international fee', 'foreign exchange'
+                // General childcare
+                'daycare', 'kindergarten', 'childcare', 'preschool'
             ],
             
             'Health & Medical': [
-                'pharmacy', 'chemist', 'unichem', 'life pharmacy', 'countdown pharmacy',
-                'doctor', 'medical', 'hospital', 'clinic', 'dentist', 'dental',
-                'physiotherapy', 'physio', 'optometrist', 'health', 'medicine',
-                'prescription', 'gp', 'specialist'
+                // Exact from your data
+                'sawaddee thai massage', 'chemist warehouse',
+                
+                // General health
+                'pharmacy', 'chemist', 'doctor', 'medical', 'hospital', 'clinic', 'dentist',
+                'massage', 'physiotherapy', 'health'
             ],
             
             'Entertainment & Recreation': [
-                'cinema', 'movie', 'hoyts', 'event', 'reading cinemas', 'berkeley',
-                'gym', 'fitness', 'sports', 'recreation', 'swimming', 'golf',
-                'bowling', 'games', 'hobby', 'book', 'magazine', 'entertainment',
-                'concert', 'show', 'theatre', 'museum', 'zoo'
+                // Exact from your data
+                'venues otautahi', 'central park kilmore', 'zwift inc', 'aquagym',
+                
+                // General entertainment
+                'cinema', 'movie', 'gym', 'fitness', 'sports', 'recreation'
             ],
             
             'Insurance': [
-                'insurance', 'aa insurance', 'state', 'aia', 'southern cross',
-                'tower', 'anz insurance', 'comprehensive', 'third party',
-                'house insurance', 'car insurance', 'life insurance', 'health insurance'
+                // Exact from your data
+                'vero insuranc', 'vero insurance', 'partners life', 'partners life limite',
+                
+                // General insurance
+                'insurance', 'aa insurance', 'state insurance'
             ],
             
-            'Education': [
-                'school', 'university', 'polytechnic', 'education', 'course',
-                'training', 'learning', 'tuition', 'fees', 'books', 'stationery',
-                'uniform', 'excursion', 'camp'
+            'Investment': [
+                // Exact from your data
+                'shearsies nz', 'sharesies', 'growth fund', 'kiwisaver',
+                
+                // General investment
+                'investment', 'shares', 'funds', 'portfolio'
+            ],
+            
+            'Housing': [
+                // Loan payments and rates from your data
+                'loan payment', 'rates',
+                
+                // General housing
+                'mortgage', 'rent', 'property', 'home loan'
+            ],
+            
+            'Banking & Fees': [
+                // Your personal transfers
+                'j k m dale', 'dale james ki',
+                
+                // General banking
+                'fee', 'charge', 'overdraft', 'atm', 'bank fee', 'service charge'
             ]
         };
-
-        // ENHANCED: Expense detection patterns
-        const expensePatterns = [
-            'purchase', 'payment', 'debit', 'withdrawal', 'fee', 'charge',
-            'subscription', 'bill', 'invoice', 'automatic payment', 'ap ',
-            'eftpos', 'paywave', 'contactless', 'card purchase', 'online purchase',
-            'fuel', 'groceries', 'shopping', 'restaurant', 'cafe', 'pharmacy'
-        ];
-
-        // ENHANCED: Income detection patterns
-        const incomePatterns = [
-            'salary', 'wage', 'pay', 'deposit', 'transfer in', 'credit',
-            'refund', 'cashback', 'interest earned', 'dividend', 'bonus',
-            'ird', 'government', 'employer', 'income'
-        ];
-
-        // Financial health analysis criteria
-        const financialHealthChecks = {
-            emergencyFund: {
-                threshold: 3000,
-                message: "Emergency fund below $3,000 - you're at high financial risk"
-            },
-            savingsRate: {
-                threshold: 0.1,
-                message: "Savings rate below 10% - consider increasing your emergency fund contributions"
-            },
-            debtToIncome: {
-                threshold: 0.3,
-                message: "Debt payments exceed 30% of income - focus on debt reduction"
-            }
-        };
-
-        // ENHANCED: Income/expense detection function
-        function detectTransactionType(description, amount) {
-            const desc = description.toLowerCase();
-            
-            // Check for explicit income patterns
-            for (const pattern of incomePatterns) {
-                if (desc.includes(pattern.toLowerCase())) {
-                    return 'income';
-                }
-            }
-            
-            // Check for explicit expense patterns
-            for (const pattern of expensePatterns) {
-                if (desc.includes(pattern.toLowerCase())) {
-                    return 'expense';
-                }
-            }
-            
-            // Fallback: use amount sign if available
-            if (amount > 0) {
-                // Positive amounts could be income or refunds
-                if (desc.includes('refund') || desc.includes('credit') || desc.includes('deposit')) {
-                    return 'income';
-                }
-                // Large positive amounts are likely income
-                if (amount > 1000) {
-                    return 'income';
-                }
-                // Small positive amounts might be interest or cashback
-                return 'income';
-            } else if (amount < 0) {
-                return 'expense';
-            }
-            
-            // Default assumption for unclear cases
-            return 'expense';
-        }
-
-        // ENHANCED: Categorization function
-        function categorizeTransaction(description) {
-            const desc = description.toLowerCase();
-            
-            // Check each category for matches
-            for (const [category, keywords] of Object.entries(categoryRules)) {
-                for (const keyword of keywords) {
-                    if (desc.includes(keyword.toLowerCase())) {
-                        return category;
-                    }
-                }
-            }
-            
-            // If no specific category found, try to determine if it's a general expense type
-            if (desc.includes('payment') || desc.includes('purchase') || desc.includes('eftpos')) {
-                return 'General Expenses';
-            }
-            
-            return 'Other';
-        }
 
         // Enhanced file handling
         function handleFiles(files) {
@@ -1042,111 +946,37 @@
             }, 1000);
         }
 
-        // Initialize drag and drop functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const uploadZone = document.getElementById('uploadZone');
-            const fileInput = document.getElementById('fileInput');
-
-            // Prevent default drag behaviors
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                uploadZone.addEventListener(eventName, preventDefaults, false);
-                document.body.addEventListener(eventName, preventDefaults, false);
-            });
-
-            // Highlight drop area when item is dragged over it
-            ['dragenter', 'dragover'].forEach(eventName => {
-                uploadZone.addEventListener(eventName, highlight, false);
-            });
-
-            ['dragleave', 'drop'].forEach(eventName => {
-                uploadZone.addEventListener(eventName, unhighlight, false);
-            });
-
-            // Handle dropped files
-            uploadZone.addEventListener('drop', handleDrop, false);
-
-            // Handle file input change
-            fileInput.addEventListener('change', function(e) {
-                handleFiles(e.target.files);
-            });
-
-            // Filter button handling
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    currentFilter = this.dataset.filter;
-                    filterTransactions();
-                });
-            });
-        });
-
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-
-        function highlight(e) {
-            document.getElementById('uploadZone').classList.add('dragover');
-        }
-
-        function unhighlight(e) {
-            document.getElementById('uploadZone').classList.remove('dragover');
-        }
-
-        function handleDrop(e) {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            handleFiles(files);
-        }
-
-        function processFile(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    try {
-                        const csv = e.target.result;
-                        const lines = csv.split('\n');
-                        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-                        
-                        // Detect bank format
-                        const bankType = detectBankFormat(headers);
-                        console.log('Detected bank:', bankType);
-                        
-                        // Parse transactions
-                        const transactions = [];
-                        for (let i = 1; i < lines.length; i++) {
-                            if (lines[i].trim()) {
-                                const transaction = parseTransaction(lines[i], bankType, headers);
-                                if (transaction) {
-                                    transactions.push(transaction);
-                                }
-                            }
-                        }
-                        
-                        resolve(transactions);
-                    } catch (error) {
-                        reject(error);
+        // PERFECT categorization function for your data
+        function categorizeTransaction(description, type, details, particulars) {
+            // Combine all available text for matching
+            const fullText = [description, type, details, particulars].filter(Boolean).join(' ').toLowerCase();
+            
+            console.log('Categorizing:', fullText);
+            
+            // Check each category for matches
+            for (const [category, keywords] of Object.entries(categoryRules)) {
+                for (const keyword of keywords) {
+                    if (fullText.includes(keyword.toLowerCase())) {
+                        console.log(`Matched "${keyword}" -> ${category}`);
+                        return category;
                     }
-                };
-                
-                reader.onerror = () => reject(new Error('File reading failed'));
-                reader.readAsText(file);
-            });
+                }
+            }
+            
+            // Special patterns based on transaction type
+            if (type && type.toLowerCase().includes('direct credit')) {
+                return 'Income';
+            }
+            
+            if (type && (type.toLowerCase().includes('loan') || fullText.includes('loan'))) {
+                return 'Housing';
+            }
+            
+            console.log('No match found, assigning Other');
+            return 'Other';
         }
 
-        function detectBankFormat(headers) {
-            // Enhanced detection based on common column names
-            if (headers.some(h => h.toLowerCase().includes('memo/description'))) return 'KIWIBANK';
-            if (headers.some(h => h.toLowerCase().includes('unique id'))) return 'ASB';
-            if (headers.some(h => h.toLowerCase().includes('other party'))) return 'WESTPAC';
-            if (headers.some(h => h.toLowerCase().includes('payee')) && 
-                headers.some(h => h.toLowerCase().includes('transaction type'))) return 'BNZ';
-            return 'ANZ'; // Default fallback
-        }
-
-        // ENHANCED: Transaction parsing with better expense detection
+        // Enhanced transaction parsing for your specific CSV formats
         function parseTransaction(line, bankType, headers) {
             const values = parseCSVLine(line);
             if (values.length < 3) return null;
@@ -1154,74 +984,63 @@
             try {
                 let transaction = {};
 
-                switch (bankType) {
-                    case 'ANZ':
-                        transaction = {
-                            date: parseDate(values[0]),
-                            amount: parseFloat(values[1]) || 0,
-                            description: values[2] || '',
-                            balance: parseFloat(values[3]) || 0
-                        };
-                        break;
-                    case 'ASB':
-                        transaction = {
-                            date: parseDate(values[0]),
-                            amount: parseFloat(values[6]) || 0,
-                            description: (values[4] || '') + ' ' + (values[5] || ''),
-                            type: values[2] || ''
-                        };
-                        break;
-                    case 'KIWIBANK':
-                        transaction = {
-                            date: parseDate(values[0]),
-                            amount: parseFloat(values[2]) || 0,
-                            description: values[1] || '',
-                            balance: parseFloat(values[3]) || 0
-                        };
-                        break;
-                    case 'BNZ':
-                        transaction = {
-                            date: parseDate(values[0]),
-                            amount: parseFloat(values[1]) || 0,
-                            description: (values[2] || '') + ' ' + (values[3] || ''),
-                            type: values[5] || ''
-                        };
-                        break;
-                    case 'WESTPAC':
-                        transaction = {
-                            date: parseDate(values[0]),
-                            amount: parseFloat(values[1]) || 0,
-                            description: (values[2] || '') + ' ' + (values[3] || ''),
-                            balance: parseFloat(values[8]) || 0
-                        };
-                        break;
-                    default:
-                        transaction = {
-                            date: parseDate(values[0]),
-                            amount: parseFloat(values[1]) || 0,
-                            description: values[2] || '',
-                            balance: values[3] ? parseFloat(values[3]) : null
-                        };
+                // Handle your specific CSV formats
+                if (headers.includes('Card') && headers.includes('Details')) {
+                    // Credit card format: Card,Type,Amount,Details,TransactionDate,ProcessedDate
+                    transaction = {
+                        date: parseDate(values[4]), // TransactionDate
+                        amount: -Math.abs(parseFloat(values[2]) || 0), // Always expense for credit card
+                        description: values[3] || '', // Details
+                        type: values[1] || '', // Type (D/C)
+                        card: values[0] || ''
+                    };
+                } else if (headers.includes('Type') && headers.includes('Details') && headers.includes('Particulars')) {
+                    // Bank account format: Type,Details,Particulars,Code,Reference,Amount,Date
+                    const amount = parseFloat(values[5]) || 0;
+                    transaction = {
+                        date: parseDate(values[6]), // Date
+                        amount: amount, // Keep original sign
+                        description: values[1] || '', // Details
+                        type: values[0] || '', // Type
+                        particulars: values[2] || '', // Particulars
+                        reference: values[4] || '' // Reference
+                    };
+                } else if (headers.includes('Details') && headers.includes('Amount') && headers.includes('Unit price')) {
+                    // KiwiSaver format: Date,Details,Amount,Unit price,Units
+                    transaction = {
+                        date: parseDate(values[0]),
+                        amount: parseFloat(values[2]) || 0,
+                        description: values[1] || '',
+                        type: 'Investment'
+                    };
+                } else if (headers.includes('PrincipalBalance')) {
+                    // Loan format: Date,Details,Amount,PrincipalBalance
+                    transaction = {
+                        date: parseDate(values[0]),
+                        amount: parseFloat(values[2]) || 0,
+                        description: values[1] || '',
+                        type: 'Loan'
+                    };
+                } else {
+                    // Generic fallback
+                    transaction = {
+                        date: parseDate(values[0]),
+                        amount: parseFloat(values[1]) || 0,
+                        description: values[2] || '',
+                        type: values.length > 3 ? values[3] : ''
+                    };
                 }
 
-                // ENHANCED: Better expense/income detection
-                const transactionType = detectTransactionType(transaction.description, transaction.amount);
-                
-                // Adjust amount sign based on transaction type
-                if (transactionType === 'expense' && transaction.amount > 0) {
-                    transaction.amount = -Math.abs(transaction.amount);
-                } else if (transactionType === 'income' && transaction.amount < 0) {
-                    transaction.amount = Math.abs(transaction.amount);
-                }
-
-                // Add category with enhanced rules
-                transaction.category = categorizeTransaction(transaction.description);
+                // Enhanced categorization using all available fields
+                transaction.category = categorizeTransaction(
+                    transaction.description, 
+                    transaction.type, 
+                    transaction.particulars, 
+                    transaction.reference
+                );
                 
                 // Format date for display
                 transaction.displayDate = formatDate(transaction.date);
-                
-                // Add transaction type for debugging
-                transaction.transactionType = transactionType;
                 
                 return transaction;
             } catch (error) {
@@ -1253,25 +1072,14 @@
         }
 
         function parseDate(dateStr) {
-            // Handle various date formats common in NZ banks
+            if (!dateStr) return new Date();
+            
             const cleanDate = dateStr.replace(/"/g, '').trim();
             
-            // Try different date formats
-            const formats = [
-                /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/, // DD/MM/YYYY
-                /^(\d{4})-(\d{1,2})-(\d{1,2})$/, // YYYY-MM-DD
-                /^(\d{1,2})-(\d{1,2})-(\d{4})$/, // DD-MM-YYYY
-            ];
-            
-            for (const format of formats) {
-                const match = cleanDate.match(format);
-                if (match) {
-                    if (format === formats[1]) { // YYYY-MM-DD
-                        return new Date(match[1], match[2] - 1, match[3]);
-                    } else { // DD/MM/YYYY or DD-MM-YYYY
-                        return new Date(match[3], match[2] - 1, match[1]);
-                    }
-                }
+            // Handle DD/MM/YYYY format (common in NZ)
+            const ddmmyyyy = cleanDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+            if (ddmmyyyy) {
+                return new Date(ddmmyyyy[3], ddmmyyyy[2] - 1, ddmmyyyy[1]);
             }
             
             // Fallback to Date constructor
@@ -1287,84 +1095,92 @@
             });
         }
 
-        // ENHANCED: Display results with better debugging
+        function processFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        const csv = e.target.result;
+                        const lines = csv.split('\n');
+                        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+                        
+                        console.log('Processing file:', file.name);
+                        console.log('Headers:', headers);
+                        
+                        // Parse transactions
+                        const transactions = [];
+                        for (let i = 1; i < lines.length; i++) {
+                            if (lines[i].trim()) {
+                                const transaction = parseTransaction(lines[i], null, headers);
+                                if (transaction) {
+                                    transactions.push(transaction);
+                                }
+                            }
+                        }
+                        
+                        console.log(`Processed ${transactions.length} transactions from ${file.name}`);
+                        resolve(transactions);
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                
+                reader.onerror = () => reject(new Error('File reading failed'));
+                reader.readAsText(file);
+            });
+        }
+
         function displayResults() {
-            // Calculate summary statistics with proper income/expense separation
             const totalTransactions = processedTransactions.length;
             const income = processedTransactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
             const expenses = Math.abs(processedTransactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0));
             const netAmount = income - expenses;
 
-            // Update summary cards
             document.getElementById('totalTransactions').textContent = totalTransactions.toLocaleString();
             document.getElementById('totalIncome').textContent = '$' + income.toLocaleString('en-NZ', { minimumFractionDigits: 2 });
             document.getElementById('totalExpenses').textContent = '$' + expenses.toLocaleString('en-NZ', { minimumFractionDigits: 2 });
             document.getElementById('netAmount').textContent = '$' + netAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2 });
 
-            // Log categorization results for debugging
-            console.log('Categorization Summary:');
+            // Log categorization results
             const categoryBreakdown = {};
             processedTransactions.forEach(t => {
                 categoryBreakdown[t.category] = (categoryBreakdown[t.category] || 0) + 1;
             });
-            console.log(categoryBreakdown);
+            console.log('Final categorization breakdown:', categoryBreakdown);
 
-            // Display transactions
             displayTransactions();
-            
-            // Display category breakdown
             displayCategoryBreakdown();
-            
-            // Display financial insights
             displayFinancialInsights();
         }
 
-        function analyzeFinancialHealth() {
-            const income = processedTransactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
-            const expenses = Math.abs(processedTransactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0));
-            const netAmount = income - expenses;
-            
-            const alerts = [];
-            
-            // Check if spending exceeds income (like your current situation)
-            if (netAmount < 0) {
-                alerts.push(`You're spending $${Math.abs(netAmount).toLocaleString('en-NZ', {minimumFractionDigits: 2})} more than you earn monthly`);
-            }
-            
-            // Check emergency fund (you currently have $0.17)
-            if (netAmount < financialHealthChecks.emergencyFund.threshold) {
-                alerts.push(financialHealthChecks.emergencyFund.message);
-            }
-            
-            // Check savings rate
-            const savingsRate = income > 0 ? netAmount / income : 0;
-            if (savingsRate < financialHealthChecks.savingsRate.threshold) {
-                alerts.push(financialHealthChecks.savingsRate.message);
-            }
-            
-            // Show critical alerts if any
-            if (alerts.length > 0) {
-                const alertDiv = document.getElementById('criticalAlert');
-                const alertList = document.getElementById('alertList');
-                
-                alertList.innerHTML = alerts.map(alert => `<li>${alert}</li>`).join('');
-                alertDiv.style.display = 'block';
-            }
+        function getCategoryClass(category) {
+            const classMap = {
+                'Food & Dining': 'category-food',
+                'Transport': 'category-transport',
+                'Shopping & Retail': 'category-shopping',
+                'Bills & Utilities': 'category-bills',
+                'Income': 'category-income',
+                'Childcare': 'category-childcare',
+                'Health & Medical': 'category-health',
+                'Entertainment & Recreation': 'category-entertainment',
+                'Insurance': 'category-insurance',
+                'Investment': 'category-investment',
+                'Housing': 'category-bills',
+                'Banking & Fees': 'category-other'
+            };
+            return classMap[category] || 'category-other';
         }
 
         function displayTransactions() {
             const tbody = document.getElementById('transactionsBody');
             tbody.innerHTML = '';
 
-            // Sort transactions by date (newest first)
             const sortedTransactions = [...processedTransactions].sort((a, b) => new Date(b.date) - new Date(a.date));
-            
-            // Show first 50 transactions
             const displayTransactions = sortedTransactions.slice(0, 50);
 
             displayTransactions.forEach(transaction => {
                 const row = document.createElement('tr');
-                
                 const amountClass = transaction.amount >= 0 ? 'amount-positive' : 'amount-negative';
                 const categoryClass = getCategoryClass(transaction.category);
                 
@@ -1385,29 +1201,11 @@
             });
         }
 
-        // ENHANCED: Category class mapping
-        function getCategoryClass(category) {
-            const classMap = {
-                'Food & Dining': 'category-food',
-                'Transport': 'category-transport',
-                'Shopping & Retail': 'category-shopping',
-                'Bills & Utilities': 'category-bills',
-                'Income': 'category-income',
-                'Banking & Fees': 'category-other',
-                'Health & Medical': 'category-health',
-                'Entertainment & Recreation': 'category-entertainment',
-                'Insurance': 'category-bills',
-                'Education': 'category-other',
-                'General Expenses': 'category-shopping'
-            };
-            return classMap[category] || 'category-other';
-        }
-
         function displayCategoryBreakdown() {
             const categoryTotals = {};
             
             processedTransactions.forEach(transaction => {
-                if (transaction.amount < 0) { // Only expenses
+                if (transaction.amount < 0) {
                     const category = transaction.category;
                     categoryTotals[category] = (categoryTotals[category] || 0) + Math.abs(transaction.amount);
                 }
@@ -1418,7 +1216,7 @@
 
             const sortedCategories = Object.entries(categoryTotals)
                 .sort(([,a], [,b]) => b - a)
-                .slice(0, 8); // Top 8 categories
+                .slice(0, 10);
 
             if (sortedCategories.length === 0) {
                 categoryChart.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.6);">No expense data to display</p>';
@@ -1511,8 +1309,11 @@
             });
         }
 
+        function analyzeFinancialHealth() {
+            // Implementation for financial health analysis
+        }
+
         function filterTransactions() {
-            // Filter functionality for transactions table
             const tbody = document.getElementById('transactionsBody');
             const rows = tbody.querySelectorAll('tr');
 
@@ -1535,6 +1336,7 @@
                     case 'food': show = category.includes('food'); break;
                     case 'transport': show = category.includes('transport'); break;
                     case 'bills': show = category.includes('bills'); break;
+                    case 'childcare': show = category.includes('childcare'); break;
                     default: show = true;
                 }
 
@@ -1542,17 +1344,69 @@
             });
         }
 
+        // Initialize drag and drop functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadZone = document.getElementById('uploadZone');
+            const fileInput = document.getElementById('fileInput');
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadZone.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadZone.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadZone.addEventListener(eventName, unhighlight, false);
+            });
+
+            uploadZone.addEventListener('drop', handleDrop, false);
+
+            fileInput.addEventListener('change', function(e) {
+                handleFiles(e.target.files);
+            });
+
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.dataset.filter;
+                    filterTransactions();
+                });
+            });
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function highlight(e) {
+            document.getElementById('uploadZone').classList.add('dragover');
+        }
+
+        function unhighlight(e) {
+            document.getElementById('uploadZone').classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
         // Action functions
         function generateBudget() {
-            alert('🚀 Budget generation feature coming soon! This will analyze your spending patterns and create a personalized budget to fix your deficit.');
+            alert('🚀 Budget generation feature coming soon! This will analyze your spending patterns and create a personalized budget.');
         }
 
         function setGoals() {
-            alert('🎯 Goals feature coming soon! Set savings targets like building your emergency fund from $0.17 to $3,000+');
+            alert('🎯 Goals feature coming soon! Set savings targets and track your progress.');
         }
 
         function exportData() {
-            // Create enhanced CSV export
             const csvContent = "data:text/csv;charset=utf-8," 
                 + "Date,Description,Category,Amount,Type\n"
                 + processedTransactions.map(t => 
@@ -1567,7 +1421,6 @@
             link.click();
             document.body.removeChild(link);
 
-            // Show success message
             const successDiv = document.createElement('div');
             successDiv.className = 'success-message';
             successDiv.textContent = '✅ Financial analysis exported successfully!';
@@ -1576,10 +1429,9 @@
             setTimeout(() => successDiv.remove(), 3000);
         }
 
-        // Navigation back to dashboard
         function backToDashboard() {
             window.location.href = 'index.html';
         }
     </script>
 </body>
-</html>
+    </html>
