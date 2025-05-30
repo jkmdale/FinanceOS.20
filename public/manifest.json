@@ -1,7 +1,7 @@
 {
   "name": "FinanceOS - Personal Finance Operating System",
   "short_name": "FinanceOS",
-  "description": "Complete personal finance management with AI-powered budget analysis and goal tracking",
+  "description": "Complete personal finance management with AI-powered budget analysis, goal tracking, and debt recovery planning. Transform your financial life with smart insights and automation.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",
@@ -9,7 +9,7 @@
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "en",
-  "categories": ["finance", "productivity", "lifestyle", "business"],
+  "categories": ["finance", "productivity", "lifestyle", "business", "utilities"],
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
@@ -58,29 +58,61 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
   "shortcuts": [
     {
       "name": "Financial Goals",
       "short_name": "Goals",
-      "description": "Track your financial recovery progress",
+      "description": "Track your financial recovery progress and milestones",
       "url": "/goals.html",
-      "icons": [{ "src": "/icons/shortcut-goals.png", "sizes": "96x96" }]
+      "icons": [{ "src": "/icons/shortcut-goals.png", "sizes": "96x96", "type": "image/png" }]
     },
     {
       "name": "Upload Statements",
       "short_name": "Upload CSV",
-      "description": "Import and analyze bank statements",
+      "description": "Import and analyze bank statements with AI insights",
       "url": "/csv-upload.html",
-      "icons": [{ "src": "/icons/shortcut-upload.png", "sizes": "96x96" }]
+      "icons": [{ "src": "/icons/shortcut-upload.png", "sizes": "96x96", "type": "image/png" }]
     },
     {
       "name": "Add to Emergency Fund",
       "short_name": "Emergency Fund",
       "description": "Quickly add money to emergency savings",
       "url": "/goals.html#emergency-fund",
-      "icons": [{ "src": "/icons/shortcut-emergency.png", "sizes": "96x96" }]
+      "icons": [{ "src": "/icons/shortcut-emergency.png", "sizes": "96x96", "type": "image/png" }]
+    },
+    {
+      "name": "Budget Recovery Plan",
+      "short_name": "Recovery Plan",
+      "description": "View your 3-month deficit elimination strategy",
+      "url": "/goals.html#budget-recovery",
+      "icons": [{ "src": "/icons/shortcut-recovery.png", "sizes": "96x96", "type": "image/png" }]
+    },
+    {
+      "name": "Quick Transaction Entry",
+      "short_name": "Add Transaction",
+      "description": "Quickly log income or expense",
+      "url": "/?action=add-transaction",
+      "icons": [{ "src": "/icons/shortcut-transaction.png", "sizes": "96x96", "type": "image/png" }]
     }
   ],
   "screenshots": [
@@ -88,15 +120,85 @@
       "src": "/screenshots/dashboard.png",
       "sizes": "540x720",
       "type": "image/png",
-      "form_factor": "narrow"
+      "form_factor": "narrow",
+      "label": "FinanceOS Dashboard with financial overview"
     },
     {
       "src": "/screenshots/goals.png", 
       "sizes": "540x720",
       "type": "image/png",
-      "form_factor": "narrow"
+      "form_factor": "narrow",
+      "label": "Financial goals tracking and progress monitoring"
+    },
+    {
+      "src": "/screenshots/csv-analysis.png", 
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "CSV upload and AI-powered transaction analysis"
+    },
+    {
+      "src": "/screenshots/desktop-dashboard.png",
+      "sizes": "1024x768",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "FinanceOS desktop experience"
     }
   ],
+  "file_handlers": [
+    {
+      "action": "/csv-upload.html",
+      "accept": {
+        "text/csv": [".csv"],
+        "application/vnd.ms-excel": [".xls"],
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"]
+      }
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+financeos",
+      "url": "/?handler=%s"
+    }
+  ],
+  "share_target": {
+    "action": "/csv-upload.html",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "csv_file",
+          "accept": ["text/csv", ".csv", "application/vnd.ms-excel", ".xls", ".xlsx"]
+        }
+      ]
+    }
+  },
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "handle_links": "preferred",
+  "capture_links": "existing-client-navigate",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "any",
   "related_applications": [],
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "iarc_rating_id": "",
+  "version": "1.0.0",
+  "scope_extensions": [
+    {
+      "origin": "https://jkmdale.github.io"
+    }
+  ],
+  "id": "financeos-pwa",
+  "start_url_params": {
+    "utm_source": "pwa",
+    "utm_medium": "homescreen"
+  }
 }
