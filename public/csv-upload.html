@@ -522,6 +522,48 @@
             line-height: 1.5;
             margin-bottom: 0.5rem;
         }
+
+        /* Budget Analysis Styles */
+        .budget-comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .budget-card {
+            padding: 1rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .recommendation-item {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .timeline-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body>
@@ -661,6 +703,133 @@
                     <div id="insightsChart">
                         <!-- Financial insights will go here -->
                     </div>
+                </div>
+            </div>
+
+            <!-- NEW: AI Budget Analysis Section -->
+            <div id="budget-analysis-section" class="glass-premium" style="border-radius: 20px; padding: 2rem; margin-top: 2rem; display: none;">
+                <div style="display: flex; align-items: center; margin-bottom: 2rem;">
+                    <div style="width: 3rem; height: 3rem; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-right: 1rem;" class="gradient-red">
+                        📊
+                    </div>
+                    <div>
+                        <h3 style="font-size: 1.5rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">AI Budget Analysis & Action Plan</h3>
+                        <p style="color: rgba(255, 255, 255, 0.7);">Smart recommendations based on your spending patterns</p>
+                    </div>
+                </div>
+
+                <!-- Critical Alert -->
+                <div id="budget-critical-alert" style="background: rgba(239, 68, 68, 0.2); border: 2px solid rgba(239, 68, 68, 0.3); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem;">
+                    <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                        <span style="font-size: 1.5rem; margin-right: 1rem;">🚨</span>
+                        <div>
+                            <h4 style="color: white; font-weight: 600; margin-bottom: 0.25rem;">CRITICAL: Monthly Deficit Detected</h4>
+                            <p style="color: #fca5a5;" id="deficit-amount">Analyzing your financial data...</p>
+                        </div>
+                    </div>
+                    <div style="background: rgba(220, 38, 38, 0.3); border-radius: 12px; padding: 1rem;">
+                        <p style="color: white; font-size: 0.9rem; font-weight: 500; margin-bottom: 0.75rem;">Immediate Actions Required:</p>
+                        <ul style="color: #fca5a5; font-size: 0.8rem; margin: 0; padding-left: 1.5rem;" id="immediate-actions">
+                            <li>Analyzing spending patterns...</li>
+                        </ul>
+                        <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(5, 150, 105, 0.3); border-radius: 8px;">
+                            <p style="color: #6ee7b7; font-size: 0.8rem; font-weight: 500;" id="projected-result">
+                                Calculating potential outcomes...
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monthly Budget Breakdown -->
+                <div class="budget-comparison-grid">
+                    <div class="budget-card">
+                        <h4 style="color: white; font-weight: 600; margin-bottom: 1rem;">Current Monthly Reality</h4>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: rgba(255, 255, 255, 0.7);">Income:</span>
+                                <span style="color: #10b981; font-weight: 500;" id="current-income">$0</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: rgba(255, 255, 255, 0.7);">Expenses:</span>
+                                <span style="color: #ef4444; font-weight: 500;" id="current-expenses">$0</span>
+                            </div>
+                            <div style="border-top: 1px solid rgba(255, 255, 255, 0.2); padding-top: 0.5rem; margin-top: 0.5rem;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: white; font-weight: 500;">Net:</span>
+                                    <span style="font-weight: 700;" id="current-net">$0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="budget-card">
+                        <h4 style="color: white; font-weight: 600; margin-bottom: 1rem;">Target Monthly Budget</h4>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: rgba(255, 255, 255, 0.7);">Income Goal:</span>
+                                <span style="color: #10b981; font-weight: 500;" id="target-income">$0</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: rgba(255, 255, 255, 0.7);">Expense Target:</span>
+                                <span style="color: #3b82f6; font-weight: 500;" id="target-expenses">$0</span>
+                            </div>
+                            <div style="border-top: 1px solid rgba(255, 255, 255, 0.2); padding-top: 0.5rem; margin-top: 0.5rem;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: white; font-weight: 500;">Target Surplus:</span>
+                                    <span style="color: #10b981; font-weight: 700;" id="target-surplus">$0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category Optimization -->
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: white; font-weight: 600; margin-bottom: 1rem;">Category-by-Category Action Plan</h4>
+                    <div id="category-recommendations">
+                        <!-- Category recommendations will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Progress Tracker -->
+                <div class="budget-card" style="margin-bottom: 2rem;">
+                    <h4 style="color: white; font-weight: 600; margin-bottom: 1rem;">3-Month Recovery Timeline</h4>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div class="timeline-item">
+                            <div class="timeline-number gradient-red">1</div>
+                            <div style="flex: 1;">
+                                <div style="color: white; font-weight: 500;">Month 1: Emergency Cuts</div>
+                                <div style="color: rgba(255, 255, 255, 0.6); font-size: 0.9rem;" id="month1-target">Reduce deficit by 50%</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-number gradient-orange">2</div>
+                            <div style="flex: 1;">
+                                <div style="color: white; font-weight: 500;">Month 2: Habit Formation</div>
+                                <div style="color: rgba(255, 255, 255, 0.6); font-size: 0.9rem;">Achieve break-even: $0 deficit</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-number gradient-green">3</div>
+                            <div style="flex: 1;">
+                                <div style="color: white; font-weight: 500;">Month 3: Surplus & Savings</div>
+                                <div style="color: rgba(255, 255, 255, 0.6); font-size: 0.9rem;" id="month3-target">Generate monthly surplus</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Budget Action Buttons -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem;">
+                    <button onclick="generateWeeklyBudget()" class="action-btn gradient-blue">
+                        📅 Create Weekly Budget
+                    </button>
+                    <button onclick="setupGoalTracking()" class="action-btn gradient-green">
+                        🎯 Track Goals
+                    </button>
+                    <button onclick="exportBudgetPlan()" class="action-btn gradient-purple">
+                        📊 Export Budget Plan
+                    </button>
                 </div>
             </div>
 
@@ -1152,6 +1321,9 @@
             displayTransactions();
             displayCategoryBreakdown();
             displayFinancialInsights();
+            
+            // NEW: Trigger budget analysis
+            triggerBudgetAnalysis(income, expenses);
         }
 
         function getCategoryClass(category) {
@@ -1313,6 +1485,250 @@
             // Implementation for financial health analysis
         }
 
+        // NEW: Budget Analysis Functions
+        function triggerBudgetAnalysis(totalIncome, totalExpenses) {
+            const monthlyIncome = totalIncome / 3; // Assuming 3 months of data
+            const monthlyExpenses = totalExpenses / 3;
+            const monthlyDeficit = monthlyExpenses - monthlyIncome;
+
+            // Get category data from current spending breakdown
+            const categoryData = {};
+            processedTransactions.forEach(transaction => {
+                if (transaction.amount < 0) {
+                    const category = transaction.category;
+                    categoryData[category] = (categoryData[category] || 0) + Math.abs(transaction.amount);
+                }
+            });
+
+            generateBudgetAnalysis(monthlyIncome, monthlyExpenses, monthlyDeficit, categoryData);
+        }
+
+        function generateBudgetAnalysis(monthlyIncome, monthlyExpenses, monthlyDeficit, categoryData) {
+            // Update the budget analysis display
+            document.getElementById('current-income').textContent = `$${monthlyIncome.toFixed(0)}`;
+            document.getElementById('current-expenses').textContent = `$${monthlyExpenses.toFixed(0)}`;
+            
+            const currentNetElement = document.getElementById('current-net');
+            if (monthlyDeficit > 0) {
+                currentNetElement.textContent = `-$${monthlyDeficit.toFixed(0)}`;
+                currentNetElement.className = 'text-red-400 font-bold';
+                currentNetElement.style.color = '#ef4444';
+            } else {
+                currentNetElement.textContent = `+$${Math.abs(monthlyDeficit).toFixed(0)}`;
+                currentNetElement.className = 'text-green-400 font-bold';
+                currentNetElement.style.color = '#10b981';
+            }
+
+            // Update deficit alert
+            if (monthlyDeficit > 0) {
+                document.getElementById('deficit-amount').textContent = `You're spending $${monthlyDeficit.toFixed(0)} more than you earn each month`;
+                
+                // Generate action items based on spending data
+                const actions = generateActionItems(categoryData, monthlyDeficit);
+                document.getElementById('immediate-actions').innerHTML = actions.map(action => `<li>${action}</li>`).join('');
+                
+                // Calculate potential savings
+                const potentialSavings = calculatePotentialSavings(categoryData);
+                const targetIncome = monthlyIncome + 500; // Assume $500 additional income
+                const targetExpenses = monthlyExpenses - potentialSavings;
+                const targetSurplus = targetIncome - targetExpenses;
+                
+                document.getElementById('target-income').textContent = `$${targetIncome.toFixed(0)}`;
+                document.getElementById('target-expenses').textContent = `$${targetExpenses.toFixed(0)}`;
+                document.getElementById('target-surplus').textContent = `+$${targetSurplus.toFixed(0)}`;
+                
+                document.getElementById('projected-result').textContent = 
+                    `Result: Monthly surplus of +$${targetSurplus.toFixed(0)} instead of -$${monthlyDeficit.toFixed(0)} deficit`;
+                
+                // Update timeline targets
+                document.getElementById('month1-target').textContent = `Reduce deficit from -$${monthlyDeficit.toFixed(0)} to -$${(monthlyDeficit * 0.5).toFixed(0)}`;
+                document.getElementById('month3-target').textContent = `Generate +$${targetSurplus.toFixed(0)} monthly surplus`;
+                
+                // Generate category recommendations
+                generateCategoryRecommendations(categoryData);
+            }
+
+            // Show the budget analysis section
+            document.getElementById('budget-analysis-section').style.display = 'block';
+        }
+
+        function generateActionItems(categoryData, deficit) {
+            const actions = [];
+            
+            // Food & Dining optimization
+            const foodSpending = categoryData['Food & Dining'] || 0;
+            if (foodSpending > 2400) { // $800/month threshold
+                const monthlyfood = foodSpending / 3;
+                const targetFood = 600;
+                const savings = monthlyfood - targetFood;
+                actions.push(`Reduce Food & Dining from $${monthlyfood.toFixed(0)} to $${targetFood}/month (-$${savings.toFixed(0)})`);
+            }
+            
+            // Shopping & Retail optimization
+            const shoppingSpending = categoryData['Shopping & Retail'] || 0;
+            if (shoppingSpending > 900) {
+                const monthlyShopping = shoppingSpending / 3;
+                const targetShopping = 300;
+                const savings = monthlyShopping - targetShopping;
+                actions.push(`Cut Shopping & Retail from $${monthlyShopping.toFixed(0)} to $${targetShopping}/month (-$${savings.toFixed(0)})`);
+            }
+            
+            actions.push('Cancel unnecessary subscriptions (-$100)');
+            actions.push('Find additional income source (+$500)');
+            
+            return actions;
+        }
+
+        function calculatePotentialSavings(categoryData) {
+            let totalSavings = 0;
+            
+            // Food & Dining: reduce to $600/month
+            const foodSpending = (categoryData['Food & Dining'] || 0) / 3;
+            if (foodSpending > 600) {
+                totalSavings += foodSpending - 600;
+            }
+            
+            // Shopping & Retail: reduce to $300/month
+            const shoppingSpending = (categoryData['Shopping & Retail'] || 0) / 3;
+            if (shoppingSpending > 300) {
+                totalSavings += shoppingSpending - 300;
+            }
+            
+            // Subscriptions and misc: $100 savings
+            totalSavings += 100;
+            
+            return totalSavings;
+        }
+
+        function generateCategoryRecommendations(categoryData) {
+            const container = document.getElementById('category-recommendations');
+            container.innerHTML = '';
+            
+            // Food & Dining recommendation
+            const foodSpending = categoryData['Food & Dining'] || 0;
+            if (foodSpending > 2400) { // More than $800/month
+                const monthlyFood = foodSpending / 3;
+                const dailyFood = monthlyFood / 30;
+                
+                container.innerHTML += `
+                    <div class="recommendation-item">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <div style="display: flex; align-items: center;">
+                                <span style="font-size: 1.2rem; margin-right: 0.5rem;">🍽️</span>
+                                <span style="color: white; font-weight: 500;">Food & Dining</span>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="color: #ef4444; font-size: 0.9rem; text-decoration: line-through;">$${monthlyFood.toFixed(0)}/month</div>
+                                <div style="color: #10b981; font-weight: 500;">$600/month</div>
+                            </div>
+                        </div>
+                        <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 0.5rem;">
+                            Currently $${dailyFood.toFixed(0)}/day average. Target: $20/day average.
+                        </div>
+                        <div style="background: rgba(59, 130, 246, 0.2); border-radius: 8px; padding: 0.75rem;">
+                            <ul style="color: #93c5fd; font-size: 0.8rem; margin: 0; padding-left: 1rem;">
+                                <li>Plan meals every Sunday (save $15/week)</li>
+                                <li>Limit takeaways to 2x per week (save $25/week)</li>
+                                <li>Shop with lists at Woolworths specials (save $20/week)</li>
+                                <li>Cook extra portions for leftovers (save $25/week)</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Shopping & Retail recommendation
+            const shoppingSpending = categoryData['Shopping & Retail'] || 0;
+            if (shoppingSpending > 900) {
+                const monthlyShopping = shoppingSpending / 3;
+                
+                container.innerHTML += `
+                    <div class="recommendation-item">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <div style="display: flex; align-items: center;">
+                                <span style="font-size: 1.2rem; margin-right: 0.5rem;">🛍️</span>
+                                <span style="color: white; font-weight: 500;">Shopping & Retail</span>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="color: #ef4444; font-size: 0.9rem; text-decoration: line-through;">$${monthlyShopping.toFixed(0)}/month</div>
+                                <div style="color: #10b981; font-weight: 500;">$300/month</div>
+                            </div>
+                        </div>
+                        <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 0.5rem;">
+                            Non-essential purchases. Target: $75/week maximum.
+                        </div>
+                        <div style="background: rgba(59, 130, 246, 0.2); border-radius: 8px; padding: 0.75rem;">
+                            <ul style="color: #93c5fd; font-size: 0.8rem; margin: 0; padding-left: 1rem;">
+                                <li>48-hour rule for purchases over $50</li>
+                                <li>Weekly cash envelope: $75 maximum</li>
+                                <li>Unsubscribe from promotional emails</li>
+                                <li>Ask "Do I really need this?" before buying</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Additional Income recommendation
+            container.innerHTML += `
+                <div class="recommendation-item">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <div style="display: flex; align-items: center;">
+                            <span style="font-size: 1.2rem; margin-right: 0.5rem;">💰</span>
+                            <span style="color: white; font-weight: 500;">Additional Income</span>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="color: #10b981; font-weight: 500;">+$500/month</div>
+                        </div>
+                    </div>
+                    <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 0.5rem;">
+                        Boost income to accelerate financial recovery.
+                    </div>
+                    <div style="background: rgba(16, 185, 129, 0.2); border-radius: 8px; padding: 0.75rem;">
+                        <ul style="color: #6ee7b7; font-size: 0.8rem; margin: 0; padding-left: 1rem;">
+                            <li>Weekend side work in engineering field</li>
+                            <li>Freelance consulting or tutoring</li>
+                            <li>Sell unused items around the house</li>
+                            <li>Consider skills-based online work</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Action button functions
+        function generateWeeklyBudget() {
+            alert('🚧 Weekly Budget Generator\n\nComing in next update! This will create week-by-week spending targets based on your monthly budget plan.\n\nFor now, try to limit spending to:\n• Food: $150/week\n• Shopping: $75/week\n• Other discretionary: $100/week');
+        }
+
+        function setupGoalTracking() {
+            alert('🚧 Goal Tracking System\n\nComing next! This will help you track:\n• Emergency fund building ($0.17 → $3,000)\n• Debt payoff progress\n• Monthly surplus targets\n• Savings milestones');
+        }
+
+        function exportBudgetPlan() {
+            const budgetData = {
+                timestamp: new Date().toISOString(),
+                analysis: 'FinanceOS Budget Analysis Export',
+                monthlyIncome: parseFloat(document.getElementById('current-income').textContent.replace('$', '').replace(',', '')),
+                monthlyExpenses: parseFloat(document.getElementById('current-expenses').textContent.replace('$', '').replace(',', '')),
+                recommendations: [
+                    'Reduce Food & Dining to $600/month',
+                    'Limit Shopping & Retail to $300/month', 
+                    'Find additional $500 monthly income',
+                    'Build emergency fund to $3,000'
+                ],
+                timeline: '3 months to achieve monthly surplus'
+            };
+            
+            const blob = new Blob([JSON.stringify(budgetData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `financeOS-budget-plan-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
         function filterTransactions() {
             const tbody = document.getElementById('transactionsBody');
             const rows = tbody.querySelectorAll('tr');
@@ -1434,4 +1850,4 @@
         }
     </script>
 </body>
-    </html>
+</html>
