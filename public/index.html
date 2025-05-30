@@ -3,7 +3,39 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>FinanceOS - Personal Finance System</title>
+    <title>FinanceOS - Personal Finance Operating System</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FinanceOS">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#8b5cf6">
+    <meta name="msapplication-TileColor" content="#8b5cf6">
+    <meta name="msapplication-navbutton-color" content="#8b5cf6">
+    
+    <!-- App Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="shortcut icon" href="/icons/favicon.ico">
+    
+    <!-- App Description -->
+    <meta name="description" content="Complete personal finance management with AI coaching, budget tracking, and goal management. Transform your financial life with smart insights and automation.">
+    <meta name="keywords" content="personal finance, budget tracker, financial goals, expense management, savings, debt payoff, financial planning">
+    <meta name="author" content="FinanceOS">
+    
+    <!-- Social Media Sharing -->
+    <meta property="og:title" content="FinanceOS - Personal Finance Operating System">
+    <meta property="og:description" content="Complete personal finance management with AI coaching and smart insights">
+    <meta property="og:image" content="/icons/og-image.png">
+    <meta property="og:url" content="https://jkmdale.github.io/FinanceOS.20">
+    <meta property="og:type" content="website">
+    
+    <!-- Security -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -130,6 +162,73 @@
         }
         .success-msg.show { display: block; }
         
+        /* PWA Install Button Styles */
+        #install-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 16px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.4);
+            display: none;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            animation: pulse-glow 2s infinite;
+        }
+        
+        #install-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(139, 92, 246, 0.5);
+        }
+        
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+        }
+        
+        /* PWA Notification Styles */
+        .pwa-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            color: white;
+            z-index: 1001;
+            max-width: 300px;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .pwa-notification.show {
+            transform: translateX(0);
+        }
+        
+        /* PWA-specific styles for installed app */
+        .pwa-installed {
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        @supports (padding: max(0px)) {
+            .pwa-installed {
+                padding-left: max(12px, env(safe-area-inset-left));
+                padding-right: max(12px, env(safe-area-inset-right));
+            }
+        }
+        
         @media (max-width: 768px) {
             .login-container { max-width: 350px; }
             .login-form { padding: 30px; }
@@ -139,72 +238,15 @@
             .dashboard-content { padding: 20px; }
             .dashboard-title { font-size: 24px; }
             .cards-grid { grid-template-columns: 1fr; }
+            
+            #install-button {
+                bottom: 16px;
+                right: 16px;
+                padding: 12px 20px;
+                font-size: 13px;
+            }
         }
     </style>
-    <!-- Add these PWA meta tags to the <head> section of index.html -->
-
-<!-- Existing head content stays here -->
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FinanceOS - Personal Finance Operating System</title>
-
-<!-- PWA Meta Tags - ADD THESE BELOW YOUR EXISTING META TAGS -->
-
-<!-- PWA Manifest -->
-<link rel="manifest" href="/manifest.json">
-
-<!-- PWA App Behavior -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="FinanceOS">
-<meta name="mobile-web-app-capable" content="yes">
-
-<!-- Theme Colors -->
-<meta name="theme-color" content="#8b5cf6">
-<meta name="msapplication-TileColor" content="#8b5cf6">
-<meta name="msapplication-navbutton-color" content="#8b5cf6">
-
-<!-- Icons (we'll create these in Step 5, but add the links now) -->
-<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
-<link rel="shortcut icon" href="/icons/favicon.ico">
-
-<!-- Preconnect for Performance -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://cdnjs.cloudflare.com">
-
-<!-- PWA Startup Images for iOS -->
-<link rel="apple-touch-startup-image" href="/icons/apple-splash-2048-2732.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="/icons/apple-splash-1668-2388.png" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="/icons/apple-splash-1536-2048.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="/icons/apple-splash-1284-2778.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="/icons/apple-splash-1170-2532.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="/icons/apple-splash-1125-2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-
-<!-- Enhanced App Description -->
-<meta name="description" content="Complete personal finance management with AI coaching, budget tracking, and goal management. Transform your financial life with smart insights and automation.">
-<meta name="keywords" content="personal finance, budget tracker, financial goals, expense management, savings, debt payoff, financial planning">
-<meta name="author" content="FinanceOS">
-
-<!-- Social Media / Sharing -->
-<meta property="og:title" content="FinanceOS - Personal Finance Operating System">
-<meta property="og:description" content="Complete personal finance management with AI coaching and smart insights">
-<meta property="og:image" content="/icons/og-image.png">
-<meta property="og:url" content="https://jkmdale.github.io/FinanceOS.20">
-<meta property="og:type" content="website">
-
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="FinanceOS - Personal Finance Operating System">
-<meta name="twitter:description" content="Complete personal finance management with AI coaching and smart insights">
-<meta name="twitter:image" content="/icons/twitter-image.png">
-
-<!-- Security -->
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https:; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com;">
-
-<!-- Your existing CSS links go here -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
 </head>
 <body>
     <div id="loginScreen" class="login-screen">
@@ -260,17 +302,17 @@
         <div class="dashboard-content">
             <h2 class="dashboard-title">Financial Dashboard</h2>
             <div class="cards-grid">
-                <div class="card card-1">
+                <div class="card card-1" onclick="window.location.href='csv-upload.html'">
                     <div class="card-icon">📊</div>
                     <h3 class="card-title">Dashboard</h3>
                     <p class="card-desc">View your complete financial overview and insights</p>
                 </div>
-                <div class="card card-2">
+                <div class="card card-2" onclick="window.location.href='csv-upload.html'">
                     <div class="card-icon">📤</div>
                     <h3 class="card-title">Upload CSV</h3>
                     <p class="card-desc">Import your bank statements and transaction data</p>
                 </div>
-                <div class="card card-3">
+                <div class="card card-3" onclick="window.location.href='goals.html'">
                     <div class="card-icon">🎯</div>
                     <h3 class="card-title">Goals</h3>
                     <p class="card-desc">Set and track your financial goals and milestones</p>
@@ -284,7 +326,9 @@
         </div>
     </div>
 
+    <!-- PWA JavaScript -->
     <script>
+        // Main app functionality
         function login() {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('dashboard').classList.add('active');
@@ -299,6 +343,175 @@
             document.getElementById('dashboard').classList.remove('active');
             document.getElementById('successMsg').classList.remove('show');
         }
+
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('✅ SW registered: ', registration);
+                        
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    showPWANotification('🔄 App updated! Refresh to get new features.', 'info');
+                                }
+                            });
+                        });
+                    })
+                    .catch((registrationError) => {
+                        console.log('❌ SW registration failed: ', registrationError);
+                    });
+            });
+        }
+
+        // PWA Install Prompt
+        let deferredPrompt;
+        let installButton;
+
+        // Create install button
+        function createInstallButton() {
+            installButton = document.createElement('button');
+            installButton.id = 'install-button';
+            installButton.innerHTML = `
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Install App
+            `;
+            installButton.style.display = 'none';
+            document.body.appendChild(installButton);
+        }
+
+        // Listen for PWA install prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('💾 PWA install prompt triggered');
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Create install button if it doesn't exist
+            if (!installButton) {
+                createInstallButton();
+            }
+            
+            // Show install button after 5 seconds if not dismissed
+            setTimeout(() => {
+                if (!localStorage.getItem('pwa-install-dismissed') && !isAppInstalled()) {
+                    installButton.style.display = 'flex';
+                }
+            }, 5000);
+        });
+
+        // Handle install button click
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'install-button' || e.target.closest('#install-button')) {
+                installPWA();
+            }
+        });
+
+        // Install PWA function
+        async function installPWA() {
+            if (!deferredPrompt) return;
+            
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            if (outcome === 'accepted') {
+                console.log('✅ User accepted PWA install');
+                if (installButton) installButton.style.display = 'none';
+                showPWANotification('🎉 FinanceOS installed! Check your home screen.', 'success');
+            } else {
+                console.log('❌ User dismissed PWA install');
+                localStorage.setItem('pwa-install-dismissed', 'true');
+                if (installButton) installButton.style.display = 'none';
+            }
+            
+            deferredPrompt = null;
+        }
+
+        // Check if app is already installed
+        function isAppInstalled() {
+            return window.matchMedia('(display-mode: standalone)').matches || 
+                   window.navigator.standalone === true;
+        }
+
+        // Listen for successful app installation
+        window.addEventListener('appinstalled', () => {
+            console.log('🎉 FinanceOS installed successfully!');
+            if (installButton) installButton.style.display = 'none';
+            showPWANotification('🎉 Welcome to FinanceOS! App installed successfully.', 'success');
+        });
+
+        // PWA Notification System
+        function showPWANotification(message, type = 'info') {
+            const colors = {
+                success: 'rgba(16, 185, 129, 0.2)',
+                error: 'rgba(239, 68, 68, 0.2)',
+                warning: 'rgba(245, 158, 11, 0.2)',
+                info: 'rgba(59, 130, 246, 0.2)'
+            };
+            
+            const notification = document.createElement('div');
+            notification.className = 'pwa-notification';
+            notification.style.background = colors[type];
+            notification.innerHTML = `
+                <p style="margin: 0; font-weight: 500;">${message}</p>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 5000);
+        }
+
+        // Online/Offline status
+        window.addEventListener('online', () => {
+            showPWANotification('🌐 Back online! Data will sync automatically.', 'success');
+        });
+
+        window.addEventListener('offline', () => {
+            showPWANotification('📱 Working offline. Changes will sync when reconnected.', 'warning');
+        });
+
+        // Enhanced iOS PWA experience
+        if (isAppInstalled()) {
+            document.body.classList.add('pwa-installed');
+            
+            // Prevent zoom on iOS
+            document.addEventListener('touchstart', (e) => {
+                if (e.touches.length > 1) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', (e) => {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    e.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+        }
+
+        // Debug info (remove in production)
+        console.log('🔍 PWA Debug Info:');
+        console.log('📱 Installed:', isAppInstalled());
+        console.log('🌐 Online:', navigator.onLine);
+        console.log('💾 Service Worker supported:', 'serviceWorker' in navigator);
+        console.log('📋 Manifest:', document.querySelector('link[rel="manifest"]')?.href);
     </script>
 </body>
 </html>
