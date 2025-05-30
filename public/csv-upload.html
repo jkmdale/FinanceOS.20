@@ -453,33 +453,138 @@
             </ul>
         </div>
 
-        <!-- Upload Zone -->
         <div class="upload-zone glass-premium" id="uploadZone">
-            <div class="upload-icon gradient-purple">📄</div>
-            <div class="upload-text">
-                <h3>Upload Your Bank Statements</h3>
-                <p>Drag and drop your CSV files here, or click to browse</p>
-                <button class="upload-btn gradient-purple" onclick="document.getElementById('fileInput').click()">
-                    Choose Files
-                </button>
-            </div>
-            <div class="supported-banks">
-                <span class="bank-tag">ANZ</span>
-                <span class="bank-tag">ASB</span>
-                <span class="bank-tag">BNZ</span>
-                <span class="bank-tag">Kiwibank</span>
-                <span class="bank-tag">Westpac</span>
-            </div>
-        </div>
+    <div class="upload-icon gradient-purple">📄</div>
+    <div class="upload-text">
+        <h3>Upload Your Bank Statements</h3>
+        <p>Select multiple CSV files at once for complete analysis</p>
+        <button class="upload-btn gradient-purple" onclick="document.getElementById('fileInput').click()">
+            📁 Choose Multiple Files
+        </button>
+        <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 0.5rem;">
+            💡 Hold Ctrl/Cmd to select multiple files
+        </p>
+    </div>
+    <div class="supported-banks">
+        <span class="bank-tag">ANZ</span>
+        <span class="bank-tag">ASB</span>
+        <span class="bank-tag">BNZ</span>
+        <span class="bank-tag">Kiwibank</span>
+        <span class="bank-tag">Westpac</span>
+    </div>
+</div>
 
-        <input type="file" id="fileInput" accept=".csv,text/csv,application/csv,text/comma-separated-values" multiple>
+<!-- Selected Files Display -->
+<div class="selected-files glass" id="selectedFiles" style="display: none; margin-bottom: 2rem; padding: 1.5rem; border-radius: 16px;">
+    <h3 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        📋 Selected Files 
+        <span id="fileCount" style="background: rgba(139, 92, 246, 0.3); padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem;"></span>
+    </h3>
+    <div id="fileList" style="max-height: 200px; overflow-y: auto;"></div>
+    <div style="margin-top: 1rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+        <button class="upload-btn gradient-green" onclick="processSelectedFiles()" id="processBtn">
+            🚀 Process All Files
+        </button>
+        <button class="upload-btn" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3);" onclick="clearSelectedFiles()">
+            🗑️ Clear All
+        </button>
+        <button class="upload-btn" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3);" onclick="document.getElementById('fileInput').click()">
+            ➕ Add More Files
+        </button>
+    </div>
+</div>
 
-        <!-- Processing Indicator -->
-        <div class="processing glass" id="processing">
-            <div class="spinner"></div>
-            <h3>Processing Your Data...</h3>
-            <p>Analyzing transactions and categorizing spending</p>
-        </div>
+<input type="file" id="fileInput" accept="*/*" multiple>
+
+<!-- STEP 2: Add these CSS styles in your <style> section -->
+<style>
+/* Enhanced file display styles */
+.file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.file-item:last-child {
+    margin-bottom: 0;
+}
+
+.file-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.file-name {
+    font-weight: 500;
+    color: white;
+    font-size: 0.9rem;
+}
+
+.file-details {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 0.25rem;
+}
+
+.file-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.status-ready {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
+
+.status-processing {
+    background: rgba(139, 92, 246, 0.2);
+    color: #a855f7;
+}
+
+.status-completed {
+    background: rgba(16, 185, 129, 0.3);
+    color: #10b981;
+}
+
+.status-error {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
+
+.remove-file {
+    background: rgba(239, 68, 68, 0.2);
+    border: none;
+    color: #f87171;
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.remove-file:hover {
+    background: rgba(239, 68, 68, 0.3);
+}
+
+/* Mobile responsive enhancements */
+@media (max-width: 768px) {
+    .file-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+}
+</style>
 
         <!-- Results Section -->
         <div class="results" id="results">
