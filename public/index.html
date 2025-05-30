@@ -141,6 +141,70 @@
             .cards-grid { grid-template-columns: 1fr; }
         }
     </style>
+    <!-- Add these PWA meta tags to the <head> section of index.html -->
+
+<!-- Existing head content stays here -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinanceOS - Personal Finance Operating System</title>
+
+<!-- PWA Meta Tags - ADD THESE BELOW YOUR EXISTING META TAGS -->
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="/manifest.json">
+
+<!-- PWA App Behavior -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FinanceOS">
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- Theme Colors -->
+<meta name="theme-color" content="#8b5cf6">
+<meta name="msapplication-TileColor" content="#8b5cf6">
+<meta name="msapplication-navbutton-color" content="#8b5cf6">
+
+<!-- Icons (we'll create these in Step 5, but add the links now) -->
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+<link rel="shortcut icon" href="/icons/favicon.ico">
+
+<!-- Preconnect for Performance -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+<!-- PWA Startup Images for iOS -->
+<link rel="apple-touch-startup-image" href="/icons/apple-splash-2048-2732.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="/icons/apple-splash-1668-2388.png" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="/icons/apple-splash-1536-2048.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="/icons/apple-splash-1284-2778.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="/icons/apple-splash-1170-2532.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="/icons/apple-splash-1125-2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+
+<!-- Enhanced App Description -->
+<meta name="description" content="Complete personal finance management with AI coaching, budget tracking, and goal management. Transform your financial life with smart insights and automation.">
+<meta name="keywords" content="personal finance, budget tracker, financial goals, expense management, savings, debt payoff, financial planning">
+<meta name="author" content="FinanceOS">
+
+<!-- Social Media / Sharing -->
+<meta property="og:title" content="FinanceOS - Personal Finance Operating System">
+<meta property="og:description" content="Complete personal finance management with AI coaching and smart insights">
+<meta property="og:image" content="/icons/og-image.png">
+<meta property="og:url" content="https://jkmdale.github.io/FinanceOS.20">
+<meta property="og:type" content="website">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="FinanceOS - Personal Finance Operating System">
+<meta name="twitter:description" content="Complete personal finance management with AI coaching and smart insights">
+<meta name="twitter:image" content="/icons/twitter-image.png">
+
+<!-- Security -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https:; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com;">
+
+<!-- Your existing CSS links go here -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
 </head>
 <body>
     <div id="loginScreen" class="login-screen">
