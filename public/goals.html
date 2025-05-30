@@ -3,7 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinanceOS - Financial Goals</title>
+    <title>Financial Goals - FinanceOS</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FinanceOS">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#8b5cf6">
+    <meta name="msapplication-TileColor" content="#8b5cf6">
+    <meta name="msapplication-navbutton-color" content="#8b5cf6">
+    
+    <!-- App Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="shortcut icon" href="/icons/favicon.ico">
+    
+    <!-- App Description -->
+    <meta name="description" content="Track and achieve your financial goals with smart progress monitoring and AI insights. Build emergency funds, eliminate debt, and create sustainable savings.">
+    <meta name="keywords" content="financial goals, emergency fund, debt payoff, savings tracker, budget recovery, financial planning">
+    <meta name="author" content="FinanceOS">
+    
+    <!-- Social Media Sharing -->
+    <meta property="og:title" content="Financial Goals - FinanceOS">
+    <meta property="og:description" content="Track and achieve your financial goals with smart progress monitoring and AI insights">
+    <meta property="og:image" content="/icons/og-image.png">
+    <meta property="og:url" content="https://jkmdale.github.io/FinanceOS.20/goals.html">
+    <meta property="og:type" content="website">
+    
+    <!-- Security -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
     <style>
         * {
             margin: 0;
@@ -399,6 +431,73 @@
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
         }
 
+        /* PWA Install Button Styles */
+        #install-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 16px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.4);
+            display: none;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            animation: pulse-glow 2s infinite;
+        }
+        
+        #install-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(139, 92, 246, 0.5);
+        }
+        
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+        }
+        
+        /* PWA Notification Styles */
+        .pwa-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            color: white;
+            z-index: 1001;
+            max-width: 300px;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .pwa-notification.show {
+            transform: translateX(0);
+        }
+
+        /* PWA-specific styles for installed app */
+        .pwa-installed {
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        @supports (padding: max(0px)) {
+            .pwa-installed {
+                padding-left: max(12px, env(safe-area-inset-left));
+                padding-right: max(12px, env(safe-area-inset-right));
+            }
+        }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .container {
@@ -424,6 +523,13 @@
             
             .actions-grid {
                 grid-template-columns: repeat(2, 1fr);
+            }
+
+            #install-button {
+                bottom: 16px;
+                right: 16px;
+                padding: 12px 20px;
+                font-size: 13px;
             }
         }
 
@@ -809,6 +915,7 @@
         <button class="action-btn btn-primary" onclick="closeCelebration()" style="margin-top: 1rem;">Continue</button>
     </div>
 
+    <!-- PWA and Original JavaScript -->
     <script>
         // Goal tracking data (in real app, this would come from your database)
         let goalData = {
@@ -843,7 +950,159 @@
             updateAllProgress();
             checkMilestones();
             loadUserProgress();
+            initializePWA();
         });
+
+        // PWA Service Worker Registration
+        function initializePWA() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('✅ SW registered: ', registration);
+                        
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    showPWANotification('🔄 App updated! New features available.', 'info');
+                                }
+                            });
+                        });
+                    })
+                    .catch((registrationError) => {
+                        console.log('❌ SW registration failed: ', registrationError);
+                    });
+            }
+
+            // PWA Install Prompt
+            let deferredPrompt;
+            let installButton;
+
+            function createInstallButton() {
+                installButton = document.createElement('button');
+                installButton.id = 'install-button';
+                installButton.innerHTML = `
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Install App
+                `;
+                installButton.style.display = 'none';
+                document.body.appendChild(installButton);
+            }
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                
+                if (!installButton) {
+                    createInstallButton();
+                }
+                
+                setTimeout(() => {
+                    if (!localStorage.getItem('pwa-install-dismissed') && !isAppInstalled()) {
+                        installButton.style.display = 'flex';
+                    }
+                }, 5000);
+            });
+
+            document.addEventListener('click', (e) => {
+                if (e.target.id === 'install-button' || e.target.closest('#install-button')) {
+                    installPWA();
+                }
+            });
+
+            async function installPWA() {
+                if (!deferredPrompt) return;
+                
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                
+                if (outcome === 'accepted') {
+                    console.log('✅ User accepted PWA install');
+                    if (installButton) installButton.style.display = 'none';
+                    showPWANotification('🎉 FinanceOS installed! Track goals offline.', 'success');
+                } else {
+                    localStorage.setItem('pwa-install-dismissed', 'true');
+                    if (installButton) installButton.style.display = 'none';
+                }
+                
+                deferredPrompt = null;
+            }
+
+            window.addEventListener('appinstalled', () => {
+                console.log('🎉 FinanceOS installed successfully!');
+                if (installButton) installButton.style.display = 'none';
+                showPWANotification('🎯 Goals tracker ready offline!', 'success');
+            });
+
+            // Online/Offline status
+            window.addEventListener('online', () => {
+                showPWANotification('🌐 Back online! Goal data will sync.', 'success');
+            });
+
+            window.addEventListener('offline', () => {
+                showPWANotification('📱 Offline mode: Goals still trackable!', 'warning');
+            });
+
+            // Enhanced iOS PWA experience
+            if (isAppInstalled()) {
+                document.body.classList.add('pwa-installed');
+                
+                // Prevent zoom on iOS
+                document.addEventListener('touchstart', (e) => {
+                    if (e.touches.length > 1) {
+                        e.preventDefault();
+                    }
+                }, { passive: false });
+                
+                let lastTouchEnd = 0;
+                document.addEventListener('touchend', (e) => {
+                    const now = (new Date()).getTime();
+                    if (now - lastTouchEnd <= 300) {
+                        e.preventDefault();
+                    }
+                    lastTouchEnd = now;
+                }, false);
+            }
+        }
+
+        function isAppInstalled() {
+            return window.matchMedia('(display-mode: standalone)').matches || 
+                   window.navigator.standalone === true;
+        }
+
+        function showPWANotification(message, type = 'info') {
+            const colors = {
+                success: 'rgba(16, 185, 129, 0.2)',
+                error: 'rgba(239, 68, 68, 0.2)',
+                warning: 'rgba(245, 158, 11, 0.2)',
+                info: 'rgba(59, 130, 246, 0.2)'
+            };
+            
+            const notification = document.createElement('div');
+            notification.className = 'pwa-notification';
+            notification.style.background = colors[type];
+            notification.innerHTML = `
+                <p style="margin: 0; font-weight: 500;">${message}</p>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 5000);
+        }
 
         function updateAllProgress() {
             updateEmergencyFundProgress();
