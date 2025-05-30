@@ -515,3 +515,207 @@
     </script>
 </body>
 </html>
+<!-- Add this script BEFORE the closing </body> tag in index.html -->
+<script>
+// PWA Installation Debug Script
+console.log('🔍 PWA Debug Starting...');
+
+// Check if running over HTTPS
+console.log('🔒 HTTPS:', location.protocol === 'https:');
+
+// Check if service worker is supported
+console.log('⚙️ Service Worker supported:', 'serviceWorker' in navigator);
+
+// Check if manifest is linked
+const manifestLink = document.querySelector('link[rel="manifest"]');
+console.log('📋 Manifest linked:', !!manifestLink, manifestLink?.href);
+
+// Check if we're in standalone mode (already installed)
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+console.log('📱 Already installed:', isStandalone);
+
+// Manual install button creation for testing
+function createTestInstallButton() {
+    const testButton = document.createElement('button');
+    testButton.innerHTML = '🧪 TEST INSTALL';
+    testButton.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: red;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        z-index: 9999;
+        cursor: pointer;
+    `;
+    testButton.onclick = () => {
+        console.log('🧪 Test install clicked');
+        if (window.deferredPrompt) {
+            console.log('✅ Deferred prompt available');
+            window.deferredPrompt.prompt();
+        } else {
+            console.log('❌ No deferred prompt available');
+            alert('Install prompt not available. Check console for details.');
+        }
+    };
+    document.body.appendChild(testButton);
+    console.log('🧪 Test install button created');
+}
+
+// Service Worker registration with detailed logging
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+        .then((registration) => {
+            console.log('✅ SW registered successfully:', registration);
+            console.log('📍 SW scope:', registration.scope);
+            console.log('📍 SW active:', !!registration.active);
+        })
+        .catch((error) => {
+            console.error('❌ SW registration failed:', error);
+        });
+} else {
+    console.error('❌ Service Worker not supported');
+}
+
+// Listen for beforeinstallprompt with detailed logging
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    console.log('🎯 beforeinstallprompt event fired!');
+    console.log('📅 Event details:', e);
+    
+    // Prevent default browser install prompt
+    e.preventDefault();
+    
+    // Store the event
+    deferredPrompt = e;
+    window.deferredPrompt = e; // Make it globally accessible
+    
+    console.log('💾 Install prompt stored');
+    
+    // Create install button
+    createInstallButton();
+});
+
+function createInstallButton() {
+    // Remove any existing install button
+    const existingButton = document.getElementById('install-button');
+    if (existingButton) {
+        existingButton.remove();
+    }
+    
+    const installButton = document.createElement('button');
+    installButton.id = 'install-button';
+    installButton.innerHTML = '📱 Install FinanceOS';
+    installButton.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 16px 24px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 8px 32px rgba(139, 92, 246, 0.4);
+        z-index: 1000;
+        animation: pulse 2s infinite;
+    `;
+    
+    installButton.onclick = async () => {
+        console.log('📱 Install button clicked');
+        
+        if (!deferredPrompt) {
+            console.error('❌ No deferred prompt available');
+            alert('Install not available. Try using browser menu "Install FinanceOS"');
+            return;
+        }
+        
+        try {
+            // Show the install prompt
+            deferredPrompt.prompt();
+            
+            // Wait for user choice
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log('🎯 User choice:', outcome);
+            
+            if (outcome === 'accepted') {
+                console.log('✅ User accepted install');
+                installButton.remove();
+            } else {
+                console.log('❌ User dismissed install');
+            }
+            
+            // Clear the deferred prompt
+            deferredPrompt = null;
+            window.deferredPrompt = null;
+            
+        } catch (error) {
+            console.error('❌ Install failed:', error);
+        }
+    };
+    
+    document.body.appendChild(installButton);
+    console.log('✅ Install button created and added to page');
+}
+
+// Check after page load
+window.addEventListener('load', () => {
+    console.log('📄 Page loaded, checking PWA status...');
+    
+    // Wait a bit then create test button
+    setTimeout(createTestInstallButton, 2000);
+    
+    // Check if install prompt should have fired by now
+    setTimeout(() => {
+        if (!deferredPrompt) {
+            console.log('⚠️ No install prompt after 5 seconds');
+            console.log('🔍 Possible reasons:');
+            console.log('   - App already installed');
+            console.log('   - User previously dismissed prompt');
+            console.log('   - PWA criteria not met');
+            console.log('   - Browser doesn\'t support PWA install');
+            
+            // Check browser support
+            const isChrome = /Chrome/.test(navigator.userAgent);
+            const isEdge = /Edge/.test(navigator.userAgent);
+            const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+            
+            console.log('🌐 Browser detection:');
+            console.log('   Chrome:', isChrome);
+            console.log('   Edge:', isEdge);
+            console.log('   Safari:', isSafari);
+            
+            if (isSafari) {
+                console.log('🍎 Safari: Use "Add to Home Screen" from share menu');
+            }
+        }
+    }, 5000);
+});
+
+// Listen for successful app installation
+window.addEventListener('appinstalled', () => {
+    console.log('🎉 App installed successfully!');
+    const installButton = document.getElementById('install-button');
+    if (installButton) {
+        installButton.remove();
+    }
+});
+
+// Add CSS for pulse animation
+const style = document.createElement('style');
+style.textContent = `
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+`;
+document.head.appendChild(style);
+
+console.log('🔍 PWA Debug script loaded');
+</script>
