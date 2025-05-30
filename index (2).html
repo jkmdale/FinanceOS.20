@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FinanceOS - Personal Finance Operating System</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FinanceOS">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#8b5cf6">
+    <meta name="msapplication-TileColor" content="#8b5cf6">
+    <meta name="msapplication-navbutton-color" content="#8b5cf6">
+    
+    <!-- App Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="shortcut icon" href="/icons/favicon.ico">
+    
+    <!-- App Description -->
+    <meta name="description" content="Complete personal finance management with AI coaching, budget tracking, and goal management. Transform your financial life with smart insights and automation.">
+    <meta name="keywords" content="personal finance, budget tracker, financial goals, expense management, savings, debt payoff, financial planning">
+    <meta name="author" content="FinanceOS">
+    
+    <!-- Social Media Sharing -->
+    <meta property="og:title" content="FinanceOS - Personal Finance Operating System">
+    <meta property="og:description" content="Complete personal finance management with AI coaching and smart insights">
+    <meta property="og:image" content="/icons/og-image.png">
+    <meta property="og:url" content="https://jkmdale.github.io/FinanceOS.20">
+    <meta property="og:type" content="website">
+    
+    <!-- Security -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+        .bg-blur { position: absolute; border-radius: 50%; filter: blur(40px); }
+        .blur1 { top: 10%; left: 10%; width: 80px; height: 80px; background: rgba(139, 92, 246, 0.1); }
+        .blur2 { top: 20%; right: 15%; width: 120px; height: 120px; background: rgba(59, 130, 246, 0.1); }
+        .blur3 { bottom: 15%; left: 25%; width: 100px; height: 100px; background: rgba(16, 185, 129, 0.1); }
+        
+        .login-container { width: 100%; max-width: 400px; position: relative; z-index: 10; }
+        .logo-section { text-align: center; margin-bottom: 40px; }
+        .logo {
+            width: 120px; height: 120px; margin: 0 auto 20px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 50%, #10b981 100%);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        .logo span { font-size: 60px; color: white; font-weight: bold; }
+        .title { font-size: 36px; font-weight: bold; color: white; margin: 0 0 10px 0; }
+        .subtitle { color: rgba(255, 255, 255, 0.7); margin: 0; font-size: 16px; }
+        
+        .login-form {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px; padding: 40px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        .form-group { margin-bottom: 30px; }
+        .form-label {
+            display: block; font-size: 14px; font-weight: 500;
+            color: rgba(255, 255, 255, 0.9); margin-bottom: 8px;
+        }
+        .form-input {
+            width: 100%; background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px;
+            padding: 12px 16px; color: white; font-size: 16px; outline: none;
+        }
+        .form-input::placeholder { color: rgba(255, 255, 255, 0.5); }
+        .login-btn {
+            width: 100%; background: linear-gradient(135deg, #8b5cf6, #9333ea);
+            color: white; border: none; border-radius: 12px; padding: 16px;
+            font-size: 16px; font-weight: 600; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+            transition: all 0.3s ease; margin-bottom: 20px;
+        }
+        .login-btn:hover { transform: translateY(-2px); }
+        .forgot-btn {
+            background: none; border: none; color: #8b5cf6;
+            font-size: 14px; cursor: pointer; text-decoration: underline;
+        }
+        
+        .dashboard { display: none; }
+        .dashboard.active { display: block; }
+        .header {
+            background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15); padding: 20px;
+        }
+        .header-content {
+            display: flex; justify-content: space-between; align-items: center;
+            max-width: 1200px; margin: 0 auto;
+        }
+        .header-logo { display: flex; align-items: center; }
+        .header-icon {
+            width: 40px; height: 40px; background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            margin-right: 12px;
+        }
+        .header-title { color: white; font-size: 24px; font-weight: bold; margin: 0; }
+        .logout-btn {
+            background: rgba(239, 68, 68, 0.2); color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px;
+            padding: 8px 16px; font-size: 14px; cursor: pointer;
+        }
+        
+        .dashboard-content { padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
+        .dashboard-title {
+            color: white; font-size: 32px; font-weight: bold;
+            margin-bottom: 40px; text-align: center;
+        }
+        .cards-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        .card {
+            backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px; padding: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            cursor: pointer; transition: transform 0.3s ease;
+        }
+        .card:hover { transform: translateY(-5px); }
+        .card-icon {
+            width: 50px; height: 50px; border-radius: 12px; display: flex;
+            align-items: center; justify-content: center; margin-bottom: 16px;
+            font-size: 24px; color: white;
+        }
+        .card-title { color: white; font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+        .card-desc { color: rgba(255, 255, 255, 0.7); font-size: 14px; line-height: 1.5; }
+        
+        .card-1 { background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%); }
+        .card-1 .card-icon { background: linear-gradient(135deg, #8b5cf6, #9333ea); }
+        .card-2 { background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.15) 100%); }
+        .card-2 .card-icon { background: linear-gradient(135deg, #10b981, #059669); }
+        .card-3 { background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.15) 100%); }
+        .card-3 .card-icon { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .card-4 { background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.15) 100%); }
+        .card-4 .card-icon { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        
+        .success-msg {
+            background: rgba(16, 185, 129, 0.2); color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px;
+            padding: 16px; margin: 20px auto; max-width: 1200px; text-align: center;
+            display: none;
+        }
+        .success-msg.show { display: block; }
+        
+        /* PWA Install Button Styles */
+        #install-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 16px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.4);
+            display: none;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            animation: pulse-glow 2s infinite;
+        }
+        
+        #install-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(139, 92, 246, 0.5);
+        }
+        
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+        }
+        
+        /* PWA Notification Styles */
+        .pwa-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            color: white;
+            z-index: 1001;
+            max-width: 300px;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .pwa-notification.show {
+            transform: translateX(0);
+        }
+        
+        /* PWA-specific styles for installed app */
+        .pwa-installed {
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        @supports (padding: max(0px)) {
+            .pwa-installed {
+                padding-left: max(12px, env(safe-area-inset-left));
+                padding-right: max(12px, env(safe-area-inset-right));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .login-container { max-width: 350px; }
+            .login-form { padding: 30px; }
+            .logo { width: 100px; height: 100px; }
+            .logo span { font-size: 50px; }
+            .title { font-size: 28px; }
+            .dashboard-content { padding: 20px; }
+            .dashboard-title { font-size: 24px; }
+            .cards-grid { grid-template-columns: 1fr; }
+            
+            #install-button {
+                bottom: 16px;
+                right: 16px;
+                padding: 12px 20px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loginScreen" class="login-screen">
+        <div class="bg-blur blur1"></div>
+        <div class="bg-blur blur2"></div>
+        <div class="bg-blur blur3"></div>
+        
+        <div class="login-container">
+            <div class="logo-section">
+                <div class="logo"><span>$</span></div>
+                <h1 class="title">FinanceOS</h1>
+                <p class="subtitle">Your Personal Finance Operating System</p>
+            </div>
+            
+            <div class="login-form">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-input" placeholder="Enter your username">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" placeholder="Enter your password">
+                </div>
+                <button class="login-btn" onclick="login()">Enter Demo</button>
+                <div style="text-align: center;">
+                    <button class="forgot-btn">Forgot Password?</button>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <p style="color: rgba(255, 255, 255, 0.5); font-size: 14px;">
+                    Add FinanceOS to your home screen for the best experience
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboard" class="dashboard">
+        <div class="header">
+            <div class="header-content">
+                <div class="header-logo">
+                    <div class="header-icon"><span style="color: white; font-size: 20px; font-weight: bold;">$</span></div>
+                    <h1 class="header-title">FinanceOS</h1>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+        
+        <div class="success-msg" id="successMsg">
+            🎉 Welcome to FinanceOS! You're successfully logged in.
+        </div>
+        
+        <div class="dashboard-content">
+            <h2 class="dashboard-title">Financial Dashboard</h2>
+            <div class="cards-grid">
+                <div class="card card-1" onclick="window.location.href='csv-upload.html'">
+                    <div class="card-icon">📊</div>
+                    <h3 class="card-title">Dashboard</h3>
+                    <p class="card-desc">View your complete financial overview and insights</p>
+                </div>
+                <div class="card card-2" onclick="window.location.href='csv-upload.html'">
+                    <div class="card-icon">📤</div>
+                    <h3 class="card-title">Upload CSV</h3>
+                    <p class="card-desc">Import your bank statements and transaction data</p>
+                </div>
+                <div class="card card-3" onclick="window.location.href='goals.html'">
+                    <div class="card-icon">🎯</div>
+                    <h3 class="card-title">Goals</h3>
+                    <p class="card-desc">Set and track your financial goals and milestones</p>
+                </div>
+                <div class="card card-4">
+                    <div class="card-icon">🤖</div>
+                    <h3 class="card-title">AI Coach</h3>
+                    <p class="card-desc">Get personalized financial advice and insights</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PWA JavaScript -->
+    <script>
+        // Main app functionality
+        function login() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboard').classList.add('active');
+            document.getElementById('successMsg').classList.add('show');
+            setTimeout(() => {
+                document.getElementById('successMsg').classList.remove('show');
+            }, 3000);
+        }
+        
+        function logout() {
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('dashboard').classList.remove('active');
+            document.getElementById('successMsg').classList.remove('show');
+        }
+
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('✅ SW registered: ', registration);
+                        
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    showPWANotification('🔄 App updated! Refresh to get new features.', 'info');
+                                }
+                            });
+                        });
+                    })
+                    .catch((registrationError) => {
+                        console.log('❌ SW registration failed: ', registrationError);
+                    });
+            });
+        }
+
+        // PWA Install Prompt
+        let deferredPrompt;
+        let installButton;
+
+        // Create install button
+        function createInstallButton() {
+            installButton = document.createElement('button');
+            installButton.id = 'install-button';
+            installButton.innerHTML = `
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Install App
+            `;
+            installButton.style.display = 'none';
+            document.body.appendChild(installButton);
+        }
+
+        // Listen for PWA install prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('💾 PWA install prompt triggered');
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Create install button if it doesn't exist
+            if (!installButton) {
+                createInstallButton();
+            }
+            
+            // Show install button after 5 seconds if not dismissed
+            setTimeout(() => {
+                if (!localStorage.getItem('pwa-install-dismissed') && !isAppInstalled()) {
+                    installButton.style.display = 'flex';
+                }
+            }, 5000);
+        });
+
+        // Handle install button click
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'install-button' || e.target.closest('#install-button')) {
+                installPWA();
+            }
+        });
+
+        // Install PWA function
+        async function installPWA() {
+            if (!deferredPrompt) return;
+            
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            if (outcome === 'accepted') {
+                console.log('✅ User accepted PWA install');
+                if (installButton) installButton.style.display = 'none';
+                showPWANotification('🎉 FinanceOS installed! Check your home screen.', 'success');
+            } else {
+                console.log('❌ User dismissed PWA install');
+                localStorage.setItem('pwa-install-dismissed', 'true');
+                if (installButton) installButton.style.display = 'none';
+            }
+            
+            deferredPrompt = null;
+        }
+
+        // Check if app is already installed
+        function isAppInstalled() {
+            return window.matchMedia('(display-mode: standalone)').matches || 
+                   window.navigator.standalone === true;
+        }
+
+        // Listen for successful app installation
+        window.addEventListener('appinstalled', () => {
+            console.log('🎉 FinanceOS installed successfully!');
+            if (installButton) installButton.style.display = 'none';
+            showPWANotification('🎉 Welcome to FinanceOS! App installed successfully.', 'success');
+        });
+
+        // PWA Notification System
+        function showPWANotification(message, type = 'info') {
+            const colors = {
+                success: 'rgba(16, 185, 129, 0.2)',
+                error: 'rgba(239, 68, 68, 0.2)',
+                warning: 'rgba(245, 158, 11, 0.2)',
+                info: 'rgba(59, 130, 246, 0.2)'
+            };
+            
+            const notification = document.createElement('div');
+            notification.className = 'pwa-notification';
+            notification.style.background = colors[type];
+            notification.innerHTML = `
+                <p style="margin: 0; font-weight: 500;">${message}</p>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => notification.classList.add('show'), 100);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 5000);
+        }
+
+        // Online/Offline status
+        window.addEventListener('online', () => {
+            showPWANotification('🌐 Back online! Data will sync automatically.', 'success');
+        });
+
+        window.addEventListener('offline', () => {
+            showPWANotification('📱 Working offline. Changes will sync when reconnected.', 'warning');
+        });
+
+        // Enhanced iOS PWA experience
+        if (isAppInstalled()) {
+            document.body.classList.add('pwa-installed');
+            
+            // Prevent zoom on iOS
+            document.addEventListener('touchstart', (e) => {
+                if (e.touches.length > 1) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', (e) => {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    e.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+        }
+
+        // Debug info (remove in production)
+        console.log('🔍 PWA Debug Info:');
+        console.log('📱 Installed:', isAppInstalled());
+        console.log('🌐 Online:', navigator.onLine);
+        console.log('💾 Service Worker supported:', 'serviceWorker' in navigator);
+        console.log('📋 Manifest:', document.querySelector('link[rel="manifest"]')?.href);
+    </script>
+</body>
+</html>
+<!-- Add this script BEFORE the closing </body> tag in index.html -->
+<script>
+// PWA Installation Debug Script
+console.log('🔍 PWA Debug Starting...');
+
+// Check if running over HTTPS
+console.log('🔒 HTTPS:', location.protocol === 'https:');
+
+// Check if service worker is supported
+console.log('⚙️ Service Worker supported:', 'serviceWorker' in navigator);
+
+// Check if manifest is linked
+const manifestLink = document.querySelector('link[rel="manifest"]');
+console.log('📋 Manifest linked:', !!manifestLink, manifestLink?.href);
+
+// Check if we're in standalone mode (already installed)
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+console.log('📱 Already installed:', isStandalone);
+
+// Manual install button creation for testing
+function createTestInstallButton() {
+    const testButton = document.createElement('button');
+    testButton.innerHTML = '🧪 TEST INSTALL';
+    testButton.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: red;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        z-index: 9999;
+        cursor: pointer;
+    `;
+    testButton.onclick = () => {
+        console.log('🧪 Test install clicked');
+        if (window.deferredPrompt) {
+            console.log('✅ Deferred prompt available');
+            window.deferredPrompt.prompt();
+        } else {
+            console.log('❌ No deferred prompt available');
+            alert('Install prompt not available. Check console for details.');
+        }
+    };
+    document.body.appendChild(testButton);
+    console.log('🧪 Test install button created');
+}
+
+// Service Worker registration with detailed logging
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+        .then((registration) => {
+            console.log('✅ SW registered successfully:', registration);
+            console.log('📍 SW scope:', registration.scope);
+            console.log('📍 SW active:', !!registration.active);
+        })
+        .catch((error) => {
+            console.error('❌ SW registration failed:', error);
+        });
+} else {
+    console.error('❌ Service Worker not supported');
+}
+
+// Listen for beforeinstallprompt with detailed logging
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    console.log('🎯 beforeinstallprompt event fired!');
+    console.log('📅 Event details:', e);
+    
+    // Prevent default browser install prompt
+    e.preventDefault();
+    
+    // Store the event
+    deferredPrompt = e;
+    window.deferredPrompt = e; // Make it globally accessible
+    
+    console.log('💾 Install prompt stored');
+    
+    // Create install button
+    createInstallButton();
+});
+
+function createInstallButton() {
+    // Remove any existing install button
+    const existingButton = document.getElementById('install-button');
+    if (existingButton) {
+        existingButton.remove();
+    }
+    
+    const installButton = document.createElement('button');
+    installButton.id = 'install-button';
+    installButton.innerHTML = '📱 Install FinanceOS';
+    installButton.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 16px 24px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 8px 32px rgba(139, 92, 246, 0.4);
+        z-index: 1000;
+        animation: pulse 2s infinite;
+    `;
+    
+    installButton.onclick = async () => {
+        console.log('📱 Install button clicked');
+        
+        if (!deferredPrompt) {
+            console.error('❌ No deferred prompt available');
+            alert('Install not available. Try using browser menu "Install FinanceOS"');
+            return;
+        }
+        
+        try {
+            // Show the install prompt
+            deferredPrompt.prompt();
+            
+            // Wait for user choice
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log('🎯 User choice:', outcome);
+            
+            if (outcome === 'accepted') {
+                console.log('✅ User accepted install');
+                installButton.remove();
+            } else {
+                console.log('❌ User dismissed install');
+            }
+            
+            // Clear the deferred prompt
+            deferredPrompt = null;
+            window.deferredPrompt = null;
+            
+        } catch (error) {
+            console.error('❌ Install failed:', error);
+        }
+    };
+    
+    document.body.appendChild(installButton);
+    console.log('✅ Install button created and added to page');
+}
+
+// Check after page load
+window.addEventListener('load', () => {
+    console.log('📄 Page loaded, checking PWA status...');
+    
+    // Wait a bit then create test button
+    setTimeout(createTestInstallButton, 2000);
+    
+    // Check if install prompt should have fired by now
+    setTimeout(() => {
+        if (!deferredPrompt) {
+            console.log('⚠️ No install prompt after 5 seconds');
+            console.log('🔍 Possible reasons:');
+            console.log('   - App already installed');
+            console.log('   - User previously dismissed prompt');
+            console.log('   - PWA criteria not met');
+            console.log('   - Browser doesn\'t support PWA install');
+            
+            // Check browser support
+            const isChrome = /Chrome/.test(navigator.userAgent);
+            const isEdge = /Edge/.test(navigator.userAgent);
+            const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+            
+            console.log('🌐 Browser detection:');
+            console.log('   Chrome:', isChrome);
+            console.log('   Edge:', isEdge);
+            console.log('   Safari:', isSafari);
+            
+            if (isSafari) {
+                console.log('🍎 Safari: Use "Add to Home Screen" from share menu');
+            }
+        }
+    }, 5000);
+});
+
+// Listen for successful app installation
+window.addEventListener('appinstalled', () => {
+    console.log('🎉 App installed successfully!');
+    const installButton = document.getElementById('install-button');
+    if (installButton) {
+        installButton.remove();
+    }
+});
+
+// Add CSS for pulse animation
+const style = document.createElement('style');
+style.textContent = `
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+`;
+document.head.appendChild(style);
+
+console.log('🔍 PWA Debug script loaded');
+</script>

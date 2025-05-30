@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanceOS PWA Test</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#8b5cf6">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e1b4b);
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .status {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        .install-btn {
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        .debug {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: left;
+            font-family: monospace;
+            font-size: 12px;
+            margin: 20px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 FinanceOS PWA Test</h1>
+        
+        <div class="status">
+            <h2>PWA Status Check</h2>
+            <div id="status-display">Checking...</div>
+        </div>
+
+        <button class="install-btn" id="manual-install" style="display:none;">
+            📱 Install FinanceOS
+        </button>
+
+        <button class="install-btn" onclick="window.location.href='/'">
+            ← Back to Main App
+        </button>
+
+        <div class="debug" id="debug-log">
+            <strong>Debug Log:</strong><br>
+        </div>
+    </div>
+
+    <script>
+        const debugLog = document.getElementById('debug-log');
+        const statusDisplay = document.getElementById('status-display');
+        const manualInstallBtn = document.getElementById('manual-install');
+        
+        function log(message) {
+            console.log(message);
+            debugLog.innerHTML += message + '<br>';
+            debugLog.scrollTop = debugLog.scrollHeight;
+        }
+
+        function updateStatus(message, color = 'white') {
+            statusDisplay.innerHTML = `<span style="color: ${color}">${message}</span>`;
+        }
+
+        // Check PWA requirements
+        function checkPWAStatus() {
+            log('🔍 Starting PWA diagnostic...');
+            
+            // Check HTTPS
+            const isHTTPS = location.protocol === 'https:';
+            log(`🔒 HTTPS: ${isHTTPS ? '✅' : '❌'}`);
+            
+            // Check Service Worker support
+            const hasSW = 'serviceWorker' in navigator;
+            log(`⚙️ Service Worker support: ${hasSW ? '✅' : '❌'}`);
+            
+            // Check if already installed
+            const isInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+            log(`📱 Already installed: ${isInstalled ? '✅' : '❌'}`);
+            
+            // Check manifest
+            const manifestLink = document.querySelector('link[rel="manifest"]');
+            log(`📋 Manifest linked: ${manifestLink ? '✅' : '❌'} ${manifestLink?.href || ''}`);
+            
+            // Check browser
+            const userAgent = navigator.userAgent;
+            const isChrome = userAgent.includes('Chrome') && !userAgent.includes('Edge');
+            const isEdge = userAgent.includes('Edge');
+            const isSafari = userAgent.includes('Safari') && !userAgent.includes('Chrome');
+            const isFirefox = userAgent.includes('Firefox');
+            
+            log(`🌐 Browser: ${isChrome ? 'Chrome' : isEdge ? 'Edge' : isSafari ? 'Safari' : isFirefox ? 'Firefox' : 'Other'}`);
+            
+            if (isSafari) {
+                log('🍎 Safari detected: Use Share menu → "Add to Home Screen"');
+                updateStatus('Safari: Use Share menu → "Add to Home Screen"', '#fbbf24');
+            }
+            
+            return { isHTTPS, hasSW, isInstalled, manifestLink, isChrome, isEdge, isSafari };
+        }
+
+        // Register service worker
+        async function registerSW() {
+            if ('serviceWorker' in navigator) {
+                try {
+                    const registration = await navigator.serviceWorker.register('/sw.js');
+                    log(`✅ Service Worker registered: ${registration.scope}`);
+                    return true;
+                } catch (error) {
+                    log(`❌ Service Worker registration failed: ${error.message}`);
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        // PWA Install functionality
+        let deferredPrompt = null;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            log('🎯 beforeinstallprompt event fired!');
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            manualInstallBtn.style.display = 'inline-block';
+            updateStatus('✅ Ready to install! Click button below.', '#10b981');
+        });
+
+        manualInstallBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) {
+                log('❌ No install prompt available');
+                updateStatus('❌ Install not available', '#ef4444');
+                return;
+            }
+
+            try {
+                log('📱 Showing install prompt...');
+                deferredPrompt.prompt();
+                
+                const { outcome } = await deferredPrompt.userChoice;
+                log(`🎯 User choice: ${outcome}`);
+                
+                if (outcome === 'accepted') {
+                    updateStatus('✅ Installing...', '#10b981');
+                    manualInstallBtn.style.display = 'none';
+                } else {
+                    updateStatus('❌ Install cancelled', '#ef4444');
+                }
+                
+                deferredPrompt = null;
+            } catch (error) {
+                log(`❌ Install failed: ${error.message}`);
+                updateStatus('❌ Install failed', '#ef4444');
+            }
+        });
+
+        window.addEventListener('appinstalled', () => {
+            log('🎉 App installed successfully!');
+            updateStatus('🎉 App installed! Check your home screen.', '#10b981');
+            manualInstallBtn.style.display = 'none';
+        });
+
+        // Initialize
+        async function init() {
+            const status = checkPWAStatus();
+            
+            if (status.isInstalled) {
+                updateStatus('📱 Already installed as PWA!', '#10b981');
+                return;
+            }
+            
+            if (!status.isHTTPS) {
+                updateStatus('❌ HTTPS required for PWA', '#ef4444');
+                return;
+            }
+            
+            if (!status.hasSW) {
+                updateStatus('❌ Service Worker not supported', '#ef4444');
+                return;
+            }
+            
+            const swRegistered = await registerSW();
+            if (!swRegistered) {
+                updateStatus('❌ Service Worker registration failed', '#ef4444');
+                return;
+            }
+            
+            if (status.isSafari) {
+                updateStatus('🍎 Safari: Use Share → "Add to Home Screen"', '#fbbf24');
+                return;
+            }
+            
+            // Wait for install prompt
+            updateStatus('⏳ Waiting for install prompt...', '#fbbf24');
+            
+            setTimeout(() => {
+                if (!deferredPrompt) {
+                    log('⚠️ No install prompt after 10 seconds');
+                    if (status.isChrome) {
+                        updateStatus('💡 Try: Browser menu → "Install FinanceOS"', '#fbbf24');
+                    } else {
+                        updateStatus('💡 Try browser menu install option', '#fbbf24');
+                    }
+                }
+            }, 10000);
+        }
+
+        // Start when page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

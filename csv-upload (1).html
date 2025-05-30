@@ -1,0 +1,1853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanceOS - CSV Upload</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Glass effect utility classes */
+        .glass {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .glass-premium {
+            background: linear-gradient(135deg, 
+                rgba(139, 92, 246, 0.15) 0%, 
+                rgba(59, 130, 246, 0.15) 50%, 
+                rgba(147, 51, 234, 0.15) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Gradient utility classes */
+        .gradient-purple {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
+        }
+
+        .gradient-green {
+            background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+        }
+
+        .gradient-red {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+        }
+
+        .gradient-blue {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+        }
+
+        .gradient-orange {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%);
+        }
+
+        /* Header */
+        .header {
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        /* Container */
+        .container {
+            padding: 0 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Upload Zone */
+        .upload-zone {
+            border: 2px dashed rgba(139, 92, 246, 0.5);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 2rem;
+        }
+
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            border-color: rgba(139, 92, 246, 0.8);
+            background: rgba(139, 92, 246, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .upload-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .upload-text h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-text p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1rem;
+        }
+
+        .supported-banks {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .bank-tag {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* File Input */
+        #fileInput {
+            display: none;
+        }
+
+        /* Upload Button */
+        .upload-btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+        }
+
+        /* Enhanced file display styles */
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .file-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .file-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 500;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .file-details {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 0.25rem;
+        }
+
+        .file-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .status-ready {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+        }
+
+        .status-processing {
+            background: rgba(139, 92, 246, 0.2);
+            color: #a855f7;
+        }
+
+        .status-completed {
+            background: rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        .remove-file {
+            background: rgba(239, 68, 68, 0.2);
+            border: none;
+            color: #f87171;
+            padding: 0.25rem 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .remove-file:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        /* Processing indicator */
+        .processing {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(139, 92, 246, 0.3);
+            border-top: 3px solid #8b5cf6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Results Section */
+        .results {
+            display: none;
+            margin-top: 2rem;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .summary-card h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-card p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        /* Transactions Table */
+        .transactions-container {
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .transactions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .transactions-header h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: transparent;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: rgba(139, 92, 246, 0.5);
+            border-color: rgba(139, 92, 246, 0.8);
+        }
+
+        .transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .transactions-table th,
+        .transactions-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .transactions-table th {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .amount-positive {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .amount-negative {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .category-tag {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .category-food { background: rgba(249, 115, 22, 0.2); color: #fb923c; }
+        .category-transport { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+        .category-shopping { background: rgba(236, 72, 153, 0.2); color: #f472b6; }
+        .category-bills { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+        .category-income { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .category-other { background: rgba(107, 114, 128, 0.2); color: #9ca3af; }
+        .category-health { background: rgba(168, 85, 247, 0.2); color: #a855f7; }
+        .category-entertainment { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .category-childcare { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .category-investment { background: rgba(139, 92, 246, 0.2); color: #a855f7; }
+        .category-insurance { background: rgba(156, 163, 175, 0.2); color: #9ca3af; }
+
+        /* Charts */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .chart-card {
+            padding: 1.5rem;
+            border-radius: 20px;
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 0.75rem;
+            }
+            
+            .upload-zone {
+                padding: 2rem 1rem;
+            }
+            
+            .transactions-table {
+                font-size: 0.8rem;
+            }
+            
+            .transactions-table th,
+            .transactions-table td {
+                padding: 0.5rem;
+            }
+            
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-buttons {
+                justify-content: center;
+            }
+
+            .file-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.5rem;
+            }
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6, #9333ea);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Success message styling */
+        .success-message {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.2) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #34d399;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* Critical financial alert */
+        .critical-alert {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.2) 100%);
+            border: 2px solid rgba(239, 68, 68, 0.4);
+            color: #f87171;
+            padding: 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            animation: pulse-alert 3s infinite;
+        }
+
+        @keyframes pulse-alert {
+            0%, 100% { border-color: rgba(239, 68, 68, 0.4); }
+            50% { border-color: rgba(239, 68, 68, 0.7); }
+        }
+
+        .critical-alert h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #ef4444;
+        }
+
+        .critical-alert p {
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Budget Analysis Styles */
+        .budget-comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .budget-card {
+            padding: 1rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .recommendation-item {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .timeline-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo gradient-green">$</div>
+        <h1>CSV Upload</h1>
+        <p>Import your bank statements and get instant insights</p>
+    </div>
+
+    <div class="container">
+        <!-- Critical Financial Alert -->
+        <div class="critical-alert glass" id="criticalAlert" style="display: none;">
+            <h3>⚠️ Financial Health Alert</h3>
+            <p id="alertMessage">Based on your financial data, we've identified areas that need immediate attention:</p>
+            <ul id="alertList" style="margin-top: 1rem; padding-left: 1.5rem;">
+                <!-- Alert items will be populated by JavaScript -->
+            </ul>
+        </div>
+
+        <!-- Enhanced Upload Zone with Multi-File Support -->
+        <div class="upload-zone glass-premium" id="uploadZone">
+            <div class="upload-icon gradient-purple">📄</div>
+            <div class="upload-text">
+                <h3>Upload Your Bank Statements</h3>
+                <p>Select multiple CSV files at once for complete analysis</p>
+                <button class="upload-btn gradient-purple" onclick="document.getElementById('fileInput').click()">
+                    📁 Choose Multiple Files
+                </button>
+                <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 0.5rem;">
+                    💡 Hold Ctrl/Cmd to select multiple files, or drag and drop here
+                </p>
+            </div>
+            <div class="supported-banks">
+                <span class="bank-tag">ANZ</span>
+                <span class="bank-tag">ASB</span>
+                <span class="bank-tag">BNZ</span>
+                <span class="bank-tag">Kiwibank</span>
+                <span class="bank-tag">Westpac</span>
+            </div>
+        </div>
+
+        <!-- Selected Files Display -->
+        <div class="selected-files glass" id="selectedFiles" style="display: none; margin-bottom: 2rem; padding: 1.5rem; border-radius: 16px;">
+            <h3 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                📋 Selected Files 
+                <span id="fileCount" style="background: rgba(139, 92, 246, 0.3); padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem;"></span>
+            </h3>
+            <div id="fileList" style="max-height: 200px; overflow-y: auto;"></div>
+            <div style="margin-top: 1rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button class="upload-btn gradient-green" onclick="processSelectedFiles()" id="processBtn">
+                    🚀 Process All Files
+                </button>
+                <button class="upload-btn" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3);" onclick="clearSelectedFiles()">
+                    🗑️ Clear All
+                </button>
+                <button class="upload-btn" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3);" onclick="document.getElementById('fileInput').click()">
+                    ➕ Add More Files
+                </button>
+            </div>
+        </div>
+
+        <input type="file" id="fileInput" accept="*/*" multiple>
+
+        <!-- Processing Indicator -->
+        <div class="processing glass" id="processing">
+            <div class="spinner"></div>
+            <h3>Processing Your Data...</h3>
+            <p>Analyzing transactions and categorizing spending</p>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results" id="results">
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+                <div class="summary-card glass-premium">
+                    <h3 id="totalTransactions">0</h3>
+                    <p>Transactions Processed</p>
+                </div>
+                <div class="summary-card glass gradient-green">
+                    <h3 id="totalIncome">$0</h3>
+                    <p>Total Income</p>
+                </div>
+                <div class="summary-card glass gradient-red">
+                    <h3 id="totalExpenses">$0</h3>
+                    <p>Total Expenses</p>
+                </div>
+                <div class="summary-card glass gradient-purple">
+                    <h3 id="netAmount">$0</h3>
+                    <p>Net Amount</p>
+                </div>
+            </div>
+
+            <!-- Transactions Table -->
+            <div class="transactions-container glass-premium">
+                <div class="transactions-header">
+                    <h3>Recent Transactions</h3>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="income">Income</button>
+                        <button class="filter-btn" data-filter="expenses">Expenses</button>
+                        <button class="filter-btn" data-filter="food">Food</button>
+                        <button class="filter-btn" data-filter="transport">Transport</button>
+                        <button class="filter-btn" data-filter="bills">Bills</button>
+                        <button class="filter-btn" data-filter="childcare">Childcare</button>
+                    </div>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="transactions-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsBody">
+                            <!-- Transactions will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Category Breakdown -->
+            <div class="charts-container">
+                <div class="chart-card glass-premium">
+                    <div class="chart-title">Spending by Category</div>
+                    <div id="categoryChart">
+                        <!-- Category breakdown will go here -->
+                    </div>
+                </div>
+                
+                <div class="chart-card glass-premium">
+                    <div class="chart-title">Financial Health Insights</div>
+                    <div id="insightsChart">
+                        <!-- Financial insights will go here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW: AI Budget Analysis Section -->
+            <div id="budget-analysis-section" class="glass-premium" style="border-radius: 20px; padding: 2rem; margin-top: 2rem; display: none;">
+                <div style="display: flex; align-items: center; margin-bottom: 2rem;">
+                    <div style="width: 3rem; height: 3rem; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-right: 1rem;" class="gradient-red">
+                        📊
+                    </div>
+                    <div>
+                        <h3 style="font-size: 1.5rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">AI Budget Analysis & Action Plan</h3>
+                        <p style="color: rgba(255, 255, 255, 0.7);">Smart recommendations based on your spending patterns</p>
+                    </div>
+                </div>
+
+                <!-- Critical Alert -->
+                <div id="budget-critical-alert" style="background: rgba(239, 68, 68, 0.2); border: 2px solid rgba(239, 68, 68, 0.3); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem;">
+                    <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                        <span style="font-size: 1.5rem; margin-right: 1rem;">🚨</span>
+                        <div>
+                            <h4 style="color: white; font-weight: 600; margin-bottom: 0.25rem;">CRITICAL: Monthly Deficit Detected</h4>
+                            <p style="color: #fca5a5;" id="deficit-amount">Analyzing your financial data...</p>
+                        </div>
+                    </div>
+                    <div style="background: rgba(220, 38, 38, 0.3); border-radius: 12px; padding: 1rem;">
+                        <p style="color: white; font-size: 0.9rem; font-weight: 500; margin-bottom: 0.75rem;">Immediate Actions Required:</p>
+                        <ul style="color: #fca5a5; font-size: 0.8rem; margin: 0; padding-left: 1.5rem;" id="immediate-actions">
+                            <li>Analyzing spending patterns...</li>
+                        </ul>
+                        <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(5, 150, 105, 0.3); border-radius: 8px;">
+                            <p style="color: #6ee7b7; font-size: 0.8rem; font-weight: 500;" id="projected-result">
+                                Calculating potential outcomes...
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monthly Budget Breakdown -->
+                <div class="budget-comparison-grid">
+                    <div class="budget-card">
+                        <h4 style="color: white; font-weight: 600; margin-bottom: 1rem;">Current Monthly Reality</h4>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: rgba(255, 255, 255, 0.7);">Income:</span>
+                                <span style="color: #10b981; font-weight: 500;" id="current-income">$0</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: rgba(255, 255, 255, 0.7);">Expenses:</span>
+                                <span style="color: #ef4444; font-weight: 500;" id="current-expenses">$0</span>
+                            </div>
+                            <div style="border-top: 1px solid rgba(255, 255, 255, 0.2); padding-top: 0.5rem; margin-top: 0.5rem;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: white; font-weight: 500;">Net:</span>
+                                    <span style="font-weight: 700;" id="current-net">$0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="budget-card">
+                        <h4 style="color: white; font-weight: 600; margin-bottom: 1rem;">Target Monthly Budget</h4>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: rgba(255, 255, 255, 0.7);">Income Goal:</span>
+                                <span style="color: #10b981; font-weight: 500;" id="target-income">$0</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: rgba(255, 255, 255, 0.7);">Expense Target:</span>
+                                <span style="color: #3b82f6; font-weight: 500;" id="target-expenses">$0</span>
+                            </div>
+                            <div style="border-top: 1px solid rgba(255, 255, 255, 0.2); padding-top: 0.5rem; margin-top: 0.5rem;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: white; font-weight: 500;">Target Surplus:</span>
+                                    <span style="color: #10b981; font-weight: 700;" id="target-surplus">$0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category Optimization -->
+                <div style="margin-bottom: 2rem;">
+                    <h4 style="color: white; font-weight: 600; margin-bottom: 1rem;">Category-by-Category Action Plan</h4>
+                    <div id="category-recommendations">
+                        <!-- Category recommendations will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Progress Tracker -->
+                <div class="budget-card" style="margin-bottom: 2rem;">
+                    <h4 style="color: white; font-weight: 600; margin-bottom: 1rem;">3-Month Recovery Timeline</h4>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div class="timeline-item">
+                            <div class="timeline-number gradient-red">1</div>
+                            <div style="flex: 1;">
+                                <div style="color: white; font-weight: 500;">Month 1: Emergency Cuts</div>
+                                <div style="color: rgba(255, 255, 255, 0.6); font-size: 0.9rem;" id="month1-target">Reduce deficit by 50%</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-number gradient-orange">2</div>
+                            <div style="flex: 1;">
+                                <div style="color: white; font-weight: 500;">Month 2: Habit Formation</div>
+                                <div style="color: rgba(255, 255, 255, 0.6); font-size: 0.9rem;">Achieve break-even: $0 deficit</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-number gradient-green">3</div>
+                            <div style="flex: 1;">
+                                <div style="color: white; font-weight: 500;">Month 3: Surplus & Savings</div>
+                                <div style="color: rgba(255, 255, 255, 0.6); font-size: 0.9rem;" id="month3-target">Generate monthly surplus</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Budget Action Buttons -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem;">
+                    <button onclick="generateWeeklyBudget()" class="action-btn gradient-blue">
+                        📅 Create Weekly Budget
+                    </button>
+                    <button onclick="setupGoalTracking()" class="action-btn gradient-green">
+                        🎯 Track Goals
+                    </button>
+                    <button onclick="exportBudgetPlan()" class="action-btn gradient-purple">
+                        📊 Export Budget Plan
+                    </button>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="action-btn btn-primary" onclick="generateBudget()">
+                    📊 Generate Budget
+                </button>
+                <button class="action-btn btn-primary" onclick="setGoals()">
+                    🎯 Set Financial Goals
+                </button>
+                <button class="action-btn btn-secondary" onclick="exportData()">
+                    📤 Export Analysis
+                </button>
+                <button class="action-btn btn-secondary" onclick="backToDashboard()">
+                    ← Back to Dashboard
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let processedTransactions = [];
+        let currentFilter = 'all';
+        let selectedFiles = [];
+        let processedFileCount = 0;
+
+        // PERFECT categorization rules based on your exact transaction formats
+        const categoryRules = {
+            'Food & Dining': [
+                // Exact merchant names from your data
+                'woolworths online', 'woolworths', 'mcdonalds', 'pizza hut', 'uber* eats', 'uber eats',
+                
+                // Major NZ Supermarkets
+                'countdown', 'new world', 'paknsave', 'pak n save', 'four square', 'fresh choice', 'supervalue',
+                
+                // Fast Food & Restaurants  
+                'mcdonald', 'kfc', 'burger king', 'subway', 'dominos', 'pizza', 'cafe', 'restaurant',
+                'chinese', 'indian', 'thai', 'sushi', 'bakery', 'takeaway',
+                
+                // Food Keywords
+                'food', 'dining', 'grocery', 'groceries', 'butcher'
+            ],
+            
+            'Transport': [
+                // Transport merchants
+                'bp', 'z energy', 'mobil', 'caltex', 'gull', 'challenge',
+                'fuel', 'petrol', 'diesel', 'gas station',
+                'uber', 'taxi', 'parking', 'toll'
+            ],
+            
+            'Shopping & Retail': [
+                // Exact merchants from your data
+                'number one shoes', 'bunnings', 'chemist warehouse', '5th street', 'garden box',
+                '99bikes.co.nz', 'sp 99bikes',
+                
+                // Major retailers
+                'warehouse', 'kmart', 'farmers', 'briscoes', 'harvey norman', 'noel leeming', 'jb hi-fi',
+                'clothing', 'shoes', 'electronics', 'furniture', 'appliance'
+            ],
+            
+            'Bills & Utilities': [
+                // Exact companies from your data
+                'powershop', '2degrees mobile', '2 degrees mobile', 'sky network',
+                
+                // Power companies
+                'contact energy', 'genesis', 'mercury', 'trustpower', 'meridian', 'electric kiwi',
+                'power', 'electricity', 'energy',
+                
+                // Telecommunications
+                'vodafone', 'spark', '2degrees', 'orcon', 'slingshot',
+                'internet', 'broadband', 'phone', 'mobile',
+                
+                // Utilities
+                'water', 'gas', 'council', 'rates'
+            ],
+            
+            'Income': [
+                // Exact employer from your data
+                'pathway engineer',
+                
+                // General income patterns
+                'salary', 'wage', 'pay', 'payroll', 'income', 'earnings',
+                'employer contributions', 'employee contributions',
+                'direct credit', 'deposit'
+            ],
+            
+            'Childcare': [
+                // Exact from your data
+                'grow active',
+                
+                // General childcare
+                'daycare', 'kindergarten', 'childcare', 'preschool'
+            ],
+            
+            'Health & Medical': [
+                // Exact from your data
+                'sawaddee thai massage', 'chemist warehouse',
+                
+                // General health
+                'pharmacy', 'chemist', 'doctor', 'medical', 'hospital', 'clinic', 'dentist',
+                'massage', 'physiotherapy', 'health'
+            ],
+            
+            'Entertainment & Recreation': [
+                // Exact from your data
+                'venues otautahi', 'central park kilmore', 'zwift inc', 'aquagym',
+                
+                // General entertainment
+                'cinema', 'movie', 'gym', 'fitness', 'sports', 'recreation'
+            ],
+            
+            'Insurance': [
+                // Exact from your data
+                'vero insuranc', 'vero insurance', 'partners life', 'partners life limite',
+                
+                // General insurance
+                'insurance', 'aa insurance', 'state insurance'
+            ],
+            
+            'Investment': [
+                // Exact from your data
+                'shearsies nz', 'sharesies', 'growth fund', 'kiwisaver',
+                
+                // General investment
+                'investment', 'shares', 'funds', 'portfolio'
+            ],
+            
+            'Housing': [
+                // Loan payments and rates from your data
+                'loan payment', 'rates',
+                
+                // General housing
+                'mortgage', 'rent', 'property', 'home loan'
+            ],
+            
+            'Banking & Fees': [
+                // Your personal transfers
+                'j k m dale', 'dale james ki',
+                
+                // General banking
+                'fee', 'charge', 'overdraft', 'atm', 'bank fee', 'service charge'
+            ]
+        };
+
+        // Enhanced file handling
+        function handleFiles(files) {
+            if (files.length === 0) return;
+            
+            // Add new files to existing selection
+            Array.from(files).forEach(file => {
+                // Check if file already selected
+                const exists = selectedFiles.find(f => f.name === file.name && f.size === file.size);
+                if (!exists) {
+                    selectedFiles.push({
+                        file: file,
+                        id: Date.now() + Math.random(),
+                        status: 'ready',
+                        size: formatFileSize(file.size),
+                        type: detectFileType(file.name)
+                    });
+                }
+            });
+            
+            displaySelectedFiles();
+            
+            // Clear the input to allow re-selecting same files
+            document.getElementById('fileInput').value = '';
+        }
+
+        function detectFileType(filename) {
+            const ext = filename.toLowerCase().split('.').pop();
+            const types = {
+                'csv': 'CSV',
+                'xls': 'Excel',
+                'xlsx': 'Excel',
+                'txt': 'Text'
+            };
+            return types[ext] || 'Unknown';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        function displaySelectedFiles() {
+            const filesContainer = document.getElementById('selectedFiles');
+            const fileList = document.getElementById('fileList');
+            const fileCount = document.getElementById('fileCount');
+            
+            if (selectedFiles.length === 0) {
+                filesContainer.style.display = 'none';
+                return;
+            }
+            
+            filesContainer.style.display = 'block';
+            fileCount.textContent = `${selectedFiles.length} file${selectedFiles.length !== 1 ? 's' : ''}`;
+            
+            fileList.innerHTML = selectedFiles.map(fileData => `
+                <div class="file-item">
+                    <div class="file-info">
+                        <div class="file-name">${fileData.file.name}</div>
+                        <div class="file-details">${fileData.type} • ${fileData.size}</div>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <span class="file-status status-${fileData.status}">
+                            ${fileData.status === 'ready' ? '📋 Ready' : 
+                              fileData.status === 'processing' ? '⏳ Processing' :
+                              fileData.status === 'completed' ? '✅ Done' : '❌ Error'}
+                        </span>
+                        <button class="remove-file" onclick="removeFile('${fileData.id}')">✕</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function removeFile(fileId) {
+            selectedFiles = selectedFiles.filter(f => f.id !== fileId);
+            displaySelectedFiles();
+        }
+
+        function clearSelectedFiles() {
+            selectedFiles = [];
+            displaySelectedFiles();
+        }
+
+        async function processSelectedFiles() {
+            if (selectedFiles.length === 0) return;
+            
+            // Show processing indicator
+            document.getElementById('processing').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            
+            processedFileCount = 0;
+            processedTransactions = [];
+            
+            for (let i = 0; i < selectedFiles.length; i++) {
+                const fileData = selectedFiles[i];
+                
+                // Update file status
+                fileData.status = 'processing';
+                displaySelectedFiles();
+                
+                try {
+                    const transactions = await processFile(fileData.file);
+                    processedTransactions = processedTransactions.concat(transactions);
+                    
+                    fileData.status = 'completed';
+                    processedFileCount++;
+                    
+                } catch (error) {
+                    console.error('Error processing file:', fileData.file.name, error);
+                    fileData.status = 'error';
+                }
+                
+                displaySelectedFiles();
+                
+                // Small delay for visual feedback
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+            
+            // Show results
+            setTimeout(() => {
+                displayResults();
+                analyzeFinancialHealth();
+                
+                document.getElementById('processing').style.display = 'none';
+                document.getElementById('results').style.display = 'block';
+                
+                // Show success message
+                const successMsg = document.createElement('div');
+                successMsg.className = 'success-message';
+                successMsg.innerHTML = `🎉 Successfully processed ${processedFileCount} files with ${processedTransactions.length} total transactions!`;
+                document.querySelector('.container').insertBefore(successMsg, document.getElementById('results'));
+                
+                setTimeout(() => successMsg.remove(), 5000);
+                
+            }, 1000);
+        }
+
+        // PERFECT categorization function for your data
+        function categorizeTransaction(description, type, details, particulars) {
+            // Combine all available text for matching
+            const fullText = [description, type, details, particulars].filter(Boolean).join(' ').toLowerCase();
+            
+            console.log('Categorizing:', fullText);
+            
+            // Check each category for matches
+            for (const [category, keywords] of Object.entries(categoryRules)) {
+                for (const keyword of keywords) {
+                    if (fullText.includes(keyword.toLowerCase())) {
+                        console.log(`Matched "${keyword}" -> ${category}`);
+                        return category;
+                    }
+                }
+            }
+            
+            // Special patterns based on transaction type
+            if (type && type.toLowerCase().includes('direct credit')) {
+                return 'Income';
+            }
+            
+            if (type && (type.toLowerCase().includes('loan') || fullText.includes('loan'))) {
+                return 'Housing';
+            }
+            
+            console.log('No match found, assigning Other');
+            return 'Other';
+        }
+
+        // Enhanced transaction parsing for your specific CSV formats
+        function parseTransaction(line, bankType, headers) {
+            const values = parseCSVLine(line);
+            if (values.length < 3) return null;
+
+            try {
+                let transaction = {};
+
+                // Handle your specific CSV formats
+                if (headers.includes('Card') && headers.includes('Details')) {
+                    // Credit card format: Card,Type,Amount,Details,TransactionDate,ProcessedDate
+                    transaction = {
+                        date: parseDate(values[4]), // TransactionDate
+                        amount: -Math.abs(parseFloat(values[2]) || 0), // Always expense for credit card
+                        description: values[3] || '', // Details
+                        type: values[1] || '', // Type (D/C)
+                        card: values[0] || ''
+                    };
+                } else if (headers.includes('Type') && headers.includes('Details') && headers.includes('Particulars')) {
+                    // Bank account format: Type,Details,Particulars,Code,Reference,Amount,Date
+                    const amount = parseFloat(values[5]) || 0;
+                    transaction = {
+                        date: parseDate(values[6]), // Date
+                        amount: amount, // Keep original sign
+                        description: values[1] || '', // Details
+                        type: values[0] || '', // Type
+                        particulars: values[2] || '', // Particulars
+                        reference: values[4] || '' // Reference
+                    };
+                } else if (headers.includes('Details') && headers.includes('Amount') && headers.includes('Unit price')) {
+                    // KiwiSaver format: Date,Details,Amount,Unit price,Units
+                    transaction = {
+                        date: parseDate(values[0]),
+                        amount: parseFloat(values[2]) || 0,
+                        description: values[1] || '',
+                        type: 'Investment'
+                    };
+                } else if (headers.includes('PrincipalBalance')) {
+                    // Loan format: Date,Details,Amount,PrincipalBalance
+                    transaction = {
+                        date: parseDate(values[0]),
+                        amount: parseFloat(values[2]) || 0,
+                        description: values[1] || '',
+                        type: 'Loan'
+                    };
+                } else {
+                    // Generic fallback
+                    transaction = {
+                        date: parseDate(values[0]),
+                        amount: parseFloat(values[1]) || 0,
+                        description: values[2] || '',
+                        type: values.length > 3 ? values[3] : ''
+                    };
+                }
+
+                // Enhanced categorization using all available fields
+                transaction.category = categorizeTransaction(
+                    transaction.description, 
+                    transaction.type, 
+                    transaction.particulars, 
+                    transaction.reference
+                );
+                
+                // Format date for display
+                transaction.displayDate = formatDate(transaction.date);
+                
+                return transaction;
+            } catch (error) {
+                console.error('Error parsing transaction:', error);
+                return null;
+            }
+        }
+
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            
+            result.push(current.trim());
+            return result.map(item => item.replace(/"/g, ''));
+        }
+
+        function parseDate(dateStr) {
+            if (!dateStr) return new Date();
+            
+            const cleanDate = dateStr.replace(/"/g, '').trim();
+            
+            // Handle DD/MM/YYYY format (common in NZ)
+            const ddmmyyyy = cleanDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+            if (ddmmyyyy) {
+                return new Date(ddmmyyyy[3], ddmmyyyy[2] - 1, ddmmyyyy[1]);
+            }
+            
+            // Fallback to Date constructor
+            return new Date(cleanDate);
+        }
+
+        function formatDate(date) {
+            if (!date || isNaN(date)) return 'Invalid Date';
+            return date.toLocaleDateString('en-NZ', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        function processFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        const csv = e.target.result;
+                        const lines = csv.split('\n');
+                        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+                        
+                        console.log('Processing file:', file.name);
+                        console.log('Headers:', headers);
+                        
+                        // Parse transactions
+                        const transactions = [];
+                        for (let i = 1; i < lines.length; i++) {
+                            if (lines[i].trim()) {
+                                const transaction = parseTransaction(lines[i], null, headers);
+                                if (transaction) {
+                                    transactions.push(transaction);
+                                }
+                            }
+                        }
+                        
+                        console.log(`Processed ${transactions.length} transactions from ${file.name}`);
+                        resolve(transactions);
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                
+                reader.onerror = () => reject(new Error('File reading failed'));
+                reader.readAsText(file);
+            });
+        }
+
+        function displayResults() {
+            const totalTransactions = processedTransactions.length;
+            const income = processedTransactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
+            const expenses = Math.abs(processedTransactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0));
+            const netAmount = income - expenses;
+
+            document.getElementById('totalTransactions').textContent = totalTransactions.toLocaleString();
+            document.getElementById('totalIncome').textContent = '$' + income.toLocaleString('en-NZ', { minimumFractionDigits: 2 });
+            document.getElementById('totalExpenses').textContent = '$' + expenses.toLocaleString('en-NZ', { minimumFractionDigits: 2 });
+            document.getElementById('netAmount').textContent = '$' + netAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2 });
+
+            // Log categorization results
+            const categoryBreakdown = {};
+            processedTransactions.forEach(t => {
+                categoryBreakdown[t.category] = (categoryBreakdown[t.category] || 0) + 1;
+            });
+            console.log('Final categorization breakdown:', categoryBreakdown);
+
+            displayTransactions();
+            displayCategoryBreakdown();
+            displayFinancialInsights();
+            
+            // NEW: Trigger budget analysis
+            triggerBudgetAnalysis(income, expenses);
+        }
+
+        function getCategoryClass(category) {
+            const classMap = {
+                'Food & Dining': 'category-food',
+                'Transport': 'category-transport',
+                'Shopping & Retail': 'category-shopping',
+                'Bills & Utilities': 'category-bills',
+                'Income': 'category-income',
+                'Childcare': 'category-childcare',
+                'Health & Medical': 'category-health',
+                'Entertainment & Recreation': 'category-entertainment',
+                'Insurance': 'category-insurance',
+                'Investment': 'category-investment',
+                'Housing': 'category-bills',
+                'Banking & Fees': 'category-other'
+            };
+            return classMap[category] || 'category-other';
+        }
+
+        function displayTransactions() {
+            const tbody = document.getElementById('transactionsBody');
+            tbody.innerHTML = '';
+
+            const sortedTransactions = [...processedTransactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+            const displayTransactions = sortedTransactions.slice(0, 50);
+
+            displayTransactions.forEach(transaction => {
+                const row = document.createElement('tr');
+                const amountClass = transaction.amount >= 0 ? 'amount-positive' : 'amount-negative';
+                const categoryClass = getCategoryClass(transaction.category);
+                
+                row.innerHTML = `
+                    <td>${transaction.displayDate}</td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${transaction.description}">
+                        ${transaction.description}
+                    </td>
+                    <td>
+                        <span class="category-tag ${categoryClass}">${transaction.category}</span>
+                    </td>
+                    <td class="${amountClass}">
+                        ${transaction.amount >= 0 ? '+' : ''}$${Math.abs(transaction.amount).toLocaleString('en-NZ', { minimumFractionDigits: 2 })}
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        function displayCategoryBreakdown() {
+            const categoryTotals = {};
+            
+            processedTransactions.forEach(transaction => {
+                if (transaction.amount < 0) {
+                    const category = transaction.category;
+                    categoryTotals[category] = (categoryTotals[category] || 0) + Math.abs(transaction.amount);
+                }
+            });
+
+            const categoryChart = document.getElementById('categoryChart');
+            categoryChart.innerHTML = '';
+
+            const sortedCategories = Object.entries(categoryTotals)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 10);
+
+            if (sortedCategories.length === 0) {
+                categoryChart.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.6);">No expense data to display</p>';
+                return;
+            }
+
+            const totalExpenses = Object.values(categoryTotals).reduce((a, b) => a + b, 0);
+
+            sortedCategories.forEach(([category, amount]) => {
+                const percentage = (amount / totalExpenses) * 100;
+                
+                const categoryItem = document.createElement('div');
+                categoryItem.style.cssText = `
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 0.75rem 0;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                `;
+                
+                categoryItem.innerHTML = `
+                    <div>
+                        <span class="category-tag ${getCategoryClass(category)}">${category}</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-weight: 600;">$${amount.toLocaleString('en-NZ', { minimumFractionDigits: 2 })}</div>
+                        <div style="font-size: 0.8rem; color: rgba(255, 255, 255, 0.6);">${percentage.toFixed(1)}%</div>
+                    </div>
+                `;
+                
+                categoryChart.appendChild(categoryItem);
+            });
+        }
+
+        function displayFinancialInsights() {
+            const insightsDiv = document.getElementById('insightsChart');
+            insightsDiv.innerHTML = '';
+
+            const income = processedTransactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
+            const expenses = Math.abs(processedTransactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0));
+            const netAmount = income - expenses;
+
+            const insights = [
+                {
+                    title: 'Monthly Cash Flow',
+                    value: `${netAmount >= 0 ? '+' : ''}$${netAmount.toLocaleString('en-NZ', {minimumFractionDigits: 2})}`,
+                    status: netAmount >= 0 ? 'positive' : 'negative',
+                    description: netAmount >= 0 ? 'Surplus' : 'Deficit'
+                },
+                {
+                    title: 'Savings Rate',
+                    value: `${income > 0 ? ((netAmount / income) * 100).toFixed(1) : '0'}%`,
+                    status: (income > 0 && (netAmount / income) >= 0.1) ? 'positive' : 'negative',
+                    description: 'of income'
+                },
+                {
+                    title: 'Avg Transaction',
+                    value: `$${expenses > 0 ? (expenses / processedTransactions.filter(t => t.amount < 0).length).toFixed(2) : '0'}`,
+                    status: 'neutral',
+                    description: 'expense size'
+                }
+            ];
+
+            insights.forEach(insight => {
+                const insightItem = document.createElement('div');
+                insightItem.style.cssText = `
+                    padding: 1rem;
+                    border-radius: 12px;
+                    margin-bottom: 1rem;
+                    background: rgba(255, 255, 255, 0.05);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                `;
+
+                const statusColor = insight.status === 'positive' ? '#10b981' : 
+                                  insight.status === 'negative' ? '#ef4444' : '#6b7280';
+
+                insightItem.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4 style="margin-bottom: 0.25rem; font-size: 0.9rem; color: rgba(255,255,255,0.8);">${insight.title}</h4>
+                            <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6);">${insight.description}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: ${statusColor};">${insight.value}</div>
+                        </div>
+                    </div>
+                `;
+
+                insightsDiv.appendChild(insightItem);
+            });
+        }
+
+        function analyzeFinancialHealth() {
+            // Implementation for financial health analysis
+        }
+
+        // NEW: Budget Analysis Functions
+        function triggerBudgetAnalysis(totalIncome, totalExpenses) {
+            const monthlyIncome = totalIncome / 3; // Assuming 3 months of data
+            const monthlyExpenses = totalExpenses / 3;
+            const monthlyDeficit = monthlyExpenses - monthlyIncome;
+
+            // Get category data from current spending breakdown
+            const categoryData = {};
+            processedTransactions.forEach(transaction => {
+                if (transaction.amount < 0) {
+                    const category = transaction.category;
+                    categoryData[category] = (categoryData[category] || 0) + Math.abs(transaction.amount);
+                }
+            });
+
+            generateBudgetAnalysis(monthlyIncome, monthlyExpenses, monthlyDeficit, categoryData);
+        }
+
+        function generateBudgetAnalysis(monthlyIncome, monthlyExpenses, monthlyDeficit, categoryData) {
+            // Update the budget analysis display
+            document.getElementById('current-income').textContent = `$${monthlyIncome.toFixed(0)}`;
+            document.getElementById('current-expenses').textContent = `$${monthlyExpenses.toFixed(0)}`;
+            
+            const currentNetElement = document.getElementById('current-net');
+            if (monthlyDeficit > 0) {
+                currentNetElement.textContent = `-$${monthlyDeficit.toFixed(0)}`;
+                currentNetElement.className = 'text-red-400 font-bold';
+                currentNetElement.style.color = '#ef4444';
+            } else {
+                currentNetElement.textContent = `+$${Math.abs(monthlyDeficit).toFixed(0)}`;
+                currentNetElement.className = 'text-green-400 font-bold';
+                currentNetElement.style.color = '#10b981';
+            }
+
+            // Update deficit alert
+            if (monthlyDeficit > 0) {
+                document.getElementById('deficit-amount').textContent = `You're spending $${monthlyDeficit.toFixed(0)} more than you earn each month`;
+                
+                // Generate action items based on spending data
+                const actions = generateActionItems(categoryData, monthlyDeficit);
+                document.getElementById('immediate-actions').innerHTML = actions.map(action => `<li>${action}</li>`).join('');
+                
+                // Calculate potential savings
+                const potentialSavings = calculatePotentialSavings(categoryData);
+                const targetIncome = monthlyIncome + 500; // Assume $500 additional income
+                const targetExpenses = monthlyExpenses - potentialSavings;
+                const targetSurplus = targetIncome - targetExpenses;
+                
+                document.getElementById('target-income').textContent = `$${targetIncome.toFixed(0)}`;
+                document.getElementById('target-expenses').textContent = `$${targetExpenses.toFixed(0)}`;
+                document.getElementById('target-surplus').textContent = `+$${targetSurplus.toFixed(0)}`;
+                
+                document.getElementById('projected-result').textContent = 
+                    `Result: Monthly surplus of +$${targetSurplus.toFixed(0)} instead of -$${monthlyDeficit.toFixed(0)} deficit`;
+                
+                // Update timeline targets
+                document.getElementById('month1-target').textContent = `Reduce deficit from -$${monthlyDeficit.toFixed(0)} to -$${(monthlyDeficit * 0.5).toFixed(0)}`;
+                document.getElementById('month3-target').textContent = `Generate +$${targetSurplus.toFixed(0)} monthly surplus`;
+                
+                // Generate category recommendations
+                generateCategoryRecommendations(categoryData);
+            }
+
+            // Show the budget analysis section
+            document.getElementById('budget-analysis-section').style.display = 'block';
+        }
+
+        function generateActionItems(categoryData, deficit) {
+            const actions = [];
+            
+            // Food & Dining optimization
+            const foodSpending = categoryData['Food & Dining'] || 0;
+            if (foodSpending > 2400) { // $800/month threshold
+                const monthlyfood = foodSpending / 3;
+                const targetFood = 600;
+                const savings = monthlyfood - targetFood;
+                actions.push(`Reduce Food & Dining from $${monthlyfood.toFixed(0)} to $${targetFood}/month (-$${savings.toFixed(0)})`);
+            }
+            
+            // Shopping & Retail optimization
+            const shoppingSpending = categoryData['Shopping & Retail'] || 0;
+            if (shoppingSpending > 900) {
+                const monthlyShopping = shoppingSpending / 3;
+                const targetShopping = 300;
+                const savings = monthlyShopping - targetShopping;
+                actions.push(`Cut Shopping & Retail from $${monthlyShopping.toFixed(0)} to $${targetShopping}/month (-$${savings.toFixed(0)})`);
+            }
+            
+            actions.push('Cancel unnecessary subscriptions (-$100)');
+            actions.push('Find additional income source (+$500)');
+            
+            return actions;
+        }
+
+        function calculatePotentialSavings(categoryData) {
+            let totalSavings = 0;
+            
+            // Food & Dining: reduce to $600/month
+            const foodSpending = (categoryData['Food & Dining'] || 0) / 3;
+            if (foodSpending > 600) {
+                totalSavings += foodSpending - 600;
+            }
+            
+            // Shopping & Retail: reduce to $300/month
+            const shoppingSpending = (categoryData['Shopping & Retail'] || 0) / 3;
+            if (shoppingSpending > 300) {
+                totalSavings += shoppingSpending - 300;
+            }
+            
+            // Subscriptions and misc: $100 savings
+            totalSavings += 100;
+            
+            return totalSavings;
+        }
+
+        function generateCategoryRecommendations(categoryData) {
+            const container = document.getElementById('category-recommendations');
+            container.innerHTML = '';
+            
+            // Food & Dining recommendation
+            const foodSpending = categoryData['Food & Dining'] || 0;
+            if (foodSpending > 2400) { // More than $800/month
+                const monthlyFood = foodSpending / 3;
+                const dailyFood = monthlyFood / 30;
+                
+                container.innerHTML += `
+                    <div class="recommendation-item">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <div style="display: flex; align-items: center;">
+                                <span style="font-size: 1.2rem; margin-right: 0.5rem;">🍽️</span>
+                                <span style="color: white; font-weight: 500;">Food & Dining</span>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="color: #ef4444; font-size: 0.9rem; text-decoration: line-through;">$${monthlyFood.toFixed(0)}/month</div>
+                                <div style="color: #10b981; font-weight: 500;">$600/month</div>
+                            </div>
+                        </div>
+                        <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 0.5rem;">
+                            Currently $${dailyFood.toFixed(0)}/day average. Target: $20/day average.
+                        </div>
+                        <div style="background: rgba(59, 130, 246, 0.2); border-radius: 8px; padding: 0.75rem;">
+                            <ul style="color: #93c5fd; font-size: 0.8rem; margin: 0; padding-left: 1rem;">
+                                <li>Plan meals every Sunday (save $15/week)</li>
+                                <li>Limit takeaways to 2x per week (save $25/week)</li>
+                                <li>Shop with lists at Woolworths specials (save $20/week)</li>
+                                <li>Cook extra portions for leftovers (save $25/week)</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Shopping & Retail recommendation
+            const shoppingSpending = categoryData['Shopping & Retail'] || 0;
+            if (shoppingSpending > 900) {
+                const monthlyShopping = shoppingSpending / 3;
+                
+                container.innerHTML += `
+                    <div class="recommendation-item">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <div style="display: flex; align-items: center;">
+                                <span style="font-size: 1.2rem; margin-right: 0.5rem;">🛍️</span>
+                                <span style="color: white; font-weight: 500;">Shopping & Retail</span>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="color: #ef4444; font-size: 0.9rem; text-decoration: line-through;">$${monthlyShopping.toFixed(0)}/month</div>
+                                <div style="color: #10b981; font-weight: 500;">$300/month</div>
+                            </div>
+                        </div>
+                        <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 0.5rem;">
+                            Non-essential purchases. Target: $75/week maximum.
+                        </div>
+                        <div style="background: rgba(59, 130, 246, 0.2); border-radius: 8px; padding: 0.75rem;">
+                            <ul style="color: #93c5fd; font-size: 0.8rem; margin: 0; padding-left: 1rem;">
+                                <li>48-hour rule for purchases over $50</li>
+                                <li>Weekly cash envelope: $75 maximum</li>
+                                <li>Unsubscribe from promotional emails</li>
+                                <li>Ask "Do I really need this?" before buying</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Additional Income recommendation
+            container.innerHTML += `
+                <div class="recommendation-item">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <div style="display: flex; align-items: center;">
+                            <span style="font-size: 1.2rem; margin-right: 0.5rem;">💰</span>
+                            <span style="color: white; font-weight: 500;">Additional Income</span>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="color: #10b981; font-weight: 500;">+$500/month</div>
+                        </div>
+                    </div>
+                    <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 0.5rem;">
+                        Boost income to accelerate financial recovery.
+                    </div>
+                    <div style="background: rgba(16, 185, 129, 0.2); border-radius: 8px; padding: 0.75rem;">
+                        <ul style="color: #6ee7b7; font-size: 0.8rem; margin: 0; padding-left: 1rem;">
+                            <li>Weekend side work in engineering field</li>
+                            <li>Freelance consulting or tutoring</li>
+                            <li>Sell unused items around the house</li>
+                            <li>Consider skills-based online work</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Action button functions
+        function generateWeeklyBudget() {
+            alert('🚧 Weekly Budget Generator\n\nComing in next update! This will create week-by-week spending targets based on your monthly budget plan.\n\nFor now, try to limit spending to:\n• Food: $150/week\n• Shopping: $75/week\n• Other discretionary: $100/week');
+        }
+
+        function setupGoalTracking() {
+            alert('🚧 Goal Tracking System\n\nComing next! This will help you track:\n• Emergency fund building ($0.17 → $3,000)\n• Debt payoff progress\n• Monthly surplus targets\n• Savings milestones');
+        }
+
+        function exportBudgetPlan() {
+            const budgetData = {
+                timestamp: new Date().toISOString(),
+                analysis: 'FinanceOS Budget Analysis Export',
+                monthlyIncome: parseFloat(document.getElementById('current-income').textContent.replace('$', '').replace(',', '')),
+                monthlyExpenses: parseFloat(document.getElementById('current-expenses').textContent.replace('$', '').replace(',', '')),
+                recommendations: [
+                    'Reduce Food & Dining to $600/month',
+                    'Limit Shopping & Retail to $300/month', 
+                    'Find additional $500 monthly income',
+                    'Build emergency fund to $3,000'
+                ],
+                timeline: '3 months to achieve monthly surplus'
+            };
+            
+            const blob = new Blob([JSON.stringify(budgetData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `financeOS-budget-plan-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function filterTransactions() {
+            const tbody = document.getElementById('transactionsBody');
+            const rows = tbody.querySelectorAll('tr');
+
+            rows.forEach(row => {
+                const categoryCell = row.cells[2];
+                const amountCell = row.cells[3];
+                
+                if (!categoryCell || !amountCell) return;
+
+                const category = categoryCell.textContent.toLowerCase();
+                const isIncome = amountCell.classList.contains('amount-positive');
+                const isExpense = amountCell.classList.contains('amount-negative');
+
+                let show = false;
+
+                switch (currentFilter) {
+                    case 'all': show = true; break;
+                    case 'income': show = isIncome; break;
+                    case 'expenses': show = isExpense; break;
+                    case 'food': show = category.includes('food'); break;
+                    case 'transport': show = category.includes('transport'); break;
+                    case 'bills': show = category.includes('bills'); break;
+                    case 'childcare': show = category.includes('childcare'); break;
+                    default: show = true;
+                }
+
+                row.style.display = show ? '' : 'none';
+            });
+        }
+
+        // Initialize drag and drop functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadZone = document.getElementById('uploadZone');
+            const fileInput = document.getElementById('fileInput');
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadZone.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadZone.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadZone.addEventListener(eventName, unhighlight, false);
+            });
+
+            uploadZone.addEventListener('drop', handleDrop, false);
+
+            fileInput.addEventListener('change', function(e) {
+                handleFiles(e.target.files);
+            });
+
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.dataset.filter;
+                    filterTransactions();
+                });
+            });
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function highlight(e) {
+            document.getElementById('uploadZone').classList.add('dragover');
+        }
+
+        function unhighlight(e) {
+            document.getElementById('uploadZone').classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        // Action functions
+        function generateBudget() {
+            alert('🚀 Budget generation feature coming soon! This will analyze your spending patterns and create a personalized budget.');
+        }
+
+        function setGoals() {
+            alert('🎯 Goals feature coming soon! Set savings targets and track your progress.');
+        }
+
+        function exportData() {
+            const csvContent = "data:text/csv;charset=utf-8," 
+                + "Date,Description,Category,Amount,Type\n"
+                + processedTransactions.map(t => 
+                    `"${t.displayDate}","${t.description}","${t.category}","${t.amount}","${t.amount >= 0 ? 'Income' : 'Expense'}"`
+                ).join("\n");
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `financeos_analysis_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.textContent = '✅ Financial analysis exported successfully!';
+            document.querySelector('.container').insertBefore(successDiv, document.getElementById('results'));
+            
+            setTimeout(() => successDiv.remove(), 3000);
+        }
+
+        function backToDashboard() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
