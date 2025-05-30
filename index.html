@@ -1,26 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>FinanceOS - Personal Finance Operating System</title>
-    
-    <!-- Basic PWA Meta Tags (no external file dependencies) -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="FinanceOS">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#8b5cf6">
-    
-    <!-- App Description -->
-    <meta name="description" content="Complete personal finance management with AI coaching, budget tracking, and goal management.">
-    <meta name="keywords" content="personal finance, budget tracker, financial goals, expense management">
-    <meta name="author" content="FinanceOS">
-    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
             min-height: 100vh;
             color: white;
@@ -142,108 +129,6 @@
             display: none;
         }
         .success-msg.show { display: block; }
-
-        /* Privacy Mode Styles */
-        .privacy-toggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: white;
-            border-radius: 20px;
-            padding: 12px 20px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            z-index: 1000;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .privacy-toggle:hover {
-            transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 12px 48px rgba(139, 92, 246, 0.3);
-            background: linear-gradient(135deg, 
-                rgba(139, 92, 246, 0.15) 0%, 
-                rgba(59, 130, 246, 0.15) 50%, 
-                rgba(147, 51, 234, 0.15) 100%);
-        }
-
-        .privacy-toggle.active {
-            background: linear-gradient(135deg, 
-                rgba(239, 68, 68, 0.2) 0%, 
-                rgba(220, 38, 38, 0.2) 100%);
-            border: 2px solid rgba(239, 68, 68, 0.3);
-            animation: pulse-privacy 2s infinite;
-        }
-
-        .financial-amount {
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .financial-amount.hidden {
-            color: transparent !important;
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
-            user-select: none;
-        }
-
-        .financial-amount.hidden::before {
-            content: "••••";
-            position: absolute;
-            left: 0;
-            top: 0;
-            color: rgba(255, 255, 255, 0.6);
-            text-shadow: none;
-            font-weight: bold;
-        }
-
-        .demo-badge {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: #10b981;
-            border-radius: 20px;
-            padding: 12px 20px;
-            font-size: 14px;
-            font-weight: 600;
-            z-index: 1000;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            display: none;
-            animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .demo-badge.show {
-            display: block;
-        }
-
-        @keyframes pulse-privacy {
-            0%, 100% { 
-                box-shadow: 0 8px 32px rgba(239, 68, 68, 0.3);
-            }
-            50% { 
-                box-shadow: 0 12px 40px rgba(239, 68, 68, 0.5);
-            }
-        }
-
-        @keyframes slideIn {
-            from { 
-                transform: translateX(-100%) translateY(10px);
-                opacity: 0;
-            }
-            to { 
-                transform: translateX(0) translateY(0);
-                opacity: 1;
-            }
-        }
         
         @media (max-width: 768px) {
             .login-container { max-width: 350px; }
@@ -254,20 +139,6 @@
             .dashboard-content { padding: 20px; }
             .dashboard-title { font-size: 24px; }
             .cards-grid { grid-template-columns: 1fr; }
-            
-            .privacy-toggle {
-                top: 16px;
-                right: 16px;
-                padding: 10px 16px;
-                font-size: 12px;
-            }
-
-            .demo-badge {
-                bottom: 16px;
-                left: 16px;
-                padding: 8px 12px;
-                font-size: 12px;
-            }
         }
     </style>
 </head>
@@ -297,12 +168,6 @@
                 <div style="text-align: center;">
                     <button class="forgot-btn">Forgot Password?</button>
                 </div>
-            </div>
-            
-            <div style="text-align: center; margin-top: 20px;">
-                <p style="color: rgba(255, 255, 255, 0.5); font-size: 14px;">
-                    Add FinanceOS to your home screen for the best experience
-                </p>
             </div>
         </div>
     </div>
@@ -349,26 +214,12 @@
         </div>
     </div>
 
-    <!-- Privacy Toggle Button -->
-    <button id="privacyToggle" class="privacy-toggle">
-        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-        </svg>
-        <span id="privacyText">Hide $</span>
-    </button>
-
-    <!-- Demo Badge -->
-    <div id="demoBadge" class="demo-badge">
-        👀 Demo Mode - Financials Hidden
-    </div>
-
     <script>
-        // ===== MAIN APP FUNCTIONALITY =====
         function login() {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('dashboard').classList.add('active');
             document.getElementById('successMsg').classList.add('show');
-            setTimeout(() => {
+            setTimeout(function() {
                 document.getElementById('successMsg').classList.remove('show');
             }, 3000);
         }
@@ -378,154 +229,6 @@
             document.getElementById('dashboard').classList.remove('active');
             document.getElementById('successMsg').classList.remove('show');
         }
-
-        // ===== PRIVACY MODE =====
-        class FinanceOSPrivacy {
-            constructor() {
-                this.isPrivate = localStorage.getItem('financeOS_privacyMode') === 'true';
-                this.isInitialized = false;
-                this.init();
-            }
-
-            init() {
-                if (document.readyState === 'loading') {
-                    document.addEventListener('DOMContentLoaded', () => this.setup());
-                } else {
-                    this.setup();
-                }
-            }
-
-            setup() {
-                this.toggleButton = document.getElementById('privacyToggle');
-                this.demoBadge = document.getElementById('demoBadge');
-                this.privacyText = document.getElementById('privacyText');
-                
-                if (this.toggleButton) {
-                    this.toggleButton.addEventListener('click', () => this.toggle());
-                    this.isInitialized = true;
-                    this.markFinancialElements();
-                    this.updatePrivacyState();
-                    
-                    let timeout;
-                    const observer = new MutationObserver(() => {
-                        clearTimeout(timeout);
-                        timeout = setTimeout(() => {
-                            if (this.isInitialized) {
-                                this.markFinancialElements();
-                                this.updatePrivacyState();
-                            }
-                        }, 100);
-                    });
-
-                    observer.observe(document.body, {
-                        childList: true,
-                        subtree: true
-                    });
-                }
-            }
-
-            markFinancialElements() {
-                const walker = document.createTreeWalker(
-                    document.body,
-                    NodeFilter.SHOW_TEXT,
-                    null,
-                    false
-                );
-
-                const textNodes = [];
-                let node;
-                while (node = walker.nextNode()) {
-                    if (node.parentElement.tagName === 'SCRIPT' || 
-                        node.parentElement.tagName === 'STYLE') {
-                        continue;
-                    }
-                    
-                    const text = node.textContent.trim();
-                    if (this.isFinancialText(text)) {
-                        textNodes.push(node);
-                    }
-                }
-
-                textNodes.forEach(textNode => {
-                    const parent = textNode.parentElement;
-                    if (parent && !parent.classList.contains('financial-amount')) {
-                        parent.classList.add('financial-amount');
-                        
-                        const text = textNode.textContent;
-                        if (text.length > 10) {
-                            parent.classList.add('large');
-                        } else if (text.length < 6) {
-                            parent.classList.add('small');
-                        }
-                    }
-                });
-            }
-
-            isFinancialText(text) {
-                const financialPatterns = [
-                    /\$[\d,]+\.?\d*/,
-                    /-\$[\d,]+\.?\d*/,
-                    /\+\$[\d,]+\.?\d*/,
-                    /[\d,]+\.\d{1,2}%/,
-                    /NZD\s*[\d,]+/i,
-                    /[\d,]+\s*NZD/i
-                ];
-
-                return financialPatterns.some(pattern => pattern.test(text));
-            }
-
-            toggle() {
-                if (!this.isInitialized) return;
-                
-                this.isPrivate = !this.isPrivate;
-                this.updatePrivacyState();
-                this.saveState();
-                
-                if (navigator.vibrate) {
-                    navigator.vibrate(50);
-                }
-                
-                console.log('Privacy mode:', this.isPrivate ? 'ENABLED' : 'DISABLED');
-            }
-
-            updatePrivacyState() {
-                if (!this.isInitialized) return;
-                
-                const financialElements = document.querySelectorAll('.financial-amount');
-                
-                if (this.isPrivate) {
-                    financialElements.forEach(el => el.classList.add('hidden'));
-                    this.toggleButton.classList.add('active');
-                    this.privacyText.textContent = 'Show $';
-                    this.demoBadge.classList.add('show');
-                    
-                    if (!document.title.includes('Demo Mode')) {
-                        document.title += ' - Demo Mode';
-                    }
-                } else {
-                    financialElements.forEach(el => el.classList.remove('hidden'));
-                    this.toggleButton.classList.remove('active');
-                    this.privacyText.textContent = 'Hide $';
-                    this.demoBadge.classList.remove('show');
-                    
-                    document.title = document.title.replace(' - Demo Mode', '');
-                }
-            }
-
-            saveState() {
-                localStorage.setItem('financeOS_privacyMode', this.isPrivate.toString());
-            }
-        }
-
-        // ===== INITIALIZATION =====
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('🚀 FinanceOS initializing...');
-            window.financeOSPrivacy = new FinanceOSPrivacy();
-            console.log('✅ FinanceOS ready');
-        });
-
-        console.log('🔍 FinanceOS Debug Info:');
-        console.log('📍 Location:', window.location.href);
     </script>
 </body>
 </html>
