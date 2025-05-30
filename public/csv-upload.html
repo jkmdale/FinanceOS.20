@@ -387,6 +387,8 @@
         .category-bills { background: rgba(239, 68, 68, 0.2); color: #f87171; }
         .category-income { background: rgba(16, 185, 129, 0.2); color: #34d399; }
         .category-other { background: rgba(107, 114, 128, 0.2); color: #9ca3af; }
+        .category-health { background: rgba(168, 85, 247, 0.2); color: #a855f7; }
+        .category-entertainment { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
 
         /* Charts */
         .charts-container {
@@ -692,52 +694,139 @@
             WESTPAC: ['Date', 'Amount', 'Other Party', 'Description', 'Reference', 'Particulars', 'Code', 'Reference', 'Balance']
         };
 
-        // Enhanced categorization rules for NZ spending patterns
+        // ENHANCED: Comprehensive NZ-specific categorization rules
         const categoryRules = {
             'Food & Dining': [
-                'countdown', 'new world', 'paknsave', 'four square', 'fresh choice',
-                'restaurant', 'cafe', 'mcdonald', 'kfc', 'subway', 'pizza', 'dominos',
-                'uber eats', 'menulog', 'food', 'dining', 'bakery', 'butcher', 
-                'supermarket', 'grocery', 'takeaway', 'fish chips', 'sushi'
+                // Major NZ Supermarkets
+                'countdown', 'new world', 'paknsave', 'four square', 'fresh choice', 'supervalue',
+                'woolworths', 'foodstuffs', 'progressive enterprises',
+                
+                // Fast Food & Restaurants
+                'mcdonald', 'kfc', 'burger king', 'subway', 'dominos', 'pizza hut', 'hell pizza',
+                'nandos', 'wendys', 'carls jr', 'taco bell', 'pizza', 'cafe', 'restaurant',
+                'fish and chips', 'fish & chips', 'chinese', 'indian', 'thai', 'sushi',
+                
+                // Food Delivery
+                'uber eats', 'menulog', 'delivereasy', 'foodora',
+                
+                // Food Keywords
+                'food', 'dining', 'bakery', 'butcher', 'grocery', 'takeaway', 'lunch', 'dinner',
+                'breakfast', 'coffee', 'drink', 'bar', 'pub', 'liquor', 'wine'
             ],
+            
             'Transport': [
-                'fuel', 'petrol', 'bp', 'z energy', 'mobil', 'caltex', 'gull',
-                'parking', 'uber', 'taxi', 'bus', 'train', 'metlink', 'at hop',
-                'vehicle', 'car', 'rego', 'wof', 'aa', 'vtnz', 'mechanic'
+                // Fuel Companies
+                'bp', 'z energy', 'mobil', 'caltex', 'gull', 'challenge', 'waitomo',
+                'fuel', 'petrol', 'diesel', 'gas station',
+                
+                // Vehicle Services
+                'mechanic', 'garage', 'automotive', 'tyre', 'tire', 'battery', 'oil change',
+                'vtnz', 'aa', 'nzaa', 'rego', 'registration', 'wof', 'warrant',
+                
+                // Transport Services
+                'uber', 'taxi', 'bus', 'train', 'ferry', 'parking', 'toll', 'at hop',
+                'metlink', 'gocards', 'snapper', 'public transport'
             ],
-            'Shopping': [
-                'warehouse', 'kmart', 'target', 'farmers', 'department', 'clothing',
-                'shoes', 'briscoes', 'harvey norman', 'noel leeming', 'jb hi-fi',
-                'shopping', 'retail', 'mall', 'store', 'online'
+            
+            'Shopping & Retail': [
+                // Department Stores
+                'warehouse', 'kmart', 'target', 'farmers', 'department store',
+                'briscoes', 'stevens', 'bed bath beyond',
+                
+                // Electronics
+                'harvey norman', 'noel leeming', 'jb hi-fi', 'dick smith', 'pb tech',
+                'computer lounge', 'apple', 'samsung', 'electronics',
+                
+                // Clothing
+                'clothing', 'fashion', 'shoes', 'footwear', 'apparel', 'dress',
+                'hallensteins', 'glassons', 'cotton on', 'macpac', 'kathmandu',
+                
+                // Hardware & Home
+                'bunnings', 'mitre 10', 'placemakers', 'hardware', 'trade depot',
+                'home', 'garden', 'furniture', 'appliance'
             ],
+            
             'Bills & Utilities': [
-                'power', 'electricity', 'gas', 'water', 'contact energy', 'genesis',
-                'mercury', 'trustpower', 'internet', 'vodafone', 'spark', '2degrees',
-                'sky', 'netflix', 'spotify', 'phone', 'mobile', 'broadband',
-                'insurance', 'rates', 'council', 'auckland council', 'wellington city'
+                // Power Companies
+                'contact energy', 'genesis', 'mercury', 'trustpower', 'meridian',
+                'electric kiwi', 'flick electric', 'power', 'electricity', 'energy',
+                
+                // Telecommunications
+                'vodafone', 'spark', '2degrees', 'orcon', 'slingshot', 'bigpipe',
+                'internet', 'broadband', 'phone', 'mobile', 'telecommunications',
+                
+                // Utilities
+                'water', 'gas', 'waste', 'council', 'rates', 'watercare',
+                
+                // Entertainment Services
+                'sky', 'netflix', 'spotify', 'disney', 'amazon prime', 'youtube',
+                'neon', 'tvnz', 'three now', 'subscription'
             ],
+            
             'Income': [
-                'salary', 'wage', 'pay', 'income', 'transfer in', 'deposit',
-                'ird', 'working for families', 'accommodation supplement',
-                'kiwisaver', 'dividend', 'interest earned'
+                // Salary & Wages
+                'salary', 'wage', 'pay', 'payroll', 'income', 'earnings',
+                'transfer in', 'deposit', 'credit', 'refund',
+                
+                // Government Payments
+                'ird', 'inland revenue', 'working for families', 'accommodation supplement',
+                'jobseeker', 'sole parent', 'winter energy', 'government payment',
+                
+                // Investments
+                'dividend', 'interest earned', 'investment', 'kiwisaver', 'bonus'
             ],
+            
             'Banking & Fees': [
-                'fee', 'interest', 'bank', 'atm', 'overdraft', 'anz', 'asb', 
-                'bnz', 'kiwibank', 'westpac', 'service charge', 'monthly fee'
+                // Bank Names
+                'anz', 'asb', 'bnz', 'kiwibank', 'westpac', 'tsb', 'sbs', 'co-operative bank',
+                
+                // Banking Terms
+                'fee', 'charge', 'interest', 'overdraft', 'atm', 'eftpos',
+                'service charge', 'monthly fee', 'account fee', 'transaction fee',
+                'international fee', 'foreign exchange'
             ],
+            
             'Health & Medical': [
-                'pharmacy', 'chemist', 'doctor', 'medical', 'hospital', 'dentist',
-                'unichem', 'life pharmacy', 'dis-chem', 'health', 'clinic'
+                'pharmacy', 'chemist', 'unichem', 'life pharmacy', 'countdown pharmacy',
+                'doctor', 'medical', 'hospital', 'clinic', 'dentist', 'dental',
+                'physiotherapy', 'physio', 'optometrist', 'health', 'medicine',
+                'prescription', 'gp', 'specialist'
             ],
-            'Entertainment': [
-                'cinema', 'movie', 'hoyts', 'event', 'reading', 'berkley',
-                'gym', 'fitness', 'sports', 'recreation', 'games', 'hobby'
+            
+            'Entertainment & Recreation': [
+                'cinema', 'movie', 'hoyts', 'event', 'reading cinemas', 'berkeley',
+                'gym', 'fitness', 'sports', 'recreation', 'swimming', 'golf',
+                'bowling', 'games', 'hobby', 'book', 'magazine', 'entertainment',
+                'concert', 'show', 'theatre', 'museum', 'zoo'
             ],
+            
+            'Insurance': [
+                'insurance', 'aa insurance', 'state', 'aia', 'southern cross',
+                'tower', 'anz insurance', 'comprehensive', 'third party',
+                'house insurance', 'car insurance', 'life insurance', 'health insurance'
+            ],
+            
             'Education': [
-                'school', 'university', 'course', 'education', 'learning',
-                'books', 'stationery', 'fees', 'tuition'
+                'school', 'university', 'polytechnic', 'education', 'course',
+                'training', 'learning', 'tuition', 'fees', 'books', 'stationery',
+                'uniform', 'excursion', 'camp'
             ]
         };
+
+        // ENHANCED: Expense detection patterns
+        const expensePatterns = [
+            'purchase', 'payment', 'debit', 'withdrawal', 'fee', 'charge',
+            'subscription', 'bill', 'invoice', 'automatic payment', 'ap ',
+            'eftpos', 'paywave', 'contactless', 'card purchase', 'online purchase',
+            'fuel', 'groceries', 'shopping', 'restaurant', 'cafe', 'pharmacy'
+        ];
+
+        // ENHANCED: Income detection patterns
+        const incomePatterns = [
+            'salary', 'wage', 'pay', 'deposit', 'transfer in', 'credit',
+            'refund', 'cashback', 'interest earned', 'dividend', 'bonus',
+            'ird', 'government', 'employer', 'income'
+        ];
 
         // Financial health analysis criteria
         const financialHealthChecks = {
@@ -754,6 +843,65 @@
                 message: "Debt payments exceed 30% of income - focus on debt reduction"
             }
         };
+
+        // ENHANCED: Income/expense detection function
+        function detectTransactionType(description, amount) {
+            const desc = description.toLowerCase();
+            
+            // Check for explicit income patterns
+            for (const pattern of incomePatterns) {
+                if (desc.includes(pattern.toLowerCase())) {
+                    return 'income';
+                }
+            }
+            
+            // Check for explicit expense patterns
+            for (const pattern of expensePatterns) {
+                if (desc.includes(pattern.toLowerCase())) {
+                    return 'expense';
+                }
+            }
+            
+            // Fallback: use amount sign if available
+            if (amount > 0) {
+                // Positive amounts could be income or refunds
+                if (desc.includes('refund') || desc.includes('credit') || desc.includes('deposit')) {
+                    return 'income';
+                }
+                // Large positive amounts are likely income
+                if (amount > 1000) {
+                    return 'income';
+                }
+                // Small positive amounts might be interest or cashback
+                return 'income';
+            } else if (amount < 0) {
+                return 'expense';
+            }
+            
+            // Default assumption for unclear cases
+            return 'expense';
+        }
+
+        // ENHANCED: Categorization function
+        function categorizeTransaction(description) {
+            const desc = description.toLowerCase();
+            
+            // Check each category for matches
+            for (const [category, keywords] of Object.entries(categoryRules)) {
+                for (const keyword of keywords) {
+                    if (desc.includes(keyword.toLowerCase())) {
+                        return category;
+                    }
+                }
+            }
+            
+            // If no specific category found, try to determine if it's a general expense type
+            if (desc.includes('payment') || desc.includes('purchase') || desc.includes('eftpos')) {
+                return 'General Expenses';
+            }
+            
+            return 'Other';
+        }
 
         // Enhanced file handling
         function handleFiles(files) {
@@ -998,6 +1146,7 @@
             return 'ANZ'; // Default fallback
         }
 
+        // ENHANCED: Transaction parsing with better expense detection
         function parseTransaction(line, bankType, headers) {
             const values = parseCSVLine(line);
             if (values.length < 3) return null;
@@ -1055,11 +1204,24 @@
                         };
                 }
 
-                // Add category
+                // ENHANCED: Better expense/income detection
+                const transactionType = detectTransactionType(transaction.description, transaction.amount);
+                
+                // Adjust amount sign based on transaction type
+                if (transactionType === 'expense' && transaction.amount > 0) {
+                    transaction.amount = -Math.abs(transaction.amount);
+                } else if (transactionType === 'income' && transaction.amount < 0) {
+                    transaction.amount = Math.abs(transaction.amount);
+                }
+
+                // Add category with enhanced rules
                 transaction.category = categorizeTransaction(transaction.description);
                 
                 // Format date for display
                 transaction.displayDate = formatDate(transaction.date);
+                
+                // Add transaction type for debugging
+                transaction.transactionType = transactionType;
                 
                 return transaction;
             } catch (error) {
@@ -1125,22 +1287,9 @@
             });
         }
 
-        function categorizeTransaction(description) {
-            const desc = description.toLowerCase();
-            
-            for (const [category, keywords] of Object.entries(categoryRules)) {
-                for (const keyword of keywords) {
-                    if (desc.includes(keyword.toLowerCase())) {
-                        return category;
-                    }
-                }
-            }
-            
-            return 'Other';
-        }
-
+        // ENHANCED: Display results with better debugging
         function displayResults() {
-            // Calculate summary statistics
+            // Calculate summary statistics with proper income/expense separation
             const totalTransactions = processedTransactions.length;
             const income = processedTransactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
             const expenses = Math.abs(processedTransactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0));
@@ -1151,6 +1300,14 @@
             document.getElementById('totalIncome').textContent = '$' + income.toLocaleString('en-NZ', { minimumFractionDigits: 2 });
             document.getElementById('totalExpenses').textContent = '$' + expenses.toLocaleString('en-NZ', { minimumFractionDigits: 2 });
             document.getElementById('netAmount').textContent = '$' + netAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2 });
+
+            // Log categorization results for debugging
+            console.log('Categorization Summary:');
+            const categoryBreakdown = {};
+            processedTransactions.forEach(t => {
+                categoryBreakdown[t.category] = (categoryBreakdown[t.category] || 0) + 1;
+            });
+            console.log(categoryBreakdown);
 
             // Display transactions
             displayTransactions();
@@ -1228,14 +1385,20 @@
             });
         }
 
+        // ENHANCED: Category class mapping
         function getCategoryClass(category) {
             const classMap = {
                 'Food & Dining': 'category-food',
                 'Transport': 'category-transport',
-                'Shopping': 'category-shopping',
+                'Shopping & Retail': 'category-shopping',
                 'Bills & Utilities': 'category-bills',
                 'Income': 'category-income',
-                'Banking & Fees': 'category-other'
+                'Banking & Fees': 'category-other',
+                'Health & Medical': 'category-health',
+                'Entertainment & Recreation': 'category-entertainment',
+                'Insurance': 'category-bills',
+                'Education': 'category-other',
+                'General Expenses': 'category-shopping'
             };
             return classMap[category] || 'category-other';
         }
