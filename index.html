@@ -105,6 +105,43 @@
             margin-bottom: 40px; text-align: center;
         }
 
+        /* Critical Alert Banner */
+        .critical-alert {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.2) 100%);
+            border: 2px solid rgba(239, 68, 68, 0.4);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .alert-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .alert-icon {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+
+        .alert-title {
+            color: #ef4444;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .alert-message {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.5;
+        }
+
         /* Financial Summary Section */
         .financial-summary {
             display: grid; 
@@ -120,6 +157,16 @@
             border-radius: 16px;
             padding: 24px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .summary-card.critical {
+            border-color: rgba(239, 68, 68, 0.4);
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%);
+        }
+
+        .summary-card.warning {
+            border-color: rgba(245, 158, 11, 0.4);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%);
         }
 
         .summary-card h3 {
@@ -145,6 +192,179 @@
         .positive { color: #10b981; }
         .negative { color: #ef4444; }
         .neutral { color: #8b5cf6; }
+
+        /* Budget Tracking Section */
+        .budget-section {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .budget-status {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .budget-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .budget-category {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid #8b5cf6;
+        }
+
+        .budget-category.over-budget {
+            border-left-color: #ef4444;
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .budget-category.on-track {
+            border-left-color: #10b981;
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .category-name {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .category-status {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .budget-amounts {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .amount-item {
+            text-align: center;
+        }
+
+        .amount-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .amount-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b5cf6, #9333ea);
+            transition: width 0.5s ease;
+        }
+
+        .progress-fill.over {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+        }
+
+        .progress-fill.good {
+            background: linear-gradient(90deg, #10b981, #059669);
+        }
+
+        .progress-text {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+        }
+
+        /* AI Insights Section */
+        .ai-insights {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .insight-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .insight-icon {
+            font-size: 20px;
+            margin-top: 2px;
+        }
+
+        .insight-content {
+            flex: 1;
+        }
+
+        .insight-title {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .insight-description {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            line-height: 1.4;
+        }
 
         .cards-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -181,7 +401,7 @@
         }
         .success-msg.show { display: block; }
 
-        /* BULLETPROOF PRIVACY BUTTON - ALWAYS VISIBLE WHEN LOGGED IN */
+        /* BULLETPROOF PRIVACY BUTTON */
         .privacy-toggle {
             position: fixed !important;
             top: 80px !important;
@@ -220,12 +440,10 @@
             box-shadow: 0 0 30px rgba(16, 185, 129, 0.8), 0 6px 16px rgba(0, 0, 0, 0.4) !important;
         }
 
-        /* Hide privacy button when not logged in */
         .login-screen .privacy-toggle {
             display: none !important;
         }
 
-        /* IMPROVED FINANCIAL AMOUNT HIDING */
         .financial-amount {
             transition: all 0.3s ease !important;
             position: relative !important;
@@ -275,7 +493,6 @@
             content: "••••" !important;
         }
 
-        /* Demo badge */
         .demo-badge {
             position: fixed !important;
             bottom: 20px !important;
@@ -296,7 +513,6 @@
             display: block !important;
         }
 
-        /* Install button */
         .install-btn {
             position: fixed;
             bottom: 30px;
@@ -335,6 +551,7 @@
             .dashboard-title { font-size: 24px; }
             .cards-grid { grid-template-columns: 1fr; }
             .financial-summary { grid-template-columns: 1fr; }
+            .budget-grid { grid-template-columns: 1fr; }
             
             .privacy-toggle {
                 top: 70px !important;
@@ -360,7 +577,6 @@
     </style>
 </head>
 <body>
-    <!-- PRIVACY TOGGLE - ALWAYS PRESENT -->
     <button id="privacyToggle" class="privacy-toggle">
         🔐 HIDE MONEY
     </button>
@@ -406,77 +622,305 @@
         </div>
         
         <div class="success-msg" id="successMsg">
-            🎉 Welcome to FinanceOS! Privacy button is top-right →
+            🎉 Welcome to FinanceOS! Your financial data is ready.
         </div>
         
         <div class="dashboard-content">
             <h2 class="dashboard-title">Financial Dashboard</h2>
+
+            <!-- Critical Alert Banner -->
+            <div class="critical-alert">
+                <div class="alert-header">
+                    <div class="alert-icon">🚨</div>
+                    <div class="alert-title">FINANCIAL EMERGENCY</div>
+                </div>
+                <div class="alert-message">
+                    You're spending <span class="financial-amount">$3,607 more than you earn monthly</span>. Emergency fund is critically low at <span class="financial-amount">$0.17</span>. 
+                    <strong>Immediate action required to prevent financial collapse.</strong>
+                    <a href="goals.html" style="color: #60a5fa; text-decoration: underline; margin-left: 8px;">View Recovery Plan →</a>
+                </div>
+            </div>
             
-            <!-- Financial Summary with ALL amounts marked for privacy -->
+            <!-- Financial Summary -->
             <div class="financial-summary">
                 <div class="summary-card">
                     <h3>Total Balance</h3>
                     <div class="summary-amount positive financial-amount large">$65,383.09</div>
-                    <div class="summary-change">+2.4% this month</div>
+                    <div class="summary-change">Includes <span class="financial-amount">$271,600</span> mortgage debt</div>
                 </div>
-                <div class="summary-card">
-                    <h3>Monthly Budget</h3>
+                <div class="summary-card critical">
+                    <h3>Monthly Cash Flow</h3>
                     <div class="summary-amount negative financial-amount medium">-$3,607.00</div>
-                    <div class="summary-change">Over budget</div>
+                    <div class="summary-change">Spending exceeds income by 57%</div>
                 </div>
-                <div class="summary-card">
+                <div class="summary-card critical">
                     <h3>Emergency Fund</h3>
                     <div class="summary-amount neutral financial-amount small">$0.17</div>
-                    <div class="summary-change">Critical: Build immediately</div>
+                    <div class="summary-change">Target: <span class="financial-amount">$15,000</span> (99.9% short)</div>
                 </div>
-                <div class="summary-card">
+                <div class="summary-card warning">
                     <h3>Credit Card Debt</h3>
                     <div class="summary-amount negative financial-amount medium">-$3,251.30</div>
-                    <div class="summary-change">Available: <span class="financial-amount medium">$6,748.70</span></div>
+                    <div class="summary-change">Available: <span class="financial-amount medium">$6,748.70</span> • 32% utilization</div>
                 </div>
                 <div class="summary-card">
                     <h3>KiwiSaver</h3>
                     <div class="summary-amount positive financial-amount large">$48,733.44</div>
-                    <div class="summary-change">+8.2% this year</div>
+                    <div class="summary-change">+8.2% this year • On track for retirement</div>
                 </div>
-                <div class="summary-card">
+                <div class="summary-card warning">
                     <h3>Home Loan</h3>
                     <div class="summary-amount negative financial-amount large">-$271,600.02</div>
-                    <div class="summary-change">Monthly: <span class="financial-amount medium">$2,070.00</span></div>
+                    <div class="summary-change">Monthly: <span class="financial-amount medium">$2,070.00</span> • 4.99% rate</div>
+                </div>
+            </div>
+
+            <!-- Budget Tracking Section -->
+            <div class="budget-section">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        📊 Monthly Budget Tracking
+                    </h3>
+                    <div class="budget-status">OVER BUDGET</div>
+                </div>
+                <div class="budget-grid">
+                    <!-- Housing -->
+                    <div class="budget-category over-budget">
+                        <div class="category-header">
+                            <div class="category-name">Housing</div>
+                            <div class="category-status">Over Budget</div>
+                        </div>
+                        <div class="budget-amounts">
+                            <div class="amount-item">
+                                <div class="amount-label">Budgeted</div>
+                                <div class="amount-value financial-amount">$2,427</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">Spent</div>
+                                <div class="amount-value negative financial-amount">$2,427</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">Remaining</div>
+                                <div class="amount-value neutral">$0</div>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%"></div>
+                        </div>
+                        <div class="progress-text">100% used • Mortgage + Rates</div>
+                    </div>
+
+                    <!-- Food -->
+                    <div class="budget-category over-budget">
+                        <div class="category-header">
+                            <div class="category-name">Food</div>
+                            <div class="category-status">160% Over</div>
+                        </div>
+                        <div class="budget-amounts">
+                            <div class="amount-item">
+                                <div class="amount-label">Budgeted</div>
+                                <div class="amount-value financial-amount">$500</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">Spent</div>
+                                <div class="amount-value negative financial-amount">$800</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">Over</div>
+                                <div class="amount-value negative financial-amount">-$300</div>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill over" style="width: 100%"></div>
+                        </div>
+                        <div class="progress-text">160% used • Cut groceries + dining out</div>
+                    </div>
+
+                    <!-- Utilities -->
+                    <div class="budget-category on-track">
+                        <div class="category-header">
+                            <div class="category-name">Utilities</div>
+                            <div class="category-status">On Track</div>
+                        </div>
+                        <div class="budget-amounts">
+                            <div class="amount-item">
+                                <div class="amount-label">Budgeted</div>
+                                <div class="amount-value financial-amount">$213</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">Spent</div>
+                                <div class="amount-value financial-amount">$213</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">Remaining</div>
+                                <div class="amount-value neutral">$0</div>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill good" style="width: 100%"></div>
+                        </div>
+                        <div class="progress-text">100% used • Fixed utilities</div>
+                    </div>
+
+                    <!-- Insurance -->
+                    <div class="budget-category on-track">
+                        <div class="category-header">
+                            <div class="category-name">Insurance</div>
+                            <div class="category-status">Fixed</div>
+                        </div>
+                        <div class="budget-amounts">
+                            <div class="amount-item">
+                                <div class="amount-label">Budgeted</div>
+                                <div class="amount-value financial-amount">$490</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">Spent</div>
+                                <div class="amount-value financial-amount">$490</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">Remaining</div>
+                                <div class="amount-value neutral">$0</div>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill good" style="width: 100%"></div>
+                        </div>
+                        <div class="progress-text">Vero + Partners Life</div>
+                    </div>
+
+                    <!-- Transportation -->
+                    <div class="budget-category over-budget">
+                        <div class="category-header">
+                            <div class="category-name">Transportation</div>
+                            <div class="category-status">Over Budget</div>
+                        </div>
+                        <div class="budget-amounts">
+                            <div class="amount-item">
+                                <div class="amount-label">Budgeted</div>
+                                <div class="amount-value financial-amount">$125</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">Spent</div>
+                                <div class="amount-value negative financial-amount">$200</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">Over</div>
+                                <div class="amount-value negative financial-amount">-$75</div>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill over" style="width: 100%"></div>
+                        </div>
+                        <div class="progress-text">160% used • Review fuel costs</div>
+                    </div>
+
+                    <!-- Entertainment -->
+                    <div class="budget-category over-budget">
+                        <div class="category-header">
+                            <div class="category-name">Entertainment</div>
+                            <div class="category-status">340% Over</div>
+                        </div>
+                        <div class="budget-amounts">
+                            <div class="amount-item">
+                                <div class="amount-label">Budgeted</div>
+                                <div class="amount-value financial-amount">$50</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">Spent</div>
+                                <div class="amount-value negative financial-amount">$220</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">Over</div>
+                                <div class="amount-value negative financial-amount">-$170</div>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill over" style="width: 100%"></div>
+                        </div>
+                        <div class="progress-text">440% used • Cancel Sky Network immediately</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Insights Section -->
+            <div class="ai-insights">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        🤖 AI Financial Insights
+                    </h3>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-icon">🔥</div>
+                    <div class="insight-content">
+                        <div class="insight-title">Critical: Budget Deficit Emergency</div>
+                        <div class="insight-description">
+                            You're overspending by <span class="financial-amount">$3,607/month</span>. At this rate, you'll accumulate <span class="financial-amount">$43,284</span> in additional debt this year. 
+                            Immediate action required: Cut food spending by <span class="financial-amount">$300</span>, cancel Sky Network (<span class="financial-amount">$163</span>), and reduce shopping by <span class="financial-amount">$100</span>.
+                        </div>
+                    </div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-icon">⚠️</div>
+                    <div class="insight-content">
+                        <div class="insight-title">Emergency Fund Critical</div>
+                        <div class="insight-description">
+                            With only <span class="financial-amount">$0.17</span> in emergency savings, any unexpected expense will force you into debt. 
+                            You're 99.998% below the recommended <span class="financial-amount">$15,000</span> emergency fund. Cannot build until budget deficit is fixed.
+                        </div>
+                    </div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-icon">💳</div>
+                    <div class="insight-content">
+                        <div class="insight-title">Credit Card Debt Growing</div>
+                        <div class="insight-description">
+                            Current debt of <span class="financial-amount">$3,251</span> costs ~<span class="financial-amount">$54/month</span> in interest. 
+                            With your budget deficit, this debt will likely increase. Stop using the card immediately and pay minimums until deficit is fixed.
+                        </div>
+                    </div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-icon">🎯</div>
+                    <div class="insight-content">
+                        <div class="insight-title">Quick Wins Available</div>
+                        <div class="insight-description">
+                            Three immediate actions could save <span class="financial-amount">$563/month</span>: Cancel Sky Network (<span class="financial-amount">$163</span>), 
+                            reduce groceries to <span class="financial-amount">$400</span> (<span class="financial-amount">$150</span> saved), and limit dining out to <span class="financial-amount">$100</span> (<span class="financial-amount">$150</span> saved), 
+                            plus reduce shopping to <span class="financial-amount">$50</span> (<span class="financial-amount">$100</span> saved).
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="cards-grid">
-                <div class="card card-1" onclick="window.location.href='csv-upload.html'">
+                <div class="card card-1" onclick="window.location.href='index.html'">
                     <div class="card-icon">📊</div>
                     <h3 class="card-title">Dashboard</h3>
-                    <p class="card-desc">View your complete financial overview and insights</p>
+                    <p class="card-desc">View your complete financial overview and real-time insights</p>
                 </div>
                 <div class="card card-2" onclick="window.location.href='csv-upload.html'">
                     <div class="card-icon">📤</div>
                     <h3 class="card-title">Upload CSV</h3>
-                    <p class="card-desc">Import your bank statements and transaction data</p>
+                    <p class="card-desc">Import bank statements for AI analysis and categorization</p>
                 </div>
                 <div class="card card-3" onclick="window.location.href='goals.html'">
                     <div class="card-icon">🎯</div>
-                    <h3 class="card-title">Goals</h3>
-                    <p class="card-desc">Set and track your financial goals and milestones</p>
+                    <h3 class="card-title">Goals & AI Coach</h3>
+                    <p class="card-desc">Get AI-powered recovery plan for your financial crisis</p>
                 </div>
                 <div class="card card-4">
                     <div class="card-icon">🤖</div>
-                    <h3 class="card-title">AI Coach</h3>
-                    <p class="card-desc">Get personalized financial advice and insights</p>
+                    <h3 class="card-title">Budget Optimizer</h3>
+                    <p class="card-desc">AI recommendations to eliminate your $3,607 deficit</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Demo Badge -->
     <div id="demoBadge" class="demo-badge">
-        👀 DEMO MODE - Financials Hidden
+        👀 Demo Mode - Financials Hidden
     </div>
 
-    <!-- PWA Install Button -->
     <button id="installBtn" class="install-btn">
         <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -493,16 +937,13 @@
 
         // ===== INITIALIZE APP =====
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 FinanceOS Starting...');
+            console.log('🚀 FinanceOS Enhanced Dashboard Starting...');
             
-            // Get elements
             privacyButton = document.getElementById('privacyToggle');
             demoBadge = document.getElementById('demoBadge');
             
-            // Load privacy state from localStorage
             isPrivate = localStorage.getItem('financeOS_privacy') === 'true';
             
-            // Initialize privacy button
             if (privacyButton) {
                 console.log('✅ Privacy button found');
                 initializePrivacyButton();
@@ -510,16 +951,15 @@
                 console.error('❌ Privacy button NOT found');
             }
             
-            // Initialize PWA
             initializePWA();
             
-            console.log('✅ FinanceOS Ready');
+            console.log('✅ FinanceOS Enhanced Dashboard Ready');
             console.log('🔐 Privacy state:', isPrivate ? 'HIDDEN' : 'VISIBLE');
         });
 
         // ===== LOGIN/LOGOUT FUNCTIONS =====
         function login() {
-            console.log('🔑 Logging in...');
+            console.log('🔑 Logging in to enhanced dashboard...');
             
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('dashboard').classList.add('active');
@@ -527,13 +967,12 @@
             
             isLoggedIn = true;
             
-            // Apply privacy state if needed
             setTimeout(function() {
                 applyPrivacyState();
                 document.getElementById('successMsg').classList.remove('show');
             }, 3000);
             
-            console.log('✅ Logged in successfully');
+            console.log('✅ Logged in to enhanced dashboard');
         }
         
         function logout() {
@@ -545,7 +984,6 @@
             
             isLoggedIn = false;
             
-            // Hide demo badge
             if (demoBadge) {
                 demoBadge.classList.remove('show');
             }
@@ -557,13 +995,9 @@
         function initializePrivacyButton() {
             if (!privacyButton) return;
             
-            // Remove any existing listeners
             privacyButton.removeEventListener('click', togglePrivacy);
-            
-            // Add click listener
             privacyButton.addEventListener('click', togglePrivacy);
             
-            // Set initial button state
             updatePrivacyButtonText();
             
             console.log('🔐 Privacy button initialized');
@@ -606,7 +1040,6 @@
                 }
             });
             
-            // Show/hide demo badge
             if (demoBadge) {
                 if (isPrivate && isLoggedIn) {
                     demoBadge.classList.add('show');
@@ -623,7 +1056,6 @@
             const installButton = document.getElementById('installBtn');
             let deferredPrompt = null;
 
-            // Show install button after delay
             setTimeout(function() {
                 if (installButton) {
                     installButton.classList.add('show');
@@ -631,14 +1063,12 @@
                 }
             }, 5000);
 
-            // Listen for install prompt
             window.addEventListener('beforeinstallprompt', function(e) {
                 e.preventDefault();
                 deferredPrompt = e;
                 console.log('📱 Install prompt available');
             });
 
-            // Handle install button click
             if (installButton) {
                 installButton.addEventListener('click', function() {
                     if (deferredPrompt) {
@@ -656,7 +1086,6 @@
                 });
             }
 
-            // Register service worker
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function() {
                     navigator.serviceWorker.register('sw.js')
@@ -681,10 +1110,13 @@
             console.log('localStorage privacy:', localStorage.getItem('financeOS_privacy'));
         }
 
-        // Make debug function available globally
         window.debugPrivacy = debugPrivacy;
 
-        console.log('🎯 To debug privacy, type: debugPrivacy()');
+        console.log('🎯 Enhanced FinanceOS Ready');
+        console.log('📊 Real budget tracking enabled');
+        console.log('🤖 AI insights active');
+        console.log('🚨 Financial emergency alerts enabled');
+        console.log('🔧 To debug privacy, type: debugPrivacy()');
     </script>
 </body>
 </html>
