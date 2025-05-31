@@ -2,12 +2,12 @@
   "name": "FinanceOS",
   "short_name": "FinanceOS", 
   "description": "Personal Finance Operating System",
-  "start_url": "/",
+  "start_url": "/FinanceOS.20/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#0f172a",
   "theme_color": "#8b5cf6",
-  "scope": "/",
+  "scope": "/FinanceOS.20/",
   "prefer_related_applications": false,
   "icons": [
     {
