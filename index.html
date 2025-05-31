@@ -1,1227 +1,349 @@
-<!DOCTYPE html> 
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>FinanceOS - Personal Finance Operating System</title>
+// ===== ENHANCED DASHBOARD WITH REAL DATA =====
+// Add this to your index.html after the existing JavaScript
+
+// Initialize transaction manager
+let transactionManager;
+
+// Enhanced dashboard initialization
+document.addEventListener('DOMContentLoaded', function() {
+    // ... existing initialization code ...
     
-    <!-- PWA Meta Tags -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="FinanceOS">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#8b5cf6">
+    // Initialize transaction manager
+    transactionManager = new FinanceOSTransactionManager();
     
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
-            min-height: 100vh;
-            color: white;
-        }
-        .login-screen {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            position: relative;
-        }
-        .bg-blur { position: absolute; border-radius: 50%; filter: blur(40px); }
-        .blur1 { top: 10%; left: 10%; width: 80px; height: 80px; background: rgba(139, 92, 246, 0.1); }
-        .blur2 { top: 20%; right: 15%; width: 120px; height: 120px; background: rgba(59, 130, 246, 0.1); }
-        .blur3 { bottom: 15%; left: 25%; width: 100px; height: 100px; background: rgba(16, 185, 129, 0.1); }
+    // Update dashboard with real data when logged in
+    if (isLoggedIn) {
+        setTimeout(function() {
+            updateDashboardWithRealData();
+        }, 500);
+    }
+});
+
+// Enhanced login function
+function login() {
+    console.log('🔑 Logging in...');
+    
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dashboard').classList.add('active');
+    document.getElementById('successMsg').classList.add('show');
+    
+    isLoggedIn = true;
+    
+    // Save login state with timestamp
+    localStorage.setItem('financeOS_loggedIn', 'true');
+    localStorage.setItem('financeOS_sessionTime', Date.now().toString());
+    
+    // Update dashboard with real data
+    setTimeout(function() {
+        applyPrivacyState();
+        updateDashboardWithRealData();
+        document.getElementById('successMsg').classList.remove('show');
+    }, 1000);
+    
+    console.log('✅ Logged in successfully with real data');
+}
+
+// ===== REAL DATA DASHBOARD UPDATES =====
+function updateDashboardWithRealData() {
+    console.log('📊 Updating dashboard with real transaction data...');
+    
+    try {
+        // Get real financial data
+        const budgetStatus = transactionManager.getBudgetStatus();
+        const financialHealth = transactionManager.getFinancialHealth();
+        const recentTransactions = transactionManager.getTransactions().slice(0, 10);
         
-        .login-container { width: 100%; max-width: 400px; position: relative; z-index: 10; }
-        .logo-section { text-align: center; margin-bottom: 40px; }
-        .logo {
-            width: 120px; height: 120px; margin: 0 auto 20px;
-            background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 50%, #10b981 100%);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-        }
-        .logo span { font-size: 60px; color: white; font-weight: bold; }
-        .title { font-size: 36px; font-weight: bold; color: white; margin: 0 0 10px 0; }
-        .subtitle { color: rgba(255, 255, 255, 0.7); margin: 0; font-size: 16px; }
+        // Update financial summary cards
+        updateFinancialSummary(budgetStatus, financialHealth);
         
-        .login-form {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
-            backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 24px; padding: 40px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-        }
-        .form-group { margin-bottom: 30px; }
-        .form-label {
-            display: block; font-size: 14px; font-weight: 500;
-            color: rgba(255, 255, 255, 0.9); margin-bottom: 8px;
-        }
-        .form-input {
-            width: 100%; background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px;
-            padding: 12px 16px; color: white; font-size: 16px; outline: none;
-        }
-        .form-input::placeholder { color: rgba(255, 255, 255, 0.5); }
-        .login-btn {
-            width: 100%; background: linear-gradient(135deg, #8b5cf6, #9333ea);
-            color: white; border: none; border-radius: 12px; padding: 16px;
-            font-size: 16px; font-weight: 600; cursor: pointer;
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-            transition: all 0.3s ease; margin-bottom: 20px;
-        }
-        .login-btn:hover { transform: translateY(-2px); }
-        .forgot-btn {
-            background: none; border: none; color: #8b5cf6;
-            font-size: 14px; cursor: pointer; text-decoration: underline;
-        }
+        // Update budget tracking section
+        updateBudgetTracking(budgetStatus);
         
-        .dashboard { display: none; position: relative; }
-        .dashboard.active { display: block; }
-        .header {
-            background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.15); padding: 20px;
-        }
-        .header-content {
-            display: flex; justify-content: space-between; align-items: center;
-            max-width: 1200px; margin: 0 auto;
-        }
-        .header-logo { display: flex; align-items: center; }
-        .header-icon {
-            width: 40px; height: 40px; background: linear-gradient(135deg, #8b5cf6, #3b82f6);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            margin-right: 12px;
-        }
-        .header-title { color: white; font-size: 24px; font-weight: bold; margin: 0; }
-        .logout-btn {
-            background: rgba(239, 68, 68, 0.2); color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px;
-            padding: 8px 16px; font-size: 14px; cursor: pointer;
-        }
+        // Update AI insights
+        updateAIInsights(financialHealth);
         
-        .dashboard-content { padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
-        .dashboard-title {
-            color: white; font-size: 32px; font-weight: bold;
-            margin-bottom: 40px; text-align: center;
-        }
-
-        /* Critical Alert Banner */
-        .critical-alert {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.2) 100%);
-            border: 2px solid rgba(239, 68, 68, 0.4);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 30px;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-
-        .alert-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .alert-icon {
-            font-size: 24px;
-            margin-right: 12px;
-        }
-
-        .alert-title {
-            color: #ef4444;
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .alert-message {
-            color: rgba(255, 255, 255, 0.9);
-            line-height: 1.5;
-        }
-
-        /* Financial Summary Section */
-        .financial-summary {
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px; 
-            margin-bottom: 40px;
-        }
-
-        .summary-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
-        .summary-card.critical {
-            border-color: rgba(239, 68, 68, 0.4);
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%);
-        }
-
-        .summary-card.warning {
-            border-color: rgba(245, 158, 11, 0.4);
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%);
-        }
-
-        .summary-card h3 {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .summary-amount {
-            font-size: 28px;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-
-        .summary-change {
-            font-size: 14px;
-            opacity: 0.8;
-        }
-
-        .positive { color: #10b981; }
-        .negative { color: #ef4444; }
-        .neutral { color: #8b5cf6; }
-
-        /* Budget Tracking Section */
-        .budget-section {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .section-title {
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .budget-status {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .budget-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .budget-category {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 20px;
-            border-left: 4px solid #8b5cf6;
-        }
-
-        .budget-category.over-budget {
-            border-left-color: #ef4444;
-            background: rgba(239, 68, 68, 0.05);
-        }
-
-        .budget-category.on-track {
-            border-left-color: #10b981;
-            background: rgba(16, 185, 129, 0.05);
-        }
-
-        .category-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .category-name {
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .category-status {
-            font-size: 12px;
-            padding: 4px 8px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .budget-amounts {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-
-        .amount-item {
-            text-align: center;
-        }
-
-        .amount-label {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 12px;
-            margin-bottom: 4px;
-        }
-
-        .amount-value {
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 8px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #8b5cf6, #9333ea);
-            transition: width 0.5s ease;
-        }
-
-        .progress-fill.over {
-            background: linear-gradient(90deg, #ef4444, #dc2626);
-        }
-
-        .progress-fill.good {
-            background: linear-gradient(90deg, #10b981, #059669);
-        }
-
-        .progress-text {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.7);
-            text-align: center;
-        }
-
-        /* AI Insights Section */
-        .ai-insights {
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-        }
-
-        .insight-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 16px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            margin-bottom: 16px;
-        }
-
-        .insight-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .insight-icon {
-            font-size: 20px;
-            margin-top: 2px;
-        }
-
-        .insight-content {
-            flex: 1;
-        }
-
-        .insight-title {
-            color: white;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .insight-description {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        .cards-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
-        }
-        .card {
-            backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px; padding: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            cursor: pointer; transition: transform 0.3s ease;
-        }
-        .card:hover { transform: translateY(-5px); }
-        .card-icon {
-            width: 50px; height: 50px; border-radius: 12px; display: flex;
-            align-items: center; justify-content: center; margin-bottom: 16px;
-            font-size: 24px; color: white;
-        }
-        .card-title { color: white; font-size: 20px; font-weight: 600; margin-bottom: 8px; }
-        .card-desc { color: rgba(255, 255, 255, 0.7); font-size: 14px; line-height: 1.5; }
+        // Update alerts
+        updateCriticalAlerts(financialHealth);
         
-        .card-1 { background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%); }
-        .card-1 .card-icon { background: linear-gradient(135deg, #8b5cf6, #9333ea); }
-        .card-2 { background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.15) 100%); }
-        .card-2 .card-icon { background: linear-gradient(135deg, #10b981, #059669); }
-        .card-3 { background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.15) 100%); }
-        .card-3 .card-icon { background: linear-gradient(135deg, #3b82f6, #2563eb); }
-        .card-4 { background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.15) 100%); }
-        .card-4 .card-icon { background: linear-gradient(135deg, #f59e0b, #d97706); }
-        
-        .success-msg {
-            background: rgba(16, 185, 129, 0.2); color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px;
-            padding: 16px; margin: 20px auto; max-width: 1200px; text-align: center;
-            display: none;
+        console.log('✅ Dashboard updated with real data');
+    } catch (error) {
+        console.warn('⚠️ Could not update dashboard with real data:', error);
+        // Fall back to static data if needed
+    }
+}
+
+function updateFinancialSummary(budgetStatus, financialHealth) {
+    const summary = budgetStatus.summary;
+    
+    // Update monthly cash flow
+    const cashFlowElement = document.querySelector('.summary-card.critical .summary-amount');
+    if (cashFlowElement) {
+        cashFlowElement.textContent = formatCurrency(-summary.deficit);
+        cashFlowElement.className = `summary-amount ${summary.deficit > 0 ? 'negative' : 'positive'} financial-amount medium`;
+    }
+    
+    // Update savings rate info
+    const cashFlowChange = document.querySelector('.summary-card.critical .summary-change');
+    if (cashFlowChange) {
+        const percentage = Math.abs((summary.deficit / summary.monthlyIncome) * 100);
+        cashFlowChange.textContent = `${summary.deficit > 0 ? 'Overspending' : 'Saving'} by ${percentage.toFixed(1)}%`;
+    }
+    
+    // Update transaction count info
+    const recentCount = transactionManager.getTransactions({
+        dateRange: {
+            start: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+            end: new Date()
         }
-        .success-msg.show { display: block; }
+    }).length;
+    
+    // Add transaction count indicator
+    addTransactionCounter(recentCount);
+}
 
-        /* BULLETPROOF PRIVACY BUTTON */
-        .privacy-toggle {
-            position: fixed !important;
-            top: 80px !important;
-            right: 20px !important;
-            background: linear-gradient(135deg, #ef4444, #dc2626) !important;
-            color: white !important;
-            border: 3px solid #fbbf24 !important;
-            border-radius: 16px !important;
-            padding: 12px 20px !important;
-            font-size: 14px !important;
-            font-weight: 700 !important;
-            cursor: pointer !important;
-            z-index: 100000 !important;
-            display: flex !important;
-            align-items: center !important;
-            gap: 8px !important;
-            box-shadow: 0 0 20px rgba(239, 68, 68, 0.6), 0 4px 12px rgba(0, 0, 0, 0.3) !important;
-            transition: all 0.3s ease !important;
-            opacity: 1 !important;
-            visibility: visible !important;
-            transform: scale(1) !important;
-        }
+function updateBudgetTracking(budgetStatus) {
+    const budgetGrid = document.querySelector('.budget-grid');
+    if (!budgetGrid) return;
+    
+    // Clear existing budget items
+    budgetGrid.innerHTML = '';
+    
+    // Add updated budget categories
+    budgetStatus.categories.forEach(category => {
+        const categoryElement = createBudgetCategoryElement(category);
+        budgetGrid.appendChild(categoryElement);
+    });
+}
 
-        .privacy-toggle:hover {
-            transform: scale(1.05) !important;
-            box-shadow: 0 0 30px rgba(239, 68, 68, 0.8), 0 6px 16px rgba(0, 0, 0, 0.4) !important;
-        }
-
-        .privacy-toggle.active {
-            background: linear-gradient(135deg, #10b981, #059669) !important;
-            border-color: #84cc16 !important;
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.6), 0 4px 12px rgba(0, 0, 0, 0.3) !important;
-        }
-
-        .privacy-toggle.active:hover {
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.8), 0 6px 16px rgba(0, 0, 0, 0.4) !important;
-        }
-
-        .login-screen .privacy-toggle {
-            display: none !important;
-        }
-
-        .financial-amount {
-            transition: all 0.3s ease !important;
-            position: relative !important;
-            display: inline-block !important;
-        }
-
-        .financial-amount.hidden {
-            color: transparent !important;
-            user-select: none !important;
-            pointer-events: none !important;
-        }
-
-        .financial-amount.hidden::before {
-            content: "" !important;
-            position: absolute !important;
-            top: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            bottom: 0 !important;
-            background: rgba(255, 255, 255, 0.1) !important;
-            border-radius: 6px !important;
-            backdrop-filter: blur(4px) !important;
-        }
-
-        .financial-amount.hidden::after {
-            content: "••••••" !important;
-            position: absolute !important;
-            top: 50% !important;
-            left: 50% !important;
-            transform: translate(-50%, -50%) !important;
-            color: rgba(255, 255, 255, 0.7) !important;
-            font-weight: bold !important;
-            font-size: 0.9em !important;
-            z-index: 2 !important;
-            pointer-events: none !important;
-        }
-
-        .financial-amount.hidden.large::after {
-            content: "••••••••••" !important;
-        }
-
-        .financial-amount.hidden.medium::after {
-            content: "••••••••" !important;
-        }
-
-        .financial-amount.hidden.small::after {
-            content: "••••" !important;
-        }
-
-        .demo-badge {
-            position: fixed !important;
-            bottom: 20px !important;
-            left: 20px !important;
-            background: linear-gradient(135deg, #f59e0b, #d97706) !important;
-            color: white !important;
-            border: 2px solid #fbbf24 !important;
-            border-radius: 20px !important;
-            padding: 12px 20px !important;
-            font-size: 14px !important;
-            font-weight: 600 !important;
-            z-index: 99999 !important;
-            display: none !important;
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4) !important;
-        }
-
-        .demo-badge.show {
-            display: block !important;
-        }
-
-        /* INSTALL BUTTON - ONLY SHOW IF NOT INSTALLED */
-        .install-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            border: none;
-            border-radius: 60px;
-            padding: 20px 32px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 12px 40px rgba(16, 185, 129, 0.4);
-            z-index: 999;
-            transition: all 0.3s ease;
-            display: none; /* Hidden by default */
-            align-items: center;
-            gap: 12px;
-        }
-
-        .install-btn.show {
-            display: flex;
-        }
-
-        .install-btn.hidden {
-            display: none !important;
-        }
-        
-        @media (max-width: 768px) {
-            .login-container { max-width: 350px; }
-            .login-form { padding: 30px; }
-            .logo { width: 100px; height: 100px; }
-            .logo span { font-size: 50px; }
-            .title { font-size: 28px; }
-            .dashboard-content { padding: 20px; }
-            .dashboard-title { font-size: 24px; }
-            .cards-grid { grid-template-columns: 1fr; }
-            .financial-summary { grid-template-columns: 1fr; }
-            .budget-grid { grid-template-columns: 1fr; }
-            
-            .privacy-toggle {
-                top: 70px !important;
-                right: 16px !important;
-                padding: 10px 16px !important;
-                font-size: 13px !important;
-            }
-
-            .demo-badge {
-                bottom: 16px !important;
-                left: 16px !important;
-                padding: 8px 12px !important;
-                font-size: 12px !important;
-            }
-
-            .install-btn {
-                bottom: 100px;
-                right: 20px;
-                padding: 16px 24px;
-                font-size: 14px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <button id="privacyToggle" class="privacy-toggle">
-        🔐 HIDE MONEY
-    </button>
-
-    <div id="loginScreen" class="login-screen">
-        <div class="bg-blur blur1"></div>
-        <div class="bg-blur blur2"></div>
-        <div class="bg-blur blur3"></div>
-        
-        <div class="login-container">
-            <div class="logo-section">
-                <div class="logo"><span>$</span></div>
-                <h1 class="title">FinanceOS</h1>
-                <p class="subtitle">Your Personal Finance Operating System</p>
+function createBudgetCategoryElement(category) {
+    const div = document.createElement('div');
+    div.className = `budget-category ${category.status === 'over' ? 'over-budget' : category.status === 'good' ? 'on-track' : 'budget-category'}`;
+    
+    const progressWidth = Math.min(category.percentage, 100);
+    const statusText = category.status === 'over' ? `${(category.percentage - 100).toFixed(0)}% Over` : 
+                      category.status === 'warning' ? 'Near Limit' : 'On Track';
+    
+    div.innerHTML = `
+        <div class="category-header">
+            <div class="category-name">${category.name}</div>
+            <div class="category-status">${statusText}</div>
+        </div>
+        <div class="budget-amounts">
+            <div class="amount-item">
+                <div class="amount-label">Budgeted</div>
+                <div class="amount-value financial-amount">${formatCurrency(category.budgeted)}</div>
             </div>
-            
-            <div class="login-form">
-                <div class="form-group">
-                    <label class="form-label">Username</label>
-                    <input type="text" class="form-input" placeholder="Enter your username">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Password</label>
-                    <input type="password" class="form-input" placeholder="Enter your password">
-                </div>
-                <button class="login-btn" onclick="login()">Enter Demo</button>
-                <div style="text-align: center;">
-                    <button class="forgot-btn">Forgot Password?</button>
-                </div>
+            <div class="amount-item">
+                <div class="amount-label">Spent</div>
+                <div class="amount-value ${category.status === 'over' ? 'negative' : ''} financial-amount">${formatCurrency(category.spent)}</div>
+            </div>
+            <div class="amount-item">
+                <div class="amount-label">${category.remaining >= 0 ? 'Remaining' : 'Over'}</div>
+                <div class="amount-value ${category.remaining >= 0 ? 'neutral' : 'negative'} financial-amount">${formatCurrency(Math.abs(category.remaining))}</div>
             </div>
         </div>
-    </div>
-
-    <div id="dashboard" class="dashboard">
-        <div class="header">
-            <div class="header-content">
-                <div class="header-logo">
-                    <div class="header-icon"><span style="color: white; font-size: 20px; font-weight: bold;">$</span></div>
-                    <h1 class="header-title">FinanceOS</h1>
-                </div>
-                <button class="logout-btn" onclick="logout()">Logout</button>
-            </div>
+        <div class="progress-bar">
+            <div class="progress-fill ${category.status === 'over' ? 'over' : category.status === 'good' ? 'good' : ''}" style="width: ${progressWidth}%"></div>
         </div>
-        
-        <div class="success-msg" id="successMsg">
-            🎉 Welcome to FinanceOS! Your financial data is ready.
-        </div>
-        
-        <div class="dashboard-content">
-            <h2 class="dashboard-title">Financial Dashboard</h2>
+        <div class="progress-text">${category.percentage.toFixed(0)}% used • ${getSpendingAdvice(category)}</div>
+    `;
+    
+    return div;
+}
 
-            <!-- Critical Alert Banner -->
-            <div class="critical-alert">
-                <div class="alert-header">
-                    <div class="alert-icon">🚨</div>
-                    <div class="alert-title">FINANCIAL EMERGENCY</div>
-                </div>
-                <div class="alert-message">
-                    You're spending <span class="financial-amount">$3,607 more than you earn monthly</span>. Emergency fund is critically low at <span class="financial-amount">$0.17</span>. 
-                    <strong>Immediate action required to prevent financial collapse.</strong>
-                    <a href="goals.html" style="color: #60a5fa; text-decoration: underline; margin-left: 8px;">View Recovery Plan →</a>
-                </div>
-            </div>
-            
-            <!-- Financial Summary -->
-            <div class="financial-summary">
-                <div class="summary-card">
-                    <h3>Total Balance</h3>
-                    <div class="summary-amount positive financial-amount large">$65,383.09</div>
-                    <div class="summary-change">Includes <span class="financial-amount">$271,600</span> mortgage debt</div>
-                </div>
-                <div class="summary-card critical">
-                    <h3>Monthly Cash Flow</h3>
-                    <div class="summary-amount negative financial-amount medium">-$3,607.00</div>
-                    <div class="summary-change">Spending exceeds income by 57%</div>
-                </div>
-                <div class="summary-card critical">
-                    <h3>Emergency Fund</h3>
-                    <div class="summary-amount neutral financial-amount small">$0.17</div>
-                    <div class="summary-change">Target: <span class="financial-amount">$15,000</span> (99.9% short)</div>
-                </div>
-                <div class="summary-card warning">
-                    <h3>Credit Card Debt</h3>
-                    <div class="summary-amount negative financial-amount medium">-$3,251.30</div>
-                    <div class="summary-change">Available: <span class="financial-amount medium">$6,748.70</span> • 32% utilization</div>
-                </div>
-                <div class="summary-card">
-                    <h3>KiwiSaver</h3>
-                    <div class="summary-amount positive financial-amount large">$48,733.44</div>
-                    <div class="summary-change">+8.2% this year • On track for retirement</div>
-                </div>
-                <div class="summary-card warning">
-                    <h3>Home Loan</h3>
-                    <div class="summary-amount negative financial-amount large">-$271,600.02</div>
-                    <div class="summary-change">Monthly: <span class="financial-amount medium">$2,070.00</span> • 4.99% rate</div>
-                </div>
-            </div>
+function getSpendingAdvice(category) {
+    if (category.status === 'over') {
+        return `Cut back by ${formatCurrency(category.spent - category.budgeted)}`;
+    } else if (category.status === 'warning') {
+        return `${formatCurrency(category.remaining)} left this month`;
+    } else {
+        return `Well managed`;
+    }
+}
 
-            <!-- Budget Tracking Section -->
-            <div class="budget-section">
-                <div class="section-header">
-                    <h3 class="section-title">
-                        📊 Monthly Budget Tracking
-                    </h3>
-                    <div class="budget-status">OVER BUDGET</div>
-                </div>
-                <div class="budget-grid">
-                    <!-- Housing -->
-                    <div class="budget-category over-budget">
-                        <div class="category-header">
-                            <div class="category-name">Housing</div>
-                            <div class="category-status">Over Budget</div>
-                        </div>
-                        <div class="budget-amounts">
-                            <div class="amount-item">
-                                <div class="amount-label">Budgeted</div>
-                                <div class="amount-value financial-amount">$2,427</div>
-                            </div>
-                            <div class="amount-item">
-                                <div class="amount-label">Spent</div>
-                                <div class="amount-value negative financial-amount">$2,427</div>
-                            </div>
-                            <div class="amount-item">
-                                <div class="amount-label">Remaining</div>
-                                <div class="amount-value neutral">$0</div>
-                            </div>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 100%"></div>
-                        </div>
-                        <div class="progress-text">100% used • Mortgage + Rates</div>
-                    </div>
+function updateAIInsights(financialHealth) {
+    const insightsContainer = document.querySelector('.ai-insights');
+    if (!insightsContainer) return;
+    
+    // Clear existing insights
+    const insightItems = insightsContainer.querySelectorAll('.insight-item');
+    insightItems.forEach(item => item.remove());
+    
+    // Add header back
+    const header = insightsContainer.querySelector('.section-header');
+    if (!header) {
+        const headerElement = document.createElement('div');
+        headerElement.className = 'section-header';
+        headerElement.innerHTML = '<h3 class="section-title">🤖 AI Financial Insights</h3>';
+        insightsContainer.insertBefore(headerElement, insightsContainer.firstChild);
+    }
+    
+    // Add real insights
+    const insights = generateRealTimeInsights(financialHealth);
+    insights.forEach(insight => {
+        const insightElement = createInsightElement(insight);
+        insightsContainer.appendChild(insightElement);
+    });
+}
 
-                    <!-- Food -->
-                    <div class="budget-category over-budget">
-                        <div class="category-header">
-                            <div class="category-name">Food</div>
-                            <div class="category-status">160% Over</div>
-                        </div>
-                        <div class="budget-amounts">
-                            <div class="amount-item">
-                                <div class="amount-label">Budgeted</div>
-                                <div class="amount-value financial-amount">$500</div>
-                            </div>
-                            <div class="amount-item">
-                                <div class="amount-label">Spent</div>
-                                <div class="amount-value negative financial-amount">$800</div>
-                            </div>
-                            <div class="amount-item">
-                                <div class="amount-label">Over</div>
-                                <div class="amount-value negative financial-amount">-$300</div>
-                            </div>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill over" style="width: 100%"></div>
-                        </div>
-                        <div class="progress-text">160% used • Cut groceries + dining out</div>
-                    </div>
-
-                    <!-- Utilities -->
-                    <div class="budget-category on-track">
-                        <div class="category-header">
-                            <div class="category-name">Utilities</div>
-                            <div class="category-status">On Track</div>
-                        </div>
-                        <div class="budget-amounts">
-                            <div class="amount-item">
-                                <div class="amount-label">Budgeted</div>
-                                <div class="amount-value financial-amount">$213</div>
-                            </div>
-                            <div class="amount-item">
-                                <div class="amount-label">Spent</div>
-                                <div class="amount-value financial-amount">$213</div>
-                            </div>
-                            <div class="amount-item">
-                                <div class="amount-label">Remaining</div>
-                                <div class="amount-value neutral">$0</div>
-                            </div>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill good" style="width: 100%"></div>
-                        </div>
-                        <div class="progress-text">100% used • Fixed utilities</div>
-                    </div>
-
-                    <!-- Insurance -->
-                    <div class="budget-category on-track">
-                        <div class="category-header">
-                            <div class="category-name">Insurance</div>
-                            <div class="category-status">Fixed</div>
-                        </div>
-                        <div class="budget-amounts">
-                            <div class="amount-item">
-                                <div class="amount-label">Budgeted</div>
-                                <div class="amount-value financial-amount">$490</div>
-                            </div>
-                            <div class="amount-item">
-                                <div class="amount-label">Spent</div>
-                                <div class="amount-value financial-amount">$490</div>
-                            </div>
-                            <div class="amount-item">
-                                <div class="amount-label">Remaining</div>
-                                <div class="amount-value neutral">$0</div>
-                            </div>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill good" style="width: 100%"></div>
-                        </div>
-                        <div class="progress-text">Vero + Partners Life</div>
-                    </div>
-
-                    <!-- Transportation -->
-                    <div class="budget-category over-budget">
-                        <div class="category-header">
-                            <div class="category-name">Transportation</div>
-                            <div class="category-status">Over Budget</div>
-                        </div>
-                        <div class="budget-amounts">
-                            <div class="amount-item">
-                                <div class="amount-label">Budgeted</div>
-                                <div class="amount-value financial-amount">$125</div>
-                            </div>
-                            <div class="amount-item">
-                                <div class="amount-label">Spent</div>
-                                <div class="amount-value negative financial-amount">$200</div>
-                            </div>
-                            <div class="amount-item">
-                                <div class="amount-label">Over</div>
-                                <div class="amount-value negative financial-amount">-$75</div>
-                            </div>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill over" style="width: 100%"></div>
-                        </div>
-                        <div class="progress-text">160% used • Review fuel costs</div>
-                    </div>
-
-                    <!-- Entertainment -->
-                    <div class="budget-category over-budget">
-                        <div class="category-header">
-                            <div class="category-name">Entertainment</div>
-                            <div class="category-status">340% Over</div>
-                        </div>
-                        <div class="budget-amounts">
-                            <div class="amount-item">
-                                <div class="amount-label">Budgeted</div>
-                                <div class="amount-value financial-amount">$50</div>
-                            </div>
-                            <div class="amount-item">
-                                <div class="amount-label">Spent</div>
-                                <div class="amount-value negative financial-amount">$220</div>
-                            </div>
-                            <div class="amount-item">
-                                <div class="amount-label">Over</div>
-                                <div class="amount-value negative financial-amount">-$170</div>
-                            </div>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill over" style="width: 100%"></div>
-                        </div>
-                        <div class="progress-text">440% used • Cancel Sky Network immediately</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- AI Insights Section -->
-            <div class="ai-insights">
-                <div class="section-header">
-                    <h3 class="section-title">
-                        🤖 AI Financial Insights
-                    </h3>
-                </div>
-                <div class="insight-item">
-                    <div class="insight-icon">🔥</div>
-                    <div class="insight-content">
-                        <div class="insight-title">Critical: Budget Deficit Emergency</div>
-                        <div class="insight-description">
-                            You're overspending by <span class="financial-amount">$3,607/month</span>. At this rate, you'll accumulate <span class="financial-amount">$43,284</span> in additional debt this year. 
-                            Immediate action required: Cut food spending by <span class="financial-amount">$300</span>, cancel Sky Network (<span class="financial-amount">$163</span>), and reduce shopping by <span class="financial-amount">$100</span>.
-                        </div>
-                    </div>
-                </div>
-                <div class="insight-item">
-                    <div class="insight-icon">⚠️</div>
-                    <div class="insight-content">
-                        <div class="insight-title">Emergency Fund Critical</div>
-                        <div class="insight-description">
-                            With only <span class="financial-amount">$0.17</span> in emergency savings, any unexpected expense will force you into debt. 
-                            You're 99.998% below the recommended <span class="financial-amount">$15,000</span> emergency fund. Cannot build until budget deficit is fixed.
-                        </div>
-                    </div>
-                </div>
-                <div class="insight-item">
-                    <div class="insight-icon">💳</div>
-                    <div class="insight-content">
-                        <div class="insight-title">Credit Card Debt Growing</div>
-                        <div class="insight-description">
-                            Current debt of <span class="financial-amount">$3,251</span> costs ~<span class="financial-amount">$54/month</span> in interest. 
-                            With your budget deficit, this debt will likely increase. Stop using the card immediately and pay minimums until deficit is fixed.
-                        </div>
-                    </div>
-                </div>
-                <div class="insight-item">
-                    <div class="insight-icon">🎯</div>
-                    <div class="insight-content">
-                        <div class="insight-title">Quick Wins Available</div>
-                        <div class="insight-description">
-                            Three immediate actions could save <span class="financial-amount">$563/month</span>: Cancel Sky Network (<span class="financial-amount">$163</span>), 
-                            reduce groceries to <span class="financial-amount">$400</span> (<span class="financial-amount">$150</span> saved), and limit dining out to <span class="financial-amount">$100</span> (<span class="financial-amount">$150</span> saved), 
-                            plus reduce shopping to <span class="financial-amount">$50</span> (<span class="financial-amount">$100</span> saved).
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="cards-grid">
-                <div class="card card-1" onclick="window.location.href='index.html'">
-                    <div class="card-icon">📊</div>
-                    <h3 class="card-title">Dashboard</h3>
-                    <p class="card-desc">View your complete financial overview and real-time insights</p>
-                </div>
-                <div class="card card-2" onclick="window.location.href='csv-upload.html'">
-                    <div class="card-icon">📤</div>
-                    <h3 class="card-title">Upload CSV</h3>
-                    <p class="card-desc">Import bank statements for AI analysis and categorization</p>
-                </div>
-                <div class="card card-3" onclick="window.location.href='goals.html'">
-                    <div class="card-icon">🎯</div>
-                    <h3 class="card-title">Goals & AI Coach</h3>
-                    <p class="card-desc">Get AI-powered recovery plan for your financial crisis</p>
-                </div>
-                <div class="card card-4">
-                    <div class="card-icon">🤖</div>
-                    <h3 class="card-title">Budget Optimizer</h3>
-                    <p class="card-desc">AI recommendations to eliminate your $3,607 deficit</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="demoBadge" class="demo-badge">
-        👀 Demo Mode - Financials Hidden
-    </div>
-
-    <!-- PWA Install Button - Only shows if not installed -->
-    <button id="installBtn" class="install-btn">
-        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-        </svg>
-        Install App
-    </button>
-
-    <script>
-        // ===== GLOBAL STATE =====
-        let isLoggedIn = false;
-        let isPrivate = false;
-        let privacyButton = null;
-        let demoBadge = null;
-
-        // ===== INITIALIZE APP =====
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 FinanceOS All Fixes Loading...');
-            
-            privacyButton = document.getElementById('privacyToggle');
-            demoBadge = document.getElementById('demoBadge');
-            
-            // Load privacy state from localStorage (FIX 5: Better session persistence)
-            isPrivate = localStorage.getItem('financeOS_privacy') === 'true';
-            
-            // Load login state (FIX 5: Prevent logout on refresh) - MORE RELIABLE
-            const savedLoginState = localStorage.getItem('financeOS_loggedIn');
-            const sessionTimestamp = localStorage.getItem('financeOS_sessionTime');
-            const currentTime = Date.now();
-            
-            // Check if session is still valid (24 hours)
-            if (savedLoginState === 'true' && sessionTimestamp) {
-                const sessionAge = currentTime - parseInt(sessionTimestamp);
-                const maxSessionAge = 24 * 60 * 60 * 1000; // 24 hours
-                
-                if (sessionAge < maxSessionAge) {
-                    isLoggedIn = true;
-                    console.log('✅ Valid session found, auto-logging in');
-                } else {
-                    console.log('⏰ Session expired, clearing login state');
-                    localStorage.removeItem('financeOS_loggedIn');
-                    localStorage.removeItem('financeOS_sessionTime');
-                    isLoggedIn = false;
-                }
-            } else {
-                isLoggedIn = false;
-            }
-            
-            if (privacyButton) {
-                console.log('✅ Privacy button found');
-                initializePrivacyButton();
-            } else {
-                console.error('❌ Privacy button NOT found');
-            }
-            
-            // FIX 1: Smart PWA initialization
-            initializePWA();
-            
-            // FIX 5: Restore session if logged in - IMMEDIATE RESTORE
-            if (isLoggedIn) {
-                console.log('🔑 Restoring logged in session...');
-                setTimeout(function() {
-                    restoreSession();
-                }, 100); // Small delay to ensure DOM is ready
-            }
-            
-            console.log('✅ All fixes loaded');
-            console.log('🔐 Privacy state:', isPrivate ? 'HIDDEN' : 'VISIBLE');
-            console.log('🔑 Login state:', isLoggedIn ? 'LOGGED IN' : 'LOGGED OUT');
+function generateRealTimeInsights(financialHealth) {
+    const insights = [];
+    
+    // Budget deficit insight
+    if (financialHealth.monthlyDeficit > 0) {
+        insights.push({
+            icon: '🔥',
+            title: 'Critical: Budget Deficit Emergency',
+            description: `You're overspending by ${formatCurrency(financialHealth.monthlyDeficit)}/month. At this rate, you'll accumulate ${formatCurrency(financialHealth.monthlyDeficit * 12)} in additional debt this year. Take immediate action to reduce expenses.`
         });
+    }
+    
+    // Transaction volume insight
+    insights.push({
+        icon: '📊',
+        title: 'Transaction Analysis',
+        description: `Processed ${financialHealth.transactionCount} transactions this month. Your top expense categories are driving overspending. Focus on ${financialHealth.topExpenseCategories[0]?.category || 'food and entertainment'} to make the biggest impact.`
+    });
+    
+    // Recommendations insight
+    if (financialHealth.recommendations.length > 0) {
+        const topRec = financialHealth.recommendations[0];
+        insights.push({
+            icon: '🎯',
+            title: 'Priority Action Required',
+            description: `${topRec.message}. This single change could save you ${formatCurrency(topRec.savings)}/month and significantly improve your financial position.`
+        });
+    }
+    
+    // Positive insight if available
+    const recentTransactions = transactionManager.getTransactions().slice(0, 50);
+    const incomeTransactions = recentTransactions.filter(t => t.amount > 0);
+    if (incomeTransactions.length > 0) {
+        insights.push({
+            icon: '💡',
+            title: 'Income Stability Detected',
+            description: `Your income appears consistent with ${incomeTransactions.length} deposits detected. Focus on expense reduction rather than income increase for faster results.`
+        });
+    }
+    
+    return insights;
+}
 
-        // ===== FIX 5: ENHANCED SESSION PERSISTENCE =====
-        function restoreSession() {
-            console.log('🔄 Restoring session...');
-            
-            // Ensure elements exist before manipulating them
-            const loginScreen = document.getElementById('loginScreen');
-            const dashboard = document.getElementById('dashboard');
-            
-            if (loginScreen && dashboard) {
-                loginScreen.style.display = 'none';
-                dashboard.classList.add('active');
-                
-                // Apply privacy state after a short delay
-                setTimeout(function() {
-                    applyPrivacyState();
-                }, 200);
-                
-                console.log('✅ Session restored successfully');
-            } else {
-                console.error('❌ Could not restore session - elements not found');
-                // Force logout if elements missing
-                logout();
-            }
-        }
+function createInsightElement(insight) {
+    const div = document.createElement('div');
+    div.className = 'insight-item';
+    div.innerHTML = `
+        <div class="insight-icon">${insight.icon}</div>
+        <div class="insight-content">
+            <div class="insight-title">${insight.title}</div>
+            <div class="insight-description">${insight.description}</div>
+        </div>
+    `;
+    return div;
+}
 
-        // ===== LOGIN/LOGOUT FUNCTIONS (ENHANCED) =====
-        function login() {
-            console.log('🔑 Logging in...');
-            
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('dashboard').classList.add('active');
-            document.getElementById('successMsg').classList.add('show');
-            
-            isLoggedIn = true;
-            
-            // FIX 5: Save login state with timestamp
-            localStorage.setItem('financeOS_loggedIn', 'true');
-            localStorage.setItem('financeOS_sessionTime', Date.now().toString());
-            
-            setTimeout(function() {
-                applyPrivacyState();
-                document.getElementById('successMsg').classList.remove('show');
-            }, 3000);
-            
-            console.log('✅ Logged in successfully with session saved');
+function updateCriticalAlerts(financialHealth) {
+    const alertBanner = document.querySelector('.critical-alert');
+    if (!alertBanner) return;
+    
+    const alertMessage = alertBanner.querySelector('.alert-message');
+    if (alertMessage) {
+        if (financialHealth.monthlyDeficit > 0) {
+            alertMessage.innerHTML = `
+                You're spending ${formatCurrency(financialHealth.monthlyDeficit)} more than you earn monthly. 
+                Emergency fund is critically low at <span class="financial-amount">$0.17</span>. 
+                <strong>Immediate action required to prevent financial collapse.</strong>
+                <a href="goals.html" style="color: #60a5fa; text-decoration: underline; margin-left: 8px;">View AI Recovery Plan →</a>
+            `;
+        } else {
+            alertMessage.innerHTML = `
+                Congratulations! You've eliminated your budget deficit. Current surplus: ${formatCurrency(-financialHealth.monthlyDeficit)}/month.
+                <strong>Now focus on building your emergency fund.</strong>
+                <a href="goals.html" style="color: #60a5fa; text-decoration: underline; margin-left: 8px;">View Next Steps →</a>
+            `;
+            alertBanner.style.background = 'linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.2) 100%)';
+            alertBanner.style.borderColor = 'rgba(16, 185, 129, 0.4)';
         }
+    }
+}
+
+function addTransactionCounter(recentCount) {
+    // Add a small indicator showing recent transaction activity
+    const dashboardTitle = document.querySelector('.dashboard-title');
+    if (dashboardTitle && !document.querySelector('.transaction-counter')) {
+        const counter = document.createElement('div');
+        counter.className = 'transaction-counter';
+        counter.style.cssText = `
+            display: inline-block;
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            margin-left: 16px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        `;
+        counter.textContent = `${recentCount} transactions this week`;
+        dashboardTitle.appendChild(counter);
+    }
+}
+
+// ===== UTILITY FUNCTIONS =====
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('en-NZ', {
+        style: 'currency',
+        currency: 'NZD'
+    }).format(amount);
+}
+
+// ===== CSV UPLOAD INTEGRATION =====
+// Function to call from CSV upload page
+function handleSuccessfulUpload(uploadResult) {
+    // Store result for dashboard update
+    localStorage.setItem('financeOS_lastUpload', JSON.stringify({
+        timestamp: new Date().toISOString(),
+        result: uploadResult
+    }));
+    
+    // Show success message
+    const message = `
+        ✅ Successfully processed ${uploadResult.newTransactions} new transactions!
+        📊 Categories: ${uploadResult.summary.categoriesFound}
+        💰 Total amount: ${formatCurrency(uploadResult.summary.totalAmount)}
         
-        function logout() {
-            console.log('🚪 Logging out...');
-            
-            document.getElementById('loginScreen').style.display = 'flex';
-            document.getElementById('dashboard').classList.remove('active');
-            document.getElementById('successMsg').classList.remove('show');
-            
-            isLoggedIn = false;
-            
-            // FIX 5: Clear login state and session
-            localStorage.setItem('financeOS_loggedIn', 'false');
-            localStorage.removeItem('financeOS_sessionTime');
-            
-            if (demoBadge) {
-                demoBadge.classList.remove('show');
-            }
-            
-            console.log('✅ Logged out successfully');
-        }
+        Your dashboard has been updated with real data.
+    `;
+    
+    alert(message);
+    
+    // Redirect to dashboard
+    window.location.href = 'index.html';
+}
 
-        // ===== BULLETPROOF PRIVACY SYSTEM =====
-        function initializePrivacyButton() {
-            if (!privacyButton) return;
-            
-            privacyButton.removeEventListener('click', togglePrivacy);
-            privacyButton.addEventListener('click', togglePrivacy);
-            
-            updatePrivacyButtonText();
-            
-            console.log('🔐 Privacy button initialized');
-        }
-
-        function togglePrivacy() {
-            console.log('🔐 Privacy toggle clicked');
-            
-            isPrivate = !isPrivate;
-            localStorage.setItem('financeOS_privacy', isPrivate.toString());
-            
+// ===== ENHANCED SESSION MANAGEMENT =====
+function restoreSession() {
+    console.log('🔄 Restoring session with data...');
+    
+    const loginScreen = document.getElementById('loginScreen');
+    const dashboard = document.getElementById('dashboard');
+    
+    if (loginScreen && dashboard) {
+        loginScreen.style.display = 'none';
+        dashboard.classList.add('active');
+        
+        // Load real data after session restore
+        setTimeout(function() {
             applyPrivacyState();
-            updatePrivacyButtonText();
-            
-            console.log('🔐 Privacy toggled to:', isPrivate ? 'HIDDEN' : 'VISIBLE');
-        }
+            updateDashboardWithRealData();
+        }, 300);
+        
+        console.log('✅ Session restored with real data');
+    } else {
+        console.error('❌ Could not restore session - elements not found');
+        logout();
+    }
+}
 
-        function updatePrivacyButtonText() {
-            if (!privacyButton) return;
-            
-            if (isPrivate) {
-                privacyButton.innerHTML = '👁️ SHOW MONEY';
-                privacyButton.classList.add('active');
-            } else {
-                privacyButton.innerHTML = '🔐 HIDE MONEY';
-                privacyButton.classList.remove('active');
-            }
-        }
-
-        function applyPrivacyState() {
-            const financialAmounts = document.querySelectorAll('.financial-amount');
-            
-            console.log(`🔐 Applying privacy to ${financialAmounts.length} financial amounts`);
-            
-            financialAmounts.forEach(function(element) {
-                if (isPrivate) {
-                    element.classList.add('hidden');
-                } else {
-                    element.classList.remove('hidden');
-                }
-            });
-            
-            if (demoBadge) {
-                if (isPrivate && isLoggedIn) {
-                    demoBadge.classList.add('show');
-                } else {
-                    demoBadge.classList.remove('show');
-                }
-            }
-            
-            console.log('✅ Privacy state applied');
-        }
-
-        // ===== FIX 1: SMART PWA FUNCTIONALITY =====
-        function initializePWA() {
-            const installButton = document.getElementById('installBtn');
-            let deferredPrompt = null;
-            
-            // FIX 1: Check if app is already installed
-            function isAppInstalled() {
-                return window.matchMedia('(display-mode: standalone)').matches || 
-                       window.navigator.standalone === true ||
-                       localStorage.getItem('pwa_installed') === 'true';
-            }
-            
-            // FIX 1: Hide install button if already installed
-            if (isAppInstalled()) {
-                if (installButton) {
-                    installButton.style.display = 'none';
-                }
-                console.log('📱 PWA already installed - hiding install button');
-                return;
-            }
-            
-            // FIX 1: Show install button only if not installed
-            setTimeout(function() {
-                if (installButton && !isAppInstalled()) {
-                    installButton.classList.add('show');
-                    console.log('📱 Install button shown');
-                }
-            }, 5000);
-
-            // Listen for install prompt
-            window.addEventListener('beforeinstallprompt', function(e) {
-                e.preventDefault();
-                deferredPrompt = e;
-                console.log('📱 Install prompt available');
-            });
-            
-            // FIX 1: Listen for successful installation
-            window.addEventListener('appinstalled', function(e) {
-                console.log('📱 PWA installed successfully!');
-                localStorage.setItem('pwa_installed', 'true');
-                if (installButton) {
-                    installButton.style.display = 'none';
-                }
-                deferredPrompt = null;
-            });
-
-            // FIX 1: Handle install button click
-            if (installButton) {
-                installButton.addEventListener('click', function() {
-                    if (deferredPrompt) {
-                        deferredPrompt.prompt();
-                        deferredPrompt.userChoice.then(function(choiceResult) {
-                            console.log('📱 Install result:', choiceResult.outcome);
-                            if (choiceResult.outcome === 'accepted') {
-                                localStorage.setItem('pwa_installed', 'true');
-                                installButton.style.display = 'none';
-                            }
-                            deferredPrompt = null;
-                        });
-                    } else {
-                        alert('To install FinanceOS:\n\n1. Open browser menu (⋮)\n2. Select "Install app" or "Add to Home Screen"\n3. Confirm installation');
-                    }
-                });
-            }
-
-            // FIX 4: Register service worker for proper PWA behavior
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                    navigator.serviceWorker.register('sw.js')
-                        .then(function(registration) {
-                            console.log('📱 Service Worker registered');
-                        })
-                        .catch(function(registrationError) {
-                            console.log('📱 Service Worker registration failed:', registrationError);
-                        });
-                });
-            }
-        }
-
-        // ===== DEBUG FUNCTIONS =====
-        function debugAll() {
-            console.log('=== FINANCEOS DEBUG ===');
-            console.log('isPrivate:', isPrivate);
-            console.log('isLoggedIn:', isLoggedIn);
-            console.log('privacyButton:', privacyButton);
-            console.log('demoBadge:', demoBadge);
-            console.log('Financial amounts found:', document.querySelectorAll('.financial-amount').length);
-            console.log('localStorage privacy:', localStorage.getItem('financeOS_privacy'));
-            console.log('localStorage login:', localStorage.getItem('financeOS_loggedIn'));
-            console.log('localStorage pwa_installed:', localStorage.getItem('pwa_installed'));
-            console.log('PWA display mode:', window.matchMedia('(display-mode: standalone)').matches);
-        }
-
-        window.debugAll = debugAll;
-
-        console.log('🎯 FinanceOS All Fixes Ready');
-        console.log('✅ Fix 1: Install button hides after installation');
-        console.log('✅ Fix 2: CSV upload (see csv-upload.html)');
-        console.log('✅ Fix 3: App icon (update manifest.json)');
-        console.log('✅ Fix 4: PWA standalone mode');
-        console.log('✅ Fix 5: Session persistence');
-        console.log('🔧 To debug all, type: debugAll()');
-    </script>
-</body>
-</html>
+console.log('📊 Enhanced Dashboard Integration Ready');
+console.log('💡 Dashboard will now show real transaction data when available');
+console.log('🔄 Upload CSV files to see your actual financial situation');
