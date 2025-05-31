@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>FinanceOS - Upload Bank Statements</title>
+    <title>FinanceOS - Personal Finance Operating System</title>
     
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="manifest.json">
@@ -21,462 +21,1072 @@
             min-height: 100vh;
             color: white;
         }
-
-        /* Header */
-        .header {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        .login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 20px;
+            position: relative;
+        }
+        .bg-blur { position: absolute; border-radius: 50%; filter: blur(40px); }
+        .blur1 { top: 10%; left: 10%; width: 80px; height: 80px; background: rgba(139, 92, 246, 0.1); }
+        .blur2 { top: 20%; right: 15%; width: 120px; height: 120px; background: rgba(59, 130, 246, 0.1); }
+        .blur3 { bottom: 15%; left: 25%; width: 100px; height: 100px; background: rgba(16, 185, 129, 0.1); }
+        
+        .login-container { width: 100%; max-width: 400px; position: relative; z-index: 10; }
+        .logo-section { text-align: center; margin-bottom: 40px; }
+        .logo {
+            width: 120px; height: 120px; margin: 0 auto 20px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 50%, #10b981 100%);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        .logo span { font-size: 60px; color: white; font-weight: bold; }
+        .title { font-size: 36px; font-weight: bold; color: white; margin: 0 0 10px 0; }
+        .subtitle { color: rgba(255, 255, 255, 0.7); margin: 0; font-size: 16px; }
+        
+        .login-form {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px; padding: 40px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        .form-group { margin-bottom: 30px; }
+        .form-label {
+            display: block; font-size: 14px; font-weight: 500;
+            color: rgba(255, 255, 255, 0.9); margin-bottom: 8px;
+        }
+        .form-input {
+            width: 100%; background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px;
+            padding: 12px 16px; color: white; font-size: 16px; outline: none;
+        }
+        .form-input::placeholder { color: rgba(255, 255, 255, 0.5); }
+        .login-btn {
+            width: 100%; background: linear-gradient(135deg, #8b5cf6, #9333ea);
+            color: white; border: none; border-radius: 12px; padding: 16px;
+            font-size: 16px; font-weight: 600; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+            transition: all 0.3s ease; margin-bottom: 20px;
+        }
+        .login-btn:hover { transform: translateY(-2px); }
+        .forgot-btn {
+            background: none; border: none; color: #8b5cf6;
+            font-size: 14px; cursor: pointer; text-decoration: underline;
+        }
+        
+        .dashboard { display: none; position: relative; }
+        .dashboard.active { display: block; }
+        .header {
+            background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15); padding: 20px;
         }
         .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+            max-width: 1200px; margin: 0 auto;
         }
         .header-logo { display: flex; align-items: center; }
         .header-icon {
-            width: 40px; height: 40px;
-            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            width: 40px; height: 40px; background: linear-gradient(135deg, #8b5cf6, #3b82f6);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             margin-right: 12px;
         }
         .header-title { color: white; font-size: 24px; font-weight: bold; margin: 0; }
-        .back-btn {
-            background: rgba(59, 130, 246, 0.2); color: #3b82f6;
-            border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px;
+        .logout-btn {
+            background: rgba(239, 68, 68, 0.2); color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px;
             padding: 8px 16px; font-size: 14px; cursor: pointer;
-            text-decoration: none; display: flex; align-items: center; gap: 8px;
         }
-
-        /* Main Content */
-        .main-content { padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
-        .page-title {
+        
+        .dashboard-content { padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
+        .dashboard-title {
             color: white; font-size: 32px; font-weight: bold;
-            margin-bottom: 16px; text-align: center;
-        }
-        .page-subtitle {
-            color: rgba(255, 255, 255, 0.7); font-size: 18px;
-            text-align: center; margin-bottom: 40px;
+            margin-bottom: 40px; text-align: center;
         }
 
-        /* Upload Section - MOBILE OPTIMIZED */
-        .upload-section {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
-            backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 20px; padding: 40px; margin-bottom: 40px; text-align: center;
-        }
-
-        .upload-zone {
-            border: 3px dashed rgba(139, 92, 246, 0.5);
-            border-radius: 16px; padding: 60px 40px; cursor: pointer;
-            transition: all 0.3s ease; position: relative;
-            background: rgba(139, 92, 246, 0.05);
-        }
-
-        .upload-zone:hover, .upload-zone.dragover {
-            border-color: rgba(139, 92, 246, 0.8);
-            background: rgba(139, 92, 246, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .upload-icon { font-size: 64px; margin-bottom: 20px; color: rgba(139, 92, 246, 0.8); }
-        .upload-text { font-size: 24px; font-weight: 600; color: white; margin-bottom: 12px; }
-        .upload-subtext { font-size: 16px; color: rgba(255, 255, 255, 0.7); margin-bottom: 24px; }
-
-        /* MOBILE-OPTIMIZED FILE INPUT */
-        .file-input-wrapper {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-            max-width: 300px;
-            margin: 0 auto;
-        }
-
-        .file-input {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
-            z-index: 2;
-        }
-
-        .upload-btn {
-            background: linear-gradient(135deg, #8b5cf6, #9333ea);
-            color: white; border: none; border-radius: 12px; padding: 16px 32px;
-            font-size: 16px; font-weight: 600; cursor: pointer;
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-            transition: all 0.3s ease; width: 100%; position: relative; z-index: 1;
-        }
-
-        .upload-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4); }
-
-        /* Alternative Upload Methods */
-        .upload-methods {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .upload-method {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
+        /* Critical Alert Banner */
+        .critical-alert {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.2) 100%);
+            border: 2px solid rgba(239, 68, 68, 0.4);
+            border-radius: 16px;
             padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
         }
 
-        .upload-method:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
         }
 
-        .method-icon {
-            font-size: 32px;
+        .alert-header {
+            display: flex;
+            align-items: center;
             margin-bottom: 12px;
         }
 
-        .method-title {
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
+        .alert-icon {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+
+        .alert-title {
+            color: #ef4444;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .alert-message {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.5;
+        }
+
+        /* Financial Summary Section */
+        .financial-summary {
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px; 
+            margin-bottom: 40px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .summary-card.critical {
+            border-color: rgba(239, 68, 68, 0.4);
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%);
+        }
+
+        .summary-card.warning {
+            border-color: rgba(245, 158, 11, 0.4);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%);
+        }
+
+        .summary-card h3 {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-amount {
+            font-size: 28px;
+            font-weight: bold;
             margin-bottom: 8px;
         }
 
-        .method-desc {
-            color: rgba(255, 255, 255, 0.7);
+        .summary-change {
             font-size: 14px;
+            opacity: 0.8;
         }
 
-        /* Bank Format Guide */
-        .bank-guide {
+        .positive { color: #10b981; }
+        .negative { color: #ef4444; }
+        .neutral { color: #8b5cf6; }
+
+        /* Budget Tracking Section */
+        .budget-section {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .budget-status {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .budget-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .budget-category {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid #8b5cf6;
+        }
+
+        .budget-category.over-budget {
+            border-left-color: #ef4444;
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .budget-category.on-track {
+            border-left-color: #10b981;
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .category-name {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .category-status {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .budget-amounts {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .amount-item {
+            text-align: center;
+        }
+
+        .amount-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .amount-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b5cf6, #9333ea);
+            transition: width 0.5s ease;
+        }
+
+        .progress-fill.over {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+        }
+
+        .progress-fill.good {
+            background: linear-gradient(90deg, #10b981, #059669);
+        }
+
+        .progress-text {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+        }
+
+        /* AI Insights Section */
+        .ai-insights {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .insight-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .insight-icon {
+            font-size: 20px;
+            margin-top: 2px;
+        }
+
+        .insight-content {
+            flex: 1;
+        }
+
+        .insight-title {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .insight-description {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .cards-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px; margin-bottom: 40px;
+            gap: 24px;
         }
-
-        .bank-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
-            backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 16px; padding: 24px; text-align: center;
+        .card {
+            backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px; padding: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            cursor: pointer; transition: transform 0.3s ease;
         }
-
-        .bank-logo {
-            width: 60px; height: 60px; background: linear-gradient(135deg, #10b981, #059669);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 16px; font-size: 24px; font-weight: bold;
+        .card:hover { transform: translateY(-5px); }
+        .card-icon {
+            width: 50px; height: 50px; border-radius: 12px; display: flex;
+            align-items: center; justify-content: center; margin-bottom: 16px;
+            font-size: 24px; color: white;
         }
-
-        .bank-name { color: white; font-size: 18px; font-weight: 600; margin-bottom: 8px; }
-        .bank-format { color: rgba(255, 255, 255, 0.7); font-size: 14px; line-height: 1.4; }
-
-        /* Processing Section */
-        .processing-section {
-            display: none; background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.15) 100%);
-            backdrop-filter: blur(20px); border: 1px solid rgba(16, 185, 129, 0.3);
-            border-radius: 20px; padding: 40px; margin-bottom: 40px; text-align: center;
+        .card-title { color: white; font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+        .card-desc { color: rgba(255, 255, 255, 0.7); font-size: 14px; line-height: 1.5; }
+        
+        .card-1 { background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%); }
+        .card-1 .card-icon { background: linear-gradient(135deg, #8b5cf6, #9333ea); }
+        .card-2 { background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.15) 100%); }
+        .card-2 .card-icon { background: linear-gradient(135deg, #10b981, #059669); }
+        .card-3 { background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.15) 100%); }
+        .card-3 .card-icon { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .card-4 { background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.15) 100%); }
+        .card-4 .card-icon { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        
+        .success-msg {
+            background: rgba(16, 185, 129, 0.2); color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px;
+            padding: 16px; margin: 20px auto; max-width: 1200px; text-align: center;
+            display: none;
         }
+        .success-msg.show { display: block; }
 
-        .processing-icon { font-size: 48px; margin-bottom: 20px; animation: spin 2s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .processing-text { font-size: 20px; font-weight: 600; color: white; margin-bottom: 12px; }
-        .processing-subtext { color: rgba(255, 255, 255, 0.7); font-size: 16px; }
-
-        /* Results Section */
-        .results-section { display: none; }
-        .results-header {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.15) 100%);
-            backdrop-filter: blur(20px); border: 1px solid rgba(16, 185, 129, 0.3);
-            border-radius: 20px; padding: 30px; margin-bottom: 30px; text-align: center;
-        }
-
-        .success-icon { font-size: 48px; margin-bottom: 16px; }
-        .results-title { color: white; font-size: 24px; font-weight: bold; margin-bottom: 8px; }
-        .results-summary { color: rgba(255, 255, 255, 0.8); font-size: 16px; }
-
-        /* Transaction List */
-        .transaction-list {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
-            backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 20px; padding: 30px; margin-bottom: 30px;
-        }
-
-        .transaction-header {
-            color: white; font-size: 20px; font-weight: 600; margin-bottom: 20px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-
-        .transaction-count { color: rgba(255, 255, 255, 0.7); font-size: 14px; }
-
-        .transaction-item {
-            display: grid; grid-template-columns: 1fr auto auto; gap: 16px;
-            padding: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); align-items: center;
-        }
-
-        .transaction-item:last-child { border-bottom: none; }
-
-        .transaction-details { display: flex; flex-direction: column; }
-        .transaction-merchant { color: white; font-weight: 600; margin-bottom: 4px; }
-        .transaction-meta { color: rgba(255, 255, 255, 0.6); font-size: 14px; }
-        .transaction-category {
-            background: linear-gradient(135deg, #8b5cf6, #9333ea); color: white;
-            padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
-            text-align: center; white-space: nowrap;
-        }
-
-        .transaction-amount { font-size: 18px; font-weight: bold; text-align: right; }
-        .amount-positive { color: #10b981; }
-        .amount-negative { color: #ef4444; }
-
-        /* Action Buttons */
-        .action-buttons { display: flex; gap: 16px; justify-content: center; }
-        .btn-primary {
-            background: linear-gradient(135deg, #8b5cf6, #9333ea); color: white; border: none;
-            border-radius: 12px; padding: 16px 32px; font-size: 16px; font-weight: 600;
-            cursor: pointer; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3); transition: all 0.3s ease;
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1); color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px;
-            padding: 16px 32px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover, .btn-secondary:hover { transform: translateY(-2px); }
-
-        /* Privacy Toggle */
+        /* BULLETPROOF PRIVACY BUTTON */
         .privacy-toggle {
-            position: fixed !important; top: 80px !important; right: 20px !important;
-            background: linear-gradient(135deg, #ef4444, #dc2626) !important; color: white !important;
-            border: 3px solid #fbbf24 !important; border-radius: 16px !important;
-            padding: 12px 20px !important; font-size: 14px !important; font-weight: 700 !important;
-            cursor: pointer !important; z-index: 100000 !important; display: flex !important;
-            align-items: center !important; gap: 8px !important;
-            box-shadow: 0 0 20px rgba(239, 68, 68, 0.6) !important; transition: all 0.3s ease !important;
+            position: fixed !important;
+            top: 80px !important;
+            right: 20px !important;
+            background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+            color: white !important;
+            border: 3px solid #fbbf24 !important;
+            border-radius: 16px !important;
+            padding: 12px 20px !important;
+            font-size: 14px !important;
+            font-weight: 700 !important;
+            cursor: pointer !important;
+            z-index: 100000 !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.6), 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+            transition: all 0.3s ease !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: scale(1) !important;
+        }
+
+        .privacy-toggle:hover {
+            transform: scale(1.05) !important;
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.8), 0 6px 16px rgba(0, 0, 0, 0.4) !important;
         }
 
         .privacy-toggle.active {
             background: linear-gradient(135deg, #10b981, #059669) !important;
             border-color: #84cc16 !important;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.6), 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        .privacy-toggle.active:hover {
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.8), 0 6px 16px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        .login-screen .privacy-toggle {
+            display: none !important;
         }
 
         .financial-amount {
-            transition: all 0.3s ease !important; position: relative !important; display: inline-block !important;
+            transition: all 0.3s ease !important;
+            position: relative !important;
+            display: inline-block !important;
         }
 
         .financial-amount.hidden {
-            color: transparent !important; user-select: none !important;
+            color: transparent !important;
+            user-select: none !important;
+            pointer-events: none !important;
+        }
+
+        .financial-amount.hidden::before {
+            content: "" !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            background: rgba(255, 255, 255, 0.1) !important;
+            border-radius: 6px !important;
+            backdrop-filter: blur(4px) !important;
         }
 
         .financial-amount.hidden::after {
-            content: "••••••" !important; position: absolute !important;
-            top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important;
-            color: rgba(255, 255, 255, 0.7) !important; font-weight: bold !important; z-index: 2 !important;
+            content: "••••••" !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            color: rgba(255, 255, 255, 0.7) !important;
+            font-weight: bold !important;
+            font-size: 0.9em !important;
+            z-index: 2 !important;
+            pointer-events: none !important;
         }
 
+        .financial-amount.hidden.large::after {
+            content: "••••••••••" !important;
+        }
+
+        .financial-amount.hidden.medium::after {
+            content: "••••••••" !important;
+        }
+
+        .financial-amount.hidden.small::after {
+            content: "••••" !important;
+        }
+
+        .demo-badge {
+            position: fixed !important;
+            bottom: 20px !important;
+            left: 20px !important;
+            background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+            color: white !important;
+            border: 2px solid #fbbf24 !important;
+            border-radius: 20px !important;
+            padding: 12px 20px !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            z-index: 99999 !important;
+            display: none !important;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4) !important;
+        }
+
+        .demo-badge.show {
+            display: block !important;
+        }
+
+        /* INSTALL BUTTON - ONLY SHOW IF NOT INSTALLED */
+        .install-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 60px;
+            padding: 20px 32px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 12px 40px rgba(16, 185, 129, 0.4);
+            z-index: 999;
+            transition: all 0.3s ease;
+            display: none; /* Hidden by default */
+            align-items: center;
+            gap: 12px;
+        }
+
+        .install-btn.show {
+            display: flex;
+        }
+
+        .install-btn.hidden {
+            display: none !important;
+        }
+        
         @media (max-width: 768px) {
-            .main-content { padding: 20px; }
-            .page-title { font-size: 24px; }
-            .upload-section { padding: 24px; }
-            .upload-zone { padding: 40px 20px; }
-            .bank-guide { grid-template-columns: 1fr; }
-            .transaction-item { grid-template-columns: 1fr; gap: 8px; }
-            .action-buttons { flex-direction: column; }
-            .upload-methods { grid-template-columns: 1fr; }
+            .login-container { max-width: 350px; }
+            .login-form { padding: 30px; }
+            .logo { width: 100px; height: 100px; }
+            .logo span { font-size: 50px; }
+            .title { font-size: 28px; }
+            .dashboard-content { padding: 20px; }
+            .dashboard-title { font-size: 24px; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .financial-summary { grid-template-columns: 1fr; }
+            .budget-grid { grid-template-columns: 1fr; }
+            
             .privacy-toggle {
-                top: 70px !important; right: 16px !important;
-                padding: 10px 16px !important; font-size: 13px !important;
+                top: 70px !important;
+                right: 16px !important;
+                padding: 10px 16px !important;
+                font-size: 13px !important;
+            }
+
+            .demo-badge {
+                bottom: 16px !important;
+                left: 16px !important;
+                padding: 8px 12px !important;
+                font-size: 12px !important;
+            }
+
+            .install-btn {
+                bottom: 100px;
+                right: 20px;
+                padding: 16px 24px;
+                font-size: 14px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Privacy Toggle -->
-    <button id="privacyToggle" class="privacy-toggle">🔐 HIDE MONEY</button>
+    <button id="privacyToggle" class="privacy-toggle">
+        🔐 HIDE MONEY
+    </button>
 
-    <!-- Header -->
-    <div class="header">
-        <div class="header-content">
-            <div class="header-logo">
-                <div class="header-icon">
-                    <span style="color: white; font-size: 20px; font-weight: bold;">$</span>
-                </div>
-                <h1 class="header-title">FinanceOS</h1>
+    <div id="loginScreen" class="login-screen">
+        <div class="bg-blur blur1"></div>
+        <div class="bg-blur blur2"></div>
+        <div class="bg-blur blur3"></div>
+        
+        <div class="login-container">
+            <div class="logo-section">
+                <div class="logo"><span>$</span></div>
+                <h1 class="title">FinanceOS</h1>
+                <p class="subtitle">Your Personal Finance Operating System</p>
             </div>
-            <a href="index.html" class="back-btn">← Back to Dashboard</a>
+            
+            <div class="login-form">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-input" placeholder="Enter your username">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" placeholder="Enter your password">
+                </div>
+                <button class="login-btn" onclick="login()">Enter Demo</button>
+                <div style="text-align: center;">
+                    <button class="forgot-btn">Forgot Password?</button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <h1 class="page-title">Upload Bank Statements</h1>
-        <p class="page-subtitle">Import your CSV files to automatically categorize transactions and track spending</p>
-
-        <!-- Upload Section - MOBILE FIXED -->
-        <div id="uploadSection" class="upload-section">
-            <div class="upload-zone" id="uploadZone">
-                <div class="upload-icon">📤</div>
-                <div class="upload-text">Upload CSV Files</div>
-                <div class="upload-subtext">Select bank statement files from your device</div>
-                
-                <!-- MULTIPLE UPLOAD METHODS FOR MOBILE -->
-                <div class="file-input-wrapper">
-                    <input 
-                        type="file" 
-                        id="fileInput" 
-                        class="file-input"
-                        multiple 
-                        accept=".csv,.xls,.xlsx,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                    />
-                    <button class="upload-btn" onclick="triggerFileSelect()">Choose Files</button>
+    <div id="dashboard" class="dashboard">
+        <div class="header">
+            <div class="header-content">
+                <div class="header-logo">
+                    <div class="header-icon"><span style="color: white; font-size: 20px; font-weight: bold;">$</span></div>
+                    <h1 class="header-title">FinanceOS</h1>
                 </div>
-                
-                <div class="upload-methods">
-                    <div class="upload-method" onclick="triggerFileSelect()">
-                        <div class="method-icon">📁</div>
-                        <div class="method-title">Browse Files</div>
-                        <div class="method-desc">Tap to select CSV files from your device</div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+        
+        <div class="success-msg" id="successMsg">
+            🎉 Welcome to FinanceOS! Your financial data is ready.
+        </div>
+        
+        <div class="dashboard-content">
+            <h2 class="dashboard-title">Financial Dashboard</h2>
+
+            <!-- Critical Alert Banner -->
+            <div class="critical-alert">
+                <div class="alert-header">
+                    <div class="alert-icon">🚨</div>
+                    <div class="alert-title">FINANCIAL EMERGENCY</div>
+                </div>
+                <div class="alert-message">
+                    You're spending <span class="financial-amount">$3,607 more than you earn monthly</span>. Emergency fund is critically low at <span class="financial-amount">$0.17</span>. 
+                    <strong>Immediate action required to prevent financial collapse.</strong>
+                    <a href="goals.html" style="color: #60a5fa; text-decoration: underline; margin-left: 8px;">View Recovery Plan →</a>
+                </div>
+            </div>
+            
+            <!-- Financial Summary -->
+            <div class="financial-summary">
+                <div class="summary-card">
+                    <h3>Total Balance</h3>
+                    <div class="summary-amount positive financial-amount large">$65,383.09</div>
+                    <div class="summary-change">Includes <span class="financial-amount">$271,600</span> mortgage debt</div>
+                </div>
+                <div class="summary-card critical">
+                    <h3>Monthly Cash Flow</h3>
+                    <div class="summary-amount negative financial-amount medium">-$3,607.00</div>
+                    <div class="summary-change">Spending exceeds income by 57%</div>
+                </div>
+                <div class="summary-card critical">
+                    <h3>Emergency Fund</h3>
+                    <div class="summary-amount neutral financial-amount small">$0.17</div>
+                    <div class="summary-change">Target: <span class="financial-amount">$15,000</span> (99.9% short)</div>
+                </div>
+                <div class="summary-card warning">
+                    <h3>Credit Card Debt</h3>
+                    <div class="summary-amount negative financial-amount medium">-$3,251.30</div>
+                    <div class="summary-change">Available: <span class="financial-amount medium">$6,748.70</span> • 32% utilization</div>
+                </div>
+                <div class="summary-card">
+                    <h3>KiwiSaver</h3>
+                    <div class="summary-amount positive financial-amount large">$48,733.44</div>
+                    <div class="summary-change">+8.2% this year • On track for retirement</div>
+                </div>
+                <div class="summary-card warning">
+                    <h3>Home Loan</h3>
+                    <div class="summary-amount negative financial-amount large">-$271,600.02</div>
+                    <div class="summary-change">Monthly: <span class="financial-amount medium">$2,070.00</span> • 4.99% rate</div>
+                </div>
+            </div>
+
+            <!-- Budget Tracking Section -->
+            <div class="budget-section">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        📊 Monthly Budget Tracking
+                    </h3>
+                    <div class="budget-status">OVER BUDGET</div>
+                </div>
+                <div class="budget-grid">
+                    <!-- Housing -->
+                    <div class="budget-category over-budget">
+                        <div class="category-header">
+                            <div class="category-name">Housing</div>
+                            <div class="category-status">Over Budget</div>
+                        </div>
+                        <div class="budget-amounts">
+                            <div class="amount-item">
+                                <div class="amount-label">Budgeted</div>
+                                <div class="amount-value financial-amount">$2,427</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">Spent</div>
+                                <div class="amount-value negative financial-amount">$2,427</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">Remaining</div>
+                                <div class="amount-value neutral">$0</div>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%"></div>
+                        </div>
+                        <div class="progress-text">100% used • Mortgage + Rates</div>
                     </div>
-                    
-                    <div class="upload-method" onclick="triggerFileSelect()">
-                        <div class="method-icon">📱</div>
-                        <div class="method-title">Mobile Upload</div>
-                        <div class="method-desc">Upload directly from mobile downloads</div>
+
+                    <!-- Food -->
+                    <div class="budget-category over-budget">
+                        <div class="category-header">
+                            <div class="category-name">Food</div>
+                            <div class="category-status">160% Over</div>
+                        </div>
+                        <div class="budget-amounts">
+                            <div class="amount-item">
+                                <div class="amount-label">Budgeted</div>
+                                <div class="amount-value financial-amount">$500</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">Spent</div>
+                                <div class="amount-value negative financial-amount">$800</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">Over</div>
+                                <div class="amount-value negative financial-amount">-$300</div>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill over" style="width: 100%"></div>
+                        </div>
+                        <div class="progress-text">160% used • Cut groceries + dining out</div>
+                    </div>
+
+                    <!-- Utilities -->
+                    <div class="budget-category on-track">
+                        <div class="category-header">
+                            <div class="category-name">Utilities</div>
+                            <div class="category-status">On Track</div>
+                        </div>
+                        <div class="budget-amounts">
+                            <div class="amount-item">
+                                <div class="amount-label">Budgeted</div>
+                                <div class="amount-value financial-amount">$213</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">Spent</div>
+                                <div class="amount-value financial-amount">$213</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">Remaining</div>
+                                <div class="amount-value neutral">$0</div>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill good" style="width: 100%"></div>
+                        </div>
+                        <div class="progress-text">100% used • Fixed utilities</div>
+                    </div>
+
+                    <!-- Insurance -->
+                    <div class="budget-category on-track">
+                        <div class="category-header">
+                            <div class="category-name">Insurance</div>
+                            <div class="category-status">Fixed</div>
+                        </div>
+                        <div class="budget-amounts">
+                            <div class="amount-item">
+                                <div class="amount-label">Budgeted</div>
+                                <div class="amount-value financial-amount">$490</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">Spent</div>
+                                <div class="amount-value financial-amount">$490</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">Remaining</div>
+                                <div class="amount-value neutral">$0</div>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill good" style="width: 100%"></div>
+                        </div>
+                        <div class="progress-text">Vero + Partners Life</div>
+                    </div>
+
+                    <!-- Transportation -->
+                    <div class="budget-category over-budget">
+                        <div class="category-header">
+                            <div class="category-name">Transportation</div>
+                            <div class="category-status">Over Budget</div>
+                        </div>
+                        <div class="budget-amounts">
+                            <div class="amount-item">
+                                <div class="amount-label">Budgeted</div>
+                                <div class="amount-value financial-amount">$125</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">Spent</div>
+                                <div class="amount-value negative financial-amount">$200</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">Over</div>
+                                <div class="amount-value negative financial-amount">-$75</div>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill over" style="width: 100%"></div>
+                        </div>
+                        <div class="progress-text">160% used • Review fuel costs</div>
+                    </div>
+
+                    <!-- Entertainment -->
+                    <div class="budget-category over-budget">
+                        <div class="category-header">
+                            <div class="category-name">Entertainment</div>
+                            <div class="category-status">340% Over</div>
+                        </div>
+                        <div class="budget-amounts">
+                            <div class="amount-item">
+                                <div class="amount-label">Budgeted</div>
+                                <div class="amount-value financial-amount">$50</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">Spent</div>
+                                <div class="amount-value negative financial-amount">$220</div>
+                            </div>
+                            <div class="amount-item">
+                                <div class="amount-label">Over</div>
+                                <div class="amount-value negative financial-amount">-$170</div>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill over" style="width: 100%"></div>
+                        </div>
+                        <div class="progress-text">440% used • Cancel Sky Network immediately</div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Bank Format Guide -->
-        <div class="bank-guide">
-            <div class="bank-card">
-                <div class="bank-logo">ANZ</div>
-                <div class="bank-name">ANZ Bank</div>
-                <div class="bank-format">Date, Amount, Description, Balance</div>
-            </div>
-            <div class="bank-card">
-                <div class="bank-logo">ASB</div>
-                <div class="bank-name">ASB Bank</div>
-                <div class="bank-format">Date, Unique Id, Tran Type, Payee, Memo, Amount</div>
-            </div>
-            <div class="bank-card">
-                <div class="bank-logo">BNZ</div>
-                <div class="bank-name">BNZ Bank</div>
-                <div class="bank-format">Date, Amount, Payee, Description, Reference</div>
-            </div>
-            <div class="bank-card">
-                <div class="bank-logo">KIW</div>
-                <div class="bank-name">Kiwibank</div>
-                <div class="bank-format">Date, Memo/Description, Amount, Balance</div>
-            </div>
-            <div class="bank-card">
-                <div class="bank-logo">WBC</div>
-                <div class="bank-name">Westpac</div>
-                <div class="bank-format">Date, Amount, Other Party, Description</div>
-            </div>
-        </div>
-
-        <!-- Processing Section -->
-        <div id="processingSection" class="processing-section">
-            <div class="processing-icon">🤖</div>
-            <div class="processing-text">AI Processing Your Transactions</div>
-            <div class="processing-subtext">Analyzing patterns, categorizing expenses, and detecting insights...</div>
-        </div>
-
-        <!-- Results Section -->
-        <div id="resultsSection" class="results-section">
-            <div class="results-header">
-                <div class="success-icon">✅</div>
-                <div class="results-title">Processing Complete!</div>
-                <div class="results-summary">
-                    Found <span id="transactionCount">0</span> transactions • 
-                    <span id="categoryCount">0</span> categories • 
-                    Total: <span class="financial-amount" id="totalAmount">$0.00</span>
+            <!-- AI Insights Section -->
+            <div class="ai-insights">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        🤖 AI Financial Insights
+                    </h3>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-icon">🔥</div>
+                    <div class="insight-content">
+                        <div class="insight-title">Critical: Budget Deficit Emergency</div>
+                        <div class="insight-description">
+                            You're overspending by <span class="financial-amount">$3,607/month</span>. At this rate, you'll accumulate <span class="financial-amount">$43,284</span> in additional debt this year. 
+                            Immediate action required: Cut food spending by <span class="financial-amount">$300</span>, cancel Sky Network (<span class="financial-amount">$163</span>), and reduce shopping by <span class="financial-amount">$100</span>.
+                        </div>
+                    </div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-icon">⚠️</div>
+                    <div class="insight-content">
+                        <div class="insight-title">Emergency Fund Critical</div>
+                        <div class="insight-description">
+                            With only <span class="financial-amount">$0.17</span> in emergency savings, any unexpected expense will force you into debt. 
+                            You're 99.998% below the recommended <span class="financial-amount">$15,000</span> emergency fund. Cannot build until budget deficit is fixed.
+                        </div>
+                    </div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-icon">💳</div>
+                    <div class="insight-content">
+                        <div class="insight-title">Credit Card Debt Growing</div>
+                        <div class="insight-description">
+                            Current debt of <span class="financial-amount">$3,251</span> costs ~<span class="financial-amount">$54/month</span> in interest. 
+                            With your budget deficit, this debt will likely increase. Stop using the card immediately and pay minimums until deficit is fixed.
+                        </div>
+                    </div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-icon">🎯</div>
+                    <div class="insight-content">
+                        <div class="insight-title">Quick Wins Available</div>
+                        <div class="insight-description">
+                            Three immediate actions could save <span class="financial-amount">$563/month</span>: Cancel Sky Network (<span class="financial-amount">$163</span>), 
+                            reduce groceries to <span class="financial-amount">$400</span> (<span class="financial-amount">$150</span> saved), and limit dining out to <span class="financial-amount">$100</span> (<span class="financial-amount">$150</span> saved), 
+                            plus reduce shopping to <span class="financial-amount">$50</span> (<span class="financial-amount">$100</span> saved).
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Transaction List -->
-            <div class="transaction-list">
-                <div class="transaction-header">
-                    <span>Recent Transactions</span>
-                    <span class="transaction-count">AI Categorized</span>
+            <div class="cards-grid">
+                <div class="card card-1" onclick="window.location.href='index.html'">
+                    <div class="card-icon">📊</div>
+                    <h3 class="card-title">Dashboard</h3>
+                    <p class="card-desc">View your complete financial overview and real-time insights</p>
                 </div>
-                <div id="transactionContainer">
-                    <!-- Transactions will be inserted here -->
+                <div class="card card-2" onclick="window.location.href='csv-upload.html'">
+                    <div class="card-icon">📤</div>
+                    <h3 class="card-title">Upload CSV</h3>
+                    <p class="card-desc">Import bank statements for AI analysis and categorization</p>
                 </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="action-buttons">
-                <button class="btn-primary" onclick="saveTransactions()">Save to FinanceOS</button>
-                <button class="btn-secondary" onclick="resetUpload()">Upload More Files</button>
+                <div class="card card-3" onclick="window.location.href='goals.html'">
+                    <div class="card-icon">🎯</div>
+                    <h3 class="card-title">Goals & AI Coach</h3>
+                    <p class="card-desc">Get AI-powered recovery plan for your financial crisis</p>
+                </div>
+                <div class="card card-4">
+                    <div class="card-icon">🤖</div>
+                    <h3 class="card-title">Budget Optimizer</h3>
+                    <p class="card-desc">AI recommendations to eliminate your $3,607 deficit</p>
+                </div>
             </div>
         </div>
     </div>
+
+    <div id="demoBadge" class="demo-badge">
+        👀 Demo Mode - Financials Hidden
+    </div>
+
+    <!-- PWA Install Button - Only shows if not installed -->
+    <button id="installBtn" class="install-btn">
+        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        Install App
+    </button>
 
     <script>
         // ===== GLOBAL STATE =====
-        let processedTransactions = [];
-        let isPrivate = localStorage.getItem('financeOS_privacy') === 'true';
+        let isLoggedIn = false;
+        let isPrivate = false;
+        let privacyButton = null;
+        let demoBadge = null;
 
-        // ===== CSV PROCESSING ENGINE =====
-        const BankFormats = {
-            ANZ: { columns: ['Date', 'Amount', 'Description', 'Balance'], dateCol: 'Date', amountCol: 'Amount', descCol: 'Description' },
-            ASB: { columns: ['Date', 'Unique Id', 'Tran Type', 'Cheque Number', 'Payee', 'Memo', 'Amount'], dateCol: 'Date', amountCol: 'Amount', descCol: 'Payee' },
-            BNZ: { columns: ['Date', 'Amount', 'Payee', 'Description', 'Reference', 'Transaction Type'], dateCol: 'Date', amountCol: 'Amount', descCol: 'Payee' },
-            KIWIBANK: { columns: ['Date', 'Memo/Description', 'Amount', 'Balance'], dateCol: 'Date', amountCol: 'Amount', descCol: 'Memo/Description' },
-            WESTPAC: { columns: ['Date', 'Amount', 'Other Party', 'Description', 'Reference', 'Particulars'], dateCol: 'Date', amountCol: 'Amount', descCol: 'Other Party' }
-        };
-
-        // AI Categorization Rules
-        const CategoryRules = {
-            'Groceries': ['countdown', 'pak n save', 'new world', 'four square', 'supermarket', 'woolworths'],
-            'Dining Out': ['restaurant', 'cafe', 'mcdonald', 'kfc', 'burger', 'pizza', 'uber eats', 'delivereasy'],
-            'Fuel': ['bp', 'z energy', 'mobil', 'caltex', 'gull', 'fuel', 'petrol', 'gas station'],
-            'Shopping': ['kmart', 'warehouse', 'briscoes', 'harvey norman', 'jb hi-fi', 'rebel sport', 'amazon'],
-            'Utilities': ['contact energy', 'mercury energy', 'genesis energy', 'trustpower', 'spark', 'vodafone'],
-            'Banking': ['bank fee', 'interest', 'loan payment', 'mortgage', 'insurance'],
-            'Entertainment': ['cinema', 'sky', 'netflix', 'spotify', 'gym', 'fitness'],
-            'Medical': ['pharmacy', 'doctor', 'hospital', 'dentist', 'medical centre'],
-            'Transport': ['uber', 'taxi', 'bus', 'train', 'parking', 'rego', 'wof'],
-            'Income': ['salary', 'wages', 'refund', 'dividend', 'interest earned']
-        };
-
-        // ===== INITIALIZATION =====
+        // ===== INITIALIZE APP =====
         document.addEventListener('DOMContentLoaded', function() {
-            initializePrivacyToggle();
-            initializeUpload();
-            console.log('📊 Mobile-Optimized CSV Upload Ready');
+            console.log('🚀 FinanceOS All Fixes Loading...');
+            
+            privacyButton = document.getElementById('privacyToggle');
+            demoBadge = document.getElementById('demoBadge');
+            
+            // Load privacy state from localStorage (FIX 5: Better session persistence)
+            isPrivate = localStorage.getItem('financeOS_privacy') === 'true';
+            
+            // Load login state (FIX 5: Prevent logout on refresh) - MORE RELIABLE
+            const savedLoginState = localStorage.getItem('financeOS_loggedIn');
+            const sessionTimestamp = localStorage.getItem('financeOS_sessionTime');
+            const currentTime = Date.now();
+            
+            // Check if session is still valid (24 hours)
+            if (savedLoginState === 'true' && sessionTimestamp) {
+                const sessionAge = currentTime - parseInt(sessionTimestamp);
+                const maxSessionAge = 24 * 60 * 60 * 1000; // 24 hours
+                
+                if (sessionAge < maxSessionAge) {
+                    isLoggedIn = true;
+                    console.log('✅ Valid session found, auto-logging in');
+                } else {
+                    console.log('⏰ Session expired, clearing login state');
+                    localStorage.removeItem('financeOS_loggedIn');
+                    localStorage.removeItem('financeOS_sessionTime');
+                    isLoggedIn = false;
+                }
+            } else {
+                isLoggedIn = false;
+            }
+            
+            if (privacyButton) {
+                console.log('✅ Privacy button found');
+                initializePrivacyButton();
+            } else {
+                console.error('❌ Privacy button NOT found');
+            }
+            
+            // FIX 1: Smart PWA initialization
+            initializePWA();
+            
+            // FIX 5: Restore session if logged in - IMMEDIATE RESTORE
+            if (isLoggedIn) {
+                console.log('🔑 Restoring logged in session...');
+                setTimeout(function() {
+                    restoreSession();
+                }, 100); // Small delay to ensure DOM is ready
+            }
+            
+            console.log('✅ All fixes loaded');
+            console.log('🔐 Privacy state:', isPrivate ? 'HIDDEN' : 'VISIBLE');
+            console.log('🔑 Login state:', isLoggedIn ? 'LOGGED IN' : 'LOGGED OUT');
         });
 
-        // ===== PRIVACY FUNCTIONALITY =====
-        function initializePrivacyToggle() {
-            const privacyButton = document.getElementById('privacyToggle');
-            if (!privacyButton) return;
+        // ===== FIX 5: ENHANCED SESSION PERSISTENCE =====
+        function restoreSession() {
+            console.log('🔄 Restoring session...');
+            
+            // Ensure elements exist before manipulating them
+            const loginScreen = document.getElementById('loginScreen');
+            const dashboard = document.getElementById('dashboard');
+            
+            if (loginScreen && dashboard) {
+                loginScreen.style.display = 'none';
+                dashboard.classList.add('active');
+                
+                // Apply privacy state after a short delay
+                setTimeout(function() {
+                    applyPrivacyState();
+                }, 200);
+                
+                console.log('✅ Session restored successfully');
+            } else {
+                console.error('❌ Could not restore session - elements not found');
+                // Force logout if elements missing
+                logout();
+            }
+        }
 
+        // ===== LOGIN/LOGOUT FUNCTIONS (ENHANCED) =====
+        function login() {
+            console.log('🔑 Logging in...');
+            
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboard').classList.add('active');
+            document.getElementById('successMsg').classList.add('show');
+            
+            isLoggedIn = true;
+            
+            // FIX 5: Save login state with timestamp
+            localStorage.setItem('financeOS_loggedIn', 'true');
+            localStorage.setItem('financeOS_sessionTime', Date.now().toString());
+            
+            setTimeout(function() {
+                applyPrivacyState();
+                document.getElementById('successMsg').classList.remove('show');
+            }, 3000);
+            
+            console.log('✅ Logged in successfully with session saved');
+        }
+        
+        function logout() {
+            console.log('🚪 Logging out...');
+            
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('dashboard').classList.remove('active');
+            document.getElementById('successMsg').classList.remove('show');
+            
+            isLoggedIn = false;
+            
+            // FIX 5: Clear login state and session
+            localStorage.setItem('financeOS_loggedIn', 'false');
+            localStorage.removeItem('financeOS_sessionTime');
+            
+            if (demoBadge) {
+                demoBadge.classList.remove('show');
+            }
+            
+            console.log('✅ Logged out successfully');
+        }
+
+        // ===== BULLETPROOF PRIVACY SYSTEM =====
+        function initializePrivacyButton() {
+            if (!privacyButton) return;
+            
+            privacyButton.removeEventListener('click', togglePrivacy);
             privacyButton.addEventListener('click', togglePrivacy);
+            
             updatePrivacyButtonText();
-            applyPrivacyState();
+            
+            console.log('🔐 Privacy button initialized');
         }
 
         function togglePrivacy() {
+            console.log('🔐 Privacy toggle clicked');
+            
             isPrivate = !isPrivate;
             localStorage.setItem('financeOS_privacy', isPrivate.toString());
+            
             applyPrivacyState();
             updatePrivacyButtonText();
+            
+            console.log('🔐 Privacy toggled to:', isPrivate ? 'HIDDEN' : 'VISIBLE');
         }
 
         function updatePrivacyButtonText() {
-            const privacyButton = document.getElementById('privacyToggle');
             if (!privacyButton) return;
-
+            
             if (isPrivate) {
                 privacyButton.innerHTML = '👁️ SHOW MONEY';
                 privacyButton.classList.add('active');
@@ -488,6 +1098,9 @@
 
         function applyPrivacyState() {
             const financialAmounts = document.querySelectorAll('.financial-amount');
+            
+            console.log(`🔐 Applying privacy to ${financialAmounts.length} financial amounts`);
+            
             financialAmounts.forEach(function(element) {
                 if (isPrivate) {
                     element.classList.add('hidden');
@@ -495,371 +1108,120 @@
                     element.classList.remove('hidden');
                 }
             });
-        }
-
-        // ===== MOBILE-OPTIMIZED FILE UPLOAD =====
-        function initializeUpload() {
-            const uploadZone = document.getElementById('uploadZone');
-            const fileInput = document.getElementById('fileInput');
-
-            // MULTIPLE EVENT LISTENERS FOR MOBILE COMPATIBILITY
-            uploadZone.addEventListener('dragover', handleDragOver);
-            uploadZone.addEventListener('dragleave', handleDragLeave);
-            uploadZone.addEventListener('drop', handleDrop);
-            uploadZone.addEventListener('click', triggerFileSelect);
-
-            // Direct file input change
-            fileInput.addEventListener('change', handleFileSelect);
-
-            console.log('📱 Mobile upload handlers initialized');
-        }
-
-        // MOBILE-FRIENDLY FILE SELECTION
-        function triggerFileSelect() {
-            console.log('📱 Triggering file selection...');
-            const fileInput = document.getElementById('fileInput');
             
-            // Reset input to allow selecting same file again
-            fileInput.value = '';
-            
-            // Trigger file selection
-            fileInput.click();
-            
-            console.log('📱 File input clicked');
-        }
-
-        function handleDragOver(e) {
-            e.preventDefault();
-            e.currentTarget.classList.add('dragover');
-        }
-
-        function handleDragLeave(e) {
-            e.preventDefault();
-            e.currentTarget.classList.remove('dragover');
-        }
-
-        function handleDrop(e) {
-            e.preventDefault();
-            e.currentTarget.classList.remove('dragover');
-            
-            const files = Array.from(e.dataTransfer.files);
-            processFiles(files);
-        }
-
-        function handleFileSelect(e) {
-            const files = Array.from(e.target.files);
-            console.log(`📱 Files selected: ${files.length}`);
-            
-            if (files.length > 0) {
-                console.log('📱 Processing files:', files.map(f => f.name));
-                processFiles(files);
-            } else {
-                console.log('📱 No files selected');
-            }
-        }
-
-        // ===== FILE PROCESSING =====
-        async function processFiles(files) {
-            if (files.length === 0) {
-                alert('No files selected. Please choose CSV files to upload.');
-                return;
-            }
-
-            console.log(`📁 Processing ${files.length} files`);
-            
-            // Validate file types
-            const validFiles = files.filter(file => {
-                const name = file.name.toLowerCase();
-                return name.endsWith('.csv') || name.endsWith('.xls') || name.endsWith('.xlsx');
-            });
-
-            if (validFiles.length === 0) {
-                alert('Please select valid CSV or Excel files.');
-                return;
-            }
-
-            if (validFiles.length !== files.length) {
-                const invalid = files.length - validFiles.length;
-                alert(`${invalid} files were skipped. Only CSV and Excel files are supported.`);
-            }
-            
-            // Show processing UI
-            document.getElementById('uploadSection').style.display = 'none';
-            document.getElementById('processingSection').style.display = 'block';
-
-            // Process each file
-            let allTransactions = [];
-            
-            for (const file of validFiles) {
-                try {
-                    console.log(`📄 Processing: ${file.name}`);
-                    const transactions = await processCSVFile(file);
-                    allTransactions = allTransactions.concat(transactions);
-                    console.log(`✅ Processed ${file.name}: ${transactions.length} transactions`);
-                } catch (error) {
-                    console.error(`❌ Error processing ${file.name}:`, error);
-                    alert(`Error processing ${file.name}: ${error.message}`);
-                }
-            }
-
-            if (allTransactions.length === 0) {
-                alert('No valid transactions found in the uploaded files.');
-                resetUpload();
-                return;
-            }
-
-            // AI categorization
-            const categorizedTransactions = categorizeTransactions(allTransactions);
-            processedTransactions = categorizedTransactions;
-
-            // Show results after processing delay
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            showResults(categorizedTransactions);
-        }
-
-        function processCSVFile(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    try {
-                        const csv = e.target.result;
-                        const transactions = parseCSV(csv, file.name);
-                        resolve(transactions);
-                    } catch (error) {
-                        reject(error);
-                    }
-                };
-                
-                reader.onerror = function() {
-                    reject(new Error('Failed to read file'));
-                };
-                
-                reader.readAsText(file);
-            });
-        }
-
-        function parseCSV(csvText, filename) {
-            const lines = csvText.split('\n').filter(line => line.trim());
-            if (lines.length < 2) return [];
-
-            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-            console.log(`📋 CSV Headers for ${filename}:`, headers);
-
-            const bankFormat = detectBankFormat(headers);
-            console.log(`🏦 Detected bank format: ${bankFormat}`);
-
-            const transactions = [];
-            
-            for (let i = 1; i < lines.length; i++) {
-                try {
-                    const values = parseCSVLine(lines[i]);
-                    if (values.length !== headers.length) continue;
-
-                    const transaction = {};
-                    headers.forEach((header, index) => {
-                        transaction[header] = values[index];
-                    });
-
-                    const standardTransaction = convertToStandardFormat(transaction, bankFormat);
-                    if (standardTransaction) {
-                        transactions.push(standardTransaction);
-                    }
-                } catch (error) {
-                    console.warn(`⚠️ Skipping line ${i + 1}:`, error.message);
-                }
-            }
-
-            console.log(`✅ Parsed ${transactions.length} transactions from ${filename}`);
-            return transactions;
-        }
-
-        function parseCSVLine(line) {
-            const values = [];
-            let current = '';
-            let inQuotes = false;
-            
-            for (let i = 0; i < line.length; i++) {
-                const char = line[i];
-                
-                if (char === '"') {
-                    inQuotes = !inQuotes;
-                } else if (char === ',' && !inQuotes) {
-                    values.push(current.trim().replace(/"/g, ''));
-                    current = '';
+            if (demoBadge) {
+                if (isPrivate && isLoggedIn) {
+                    demoBadge.classList.add('show');
                 } else {
-                    current += char;
+                    demoBadge.classList.remove('show');
                 }
             }
             
-            values.push(current.trim().replace(/"/g, ''));
-            return values;
+            console.log('✅ Privacy state applied');
         }
 
-        function detectBankFormat(headers) {
-            const headerStr = headers.join(',').toLowerCase();
+        // ===== FIX 1: SMART PWA FUNCTIONALITY =====
+        function initializePWA() {
+            const installButton = document.getElementById('installBtn');
+            let deferredPrompt = null;
             
-            if (headerStr.includes('unique id') && headerStr.includes('tran type')) return 'ASB';
-            if (headerStr.includes('other party') && headerStr.includes('particulars')) return 'WESTPAC';
-            if (headerStr.includes('memo/description')) return 'KIWIBANK';
-            if (headerStr.includes('payee') && headerStr.includes('reference')) return 'BNZ';
+            // FIX 1: Check if app is already installed
+            function isAppInstalled() {
+                return window.matchMedia('(display-mode: standalone)').matches || 
+                       window.navigator.standalone === true ||
+                       localStorage.getItem('pwa_installed') === 'true';
+            }
             
-            return 'ANZ';
-        }
+            // FIX 1: Hide install button if already installed
+            if (isAppInstalled()) {
+                if (installButton) {
+                    installButton.style.display = 'none';
+                }
+                console.log('📱 PWA already installed - hiding install button');
+                return;
+            }
+            
+            // FIX 1: Show install button only if not installed
+            setTimeout(function() {
+                if (installButton && !isAppInstalled()) {
+                    installButton.classList.add('show');
+                    console.log('📱 Install button shown');
+                }
+            }, 5000);
 
-        function convertToStandardFormat(transaction, bankFormat) {
-            const format = BankFormats[bankFormat];
-            if (!format) return null;
+            // Listen for install prompt
+            window.addEventListener('beforeinstallprompt', function(e) {
+                e.preventDefault();
+                deferredPrompt = e;
+                console.log('📱 Install prompt available');
+            });
+            
+            // FIX 1: Listen for successful installation
+            window.addEventListener('appinstalled', function(e) {
+                console.log('📱 PWA installed successfully!');
+                localStorage.setItem('pwa_installed', 'true');
+                if (installButton) {
+                    installButton.style.display = 'none';
+                }
+                deferredPrompt = null;
+            });
 
-            const date = transaction[format.dateCol];
-            const amount = parseFloat(transaction[format.amountCol]?.replace(/[^-0-9.]/g, ''));
-            const description = transaction[format.descCol] || '';
-
-            if (!date || isNaN(amount) || !description) return null;
-
-            return {
-                date: parseDate(date),
-                amount: amount,
-                description: description.trim(),
-                raw: transaction,
-                bank: bankFormat
-            };
-        }
-
-        function parseDate(dateStr) {
-            const formats = [
-                /(\d{1,2})\/(\d{1,2})\/(\d{4})/,
-                /(\d{4})-(\d{1,2})-(\d{1,2})/,
-                /(\d{1,2})-(\d{1,2})-(\d{4})/,
-            ];
-
-            for (const format of formats) {
-                const match = dateStr.match(format);
-                if (match) {
-                    if (format === formats[1]) {
-                        return new Date(match[1], match[2] - 1, match[3]);
+            // FIX 1: Handle install button click
+            if (installButton) {
+                installButton.addEventListener('click', function() {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        deferredPrompt.userChoice.then(function(choiceResult) {
+                            console.log('📱 Install result:', choiceResult.outcome);
+                            if (choiceResult.outcome === 'accepted') {
+                                localStorage.setItem('pwa_installed', 'true');
+                                installButton.style.display = 'none';
+                            }
+                            deferredPrompt = null;
+                        });
                     } else {
-                        return new Date(match[3], match[2] - 1, match[1]);
+                        alert('To install FinanceOS:\n\n1. Open browser menu (⋮)\n2. Select "Install app" or "Add to Home Screen"\n3. Confirm installation');
                     }
-                }
+                });
             }
 
-            return new Date();
-        }
-
-        // ===== AI CATEGORIZATION =====
-        function categorizeTransactions(transactions) {
-            return transactions.map(transaction => {
-                const category = determineCategory(transaction.description);
-                return { ...transaction, category: category, id: generateId() };
-            });
-        }
-
-        function determineCategory(description) {
-            const desc = description.toLowerCase();
-            
-            for (const [category, keywords] of Object.entries(CategoryRules)) {
-                for (const keyword of keywords) {
-                    if (desc.includes(keyword)) {
-                        return category;
-                    }
-                }
+            // FIX 4: Register service worker for proper PWA behavior
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('sw.js')
+                        .then(function(registration) {
+                            console.log('📱 Service Worker registered');
+                        })
+                        .catch(function(registrationError) {
+                            console.log('📱 Service Worker registration failed:', registrationError);
+                        });
+                });
             }
-            
-            if (desc.includes('refund') || desc.includes('credit')) return 'Income';
-            if (desc.includes('fee') || desc.includes('charge')) return 'Banking';
-            
-            return 'Other';
         }
 
-        function generateId() {
-            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        // ===== DEBUG FUNCTIONS =====
+        function debugAll() {
+            console.log('=== FINANCEOS DEBUG ===');
+            console.log('isPrivate:', isPrivate);
+            console.log('isLoggedIn:', isLoggedIn);
+            console.log('privacyButton:', privacyButton);
+            console.log('demoBadge:', demoBadge);
+            console.log('Financial amounts found:', document.querySelectorAll('.financial-amount').length);
+            console.log('localStorage privacy:', localStorage.getItem('financeOS_privacy'));
+            console.log('localStorage login:', localStorage.getItem('financeOS_loggedIn'));
+            console.log('localStorage pwa_installed:', localStorage.getItem('pwa_installed'));
+            console.log('PWA display mode:', window.matchMedia('(display-mode: standalone)').matches);
         }
 
-        // ===== RESULTS DISPLAY =====
-        function showResults(transactions) {
-            console.log(`📊 Displaying ${transactions.length} categorized transactions`);
-            
-            document.getElementById('processingSection').style.display = 'none';
-            document.getElementById('resultsSection').style.display = 'block';
+        window.debugAll = debugAll;
 
-            const totalAmount = transactions.reduce((sum, t) => sum + t.amount, 0);
-            const categories = [...new Set(transactions.map(t => t.category))];
-            
-            document.getElementById('transactionCount').textContent = transactions.length;
-            document.getElementById('categoryCount').textContent = categories.length;
-            document.getElementById('totalAmount').textContent = formatCurrency(totalAmount);
-
-            const container = document.getElementById('transactionContainer');
-            container.innerHTML = '';
-            
-            const displayTransactions = transactions.slice(0, 10);
-            
-            displayTransactions.forEach(transaction => {
-                const element = createTransactionElement(transaction);
-                container.appendChild(element);
-            });
-
-            applyPrivacyState();
-        }
-
-        function createTransactionElement(transaction) {
-            const div = document.createElement('div');
-            div.className = 'transaction-item';
-            
-            const amountClass = transaction.amount >= 0 ? 'amount-positive' : 'amount-negative';
-            const amountPrefix = transaction.amount >= 0 ? '+' : '';
-            
-            div.innerHTML = `
-                <div class="transaction-details">
-                    <div class="transaction-merchant">${transaction.description}</div>
-                    <div class="transaction-meta">${formatDate(transaction.date)} • ${transaction.bank}</div>
-                </div>
-                <div class="transaction-category">${transaction.category}</div>
-                <div class="transaction-amount ${amountClass} financial-amount">
-                    ${amountPrefix}${formatCurrency(Math.abs(transaction.amount))}
-                </div>
-            `;
-            
-            return div;
-        }
-
-        // ===== UTILITY FUNCTIONS =====
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('en-NZ', { style: 'currency', currency: 'NZD' }).format(amount);
-        }
-
-        function formatDate(date) {
-            return new Intl.DateTimeFormat('en-NZ', { day: 'numeric', month: 'short', year: 'numeric' }).format(date);
-        }
-
-        // ===== ACTION HANDLERS =====
-        function saveTransactions() {
-            const existingTransactions = JSON.parse(localStorage.getItem('financeOS_transactions') || '[]');
-            const allTransactions = [...existingTransactions, ...processedTransactions];
-            localStorage.setItem('financeOS_transactions', JSON.stringify(allTransactions));
-            
-            console.log(`💾 Saved ${processedTransactions.length} transactions to FinanceOS`);
-            
-            alert(`Successfully saved ${processedTransactions.length} transactions to FinanceOS!`);
-            window.location.href = 'index.html';
-        }
-
-        function resetUpload() {
-            document.getElementById('resultsSection').style.display = 'none';
-            document.getElementById('processingSection').style.display = 'none';
-            document.getElementById('uploadSection').style.display = 'block';
-            
-            document.getElementById('fileInput').value = '';
-            processedTransactions = [];
-            
-            console.log('🔄 Upload reset');
-        }
-
-        console.log('📊 Mobile-Optimized CSV Upload Ready');
-        console.log('💡 Supports: ANZ, ASB, BNZ, Kiwibank, Westpac');
-        console.log('🤖 AI categorization enabled');
-        console.log('📱 Mobile file selection optimized');
+        console.log('🎯 FinanceOS All Fixes Ready');
+        console.log('✅ Fix 1: Install button hides after installation');
+        console.log('✅ Fix 2: CSV upload (see csv-upload.html)');
+        console.log('✅ Fix 3: App icon (update manifest.json)');
+        console.log('✅ Fix 4: PWA standalone mode');
+        console.log('✅ Fix 5: Session persistence');
+        console.log('🔧 To debug all, type: debugAll()');
     </script>
 </body>
 </html>
