@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSV Upload - FinanceOS</title>
+    <title>FinanceOS - Personal Finance Dashboard</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#667eea">
     <style>
@@ -42,35 +42,6 @@
             opacity: 0.9;
         }
 
-        .navigation {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-
-        .nav-button {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
-            padding: 12px 24px;
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .nav-button:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .nav-button.active {
-            background: rgba(255, 255, 255, 0.25);
-        }
-
         .privacy-controls {
             position: fixed;
             top: 20px;
@@ -101,239 +72,200 @@
             background: rgba(87, 255, 87, 0.9);
         }
 
-        .upload-section {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            padding: 30px;
+        .navigation {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
             margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            flex-wrap: wrap;
         }
 
-        .upload-zone {
-            border: 2px dashed rgba(255, 255, 255, 0.3);
+        .nav-button {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 15px;
-            padding: 40px;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            margin-bottom: 20px;
-        }
-
-        .upload-zone:hover,
-        .upload-zone.drag-over {
-            border-color: rgba(255, 255, 255, 0.6);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .upload-zone input[type="file"] {
-            display: none;
-        }
-
-        .upload-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            opacity: 0.7;
-        }
-
-        .upload-text {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-        }
-
-        .upload-hint {
-            font-size: 0.9rem;
-            opacity: 0.7;
-        }
-
-        .file-info {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 15px;
-            display: none;
-        }
-
-        .file-info.show {
-            display: block;
-        }
-
-        .file-details {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .file-name {
-            font-weight: 600;
-        }
-
-        .file-size {
-            opacity: 0.7;
-            font-size: 0.9rem;
-        }
-
-        .process-button {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            border: none;
-            border-radius: 10px;
-            padding: 12px 30px;
+            padding: 12px 24px;
             color: white;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 1rem;
+            text-decoration: none;
+            font-weight: 500;
             transition: all 0.3s ease;
-            margin-top: 15px;
         }
 
-        .process-button:hover:not(:disabled) {
+        .nav-button:hover {
+            background: rgba(255, 255, 255, 0.2);
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
         }
 
-        .process-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .nav-button.active {
+            background: rgba(255, 255, 255, 0.25);
         }
 
-        .preview-section {
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
+            padding: 25px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            display: none;
+            transition: transform 0.3s ease;
         }
 
-        .preview-section.show {
-            display: block;
+        .card:hover {
+            transform: translateY(-5px);
         }
 
-        .preview-header {
+        .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
         }
 
-        .preview-title {
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-icon {
             font-size: 1.5rem;
+        }
+
+        .card-amount {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .positive {
+            color: #4ade80;
+        }
+
+        .negative {
+            color: #f87171;
+        }
+
+        .warning {
+            color: #fbbf24;
+        }
+
+        .critical {
+            color: #ef4444;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .card-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+
+        .account-list {
+            list-style: none;
+        }
+
+        .account-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .account-item:last-child {
+            border-bottom: none;
+        }
+
+        .account-name {
+            font-weight: 500;
+        }
+
+        .account-balance {
             font-weight: 600;
         }
 
-        .preview-stats {
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .summary-label {
             font-size: 0.9rem;
             opacity: 0.8;
         }
 
-        .preview-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            overflow: hidden;
+        .alert-banner {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
         }
 
-        .preview-table th,
-        .preview-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .preview-table th {
-            background: rgba(255, 255, 255, 0.1);
+        .alert-title {
+            font-size: 1.3rem;
             font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .preview-table td {
-            font-size: 0.85rem;
-        }
-
-        .amount-positive {
-            color: #4ade80;
-        }
-
-        .amount-negative {
-            color: #f87171;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-            overflow: hidden;
-            margin: 20px 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        .error-message {
-            background: rgba(248, 113, 113, 0.2);
-            border: 1px solid rgba(248, 113, 113, 0.3);
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 15px;
+            margin-bottom: 10px;
             color: #fecaca;
-            display: none;
         }
 
-        .error-message.show {
-            display: block;
-        }
-
-        .success-message {
-            background: rgba(74, 222, 128, 0.2);
-            border: 1px solid rgba(74, 222, 128, 0.3);
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 15px;
-            color: #bbf7d0;
-            display: none;
-        }
-
-        .success-message.show {
-            display: block;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-
-            .header h1 {
-                font-size: 2rem;
-            }
-
-            .upload-section,
-            .preview-section {
-                padding: 20px;
-            }
-
-            .preview-table {
-                font-size: 0.8rem;
-            }
-
-            .preview-table th,
-            .preview-table td {
-                padding: 8px 10px;
-            }
+        .alert-message {
+            font-size: 1rem;
+            color: #fecaca;
         }
 
         .hidden-data {
             filter: blur(8px);
             transition: filter 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
         }
     </style>
 </head>
@@ -346,59 +278,211 @@
 
     <div class="container">
         <div class="header">
-            <h1>📊 CSV Upload</h1>
-            <p>Upload your bank statements to import transactions</p>
+            <h1>💰 FinanceOS</h1>
+            <p>Secure Personal Finance Operating System</p>
         </div>
 
         <div class="navigation">
-            <a href="index.html" class="nav-button">📈 Dashboard</a>
-            <a href="csv-upload.html" class="nav-button active">📊 CSV Upload</a>
+            <a href="index.html" class="nav-button active">📈 Dashboard</a>
+            <a href="csv-upload.html" class="nav-button">📊 CSV Upload</a>
             <a href="goals.html" class="nav-button">🎯 Goals</a>
         </div>
 
-        <div class="upload-section">
-            <div class="upload-zone" id="uploadZone">
-                <div class="upload-icon">📁</div>
-                <div class="upload-text">Drop CSV files here or click to browse</div>
-                <div class="upload-hint">Select any file type - we'll validate CSV files after selection</div>
-                <input type="file" id="fileInput" multiple>
-            </div>
-
-            <div class="file-info" id="fileInfo">
-                <div class="file-details">
-                    <span class="file-name" id="fileName"></span>
-                    <span class="file-size" id="fileSize"></span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
-                <button class="process-button" id="processButton" disabled>Process CSV</button>
-            </div>
-
-            <div class="error-message" id="errorMessage"></div>
-            <div class="success-message" id="successMessage"></div>
+        <div class="alert-banner">
+            <div class="alert-title">⚠️ Emergency Fund Critical</div>
+            <div class="alert-message">You have only <span class="financial-data">$125.50</span> in emergency savings. Build to <span class="financial-data">$12,000</span> (3 months expenses).</div>
         </div>
 
-        <div class="preview-section" id="previewSection">
-            <div class="preview-header">
-                <div class="preview-title" id="previewTitle">Transaction Preview</div>
-                <div class="preview-stats" id="previewStats"></div>
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="summary-value positive financial-data">$52,350</div>
+                <div class="summary-label">Total Assets</div>
             </div>
-            <div style="overflow-x: auto;">
-                <table class="preview-table" id="previewTable">
-                    <thead id="previewTableHead"></thead>
-                    <tbody id="previewTableBody"></tbody>
-                </table>
+            <div class="summary-card">
+                <div class="summary-value negative financial-data">-$2,850</div>
+                <div class="summary-label">Monthly Cash Flow</div>
             </div>
+            <div class="summary-card">
+                <div class="summary-value positive financial-data">$38,250</div>
+                <div class="summary-label">KiwiSaver Balance</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value negative financial-data">$218,500</div>
+                <div class="summary-label">Total Debt</div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-icon">🏦</span>
+                        Transaction Accounts
+                    </div>
+                </div>
+                <ul class="account-list">
+                    <li class="account-item">
+                        <span class="account-name">Main Account</span>
+                        <span class="account-balance positive financial-data">$2,350.75</span>
+                    </li>
+                    <li class="account-item">
+                        <span class="account-name">Spending Account</span>
+                        <span class="account-balance positive financial-data">$1,285.20</span>
+                    </li>
+                    <li class="account-item">
+                        <span class="account-name">Everyday Account</span>
+                        <span class="account-balance positive financial-data">$856.30</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-icon">💳</span>
+                        Credit & Savings
+                    </div>
+                </div>
+                <ul class="account-list">
+                    <li class="account-item">
+                        <span class="account-name">Visa Credit Card</span>
+                        <span class="account-balance negative financial-data">-$2,650.40</span>
+                    </li>
+                    <li class="account-item">
+                        <span class="account-name">Savings Account</span>
+                        <span class="account-balance positive financial-data">$125.50</span>
+                    </li>
+                    <li class="account-item">
+                        <span class="account-name">Emergency Fund</span>
+                        <span class="account-balance critical financial-data">$125.50</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-icon">🏠</span>
+                        Loans & Mortgages
+                    </div>
+                </div>
+                <ul class="account-list">
+                    <li class="account-item">
+                        <span class="account-name">Home Loan</span>
+                        <span class="account-balance negative financial-data">-$215,850.25</span>
+                    </li>
+                    <li class="account-item">
+                        <span class="account-name">Personal Loan</span>
+                        <span class="account-balance negative financial-data">-$85,250.30</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-icon">📈</span>
+                        Investments
+                    </div>
+                </div>
+                <ul class="account-list">
+                    <li class="account-item">
+                        <span class="account-name">KiwiSaver Growth</span>
+                        <span class="account-balance positive financial-data">$38,250.85</span>
+                    </li>
+                    <li class="account-item">
+                        <span class="account-name">Shares Portfolio</span>
+                        <span class="account-balance positive financial-data">$3,850.00</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-icon">📊</span>
+                        Monthly Budget
+                    </div>
+                </div>
+                <div class="card-subtitle">May 2025 Overview</div>
+                <ul class="account-list">
+                    <li class="account-item">
+                        <span class="account-name">Income</span>
+                        <span class="account-balance positive financial-data">$4,850.50</span>
+                    </li>
+                    <li class="account-item">
+                        <span class="account-name">Expenses</span>
+                        <span class="account-balance negative financial-data">-$7,700.25</span>
+                    </li>
+                    <li class="account-item">
+                        <span class="account-name">Net Flow</span>
+                        <span class="account-balance negative financial-data">-$2,849.75</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-icon">🎯</span>
+                        Financial Goals
+                    </div>
+                </div>
+                <ul class="account-list">
+                    <li class="account-item">
+                        <span class="account-name">Emergency Fund</span>
+                        <span class="account-balance warning financial-data">1% Complete</span>
+                    </li>
+                    <li class="account-item">
+                        <span class="account-name">Debt Payoff</span>
+                        <span class="account-balance warning financial-data">12% Complete</span>
+                    </li>
+                    <li class="account-item">
+                        <span class="account-name">House Deposit</span>
+                        <span class="account-balance warning financial-data">5% Complete</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">📈</span>
+                    Recent Activity
+                </div>
+            </div>
+            <div class="card-subtitle">Last 7 days</div>
+            <ul class="account-list">
+                <li class="account-item">
+                    <span class="account-name">Salary - Tech Solutions Ltd</span>
+                    <span class="account-balance positive financial-data">+$2,350.25</span>
+                </li>
+                <li class="account-item">
+                    <span class="account-name">Home Loan Payment</span>
+                    <span class="account-balance negative financial-data">-$425.00</span>
+                </li>
+                <li class="account-item">
+                    <span class="account-name">Personal Loan Payment</span>
+                    <span class="account-balance negative financial-data">-$325.50</span>
+                </li>
+                <li class="account-item">
+                    <span class="account-name">ElectricCorp Bill</span>
+                    <span class="account-balance negative financial-data">-$325.50</span>
+                </li>
+                <li class="account-item">
+                    <span class="account-name">Grocery Shopping</span>
+                    <span class="account-balance negative financial-data">-$185.75</span>
+                </li>
+            </ul>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script>
         // Privacy mode functionality
         let privacyMode = false;
         const privacyToggle = document.getElementById('privacyToggle');
-        const privacyElements = ['.preview-table', '.preview-stats'];
+        const financialElements = document.querySelectorAll('.financial-data, .account-balance, .summary-value, .card-amount');
 
         privacyToggle.addEventListener('click', () => {
             privacyMode = !privacyMode;
@@ -406,298 +490,28 @@
             if (privacyMode) {
                 privacyToggle.textContent = '👁️ SHOW MONEY';
                 privacyToggle.classList.add('active');
-                privacyElements.forEach(selector => {
-                    const elements = document.querySelectorAll(selector);
-                    elements.forEach(el => el.classList.add('hidden-data'));
-                });
+                financialElements.forEach(el => el.classList.add('hidden-data'));
             } else {
                 privacyToggle.textContent = '🔒 HIDE MONEY';
                 privacyToggle.classList.remove('active');
-                privacyElements.forEach(selector => {
-                    const elements = document.querySelectorAll(selector);
-                    elements.forEach(el => el.classList.remove('hidden-data'));
-                });
+                financialElements.forEach(el => el.classList.remove('hidden-data'));
             }
         });
 
-        // File upload functionality
-        const uploadZone = document.getElementById('uploadZone');
-        const fileInput = document.getElementById('fileInput');
-        const fileInfo = document.getElementById('fileInfo');
-        const fileName = document.getElementById('fileName');
-        const fileSize = document.getElementById('fileSize');
-        const processButton = document.getElementById('processButton');
-        const progressFill = document.getElementById('progressFill');
-        const errorMessage = document.getElementById('errorMessage');
-        const successMessage = document.getElementById('successMessage');
-        const previewSection = document.getElementById('previewSection');
-        const previewTitle = document.getElementById('previewTitle');
-        const previewStats = document.getElementById('previewStats');
-        const previewTable = document.getElementById('previewTable');
-        const previewTableHead = document.getElementById('previewTableHead');
-        const previewTableBody = document.getElementById('previewTableBody');
-
-        let currentFiles = [];
-        let parsedData = [];
-
-        // Upload zone click handler
-        uploadZone.addEventListener('click', () => {
-            fileInput.click();
+        // Install PWA functionality
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            deferredPrompt = e;
+            // Show install button if needed
         });
 
-        // Drag and drop handlers
-        uploadZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadZone.classList.add('drag-over');
-        });
-
-        uploadZone.addEventListener('dragleave', () => {
-            uploadZone.classList.remove('drag-over');
-        });
-
-        uploadZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadZone.classList.remove('drag-over');
-            handleFiles(e.dataTransfer.files);
-        });
-
-        // File input change handler
-        fileInput.addEventListener('change', (e) => {
-            handleFiles(e.target.files);
-        });
-
-        // Process button handler
-        processButton.addEventListener('click', () => {
-            processCSVFiles();
-        });
-
-        function handleFiles(files) {
-            hideMessages();
-            currentFiles = Array.from(files).filter(file => 
-                file.name.toLowerCase().endsWith('.csv') || 
-                file.type === 'text/csv' || 
-                file.type === 'application/csv' ||
-                file.type === 'text/plain'
-            );
-            
-            if (currentFiles.length === 0) {
-                showError('Please select valid CSV or text files. Selected files: ' + Array.from(files).map(f => f.name).join(', '));
-                return;
-            }
-
-            // Show file info for first file
-            const file = currentFiles[0];
-            fileName.textContent = currentFiles.length > 1 ? 
-                `${file.name} and ${currentFiles.length - 1} more` : file.name;
-            fileSize.textContent = formatFileSize(getTotalSize());
-            
-            fileInfo.classList.add('show');
-            processButton.disabled = false;
+        // Service worker registration
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(registration => console.log('SW registered'))
+                .catch(error => console.log('SW registration failed'));
         }
-
-        function getTotalSize() {
-            return currentFiles.reduce((total, file) => total + file.size, 0);
-        }
-
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        function processCSVFiles() {
-            processButton.disabled = true;
-            hideMessages();
-            parsedData = [];
-            let processedCount = 0;
-
-            currentFiles.forEach((file, index) => {
-                Papa.parse(file, {
-                    header: true,
-                    dynamicTyping: true,
-                    skipEmptyLines: true,
-                    delimitersToGuess: [',', '\t', '|', ';'],
-                    complete: function(results) {
-                        processedCount++;
-                        
-                        // Update progress
-                        const progress = (processedCount / currentFiles.length) * 100;
-                        progressFill.style.width = progress + '%';
-
-                        if (results.errors.length > 0) {
-                            console.warn(`Parsing warnings for ${file.name}:`, results.errors);
-                        }
-
-                        // Detect bank type and process data
-                        const bankType = detectBankType(results.meta.fields, file.name);
-                        const processedTransactions = processTransactions(results.data, bankType, file.name);
-                        
-                        parsedData.push({
-                            fileName: file.name,
-                            bankType: bankType,
-                            data: processedTransactions,
-                            rawData: results.data
-                        });
-
-                        // If all files processed, show preview
-                        if (processedCount === currentFiles.length) {
-                            showPreview();
-                            showSuccess(`Successfully processed ${currentFiles.length} CSV file(s) with ${getTotalTransactions()} transactions.`);
-                            processButton.disabled = false;
-                        }
-                    },
-                    error: function(error) {
-                        showError(`Error processing ${file.name}: ${error.message}`);
-                        processButton.disabled = false;
-                    }
-                });
-            });
-        }
-
-        function detectBankType(fields, fileName) {
-            // Clean field names (remove whitespace)
-            const cleanFields = fields.map(field => field.trim().toLowerCase());
-            
-            // KiwiSaver detection
-            if (cleanFields.includes('unit price') && cleanFields.includes('units')) {
-                return 'kiwisaver';
-            }
-            
-            // Loan account detection
-            if (cleanFields.includes('principalbalance')) {
-                return 'loan';
-            }
-            
-            // Credit card detection
-            if (cleanFields.includes('card') && cleanFields.includes('type')) {
-                return 'credit_card';
-            }
-            
-            // Transaction account detection (ANZ/ASB format)
-            if (cleanFields.includes('type') && cleanFields.includes('particulars')) {
-                return 'transaction_account';
-            }
-            
-            return 'unknown';
-        }
-
-        function processTransactions(data, bankType, fileName) {
-            return data.map(row => {
-                const processed = { ...row };
-                
-                // Standardize amount field
-                if (processed.Amount) {
-                    processed.standardAmount = parseFloat(processed.Amount) || 0;
-                }
-                
-                // Standardize date field
-                if (processed.Date || processed.TransactionDate) {
-                    processed.standardDate = processed.Date || processed.TransactionDate;
-                }
-                
-                // Standardize description field
-                if (processed.Details) {
-                    processed.standardDescription = processed.Details;
-                } else if (processed.Particulars) {
-                    processed.standardDescription = processed.Particulars;
-                }
-                
-                // Add metadata
-                processed._bankType = bankType;
-                processed._fileName = fileName;
-                
-                return processed;
-            });
-        }
-
-        function showPreview() {
-            if (parsedData.length === 0) return;
-
-            const totalTransactions = getTotalTransactions();
-            const totalAmount = getTotalAmount();
-            
-            previewTitle.textContent = `Transaction Preview (${parsedData.length} files)`;
-            previewStats.textContent = `${totalTransactions} transactions • Total: $${totalAmount.toFixed(2)}`;
-            
-            // Create table headers based on first file
-            const firstFile = parsedData[0];
-            const headers = Object.keys(firstFile.data[0] || {}).filter(key => !key.startsWith('_'));
-            
-            previewTableHead.innerHTML = `
-                <tr>
-                    ${headers.map(header => `<th>${header}</th>`).join('')}
-                    <th>File</th>
-                </tr>
-            `;
-            
-            // Show first 20 transactions from all files
-            const allTransactions = parsedData.flatMap(file => 
-                file.data.map(row => ({ ...row, _sourceFile: file.fileName }))
-            );
-            
-            const displayTransactions = allTransactions.slice(0, 20);
-            
-            previewTableBody.innerHTML = displayTransactions.map(row => {
-                const cells = headers.map(header => {
-                    let value = row[header] || '';
-                    let className = '';
-                    
-                    // Style amounts
-                    if (header.toLowerCase().includes('amount') && typeof value === 'number') {
-                        className = value >= 0 ? 'amount-positive' : 'amount-negative';
-                        value = `$${Math.abs(value).toFixed(2)}`;
-                        if (row[header] < 0) value = `-${value}`;
-                    }
-                    
-                    return `<td class="${className}">${value}</td>`;
-                }).join('');
-                
-                return `<tr>${cells}<td>${row._sourceFile}</td></tr>`;
-            }).join('');
-            
-            previewSection.classList.add('show');
-        }
-
-        function getTotalTransactions() {
-            return parsedData.reduce((total, file) => total + file.data.length, 0);
-        }
-
-        function getTotalAmount() {
-            return parsedData.reduce((total, file) => {
-                return total + file.data.reduce((fileTotal, row) => {
-                    return fileTotal + (row.standardAmount || 0);
-                }, 0);
-            }, 0);
-        }
-
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.classList.add('show');
-            successMessage.classList.remove('show');
-        }
-
-        function showSuccess(message) {
-            successMessage.textContent = message;
-            successMessage.classList.add('show');
-            errorMessage.classList.remove('show');
-        }
-
-        function hideMessages() {
-            errorMessage.classList.remove('show');
-            successMessage.classList.remove('show');
-        }
-
-        // Auto-hide messages after 5 seconds
-        function autoHideMessage(element) {
-            setTimeout(() => {
-                element.classList.remove('show');
-            }, 5000);
-        }
-
-        // Store processed data for later use
-        window.uploadedTransactions = parsedData;
     </script>
 </body>
 </html>
