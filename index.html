@@ -76,7 +76,7 @@
             font-size: 14px; cursor: pointer; text-decoration: underline;
         }
         
-        .dashboard { display: none; }
+        .dashboard { display: none; position: relative; }
         .dashboard.active { display: block; }
         .header {
             background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px);
@@ -181,92 +181,119 @@
         }
         .success-msg.show { display: block; }
 
-        /* SUPER VISIBLE PRIVACY BUTTON FOR MOBILE */
+        /* BULLETPROOF PRIVACY BUTTON - ALWAYS VISIBLE WHEN LOGGED IN */
         .privacy-toggle {
             position: fixed !important;
-            top: 20px !important;
+            top: 80px !important;
             right: 20px !important;
-            background: red !important;
+            background: linear-gradient(135deg, #ef4444, #dc2626) !important;
             color: white !important;
-            border: 3px solid yellow !important;
-            border-radius: 15px !important;
-            padding: 15px 20px !important;
-            font-size: 16px !important;
-            font-weight: bold !important;
+            border: 3px solid #fbbf24 !important;
+            border-radius: 16px !important;
+            padding: 12px 20px !important;
+            font-size: 14px !important;
+            font-weight: 700 !important;
             cursor: pointer !important;
-            z-index: 99999 !important;
-            display: none !important;
+            z-index: 100000 !important;
+            display: flex !important;
             align-items: center !important;
             gap: 8px !important;
-            box-shadow: 0 0 20px rgba(255,0,0,0.8) !important;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.6), 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+            transition: all 0.3s ease !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: scale(1) !important;
         }
 
-        .dashboard.active .privacy-toggle {
-            display: flex !important;
+        .privacy-toggle:hover {
+            transform: scale(1.05) !important;
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.8), 0 6px 16px rgba(0, 0, 0, 0.4) !important;
         }
 
         .privacy-toggle.active {
-            background: green !important;
-            border-color: lime !important;
+            background: linear-gradient(135deg, #10b981, #059669) !important;
+            border-color: #84cc16 !important;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.6), 0 4px 12px rgba(0, 0, 0, 0.3) !important;
         }
 
-        /* COMPLETE FINANCIAL HIDING */
+        .privacy-toggle.active:hover {
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.8), 0 6px 16px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        /* Hide privacy button when not logged in */
+        .login-screen .privacy-toggle {
+            display: none !important;
+        }
+
+        /* IMPROVED FINANCIAL AMOUNT HIDING */
         .financial-amount {
-            transition: all 0.3s ease;
-            position: relative;
-            display: inline-block;
+            transition: all 0.3s ease !important;
+            position: relative !important;
+            display: inline-block !important;
         }
 
         .financial-amount.hidden {
             color: transparent !important;
-            user-select: none;
+            user-select: none !important;
+            pointer-events: none !important;
+        }
+
+        .financial-amount.hidden::before {
+            content: "" !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            background: rgba(255, 255, 255, 0.1) !important;
+            border-radius: 6px !important;
+            backdrop-filter: blur(4px) !important;
         }
 
         .financial-amount.hidden::after {
-            content: "••••";
-            position: absolute;
-            left: 0;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            color: rgba(255, 255, 255, 0.6) !important;
-            background: inherit;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            font-weight: bold;
-            z-index: 1;
+            content: "••••••" !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            color: rgba(255, 255, 255, 0.7) !important;
+            font-weight: bold !important;
+            font-size: 0.9em !important;
+            z-index: 2 !important;
+            pointer-events: none !important;
         }
 
         .financial-amount.hidden.large::after {
-            content: "••••••••";
+            content: "••••••••••" !important;
         }
 
         .financial-amount.hidden.medium::after {
-            content: "••••••";
+            content: "••••••••" !important;
         }
 
         .financial-amount.hidden.small::after {
-            content: "•••";
+            content: "••••" !important;
         }
 
+        /* Demo badge */
         .demo-badge {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: orange;
-            color: black;
-            border: 2px solid red;
-            border-radius: 20px;
-            padding: 12px 20px;
-            font-size: 14px;
-            font-weight: 600;
-            z-index: 1000;
-            display: none;
+            position: fixed !important;
+            bottom: 20px !important;
+            left: 20px !important;
+            background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+            color: white !important;
+            border: 2px solid #fbbf24 !important;
+            border-radius: 20px !important;
+            padding: 12px 20px !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            z-index: 99999 !important;
+            display: none !important;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4) !important;
         }
 
         .demo-badge.show {
-            display: block;
+            display: block !important;
         }
 
         /* Install button */
@@ -285,7 +312,7 @@
             box-shadow: 0 12px 40px rgba(16, 185, 129, 0.4);
             z-index: 999;
             transition: all 0.3s ease;
-            display: flex;
+            display: none;
             align-items: center;
             gap: 12px;
         }
@@ -295,7 +322,7 @@
         }
 
         .install-btn.hidden {
-            display: none;
+            display: none !important;
         }
         
         @media (max-width: 768px) {
@@ -310,17 +337,17 @@
             .financial-summary { grid-template-columns: 1fr; }
             
             .privacy-toggle {
-                top: 16px !important;
+                top: 70px !important;
                 right: 16px !important;
-                padding: 12px 16px !important;
-                font-size: 14px !important;
+                padding: 10px 16px !important;
+                font-size: 13px !important;
             }
 
             .demo-badge {
-                bottom: 16px;
-                left: 16px;
-                padding: 8px 12px;
-                font-size: 12px;
+                bottom: 16px !important;
+                left: 16px !important;
+                padding: 8px 12px !important;
+                font-size: 12px !important;
             }
 
             .install-btn {
@@ -333,6 +360,11 @@
     </style>
 </head>
 <body>
+    <!-- PRIVACY TOGGLE - ALWAYS PRESENT -->
+    <button id="privacyToggle" class="privacy-toggle">
+        🔐 HIDE MONEY
+    </button>
+
     <div id="loginScreen" class="login-screen">
         <div class="bg-blur blur1"></div>
         <div class="bg-blur blur2"></div>
@@ -363,11 +395,6 @@
     </div>
 
     <div id="dashboard" class="dashboard">
-        <!-- SUPER VISIBLE PRIVACY BUTTON -->
-        <button id="privacyToggle" class="privacy-toggle">
-            🔐 HIDE $
-        </button>
-
         <div class="header">
             <div class="header-content">
                 <div class="header-logo">
@@ -379,13 +406,13 @@
         </div>
         
         <div class="success-msg" id="successMsg">
-            🎉 Welcome to FinanceOS! You're successfully logged in.
+            🎉 Welcome to FinanceOS! Privacy button is top-right →
         </div>
         
         <div class="dashboard-content">
             <h2 class="dashboard-title">Financial Dashboard</h2>
             
-            <!-- Financial Summary with amounts marked for privacy -->
+            <!-- Financial Summary with ALL amounts marked for privacy -->
             <div class="financial-summary">
                 <div class="summary-card">
                     <h3>Total Balance</h3>
@@ -446,7 +473,7 @@
 
     <!-- Demo Badge -->
     <div id="demoBadge" class="demo-badge">
-        👀 Demo Mode - Financials Hidden
+        👀 DEMO MODE - Financials Hidden
     </div>
 
     <!-- PWA Install Button -->
@@ -458,104 +485,206 @@
     </button>
 
     <script>
-        // ===== MAIN APP FUNCTIONALITY =====
+        // ===== GLOBAL STATE =====
+        let isLoggedIn = false;
+        let isPrivate = false;
+        let privacyButton = null;
+        let demoBadge = null;
+
+        // ===== INITIALIZE APP =====
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 FinanceOS Starting...');
+            
+            // Get elements
+            privacyButton = document.getElementById('privacyToggle');
+            demoBadge = document.getElementById('demoBadge');
+            
+            // Load privacy state from localStorage
+            isPrivate = localStorage.getItem('financeOS_privacy') === 'true';
+            
+            // Initialize privacy button
+            if (privacyButton) {
+                console.log('✅ Privacy button found');
+                initializePrivacyButton();
+            } else {
+                console.error('❌ Privacy button NOT found');
+            }
+            
+            // Initialize PWA
+            initializePWA();
+            
+            console.log('✅ FinanceOS Ready');
+            console.log('🔐 Privacy state:', isPrivate ? 'HIDDEN' : 'VISIBLE');
+        });
+
+        // ===== LOGIN/LOGOUT FUNCTIONS =====
         function login() {
+            console.log('🔑 Logging in...');
+            
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('dashboard').classList.add('active');
             document.getElementById('successMsg').classList.add('show');
+            
+            isLoggedIn = true;
+            
+            // Apply privacy state if needed
             setTimeout(function() {
+                applyPrivacyState();
                 document.getElementById('successMsg').classList.remove('show');
             }, 3000);
+            
+            console.log('✅ Logged in successfully');
         }
         
         function logout() {
+            console.log('🚪 Logging out...');
+            
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('dashboard').classList.remove('active');
             document.getElementById('successMsg').classList.remove('show');
+            
+            isLoggedIn = false;
+            
+            // Hide demo badge
+            if (demoBadge) {
+                demoBadge.classList.remove('show');
+            }
+            
+            console.log('✅ Logged out successfully');
         }
 
-        // ===== SUPER SIMPLE PRIVACY MODE =====
-        var isPrivate = localStorage.getItem('privacy') === 'true';
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            var btn = document.getElementById('privacyToggle');
-            var badge = document.getElementById('demoBadge');
+        // ===== BULLETPROOF PRIVACY SYSTEM =====
+        function initializePrivacyButton() {
+            if (!privacyButton) return;
             
-            if (btn) {
-                btn.addEventListener('click', function() {
-                    isPrivate = !isPrivate;
-                    localStorage.setItem('privacy', isPrivate);
-                    
-                    var financials = document.querySelectorAll('.financial-amount');
-                    
-                    if (isPrivate) {
-                        // Hide all financial amounts
-                        financials.forEach(function(el) {
-                            el.classList.add('hidden');
-                        });
-                        btn.innerHTML = '🔐 SHOW $';
-                        btn.classList.add('active');
-                        badge.classList.add('show');
-                    } else {
-                        // Show all financial amounts  
-                        financials.forEach(function(el) {
-                            el.classList.remove('hidden');
-                        });
-                        btn.innerHTML = '🔐 HIDE $';
-                        btn.classList.remove('active');
-                        badge.classList.remove('show');
-                    }
-                    
-                    console.log('Privacy toggled:', isPrivate ? 'HIDDEN' : 'VISIBLE');
-                });
-                
-                // Set initial state
+            // Remove any existing listeners
+            privacyButton.removeEventListener('click', togglePrivacy);
+            
+            // Add click listener
+            privacyButton.addEventListener('click', togglePrivacy);
+            
+            // Set initial button state
+            updatePrivacyButtonText();
+            
+            console.log('🔐 Privacy button initialized');
+        }
+
+        function togglePrivacy() {
+            console.log('🔐 Privacy toggle clicked');
+            
+            isPrivate = !isPrivate;
+            localStorage.setItem('financeOS_privacy', isPrivate.toString());
+            
+            applyPrivacyState();
+            updatePrivacyButtonText();
+            
+            console.log('🔐 Privacy toggled to:', isPrivate ? 'HIDDEN' : 'VISIBLE');
+        }
+
+        function updatePrivacyButtonText() {
+            if (!privacyButton) return;
+            
+            if (isPrivate) {
+                privacyButton.innerHTML = '👁️ SHOW MONEY';
+                privacyButton.classList.add('active');
+            } else {
+                privacyButton.innerHTML = '🔐 HIDE MONEY';
+                privacyButton.classList.remove('active');
+            }
+        }
+
+        function applyPrivacyState() {
+            const financialAmounts = document.querySelectorAll('.financial-amount');
+            
+            console.log(`🔐 Applying privacy to ${financialAmounts.length} financial amounts`);
+            
+            financialAmounts.forEach(function(element) {
                 if (isPrivate) {
-                    btn.click();
-                }
-                
-                console.log('✅ Privacy button ready!');
-            }
-        });
-
-        // ===== PWA FUNCTIONALITY =====
-        var installButton = document.getElementById('installBtn');
-        var deferredPrompt = null;
-
-        // Show install button after delay
-        setTimeout(function() {
-            if (installButton) {
-                installButton.classList.add('show');
-                console.log('📱 Install button shown');
-            }
-        }, 3000);
-
-        // Install prompt handling
-        window.addEventListener('beforeinstallprompt', function(e) {
-            e.preventDefault();
-            deferredPrompt = e;
-            console.log('🎯 Install prompt ready');
-        });
-
-        if (installButton) {
-            installButton.addEventListener('click', function() {
-                if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                    deferredPrompt.userChoice.then(function(choiceResult) {
-                        console.log('Install result:', choiceResult.outcome);
-                        if (choiceResult.outcome === 'accepted') {
-                            installButton.classList.add('hidden');
-                        }
-                        deferredPrompt = null;
-                    });
+                    element.classList.add('hidden');
                 } else {
-                    alert('To install: Use your browser menu → "Install app" or "Add to Home Screen"');
+                    element.classList.remove('hidden');
                 }
             });
+            
+            // Show/hide demo badge
+            if (demoBadge) {
+                if (isPrivate && isLoggedIn) {
+                    demoBadge.classList.add('show');
+                } else {
+                    demoBadge.classList.remove('show');
+                }
+            }
+            
+            console.log('✅ Privacy state applied');
         }
 
-        console.log('🚀 FinanceOS Ready');
-        console.log('🔐 Look for RED privacy button top-right after login!');
+        // ===== PWA FUNCTIONALITY =====
+        function initializePWA() {
+            const installButton = document.getElementById('installBtn');
+            let deferredPrompt = null;
+
+            // Show install button after delay
+            setTimeout(function() {
+                if (installButton) {
+                    installButton.classList.add('show');
+                    console.log('📱 Install button shown');
+                }
+            }, 5000);
+
+            // Listen for install prompt
+            window.addEventListener('beforeinstallprompt', function(e) {
+                e.preventDefault();
+                deferredPrompt = e;
+                console.log('📱 Install prompt available');
+            });
+
+            // Handle install button click
+            if (installButton) {
+                installButton.addEventListener('click', function() {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        deferredPrompt.userChoice.then(function(choiceResult) {
+                            console.log('📱 Install result:', choiceResult.outcome);
+                            if (choiceResult.outcome === 'accepted') {
+                                installButton.classList.add('hidden');
+                            }
+                            deferredPrompt = null;
+                        });
+                    } else {
+                        alert('To install FinanceOS:\n\n1. Open browser menu (⋮)\n2. Select "Install app" or "Add to Home Screen"\n3. Confirm installation');
+                    }
+                });
+            }
+
+            // Register service worker
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('sw.js')
+                        .then(function(registration) {
+                            console.log('📱 Service Worker registered');
+                        })
+                        .catch(function(registrationError) {
+                            console.log('📱 Service Worker registration failed:', registrationError);
+                        });
+                });
+            }
+        }
+
+        // ===== DEBUG FUNCTIONS =====
+        function debugPrivacy() {
+            console.log('=== PRIVACY DEBUG ===');
+            console.log('isPrivate:', isPrivate);
+            console.log('isLoggedIn:', isLoggedIn);
+            console.log('privacyButton:', privacyButton);
+            console.log('demoBadge:', demoBadge);
+            console.log('Financial amounts found:', document.querySelectorAll('.financial-amount').length);
+            console.log('localStorage privacy:', localStorage.getItem('financeOS_privacy'));
+        }
+
+        // Make debug function available globally
+        window.debugPrivacy = debugPrivacy;
+
+        console.log('🎯 To debug privacy, type: debugPrivacy()');
     </script>
 </body>
 </html>
