@@ -360,8 +360,8 @@
             <div class="upload-zone" id="uploadZone">
                 <div class="upload-icon">📁</div>
                 <div class="upload-text">Drop CSV files here or click to browse</div>
-                <div class="upload-hint">Supports all major NZ bank formats (ANZ, ASB, BNZ, Westpac, KiwiSaver)</div>
-                <input type="file" id="fileInput" accept=".csv" multiple>
+                <div class="upload-hint">Select any file type - we'll validate CSV files after selection</div>
+                <input type="file" id="fileInput" multiple>
             </div>
 
             <div class="file-info" id="fileInfo">
@@ -473,10 +473,15 @@
 
         function handleFiles(files) {
             hideMessages();
-            currentFiles = Array.from(files).filter(file => file.name.endsWith('.csv'));
+            currentFiles = Array.from(files).filter(file => 
+                file.name.toLowerCase().endsWith('.csv') || 
+                file.type === 'text/csv' || 
+                file.type === 'application/csv' ||
+                file.type === 'text/plain'
+            );
             
             if (currentFiles.length === 0) {
-                showError('Please select valid CSV files.');
+                showError('Please select valid CSV or text files. Selected files: ' + Array.from(files).map(f => f.name).join(', '));
                 return;
             }
 
