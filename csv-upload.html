@@ -1,172 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinanceOS - CSV Upload</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FinanceOS - Upload Bank Statements</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FinanceOS">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#8b5cf6">
+    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
             min-height: 100vh;
             color: white;
-            overflow-x: hidden;
-        }
-
-        /* Glass effect utility classes */
-        .glass {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
-        .glass-premium {
-            background: linear-gradient(135deg, 
-                rgba(139, 92, 246, 0.15) 0%, 
-                rgba(59, 130, 246, 0.15) 50%, 
-                rgba(147, 51, 234, 0.15) 100%);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-        }
-
-        /* Gradient utility classes */
-        .gradient-purple {
-            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
-        }
-
-        .gradient-green {
-            background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
-        }
-
-        .gradient-red {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
-        }
-
-        .gradient-blue {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
-        }
-
-        .gradient-orange {
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%);
         }
 
         /* Header */
         .header {
-            padding: 1rem;
-            text-align: center;
-            margin-bottom: 2rem;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 20px;
         }
-
-        .logo {
-            width: 60px;
-            height: 60px;
-            margin: 0 auto 1rem;
-            border-radius: 15px;
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header-logo {
+            display: flex;
+            align-items: center;
+        }
+        .header-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-right: 12px;
+        }
+        .header-title {
+            color: white;
             font-size: 24px;
             font-weight: bold;
-            color: white;
+            margin: 0;
+        }
+        .back-btn {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .header h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .header p {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
-        }
-
-        /* Container */
-        .container {
-            padding: 0 1rem;
+        /* Main Content */
+        .main-content {
+            padding: 40px 20px;
             max-width: 1200px;
             margin: 0 auto;
         }
 
-        /* Upload Zone */
-        .upload-zone {
-            border: 2px dashed rgba(139, 92, 246, 0.5);
-            border-radius: 20px;
-            padding: 3rem 2rem;
+        .page-title {
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 16px;
             text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            margin-bottom: 2rem;
         }
 
-        .upload-zone:hover,
-        .upload-zone.dragover {
+        .page-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .upload-zone {
+            border: 3px dashed rgba(139, 92, 246, 0.5);
+            border-radius: 16px;
+            padding: 60px 40px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .upload-zone:hover {
             border-color: rgba(139, 92, 246, 0.8);
             background: rgba(139, 92, 246, 0.1);
             transform: translateY(-2px);
         }
 
+        .upload-zone.dragover {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
         .upload-icon {
-            width: 60px;
-            height: 60px;
-            margin: 0 auto 1rem;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-size: 64px;
+            margin-bottom: 20px;
+            color: rgba(139, 92, 246, 0.8);
+        }
+
+        .upload-text {
             font-size: 24px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 12px;
         }
 
-        .upload-text h3 {
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .upload-text p {
+        .upload-subtext {
+            font-size: 16px;
             color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 1rem;
+            margin-bottom: 24px;
         }
 
-        .supported-banks {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            justify-content: center;
-            margin-top: 1rem;
-        }
-
-        .bank-tag {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        /* File Input */
-        #fileInput {
+        .file-input {
             display: none;
         }
 
-        /* Upload Button */
         .upload-btn {
-            padding: 0.75rem 2rem;
+            background: linear-gradient(135deg, #8b5cf6, #9333ea);
+            color: white;
             border: none;
             border-radius: 12px;
-            font-size: 1rem;
+            padding: 16px 32px;
+            font-size: 16px;
             font-weight: 600;
-            color: white;
             cursor: pointer;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
             transition: all 0.3s ease;
-            margin-top: 1rem;
         }
 
         .upload-btn:hover {
@@ -174,686 +165,626 @@
             box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
         }
 
-        /* Processing indicator */
-        .processing {
-            display: none;
-            text-align: center;
-            padding: 2rem;
+        /* Bank Format Guide */
+        .bank-guide {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
         }
 
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(139, 92, 246, 0.3);
-            border-top: 3px solid #8b5cf6;
+        .bank-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .bank-logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #10b981, #059669);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .bank-name {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .bank-format {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        /* Processing Section */
+        .processing-section {
+            display: none;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.15) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .processing-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            animation: spin 2s linear infinite;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .processing-text {
+            font-size: 20px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .processing-subtext {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
         }
 
         /* Results Section */
-        .results {
+        .results-section {
             display: none;
-            margin-top: 2rem;
         }
 
-        .summary-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .summary-card {
-            padding: 1.5rem;
-            border-radius: 16px;
+        .results-header {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.15) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
             text-align: center;
         }
 
-        .summary-card h3 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
+        .success-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
         }
 
-        .summary-card p {
+        .results-title {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .results-summary {
             color: rgba(255, 255, 255, 0.8);
-            font-size: 0.9rem;
+            font-size: 16px;
         }
 
-        /* Transactions Table */
-        .transactions-container {
+        /* Transaction List */
+        .transaction-list {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 20px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
+            padding: 30px;
+            margin-bottom: 30px;
         }
 
-        .transactions-header {
+        .transaction-header {
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
         }
 
-        .transactions-header h3 {
-            font-size: 1.3rem;
-            font-weight: 600;
+        .transaction-count {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
         }
 
-        .filter-buttons {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            padding: 0.5rem 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            background: transparent;
-            color: white;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .filter-btn.active {
-            background: rgba(139, 92, 246, 0.5);
-            border-color: rgba(139, 92, 246, 0.8);
-        }
-
-        .transactions-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-
-        .transactions-table th,
-        .transactions-table td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .transactions-table th {
-            color: rgba(255, 255, 255, 0.8);
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .amount-positive {
-            color: #10b981;
-            font-weight: 600;
-        }
-
-        .amount-negative {
-            color: #ef4444;
-            font-weight: 600;
-        }
-
-        .category-tag {
-            padding: 0.25rem 0.75rem;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .category-food { background: rgba(249, 115, 22, 0.2); color: #fb923c; }
-        .category-transport { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
-        .category-shopping { background: rgba(236, 72, 153, 0.2); color: #f472b6; }
-        .category-bills { background: rgba(239, 68, 68, 0.2); color: #f87171; }
-        .category-income { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-        .category-other { background: rgba(107, 114, 128, 0.2); color: #9ca3af; }
-
-        /* Charts */
-        .charts-container {
+        .transaction-item {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
+            grid-template-columns: 1fr auto auto;
+            gap: 16px;
+            padding: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            align-items: center;
         }
 
-        .chart-card {
-            padding: 1.5rem;
-            border-radius: 20px;
+        .transaction-item:last-child {
+            border-bottom: none;
         }
 
-        .chart-title {
-            font-size: 1.2rem;
+        .transaction-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .transaction-merchant {
+            color: white;
             font-weight: 600;
-            margin-bottom: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .transaction-meta {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+        }
+
+        .transaction-category {
+            background: linear-gradient(135deg, #8b5cf6, #9333ea);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
             text-align: center;
+            white-space: nowrap;
         }
 
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 0 0.75rem;
-            }
-            
-            .upload-zone {
-                padding: 2rem 1rem;
-            }
-            
-            .transactions-table {
-                font-size: 0.8rem;
-            }
-            
-            .transactions-table th,
-            .transactions-table td {
-                padding: 0.5rem;
-            }
-            
-            .summary-cards {
-                grid-template-columns: 1fr;
-            }
-            
-            .filter-buttons {
-                justify-content: center;
-            }
+        .transaction-amount {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: right;
         }
 
-        /* Action buttons */
+        .amount-positive { color: #10b981; }
+        .amount-negative { color: #ef4444; }
+
+        /* Action Buttons */
         .action-buttons {
             display: flex;
-            gap: 1rem;
+            gap: 16px;
             justify-content: center;
-            margin-top: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .action-btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
         }
 
         .btn-primary {
             background: linear-gradient(135deg, #8b5cf6, #9333ea);
             color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+            transition: all 0.3s ease;
         }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
             color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Success message styling */
-        .success-message {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.2) 100%);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: #34d399;
-            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 12px;
-            margin-bottom: 1rem;
-            text-align: center;
-            font-weight: 500;
+            padding: 16px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        /* Critical financial alert */
-        .critical-alert {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.2) 100%);
-            border: 2px solid rgba(239, 68, 68, 0.4);
-            color: #f87171;
-            padding: 1.5rem;
-            border-radius: 16px;
-            margin-bottom: 2rem;
-            animation: pulse-alert 3s infinite;
+        .btn-primary:hover, .btn-secondary:hover {
+            transform: translateY(-2px);
         }
 
-        @keyframes pulse-alert {
-            0%, 100% { border-color: rgba(239, 68, 68, 0.4); }
-            50% { border-color: rgba(239, 68, 68, 0.7); }
+        /* Privacy Toggle */
+        .privacy-toggle {
+            position: fixed !important;
+            top: 80px !important;
+            right: 20px !important;
+            background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+            color: white !important;
+            border: 3px solid #fbbf24 !important;
+            border-radius: 16px !important;
+            padding: 12px 20px !important;
+            font-size: 14px !important;
+            font-weight: 700 !important;
+            cursor: pointer !important;
+            z-index: 100000 !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.6) !important;
+            transition: all 0.3s ease !important;
         }
 
-        .critical-alert h3 {
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
-            color: #ef4444;
+        .privacy-toggle.active {
+            background: linear-gradient(135deg, #10b981, #059669) !important;
+            border-color: #84cc16 !important;
         }
 
-        .critical-alert p {
-            line-height: 1.5;
-            margin-bottom: 0.5rem;
+        .financial-amount {
+            transition: all 0.3s ease !important;
+            position: relative !important;
+            display: inline-block !important;
+        }
+
+        .financial-amount.hidden {
+            color: transparent !important;
+            user-select: none !important;
+        }
+
+        .financial-amount.hidden::after {
+            content: "••••••" !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            color: rgba(255, 255, 255, 0.7) !important;
+            font-weight: bold !important;
+            z-index: 2 !important;
+        }
+
+        @media (max-width: 768px) {
+            .main-content { padding: 20px; }
+            .page-title { font-size: 24px; }
+            .upload-section { padding: 24px; }
+            .upload-zone { padding: 40px 20px; }
+            .bank-guide { grid-template-columns: 1fr; }
+            .transaction-item { grid-template-columns: 1fr; gap: 8px; }
+            .action-buttons { flex-direction: column; }
+            .privacy-toggle {
+                top: 70px !important;
+                right: 16px !important;
+                padding: 10px 16px !important;
+                font-size: 13px !important;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Privacy Toggle -->
+    <button id="privacyToggle" class="privacy-toggle">
+        🔐 HIDE MONEY
+    </button>
+
     <!-- Header -->
     <div class="header">
-        <div class="logo gradient-green">$</div>
-        <h1>CSV Upload</h1>
-        <p>Import your bank statements and get instant insights</p>
+        <div class="header-content">
+            <div class="header-logo">
+                <div class="header-icon">
+                    <span style="color: white; font-size: 20px; font-weight: bold;">$</span>
+                </div>
+                <h1 class="header-title">FinanceOS</h1>
+            </div>
+            <a href="index.html" class="back-btn">
+                ← Back to Dashboard
+            </a>
+        </div>
     </div>
 
-    <div class="container">
-        <!-- Critical Financial Alert -->
-        <div class="critical-alert glass" id="criticalAlert" style="display: none;">
-            <h3>⚠️ Financial Health Alert</h3>
-            <p id="alertMessage">Based on your financial data, we've identified areas that need immediate attention:</p>
-            <ul id="alertList" style="margin-top: 1rem; padding-left: 1.5rem;">
-                <!-- Alert items will be populated by JavaScript -->
-            </ul>
-        </div>
+    <!-- Main Content -->
+    <div class="main-content">
+        <h1 class="page-title">Upload Bank Statements</h1>
+        <p class="page-subtitle">Import your CSV files to automatically categorize transactions and track spending</p>
 
-        <!-- Upload Zone -->
-        <div class="upload-zone glass-premium" id="uploadZone">
-            <div class="upload-icon gradient-purple">📄</div>
-            <div class="upload-text">
-                <h3>Upload Your Bank Statements</h3>
-                <p>Drag and drop your CSV files here, or click to browse</p>
-                <button class="upload-btn gradient-purple" onclick="document.getElementById('fileInput').click()">
-                    Choose Files
-                </button>
-            </div>
-            <div class="supported-banks">
-                <span class="bank-tag">ANZ</span>
-                <span class="bank-tag">ASB</span>
-                <span class="bank-tag">BNZ</span>
-                <span class="bank-tag">Kiwibank</span>
-                <span class="bank-tag">Westpac</span>
+        <!-- Upload Section -->
+        <div id="uploadSection" class="upload-section">
+            <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">📤</div>
+                <div class="upload-text">Drop CSV files here</div>
+                <div class="upload-subtext">or click to browse and select files</div>
+                <input type="file" id="fileInput" class="file-input" multiple accept=".csv,.xls,.xlsx" />
+                <button class="upload-btn">Choose Files</button>
             </div>
         </div>
 
-        <input type="file" id="fileInput" accept=".csv,.xls,.xlsx" multiple>
+        <!-- Bank Format Guide -->
+        <div class="bank-guide">
+            <div class="bank-card">
+                <div class="bank-logo">ANZ</div>
+                <div class="bank-name">ANZ Bank</div>
+                <div class="bank-format">Date, Amount, Description, Balance</div>
+            </div>
+            <div class="bank-card">
+                <div class="bank-logo">ASB</div>
+                <div class="bank-name">ASB Bank</div>
+                <div class="bank-format">Date, Unique Id, Tran Type, Payee, Memo, Amount</div>
+            </div>
+            <div class="bank-card">
+                <div class="bank-logo">BNZ</div>
+                <div class="bank-name">BNZ Bank</div>
+                <div class="bank-format">Date, Amount, Payee, Description, Reference</div>
+            </div>
+            <div class="bank-card">
+                <div class="bank-logo">KIW</div>
+                <div class="bank-name">Kiwibank</div>
+                <div class="bank-format">Date, Memo/Description, Amount, Balance</div>
+            </div>
+            <div class="bank-card">
+                <div class="bank-logo">WBC</div>
+                <div class="bank-name">Westpac</div>
+                <div class="bank-format">Date, Amount, Other Party, Description</div>
+            </div>
+        </div>
 
-        <!-- Processing Indicator -->
-        <div class="processing glass" id="processing">
-            <div class="spinner"></div>
-            <h3>Processing Your Data...</h3>
-            <p>Analyzing transactions and categorizing spending</p>
+        <!-- Processing Section -->
+        <div id="processingSection" class="processing-section">
+            <div class="processing-icon">🤖</div>
+            <div class="processing-text">AI Processing Your Transactions</div>
+            <div class="processing-subtext">Analyzing patterns, categorizing expenses, and detecting insights...</div>
         </div>
 
         <!-- Results Section -->
-        <div class="results" id="results">
-            <!-- Summary Cards -->
-            <div class="summary-cards">
-                <div class="summary-card glass-premium">
-                    <h3 id="totalTransactions">0</h3>
-                    <p>Transactions Processed</p>
-                </div>
-                <div class="summary-card glass gradient-green">
-                    <h3 id="totalIncome">$0</h3>
-                    <p>Total Income</p>
-                </div>
-                <div class="summary-card glass gradient-red">
-                    <h3 id="totalExpenses">$0</h3>
-                    <p>Total Expenses</p>
-                </div>
-                <div class="summary-card glass gradient-purple">
-                    <h3 id="netAmount">$0</h3>
-                    <p>Net Amount</p>
+        <div id="resultsSection" class="results-section">
+            <div class="results-header">
+                <div class="success-icon">✅</div>
+                <div class="results-title">Processing Complete!</div>
+                <div class="results-summary">
+                    Found <span id="transactionCount">0</span> transactions • 
+                    <span id="categoryCount">0</span> categories • 
+                    Total: <span class="financial-amount" id="totalAmount">$0.00</span>
                 </div>
             </div>
 
-            <!-- Transactions Table -->
-            <div class="transactions-container glass-premium">
-                <div class="transactions-header">
-                    <h3>Recent Transactions</h3>
-                    <div class="filter-buttons">
-                        <button class="filter-btn active" data-filter="all">All</button>
-                        <button class="filter-btn" data-filter="income">Income</button>
-                        <button class="filter-btn" data-filter="expenses">Expenses</button>
-                        <button class="filter-btn" data-filter="food">Food</button>
-                        <button class="filter-btn" data-filter="transport">Transport</button>
-                        <button class="filter-btn" data-filter="bills">Bills</button>
-                    </div>
+            <!-- Transaction List -->
+            <div class="transaction-list">
+                <div class="transaction-header">
+                    <span>Recent Transactions</span>
+                    <span class="transaction-count">AI Categorized</span>
                 </div>
-                
-                <div style="overflow-x: auto;">
-                    <table class="transactions-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Description</th>
-                                <th>Category</th>
-                                <th>Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody id="transactionsBody">
-                            <!-- Transactions will be populated here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Category Breakdown -->
-            <div class="charts-container">
-                <div class="chart-card glass-premium">
-                    <div class="chart-title">Spending by Category</div>
-                    <div id="categoryChart">
-                        <!-- Category breakdown will go here -->
-                    </div>
-                </div>
-                
-                <div class="chart-card glass-premium">
-                    <div class="chart-title">Financial Health Insights</div>
-                    <div id="insightsChart">
-                        <!-- Financial insights will go here -->
-                    </div>
+                <div id="transactionContainer">
+                    <!-- Transactions will be inserted here -->
                 </div>
             </div>
 
             <!-- Action Buttons -->
             <div class="action-buttons">
-                <button class="action-btn btn-primary" onclick="generateBudget()">
-                    📊 Generate Budget
-                </button>
-                <button class="action-btn btn-primary" onclick="setGoals()">
-                    🎯 Set Financial Goals
-                </button>
-                <button class="action-btn btn-secondary" onclick="exportData()">
-                    📤 Export Analysis
-                </button>
-                <button class="action-btn btn-secondary" onclick="backToDashboard()">
-                    ← Back to Dashboard
-                </button>
+                <button class="btn-primary" onclick="saveTransactions()">Save to FinanceOS</button>
+                <button class="btn-secondary" onclick="resetUpload()">Upload More Files</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Global variables
+        // ===== GLOBAL STATE =====
         let processedTransactions = [];
-        let currentFilter = 'all';
+        let isPrivate = localStorage.getItem('financeOS_privacy') === 'true';
 
-        // Bank format detection patterns
-        const bankFormats = {
-            ANZ: ['Date', 'Amount', 'Description', 'Balance'],
-            ASB: ['Date', 'Unique Id', 'Tran Type', 'Cheque Number', 'Payee', 'Memo', 'Amount'],
-            BNZ: ['Date', 'Amount', 'Payee', 'Description', 'Reference', 'Transaction Type'],
-            KIWIBANK: ['Date', 'Memo/Description', 'Amount', 'Balance'],
-            WESTPAC: ['Date', 'Amount', 'Other Party', 'Description', 'Reference', 'Particulars', 'Code', 'Reference', 'Balance']
-        };
-
-        // Enhanced categorization rules for NZ spending patterns
-        const categoryRules = {
-            'Food & Dining': [
-                'countdown', 'new world', 'paknsave', 'four square', 'fresh choice',
-                'restaurant', 'cafe', 'mcdonald', 'kfc', 'subway', 'pizza', 'dominos',
-                'uber eats', 'menulog', 'food', 'dining', 'bakery', 'butcher', 
-                'supermarket', 'grocery', 'takeaway', 'fish chips', 'sushi'
-            ],
-            'Transport': [
-                'fuel', 'petrol', 'bp', 'z energy', 'mobil', 'caltex', 'gull',
-                'parking', 'uber', 'taxi', 'bus', 'train', 'metlink', 'at hop',
-                'vehicle', 'car', 'rego', 'wof', 'aa', 'vtnz', 'mechanic'
-            ],
-            'Shopping': [
-                'warehouse', 'kmart', 'target', 'farmers', 'department', 'clothing',
-                'shoes', 'briscoes', 'harvey norman', 'noel leeming', 'jb hi-fi',
-                'shopping', 'retail', 'mall', 'store', 'online'
-            ],
-            'Bills & Utilities': [
-                'power', 'electricity', 'gas', 'water', 'contact energy', 'genesis',
-                'mercury', 'trustpower', 'internet', 'vodafone', 'spark', '2degrees',
-                'sky', 'netflix', 'spotify', 'phone', 'mobile', 'broadband',
-                'insurance', 'rates', 'council', 'auckland council', 'wellington city'
-            ],
-            'Income': [
-                'salary', 'wage', 'pay', 'income', 'transfer in', 'deposit',
-                'ird', 'working for families', 'accommodation supplement',
-                'kiwisaver', 'dividend', 'interest earned'
-            ],
-            'Banking & Fees': [
-                'fee', 'interest', 'bank', 'atm', 'overdraft', 'anz', 'asb', 
-                'bnz', 'kiwibank', 'westpac', 'service charge', 'monthly fee'
-            ],
-            'Health & Medical': [
-                'pharmacy', 'chemist', 'doctor', 'medical', 'hospital', 'dentist',
-                'unichem', 'life pharmacy', 'dis-chem', 'health', 'clinic'
-            ],
-            'Entertainment': [
-                'cinema', 'movie', 'hoyts', 'event', 'reading', 'berkley',
-                'gym', 'fitness', 'sports', 'recreation', 'games', 'hobby'
-            ],
-            'Education': [
-                'school', 'university', 'course', 'education', 'learning',
-                'books', 'stationery', 'fees', 'tuition'
-            ]
-        };
-
-        // Financial health analysis criteria
-        const financialHealthChecks = {
-            emergencyFund: {
-                threshold: 3000, // 3 months of basic expenses for NZ
-                message: "Emergency fund below $3,000 - you're at high financial risk"
+        // ===== CSV PROCESSING ENGINE =====
+        const BankFormats = {
+            ANZ: {
+                columns: ['Date', 'Amount', 'Description', 'Balance'],
+                dateCol: 'Date',
+                amountCol: 'Amount', 
+                descCol: 'Description'
             },
-            savingsRate: {
-                threshold: 0.1, // 10% savings rate
-                message: "Savings rate below 10% - consider increasing your emergency fund contributions"
+            ASB: {
+                columns: ['Date', 'Unique Id', 'Tran Type', 'Cheque Number', 'Payee', 'Memo', 'Amount'],
+                dateCol: 'Date',
+                amountCol: 'Amount',
+                descCol: 'Payee'
             },
-            debtToIncome: {
-                threshold: 0.3, // 30% debt to income ratio
-                message: "Debt payments exceed 30% of income - focus on debt reduction"
+            BNZ: {
+                columns: ['Date', 'Amount', 'Payee', 'Description', 'Reference', 'Transaction Type'],
+                dateCol: 'Date',
+                amountCol: 'Amount',
+                descCol: 'Payee'
+            },
+            KIWIBANK: {
+                columns: ['Date', 'Memo/Description', 'Amount', 'Balance'],
+                dateCol: 'Date',
+                amountCol: 'Amount',
+                descCol: 'Memo/Description'
+            },
+            WESTPAC: {
+                columns: ['Date', 'Amount', 'Other Party', 'Description', 'Reference', 'Particulars'],
+                dateCol: 'Date',
+                amountCol: 'Amount',
+                descCol: 'Other Party'
             }
         };
 
-        // Initialize drag and drop functionality
+        // AI Categorization Rules
+        const CategoryRules = {
+            'Groceries': ['countdown', 'pak n save', 'new world', 'four square', 'supermarket', 'woolworths'],
+            'Dining Out': ['restaurant', 'cafe', 'mcdonald', 'kfc', 'burger', 'pizza', 'uber eats', 'delivereasy'],
+            'Fuel': ['bp', 'z energy', 'mobil', 'caltex', 'gull', 'fuel', 'petrol', 'gas station'],
+            'Shopping': ['kmart', 'warehouse', 'briscoes', 'harvey norman', 'jb hi-fi', 'rebel sport', 'amazon'],
+            'Utilities': ['contact energy', 'mercury energy', 'genesis energy', 'trustpower', 'spark', 'vodafone'],
+            'Banking': ['bank fee', 'interest', 'loan payment', 'mortgage', 'insurance'],
+            'Entertainment': ['cinema', 'sky', 'netflix', 'spotify', 'gym', 'fitness'],
+            'Medical': ['pharmacy', 'doctor', 'hospital', 'dentist', 'medical centre'],
+            'Transport': ['uber', 'taxi', 'bus', 'train', 'parking', 'rego', 'wof'],
+            'Income': ['salary', 'wages', 'refund', 'dividend', 'interest earned']
+        };
+
+        // ===== INITIALIZATION =====
         document.addEventListener('DOMContentLoaded', function() {
-            const uploadZone = document.getElementById('uploadZone');
-            const fileInput = document.getElementById('fileInput');
-
-            // Prevent default drag behaviors
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                uploadZone.addEventListener(eventName, preventDefaults, false);
-                document.body.addEventListener(eventName, preventDefaults, false);
-            });
-
-            // Highlight drop area when item is dragged over it
-            ['dragenter', 'dragover'].forEach(eventName => {
-                uploadZone.addEventListener(eventName, highlight, false);
-            });
-
-            ['dragleave', 'drop'].forEach(eventName => {
-                uploadZone.addEventListener(eventName, unhighlight, false);
-            });
-
-            // Handle dropped files
-            uploadZone.addEventListener('drop', handleDrop, false);
-
-            // Handle file input change
-            fileInput.addEventListener('change', function(e) {
-                handleFiles(e.target.files);
-            });
-
-            // Filter button handling
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    currentFilter = this.dataset.filter;
-                    filterTransactions();
-                });
-            });
+            initializePrivacyToggle();
+            initializeUpload();
+            console.log('📊 CSV Upload System Ready');
         });
 
-        function preventDefaults(e) {
+        // ===== PRIVACY FUNCTIONALITY =====
+        function initializePrivacyToggle() {
+            const privacyButton = document.getElementById('privacyToggle');
+            if (!privacyButton) return;
+
+            privacyButton.addEventListener('click', togglePrivacy);
+            updatePrivacyButtonText();
+            applyPrivacyState();
+        }
+
+        function togglePrivacy() {
+            isPrivate = !isPrivate;
+            localStorage.setItem('financeOS_privacy', isPrivate.toString());
+            applyPrivacyState();
+            updatePrivacyButtonText();
+        }
+
+        function updatePrivacyButtonText() {
+            const privacyButton = document.getElementById('privacyToggle');
+            if (!privacyButton) return;
+
+            if (isPrivate) {
+                privacyButton.innerHTML = '👁️ SHOW MONEY';
+                privacyButton.classList.add('active');
+            } else {
+                privacyButton.innerHTML = '🔐 HIDE MONEY';
+                privacyButton.classList.remove('active');
+            }
+        }
+
+        function applyPrivacyState() {
+            const financialAmounts = document.querySelectorAll('.financial-amount');
+            financialAmounts.forEach(function(element) {
+                if (isPrivate) {
+                    element.classList.add('hidden');
+                } else {
+                    element.classList.remove('hidden');
+                }
+            });
+        }
+
+        // ===== FILE UPLOAD HANDLING =====
+        function initializeUpload() {
+            const uploadZone = document.querySelector('.upload-zone');
+            const fileInput = document.getElementById('fileInput');
+
+            // Drag and drop events
+            uploadZone.addEventListener('dragover', handleDragOver);
+            uploadZone.addEventListener('dragleave', handleDragLeave);
+            uploadZone.addEventListener('drop', handleDrop);
+
+            // File input change
+            fileInput.addEventListener('change', handleFileSelect);
+        }
+
+        function handleDragOver(e) {
             e.preventDefault();
-            e.stopPropagation();
+            e.currentTarget.classList.add('dragover');
         }
 
-        function highlight(e) {
-            document.getElementById('uploadZone').classList.add('dragover');
-        }
-
-        function unhighlight(e) {
-            document.getElementById('uploadZone').classList.remove('dragover');
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
         }
 
         function handleDrop(e) {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            handleFiles(files);
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            
+            const files = Array.from(e.dataTransfer.files);
+            processFiles(files);
         }
 
-        function handleFiles(files) {
+        function handleFileSelect(e) {
+            const files = Array.from(e.target.files);
+            processFiles(files);
+        }
+
+        // ===== FILE PROCESSING =====
+        async function processFiles(files) {
             if (files.length === 0) return;
 
-            // Show processing indicator
-            document.getElementById('processing').style.display = 'block';
-            document.getElementById('results').style.display = 'none';
-
-            // Process files
-            const filePromises = Array.from(files).map(file => processFile(file));
+            console.log(`📁 Processing ${files.length} files`);
             
-            Promise.all(filePromises).then(results => {
-                // Combine all transactions from all files
-                processedTransactions = results.flat();
-                
-                // Show results
-                displayResults();
-                
-                // Analyze financial health
-                analyzeFinancialHealth();
-                
-                // Hide processing indicator
-                setTimeout(() => {
-                    document.getElementById('processing').style.display = 'none';
-                    document.getElementById('results').style.display = 'block';
-                }, 1500);
-            }).catch(error => {
-                console.error('Error processing files:', error);
-                alert('Error processing files. Please check the format and try again.');
-                document.getElementById('processing').style.display = 'none';
-            });
+            // Show processing UI
+            document.getElementById('uploadSection').style.display = 'none';
+            document.getElementById('processingSection').style.display = 'block';
+
+            // Process each file
+            let allTransactions = [];
+            
+            for (const file of files) {
+                try {
+                    const transactions = await processCSVFile(file);
+                    allTransactions = allTransactions.concat(transactions);
+                    console.log(`✅ Processed ${file.name}: ${transactions.length} transactions`);
+                } catch (error) {
+                    console.error(`❌ Error processing ${file.name}:`, error);
+                }
+            }
+
+            // AI categorization
+            const categorizedTransactions = categorizeTransactions(allTransactions);
+            processedTransactions = categorizedTransactions;
+
+            // Show results
+            await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate AI processing time
+            showResults(categorizedTransactions);
         }
 
-        function processFile(file) {
+        function processCSVFile(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 
                 reader.onload = function(e) {
                     try {
                         const csv = e.target.result;
-                        const lines = csv.split('\n');
-                        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
-                        
-                        // Detect bank format
-                        const bankType = detectBankFormat(headers);
-                        console.log('Detected bank:', bankType);
-                        
-                        // Parse transactions
-                        const transactions = [];
-                        for (let i = 1; i < lines.length; i++) {
-                            if (lines[i].trim()) {
-                                const transaction = parseTransaction(lines[i], bankType, headers);
-                                if (transaction) {
-                                    transactions.push(transaction);
-                                }
-                            }
-                        }
-                        
+                        const transactions = parseCSV(csv, file.name);
                         resolve(transactions);
                     } catch (error) {
                         reject(error);
                     }
                 };
                 
-                reader.onerror = () => reject(new Error('File reading failed'));
+                reader.onerror = function() {
+                    reject(new Error('Failed to read file'));
+                };
+                
                 reader.readAsText(file);
             });
         }
 
-        function detectBankFormat(headers) {
-            // Enhanced detection based on common column names
-            if (headers.some(h => h.toLowerCase().includes('memo/description'))) return 'KIWIBANK';
-            if (headers.some(h => h.toLowerCase().includes('unique id'))) return 'ASB';
-            if (headers.some(h => h.toLowerCase().includes('other party'))) return 'WESTPAC';
-            if (headers.some(h => h.toLowerCase().includes('payee')) && 
-                headers.some(h => h.toLowerCase().includes('transaction type'))) return 'BNZ';
-            return 'ANZ'; // Default fallback
-        }
+        function parseCSV(csvText, filename) {
+            const lines = csvText.split('\n').filter(line => line.trim());
+            if (lines.length < 2) return [];
 
-        function parseTransaction(line, bankType, headers) {
-            const values = parseCSVLine(line);
-            if (values.length < 3) return null;
+            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+            console.log(`📋 CSV Headers for ${filename}:`, headers);
 
-            try {
-                let transaction = {};
+            // Detect bank format
+            const bankFormat = detectBankFormat(headers);
+            console.log(`🏦 Detected bank format: ${bankFormat}`);
 
-                switch (bankType) {
-                    case 'ANZ':
-                        transaction = {
-                            date: parseDate(values[0]),
-                            amount: parseFloat(values[1]) || 0,
-                            description: values[2] || '',
-                            balance: parseFloat(values[3]) || 0
-                        };
-                        break;
-                    case 'ASB':
-                        transaction = {
-                            date: parseDate(values[0]),
-                            amount: parseFloat(values[6]) || 0,
-                            description: (values[4] || '') + ' ' + (values[5] || ''),
-                            type: values[2] || ''
-                        };
-                        break;
-                    case 'KIWIBANK':
-                        transaction = {
-                            date: parseDate(values[0]),
-                            amount: parseFloat(values[2]) || 0,
-                            description: values[1] || '',
-                            balance: parseFloat(values[3]) || 0
-                        };
-                        break;
-                    case 'BNZ':
-                        transaction = {
-                            date: parseDate(values[0]),
-                            amount: parseFloat(values[1]) || 0,
-                            description: (values[2] || '') + ' ' + (values[3] || ''),
-                            type: values[5] || ''
-                        };
-                        break;
-                    case 'WESTPAC':
-                        transaction = {
-                            date: parseDate(values[0]),
-                            amount: parseFloat(values[1]) || 0,
-                            description: (values[2] || '') + ' ' + (values[3] || ''),
-                            balance: parseFloat(values[8]) || 0
-                        };
-                        break;
-                    default:
-                        transaction = {
-                            date: parseDate(values[0]),
-                            amount: parseFloat(values[1]) || 0,
-                            description: values[2] || '',
-                            balance: values[3] ? parseFloat(values[3]) : null
-                        };
+            const transactions = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                try {
+                    const values = parseCSVLine(lines[i]);
+                    if (values.length !== headers.length) continue;
+
+                    const transaction = {};
+                    headers.forEach((header, index) => {
+                        transaction[header] = values[index];
+                    });
+
+                    // Convert to standard format
+                    const standardTransaction = convertToStandardFormat(transaction, bankFormat);
+                    if (standardTransaction) {
+                        transactions.push(standardTransaction);
+                    }
+                } catch (error) {
+                    console.warn(`⚠️ Skipping line ${i + 1}:`, error.message);
                 }
-
-                // Add category
-                transaction.category = categorizeTransaction(transaction.description);
-                
-                // Format date for display
-                transaction.displayDate = formatDate(transaction.date);
-                
-                return transaction;
-            } catch (error) {
-                console.error('Error parsing transaction:', error);
-                return null;
             }
+
+            console.log(`✅ Parsed ${transactions.length} transactions from ${filename}`);
+            return transactions;
         }
 
         function parseCSVLine(line) {
-            const result = [];
+            const values = [];
             let current = '';
             let inQuotes = false;
             
@@ -863,30 +794,57 @@
                 if (char === '"') {
                     inQuotes = !inQuotes;
                 } else if (char === ',' && !inQuotes) {
-                    result.push(current.trim());
+                    values.push(current.trim().replace(/"/g, ''));
                     current = '';
                 } else {
                     current += char;
                 }
             }
             
-            result.push(current.trim());
-            return result.map(item => item.replace(/"/g, ''));
+            values.push(current.trim().replace(/"/g, ''));
+            return values;
+        }
+
+        function detectBankFormat(headers) {
+            const headerStr = headers.join(',').toLowerCase();
+            
+            if (headerStr.includes('unique id') && headerStr.includes('tran type')) return 'ASB';
+            if (headerStr.includes('other party') && headerStr.includes('particulars')) return 'WESTPAC';
+            if (headerStr.includes('memo/description')) return 'KIWIBANK';
+            if (headerStr.includes('payee') && headerStr.includes('reference')) return 'BNZ';
+            
+            return 'ANZ'; // Default fallback
+        }
+
+        function convertToStandardFormat(transaction, bankFormat) {
+            const format = BankFormats[bankFormat];
+            if (!format) return null;
+
+            const date = transaction[format.dateCol];
+            const amount = parseFloat(transaction[format.amountCol]?.replace(/[^-0-9.]/g, ''));
+            const description = transaction[format.descCol] || '';
+
+            if (!date || isNaN(amount) || !description) return null;
+
+            return {
+                date: parseDate(date),
+                amount: amount,
+                description: description.trim(),
+                raw: transaction,
+                bank: bankFormat
+            };
         }
 
         function parseDate(dateStr) {
-            // Handle various date formats common in NZ banks
-            const cleanDate = dateStr.replace(/"/g, '').trim();
-            
-            // Try different date formats
+            // Handle various date formats used by NZ banks
             const formats = [
-                /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/, // DD/MM/YYYY
-                /^(\d{4})-(\d{1,2})-(\d{1,2})$/, // YYYY-MM-DD
-                /^(\d{1,2})-(\d{1,2})-(\d{4})$/, // DD-MM-YYYY
+                /(\d{1,2})\/(\d{1,2})\/(\d{4})/, // DD/MM/YYYY
+                /(\d{4})-(\d{1,2})-(\d{1,2})/, // YYYY-MM-DD
+                /(\d{1,2})-(\d{1,2})-(\d{4})/, // DD-MM-YYYY
             ];
-            
+
             for (const format of formats) {
-                const match = cleanDate.match(format);
+                const match = dateStr.match(format);
                 if (match) {
                     if (format === formats[1]) { // YYYY-MM-DD
                         return new Date(match[1], match[2] - 1, match[3]);
@@ -895,312 +853,142 @@
                     }
                 }
             }
-            
-            // Fallback to Date constructor
-            return new Date(cleanDate);
+
+            return new Date(); // Fallback to current date
         }
 
-        function formatDate(date) {
-            if (!date || isNaN(date)) return 'Invalid Date';
-            return date.toLocaleDateString('en-NZ', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
+        // ===== AI CATEGORIZATION =====
+        function categorizeTransactions(transactions) {
+            return transactions.map(transaction => {
+                const category = determineCategory(transaction.description);
+                return {
+                    ...transaction,
+                    category: category,
+                    id: generateId()
+                };
             });
         }
 
-        function categorizeTransaction(description) {
+        function determineCategory(description) {
             const desc = description.toLowerCase();
             
-            for (const [category, keywords] of Object.entries(categoryRules)) {
+            for (const [category, keywords] of Object.entries(CategoryRules)) {
                 for (const keyword of keywords) {
-                    if (desc.includes(keyword.toLowerCase())) {
+                    if (desc.includes(keyword)) {
                         return category;
                     }
                 }
             }
             
+            // Default categorization based on amount patterns
+            if (desc.includes('refund') || desc.includes('credit')) return 'Income';
+            if (desc.includes('fee') || desc.includes('charge')) return 'Banking';
+            
             return 'Other';
         }
 
-        function displayResults() {
-            // Calculate summary statistics
-            const totalTransactions = processedTransactions.length;
-            const income = processedTransactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
-            const expenses = Math.abs(processedTransactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0));
-            const netAmount = income - expenses;
-
-            // Update summary cards
-            document.getElementById('totalTransactions').textContent = totalTransactions.toLocaleString();
-            document.getElementById('totalIncome').textContent = '$' + income.toLocaleString('en-NZ', { minimumFractionDigits: 2 });
-            document.getElementById('totalExpenses').textContent = '$' + expenses.toLocaleString('en-NZ', { minimumFractionDigits: 2 });
-            document.getElementById('netAmount').textContent = '$' + netAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2 });
-
-            // Display transactions
-            displayTransactions();
-            
-            // Display category breakdown
-            displayCategoryBreakdown();
-            
-            // Display financial insights
-            displayFinancialInsights();
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
         }
 
-        function analyzeFinancialHealth() {
-            const income = processedTransactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
-            const expenses = Math.abs(processedTransactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0));
-            const netAmount = income - expenses;
+        // ===== RESULTS DISPLAY =====
+        function showResults(transactions) {
+            console.log(`📊 Displaying ${transactions.length} categorized transactions`);
             
-            const alerts = [];
-            
-            // Check if spending exceeds income (like your current situation)
-            if (netAmount < 0) {
-                alerts.push(`You're spending $${Math.abs(netAmount).toLocaleString('en-NZ', {minimumFractionDigits: 2})} more than you earn monthly`);
-            }
-            
-            // Check emergency fund (you currently have $0.17)
-            if (netAmount < financialHealthChecks.emergencyFund.threshold) {
-                alerts.push(financialHealthChecks.emergencyFund.message);
-            }
-            
-            // Check savings rate
-            const savingsRate = income > 0 ? netAmount / income : 0;
-            if (savingsRate < financialHealthChecks.savingsRate.threshold) {
-                alerts.push(financialHealthChecks.savingsRate.message);
-            }
-            
-            // Show critical alerts if any
-            if (alerts.length > 0) {
-                const alertDiv = document.getElementById('criticalAlert');
-                const alertList = document.getElementById('alertList');
-                
-                alertList.innerHTML = alerts.map(alert => `<li>${alert}</li>`).join('');
-                alertDiv.style.display = 'block';
-            }
-        }
+            // Hide processing, show results
+            document.getElementById('processingSection').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'block';
 
-        function displayTransactions() {
-            const tbody = document.getElementById('transactionsBody');
-            tbody.innerHTML = '';
-
-            // Sort transactions by date (newest first)
-            const sortedTransactions = [...processedTransactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+            // Update summary
+            const totalAmount = transactions.reduce((sum, t) => sum + t.amount, 0);
+            const categories = [...new Set(transactions.map(t => t.category))];
             
-            // Show first 50 transactions
-            const displayTransactions = sortedTransactions.slice(0, 50);
+            document.getElementById('transactionCount').textContent = transactions.length;
+            document.getElementById('categoryCount').textContent = categories.length;
+            document.getElementById('totalAmount').textContent = formatCurrency(totalAmount);
 
+            // Display transactions (show first 10)
+            const container = document.getElementById('transactionContainer');
+            container.innerHTML = '';
+            
+            const displayTransactions = transactions.slice(0, 10);
+            
             displayTransactions.forEach(transaction => {
-                const row = document.createElement('tr');
-                
-                const amountClass = transaction.amount >= 0 ? 'amount-positive' : 'amount-negative';
-                const categoryClass = getCategoryClass(transaction.category);
-                
-                row.innerHTML = `
-                    <td>${transaction.displayDate}</td>
-                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${transaction.description}">
-                        ${transaction.description}
-                    </td>
-                    <td>
-                        <span class="category-tag ${categoryClass}">${transaction.category}</span>
-                    </td>
-                    <td class="${amountClass}">
-                        ${transaction.amount >= 0 ? '+' : ''}$${Math.abs(transaction.amount).toLocaleString('en-NZ', { minimumFractionDigits: 2 })}
-                    </td>
-                `;
-                
-                tbody.appendChild(row);
+                const element = createTransactionElement(transaction);
+                container.appendChild(element);
             });
+
+            // Apply privacy state to new elements
+            applyPrivacyState();
         }
 
-        function getCategoryClass(category) {
-            const classMap = {
-                'Food & Dining': 'category-food',
-                'Transport': 'category-transport',
-                'Shopping': 'category-shopping',
-                'Bills & Utilities': 'category-bills',
-                'Income': 'category-income',
-                'Banking & Fees': 'category-other'
-            };
-            return classMap[category] || 'category-other';
-        }
-
-        function displayCategoryBreakdown() {
-            const categoryTotals = {};
+        function createTransactionElement(transaction) {
+            const div = document.createElement('div');
+            div.className = 'transaction-item';
             
-            processedTransactions.forEach(transaction => {
-                if (transaction.amount < 0) { // Only expenses
-                    const category = transaction.category;
-                    categoryTotals[category] = (categoryTotals[category] || 0) + Math.abs(transaction.amount);
-                }
-            });
-
-            const categoryChart = document.getElementById('categoryChart');
-            categoryChart.innerHTML = '';
-
-            const sortedCategories = Object.entries(categoryTotals)
-                .sort(([,a], [,b]) => b - a)
-                .slice(0, 8); // Top 8 categories
-
-            if (sortedCategories.length === 0) {
-                categoryChart.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.6);">No expense data to display</p>';
-                return;
-            }
-
-            const totalExpenses = Object.values(categoryTotals).reduce((a, b) => a + b, 0);
-
-            sortedCategories.forEach(([category, amount]) => {
-                const percentage = (amount / totalExpenses) * 100;
-                
-                const categoryItem = document.createElement('div');
-                categoryItem.style.cssText = `
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    padding: 0.75rem 0;
-                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-                `;
-                
-                categoryItem.innerHTML = `
-                    <div>
-                        <span class="category-tag ${getCategoryClass(category)}">${category}</span>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="font-weight: 600;">$${amount.toLocaleString('en-NZ', { minimumFractionDigits: 2 })}</div>
-                        <div style="font-size: 0.8rem; color: rgba(255, 255, 255, 0.6);">${percentage.toFixed(1)}%</div>
-                    </div>
-                `;
-                
-                categoryChart.appendChild(categoryItem);
-            });
-        }
-
-        function displayFinancialInsights() {
-            const insightsDiv = document.getElementById('insightsChart');
-            insightsDiv.innerHTML = '';
-
-            const income = processedTransactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
-            const expenses = Math.abs(processedTransactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0));
-            const netAmount = income - expenses;
-
-            const insights = [
-                {
-                    title: 'Monthly Cash Flow',
-                    value: `${netAmount >= 0 ? '+' : ''}$${netAmount.toLocaleString('en-NZ', {minimumFractionDigits: 2})}`,
-                    status: netAmount >= 0 ? 'positive' : 'negative',
-                    description: netAmount >= 0 ? 'Surplus' : 'Deficit'
-                },
-                {
-                    title: 'Savings Rate',
-                    value: `${income > 0 ? ((netAmount / income) * 100).toFixed(1) : '0'}%`,
-                    status: (income > 0 && (netAmount / income) >= 0.1) ? 'positive' : 'negative',
-                    description: 'of income'
-                },
-                {
-                    title: 'Avg Transaction',
-                    value: `$${expenses > 0 ? (expenses / processedTransactions.filter(t => t.amount < 0).length).toFixed(2) : '0'}`,
-                    status: 'neutral',
-                    description: 'expense size'
-                }
-            ];
-
-            insights.forEach(insight => {
-                const insightItem = document.createElement('div');
-                insightItem.style.cssText = `
-                    padding: 1rem;
-                    border-radius: 12px;
-                    margin-bottom: 1rem;
-                    background: rgba(255, 255, 255, 0.05);
-                    border: 1px solid rgba(255, 255, 255, 0.1);
-                `;
-
-                const statusColor = insight.status === 'positive' ? '#10b981' : 
-                                  insight.status === 'negative' ? '#ef4444' : '#6b7280';
-
-                insightItem.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <h4 style="margin-bottom: 0.25rem; font-size: 0.9rem; color: rgba(255,255,255,0.8);">${insight.title}</h4>
-                            <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6);">${insight.description}</p>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 1.5rem; font-weight: 700; color: ${statusColor};">${insight.value}</div>
-                        </div>
-                    </div>
-                `;
-
-                insightsDiv.appendChild(insightItem);
-            });
-        }
-
-        function filterTransactions() {
-            // Filter functionality for transactions table
-            const tbody = document.getElementById('transactionsBody');
-            const rows = tbody.querySelectorAll('tr');
-
-            rows.forEach(row => {
-                const categoryCell = row.cells[2];
-                const amountCell = row.cells[3];
-                
-                if (!categoryCell || !amountCell) return;
-
-                const category = categoryCell.textContent.toLowerCase();
-                const isIncome = amountCell.classList.contains('amount-positive');
-                const isExpense = amountCell.classList.contains('amount-negative');
-
-                let show = false;
-
-                switch (currentFilter) {
-                    case 'all': show = true; break;
-                    case 'income': show = isIncome; break;
-                    case 'expenses': show = isExpense; break;
-                    case 'food': show = category.includes('food'); break;
-                    case 'transport': show = category.includes('transport'); break;
-                    case 'bills': show = category.includes('bills'); break;
-                    default: show = true;
-                }
-
-                row.style.display = show ? '' : 'none';
-            });
-        }
-
-        // Action functions
-        function generateBudget() {
-            alert('🚀 Budget generation feature coming soon! This will analyze your spending patterns and create a personalized budget to fix your -$3,607 deficit.');
-        }
-
-        function setGoals() {
-            alert('🎯 Goals feature coming soon! Set savings targets like building your emergency fund from $0.17 to $3,000+');
-        }
-
-        function exportData() {
-            // Create enhanced CSV export
-            const csvContent = "data:text/csv;charset=utf-8," 
-                + "Date,Description,Category,Amount,Type\n"
-                + processedTransactions.map(t => 
-                    `"${t.displayDate}","${t.description}","${t.category}","${t.amount}","${t.amount >= 0 ? 'Income' : 'Expense'}"`
-                ).join("\n");
+            const amountClass = transaction.amount >= 0 ? 'amount-positive' : 'amount-negative';
+            const amountPrefix = transaction.amount >= 0 ? '+' : '';
             
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `financeos_analysis_${new Date().toISOString().split('T')[0]}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            // Show success message
-            const successDiv = document.createElement('div');
-            successDiv.className = 'success-message';
-            successDiv.textContent = '✅ Financial analysis exported successfully!';
-            document.querySelector('.container').insertBefore(successDiv, document.getElementById('results'));
+            div.innerHTML = `
+                <div class="transaction-details">
+                    <div class="transaction-merchant">${transaction.description}</div>
+                    <div class="transaction-meta">${formatDate(transaction.date)} • ${transaction.bank}</div>
+                </div>
+                <div class="transaction-category">${transaction.category}</div>
+                <div class="transaction-amount ${amountClass} financial-amount">
+                    ${amountPrefix}${formatCurrency(Math.abs(transaction.amount))}
+                </div>
+            `;
             
-            setTimeout(() => successDiv.remove(), 3000);
+            return div;
         }
 
-        // UPDATED: Proper navigation back to dashboard
-        function backToDashboard() {
+        // ===== UTILITY FUNCTIONS =====
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-NZ', {
+                style: 'currency',
+                currency: 'NZD'
+            }).format(amount);
+        }
+
+        function formatDate(date) {
+            return new Intl.DateTimeFormat('en-NZ', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            }).format(date);
+        }
+
+        // ===== ACTION HANDLERS =====
+        function saveTransactions() {
+            // Save to localStorage (will integrate with backend later)
+            const existingTransactions = JSON.parse(localStorage.getItem('financeOS_transactions') || '[]');
+            const allTransactions = [...existingTransactions, ...processedTransactions];
+            localStorage.setItem('financeOS_transactions', JSON.stringify(allTransactions));
+            
+            console.log(`💾 Saved ${processedTransactions.length} transactions to FinanceOS`);
+            
+            // Show success and redirect
+            alert(`Successfully saved ${processedTransactions.length} transactions to FinanceOS!`);
             window.location.href = 'index.html';
         }
+
+        function resetUpload() {
+            // Reset to upload state
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('processingSection').style.display = 'none';
+            document.getElementById('uploadSection').style.display = 'block';
+            
+            // Clear file input
+            document.getElementById('fileInput').value = '';
+            processedTransactions = [];
+            
+            console.log('🔄 Upload reset');
+        }
+
+        console.log('📊 FinanceOS CSV Upload Ready');
+        console.log('💡 Supports: ANZ, ASB, BNZ, Kiwibank, Westpac');
+        console.log('🤖 AI categorization enabled');
     </script>
 </body>
 </html>
