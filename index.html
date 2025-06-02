@@ -200,11 +200,10 @@
         </section>
     </main>
 
-    <!-- Scripts -->
     <script src="data-manager.js"></script>
     <script src="notification-system.js"></script>
     <script>
-        // Privacy Mode Toggle
+        // Privacy Mode Toggle - Simple Implementation
         const privacyToggle = document.getElementById('privacyToggle');
         const mainContent = document.getElementById('mainContent');
         
@@ -229,15 +228,6 @@
             }
         }
 
-        // Notification Settings
-        document.getElementById('notificationSettings').addEventListener('click', () => {
-            if (window.FinanceOSNotifications) {
-                window.FinanceOSNotifications.showNotificationSettings();
-            } else {
-                alert('Notification system loading...');
-            }
-        });
-
         // Check for CSV data
         function checkCSVData() {
             const csvData = localStorage.getItem('csvData');
@@ -253,6 +243,15 @@
             }
         }
 
+        // Notification Settings
+        document.getElementById('notificationSettings').addEventListener('click', () => {
+            if (window.FinanceOSNotifications) {
+                window.FinanceOSNotifications.showNotificationSettings();
+            } else {
+                alert('Notification system will be available once notifications.js is loaded');
+            }
+        });
+
         // Quick action functions
         function addTransaction() {
             alert('Add Transaction feature coming soon!');
@@ -265,12 +264,12 @@
         // Initialize
         checkCSVData();
 
-        // Register service worker
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
+        // Initialize data manager if available
+        if (window.FinanceOSHelpers) {
+            window.FinanceOSHelpers.initializePage();
         }
 
-        console.log('FinanceOS Dashboard loaded successfully');
+        console.log('FinanceOS Dashboard loaded successfully - No authentication required');
     </script>
 </body>
 </html>
