@@ -57,36 +57,40 @@
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 20px;
-            padding: 40px;
+            padding: 48px 40px;
             text-align: center;
-            max-width: 400px;
-            width: 90%;
+            max-width: 460px;
+            width: 95%;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            min-height: 580px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         
         .login-logo {
-            width: 60px;
-            height: 60px;
+            width: 80px;
+            height: 80px;
             background: linear-gradient(135deg, #8b5cf6, #3b82f6);
-            border-radius: 15px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 24px;
+            margin: 0 auto 24px;
+            font-size: 32px;
             color: white;
             font-weight: bold;
         }
         
         .login-input {
             width: 100%;
-            padding: 12px 16px;
-            margin-bottom: 15px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 8px;
+            border-radius: 12px;
             color: white;
-            font-size: 16px;
+            font-size: 18px;
             box-sizing: border-box;
         }
         
@@ -102,15 +106,15 @@
         
         .login-button {
             width: 100%;
-            padding: 12px;
+            padding: 16px;
             background: linear-gradient(135deg, #8b5cf6, #9333ea);
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 12px;
+            font-size: 18px;
             font-weight: 600;
             cursor: pointer;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             transition: all 0.3s ease;
         }
         
@@ -127,14 +131,14 @@
         
         .biometric-button {
             width: 100%;
-            padding: 12px;
+            padding: 16px;
             background: rgba(255, 255, 255, 0.1);
             color: white;
             border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 12px;
+            font-size: 18px;
             cursor: pointer;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             transition: all 0.3s ease;
         }
         
@@ -213,7 +217,7 @@
 <body>
     <!-- Session Info (hidden until logged in) -->
     <div class="session-info" id="sessionInfo" style="display: none;">
-        <span>Session: <span id="sessionTime">30:00</span></span>
+        <span>Session: <span id="sessionTime">5:00</span></span>
         <button class="logout-button" onclick="logout()">Logout</button>
     </div>
 
@@ -221,8 +225,8 @@
     <div class="login-overlay" id="loginOverlay">
         <div class="login-container">
             <div class="login-logo">$</div>
-            <h2 style="color: white; margin-bottom: 10px;">FinanceOS</h2>
-            <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 30px;">
+            <h2 style="color: white; margin-bottom: 12px; font-size: 28px;">FinanceOS</h2>
+            <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 40px; font-size: 16px;">
                 Your Personal Finance Operating System
             </p>
             
@@ -472,9 +476,9 @@
     <script src="data-manager.js"></script>
     <script src="notification-system.js"></script>
     <script>
-        // Session Management
+        // Session Management - 5 MINUTES TIMEOUT, NO WARNING
         let sessionTimer;
-        let sessionTimeLeft = 30 * 60; // 30 minutes in seconds
+        let sessionTimeLeft = 5 * 60; // 5 minutes in seconds
         let isAuthenticated = false;
 
         // Initialize
@@ -493,9 +497,9 @@
                 return;
             }
             
-            // Check if session has expired (30 minutes)
+            // Check if session has expired (5 minutes)
             const currentTime = Date.now();
-            const sessionDuration = 30 * 60 * 1000; // 30 minutes
+            const sessionDuration = 5 * 60 * 1000; // 5 minutes
             
             if (currentTime - parseInt(loginTime) > sessionDuration) {
                 showLogin();
@@ -665,24 +669,17 @@
             }
         }
 
-        // Session Timer
+        // Session Timer - 5 MINUTES, NO WARNING
         function startSessionTimer() {
-            sessionTimeLeft = 30 * 60; // Reset to 30 minutes
+            sessionTimeLeft = 5 * 60; // Reset to 5 minutes
             updateSessionDisplay();
             
             sessionTimer = setInterval(() => {
                 sessionTimeLeft--;
                 updateSessionDisplay();
                 
-                // Warning at 5 minutes
-                if (sessionTimeLeft === 5 * 60) {
-                    alert('Your session will expire in 5 minutes. Click OK to extend your session.');
-                    sessionTimeLeft = 30 * 60; // Extend session
-                    localStorage.setItem('financeos-login-time', Date.now().toString());
-                }
-                
+                // NO WARNING - Just logout when time runs out
                 if (sessionTimeLeft <= 0) {
-                    alert('Session expired due to inactivity.');
                     logout();
                 }
             }, 1000);
@@ -716,16 +713,16 @@
             showLogin();
         }
 
-        // Extend session on activity
+        // Extend session on activity - reset to 2 minutes on activity
         document.addEventListener('mousemove', () => {
             if (isAuthenticated) {
-                sessionTimeLeft = Math.max(sessionTimeLeft, 5 * 60); // Keep at least 5 minutes
+                sessionTimeLeft = Math.max(sessionTimeLeft, 2 * 60); // Keep at least 2 minutes
             }
         });
 
         document.addEventListener('keydown', () => {
             if (isAuthenticated) {
-                sessionTimeLeft = Math.max(sessionTimeLeft, 5 * 60);
+                sessionTimeLeft = Math.max(sessionTimeLeft, 2 * 60);
             }
         });
 
@@ -801,7 +798,7 @@
             alert('Reports feature coming soon!');
         }
 
-        console.log('FinanceOS Dashboard loaded with enhanced authentication');
+        console.log('FinanceOS Dashboard loaded with 5-minute session timeout');
     </script>
 </body>
 </html>
