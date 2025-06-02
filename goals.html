@@ -3,39 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Financial Goals - FinanceOS</title>
-    
-    <!-- PWA Meta Tags -->
-    <link rel="manifest" href="/manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="FinanceOS">
-    <meta name="mobile-web-app-capable" content="yes">
+    <title>FinanceOS - Financial Goals</title>
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8b5cf6">
-    <meta name="msapplication-TileColor" content="#8b5cf6">
-    <meta name="msapplication-navbutton-color" content="#8b5cf6">
-    
-    <!-- App Icons -->
-    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
-    <link rel="shortcut icon" href="/icons/favicon.ico">
-    
-    <!-- App Description -->
-    <meta name="description" content="Track and achieve your financial goals with smart progress monitoring and AI insights. Build emergency funds, eliminate debt, and create sustainable savings.">
-    <meta name="keywords" content="financial goals, emergency fund, debt payoff, savings tracker, budget recovery, financial planning">
-    <meta name="author" content="FinanceOS">
-    
-    <!-- Social Media Sharing -->
-    <meta property="og:title" content="Financial Goals - FinanceOS">
-    <meta property="og:description" content="Track and achieve your financial goals with smart progress monitoring and AI insights">
-    <meta property="og:image" content="/icons/og-image.png">
-    <meta property="og:url" content="https://jkmdale.github.io/FinanceOS.20/goals.html">
-    <meta property="og:type" content="website">
-    
-    <!-- Security -->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
     <style>
         * {
             margin: 0;
@@ -44,14 +14,14 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
             min-height: 100vh;
             color: white;
             overflow-x: hidden;
         }
 
-        /* Glass effect utility classes */
+        /* Glass Effects */
         .glass {
             background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(20px);
@@ -69,1368 +39,856 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
 
-        /* Gradient utility classes */
-        .gradient-purple { background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%); }
-        .gradient-green { background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%); }
-        .gradient-red { background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%); }
-        .gradient-blue { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%); }
-        .gradient-orange { background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%); }
-        .gradient-yellow { background: linear-gradient(135deg, #eab308 0%, #ca8a04 50%, #a16207 100%); }
-
         /* Header */
         .header {
-            padding: 1rem;
-            text-align: center;
-            margin-bottom: 2rem;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .logo {
-            width: 60px;
-            height: 60px;
-            margin: 0 auto 1rem;
-            border-radius: 15px;
+        .header-content {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: bold;
-            color: white;
-        }
-
-        .header h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .header p {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
-        }
-
-        /* Container */
-        .container {
-            padding: 0 1rem;
             max-width: 1200px;
             margin: 0 auto;
         }
 
-        /* Financial Health Overview */
-        .health-overview {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
 
-        .health-card {
-            padding: 1.5rem;
-            border-radius: 16px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: bold;
         }
 
-        .health-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--accent-color);
-        }
-
-        .health-card h3 {
+        .logo-text {
             font-size: 1.5rem;
             font-weight: 700;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Navigation */
+        .nav {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-button {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .nav-button.active {
+            background: linear-gradient(135deg, #8b5cf6, #9333ea);
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+
+        /* Privacy Toggle */
+        .privacy-toggle {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .privacy-toggle:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        .privacy-toggle.active {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
             margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .health-card p {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
+        .page-subtitle {
+            font-size: 1.125rem;
+            opacity: 0.8;
+            margin-bottom: 2rem;
         }
-
-        .health-status {
-            font-size: 0.8rem;
-            font-weight: 600;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            display: inline-block;
-            margin-top: 0.5rem;
-        }
-
-        .status-critical { background: rgba(239, 68, 68, 0.2); color: #f87171; }
-        .status-warning { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-        .status-good { background: rgba(16, 185, 129, 0.2); color: #34d399; }
 
         /* Goals Grid */
         .goals-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2rem;
+            gap: 1.5rem;
             margin-bottom: 2rem;
         }
 
         .goal-card {
             padding: 2rem;
-            border-radius: 20px;
+            border-radius: 16px;
+            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
         }
 
+        .goal-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 48px rgba(139, 92, 246, 0.3);
+        }
+
         .goal-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
         }
 
         .goal-icon {
-            width: 3rem;
-            height: 3rem;
+            width: 50px;
+            height: 50px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
             margin-right: 1rem;
-            flex-shrink: 0;
         }
 
         .goal-info h3 {
-            font-size: 1.2rem;
-            font-weight: 600;
+            font-size: 1.25rem;
+            font-weight: 700;
             margin-bottom: 0.25rem;
         }
 
-        .goal-info p {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
+        .goal-info .goal-type {
+            font-size: 0.875rem;
+            opacity: 0.7;
         }
 
-        .goal-progress {
+        .goal-priority {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .priority-critical {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .priority-high {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .priority-medium {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        /* Progress Bars */
+        .progress-section {
             margin-bottom: 1.5rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .progress-amount {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .progress-target {
+            font-size: 0.875rem;
+            opacity: 0.7;
         }
 
         .progress-bar {
             width: 100%;
-            height: 8px;
+            height: 12px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
+            border-radius: 6px;
             overflow: hidden;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.5rem;
         }
 
         .progress-fill {
             height: 100%;
-            transition: width 0.5s ease;
-            border-radius: 4px;
+            border-radius: 6px;
+            transition: width 0.3s ease;
+            position: relative;
         }
 
-        .progress-text {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.9rem;
-        }
-
-        .progress-current {
+        .progress-percentage {
+            font-size: 0.875rem;
             font-weight: 600;
-        }
-
-        .progress-target {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .goal-timeline {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding: 0.75rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-        }
-
-        .timeline-item {
             text-align: center;
-            flex: 1;
         }
 
-        .timeline-label {
-            font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 0.25rem;
-        }
-
-        .timeline-value {
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
+        /* Goal Actions */
         .goal-actions {
             display: flex;
             gap: 0.5rem;
-            flex-wrap: wrap;
+            margin-top: 1rem;
         }
 
-        .action-btn {
+        .btn {
             padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.8rem;
+            border-radius: 6px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
-            color: white;
+            border: none;
+            font-size: 0.875rem;
         }
 
         .btn-primary {
-            background: rgba(139, 92, 246, 0.8);
+            background: linear-gradient(135deg, #8b5cf6, #9333ea);
+            color: white;
         }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
+            color: white;
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .action-btn:hover {
+        .btn:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
-        /* Monthly Progress Tracker */
-        .progress-tracker {
+        /* AI Insights */
+        .ai-insights {
+            margin-top: 2rem;
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .insight-card {
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid;
+        }
+
+        .insight-card h4 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .insight-card p {
+            font-size: 0.875rem;
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+
+        /* CSV Integration Alert */
+        .csv-alert {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
             margin-bottom: 2rem;
+            font-size: 0.875rem;
         }
 
-        .tracker-header {
+        .csv-alert.no-data {
+            background: rgba(245, 158, 11, 0.15);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        /* Add Goal Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            max-width: 500px;
+            width: 90%;
+            padding: 2rem;
+            border-radius: 16px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
         }
 
-        .tracker-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1rem;
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
         }
 
-        .tracker-card {
-            padding: 1.5rem;
-            border-radius: 16px;
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
         }
 
-        .tracker-title {
-            font-size: 1.1rem;
-            font-weight: 600;
+        .form-group {
             margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
         }
 
-        .month-progress {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
             padding: 0.75rem;
-            margin-bottom: 0.5rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-        }
-
-        .month-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .month-name {
-            font-weight: 500;
-            margin-bottom: 0.25rem;
-        }
-
-        .month-target {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .month-status {
-            padding: 0.25rem 0.75rem;
-            border-radius: 15px;
-            font-size: 0.7rem;
-            font-weight: 500;
-        }
-
-        /* Quick Actions */
-        .quick-actions {
-            margin-bottom: 2rem;
-        }
-
-        .actions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-
-        .quick-action {
-            padding: 1.5rem;
-            border-radius: 16px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-        }
-
-        .quick-action:hover {
-            transform: translateY(-2px);
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .quick-action-icon {
-            font-size: 2rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .quick-action h4 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .quick-action p {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        /* Navigation */
-        .nav-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-top: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .nav-btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-        }
-
-        .nav-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-        }
-
-        /* PWA Install Button Styles */
-        #install-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 16px 24px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.4);
-            display: none;
-            align-items: center;
-            gap: 8px;
-            z-index: 1000;
-            transition: all 0.3s ease;
-            animation: pulse-glow 2s infinite;
-        }
-        
-        #install-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 40px rgba(139, 92, 246, 0.5);
-        }
-        
-        @keyframes pulse-glow {
-            0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
-        }
-        
-        /* PWA Notification Styles */
-        .pwa-notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            padding: 16px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
             color: white;
-            z-index: 1001;
-            max-width: 300px;
-            transform: translateX(100%);
-            transition: transform 0.3s ease;
-        }
-        
-        .pwa-notification.show {
-            transform: translateX(0);
+            backdrop-filter: blur(10px);
         }
 
-        /* PWA-specific styles for installed app */
-        .pwa-installed {
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-        
-        @supports (padding: max(0px)) {
-            .pwa-installed {
-                padding-left: max(12px, env(safe-area-inset-left));
-                padding-right: max(12px, env(safe-area-inset-right));
-            }
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
         }
 
-        /* Mobile Responsive */
+        /* Privacy Mode */
+        .privacy-mode .progress-amount,
+        .privacy-mode .progress-target {
+            filter: blur(6px);
+            transition: filter 0.3s ease;
+        }
+
+        .privacy-mode .progress-amount:hover,
+        .privacy-mode .progress-target:hover {
+            filter: blur(0px);
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            .container {
-                padding: 0 0.75rem;
-            }
-            
-            .goals-grid {
-                grid-template-columns: 1fr;
+            .header-content {
+                flex-direction: column;
                 gap: 1rem;
             }
-            
-            .goal-card {
-                padding: 1.5rem;
+
+            .nav {
+                flex-wrap: wrap;
+                justify-content: center;
             }
-            
-            .health-overview {
+
+            .goals-grid {
                 grid-template-columns: 1fr;
             }
-            
-            .tracker-grid {
+
+            .goal-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .insights-grid {
                 grid-template-columns: 1fr;
             }
-            
-            .actions-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            #install-button {
-                bottom: 16px;
-                right: 16px;
-                padding: 12px 20px;
-                font-size: 13px;
-            }
-        }
-
-        /* Celebration Effects */
-        .milestone-celebration {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #10b981, #059669);
-            padding: 2rem;
-            border-radius: 20px;
-            text-align: center;
-            z-index: 1000;
-            display: none;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-        }
-
-        .celebration-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 999;
-            display: none;
         }
     </style>
 </head>
 <body>
     <!-- Header -->
-    <div class="header">
-        <div class="logo gradient-green">🎯</div>
-        <h1>Financial Goals</h1>
-        <p>Track your progress toward financial freedom</p>
-    </div>
+    <header class="header glass">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">$</div>
+                <span class="logo-text">FinanceOS</span>
+            </div>
+            
+            <nav class="nav">
+                <a href="index.html" class="nav-button">Dashboard</a>
+                <a href="csv-upload.html" class="nav-button">Upload CSV</a>
+                <a href="goals.html" class="nav-button active">Goals</a>
+                <button class="privacy-toggle" id="privacyToggle">🔒 Privacy Mode</button>
+            </nav>
+        </div>
+    </header>
 
-    <div class="container">
-        <!-- Financial Health Overview -->
-        <div class="health-overview">
-            <div class="health-card glass-premium" style="--accent-color: #ef4444;">
-                <h3 id="emergency-fund-amount">$0.17</h3>
-                <p>Emergency Fund</p>
-                <div class="health-status status-critical">CRITICAL</div>
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h1 class="page-title">Financial Goals</h1>
+                <p class="page-subtitle">
+                    Track your progress toward financial freedom with AI-powered insights and recommendations.
+                </p>
             </div>
-            <div class="health-card glass-premium" style="--accent-color: #f59e0b;">
-                <h3 id="monthly-deficit">-$2,685</h3>
-                <p>Monthly Cash Flow</p>
-                <div class="health-status status-critical">DEFICIT</div>
-            </div>
-            <div class="health-card glass-premium" style="--accent-color: #8b5cf6;">
-                <h3 id="debt-amount">$3,251</h3>
-                <p>Credit Card Debt</p>
-                <div class="health-status status-warning">HIGH</div>
-            </div>
-            <div class="health-card glass-premium" style="--accent-color: #10b981;">
-                <h3 id="days-to-goals">89</h3>
-                <p>Days to Break Even</p>
-                <div class="health-status status-warning">ON TRACK</div>
-            </div>
+            <button class="btn btn-primary" onclick="openAddGoalModal()" style="padding: 0.75rem 1.5rem;">
+                ➕ Add New Goal
+            </button>
+        </div>
+
+        <!-- CSV Integration Status -->
+        <div class="csv-alert" id="csvAlert">
+            📊 Your spending analysis is enhanced by CSV transaction data. Goals are automatically updated based on your actual spending patterns.
         </div>
 
         <!-- Goals Grid -->
-        <div class="goals-grid">
-            <!-- Emergency Fund Goal -->
+        <section class="goals-grid" id="goalsGrid">
+            <!-- Critical Goals -->
             <div class="goal-card glass-premium">
                 <div class="goal-header">
-                    <div class="goal-icon gradient-red">🛡️</div>
-                    <div class="goal-info">
-                        <h3>Emergency Fund</h3>
-                        <p>Build financial security buffer</p>
+                    <div style="display: flex; align-items: center;">
+                        <div class="goal-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">🚨</div>
+                        <div class="goal-info">
+                            <h3>Fix Budget Deficit</h3>
+                            <div class="goal-type">Budget Optimization</div>
+                        </div>
                     </div>
+                    <div class="goal-priority priority-critical">Critical</div>
                 </div>
                 
-                <div class="goal-progress">
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <div class="progress-amount" style="color: #ef4444;">-$3,607/month</div>
+                        <div class="progress-target">Target: $0 (break even)</div>
+                    </div>
                     <div class="progress-bar">
-                        <div class="progress-fill gradient-red" style="width: 0.006%;" id="emergency-progress"></div>
+                        <div class="progress-fill" style="width: 15%; background: linear-gradient(135deg, #ef4444, #dc2626);"></div>
                     </div>
-                    <div class="progress-text">
-                        <span class="progress-current">$0.17</span>
-                        <span class="progress-target">of $3,000</span>
-                    </div>
+                    <div class="progress-percentage">15% - Need to cut $3,607 monthly expenses</div>
                 </div>
-
-                <div class="goal-timeline">
-                    <div class="timeline-item">
-                        <div class="timeline-label">Started</div>
-                        <div class="timeline-value">Dec 2024</div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-label">Target</div>
-                        <div class="timeline-value">Dec 2025</div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-label">Monthly</div>
-                        <div class="timeline-value">$250</div>
-                    </div>
-                </div>
-
+                
                 <div class="goal-actions">
-                    <button class="action-btn btn-primary" onclick="addToEmergencyFund()">💰 Add Money</button>
-                    <button class="action-btn btn-secondary" onclick="editGoal('emergency')">⚙️ Edit Goal</button>
+                    <button class="btn btn-primary">View AI Plan</button>
+                    <button class="btn btn-secondary">Update Progress</button>
                 </div>
             </div>
 
-            <!-- Budget Recovery Goal -->
-            <div class="goal-card glass-premium">
+            <!-- Emergency Fund -->
+            <div class="goal-card glass">
                 <div class="goal-header">
-                    <div class="goal-icon gradient-orange">📊</div>
-                    <div class="goal-info">
-                        <h3>Budget Recovery</h3>
-                        <p>Eliminate monthly deficit</p>
+                    <div style="display: flex; align-items: center;">
+                        <div class="goal-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">🛡️</div>
+                        <div class="goal-info">
+                            <h3>Emergency Fund</h3>
+                            <div class="goal-type">Emergency Savings</div>
+                        </div>
                     </div>
+                    <div class="goal-priority priority-critical">Critical</div>
                 </div>
                 
-                <div class="goal-progress">
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <div class="progress-amount" style="color: #ef4444;">$0.17</div>
+                        <div class="progress-target">Target: $15,000 (3 months expenses)</div>
+                    </div>
                     <div class="progress-bar">
-                        <div class="progress-fill gradient-orange" style="width: 25%;" id="budget-progress"></div>
+                        <div class="progress-fill" style="width: 0.001%; background: linear-gradient(135deg, #f59e0b, #d97706);"></div>
                     </div>
-                    <div class="progress-text">
-                        <span class="progress-current">-$2,685</span>
-                        <span class="progress-target">to $0 (break even)</span>
-                    </div>
+                    <div class="progress-percentage">0% - Start immediately after fixing budget</div>
                 </div>
-
-                <div class="goal-timeline">
-                    <div class="timeline-item">
-                        <div class="timeline-label">Current</div>
-                        <div class="timeline-value">-$2,685</div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-label">Month 2</div>
-                        <div class="timeline-value">-$1,300</div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-label">Month 3</div>
-                        <div class="timeline-value">$0</div>
-                    </div>
-                </div>
-
+                
                 <div class="goal-actions">
-                    <button class="action-btn btn-primary" onclick="updateBudgetProgress()">📈 Log Progress</button>
-                    <button class="action-btn btn-secondary" onclick="viewBudgetPlan()">📋 View Plan</button>
+                    <button class="btn btn-primary">Auto-Save Setup</button>
+                    <button class="btn btn-secondary">Add Funds</button>
                 </div>
             </div>
 
-            <!-- Debt Payoff Goal -->
-            <div class="goal-card glass-premium">
+            <!-- Debt Payoff -->
+            <div class="goal-card glass">
                 <div class="goal-header">
-                    <div class="goal-icon gradient-yellow">💳</div>
-                    <div class="goal-info">
-                        <h3>Credit Card Payoff</h3>
-                        <p>Eliminate high-interest debt</p>
+                    <div style="display: flex; align-items: center;">
+                        <div class="goal-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">💳</div>
+                        <div class="goal-info">
+                            <h3>Pay Off Visa Debt</h3>
+                            <div class="goal-type">Debt Elimination</div>
+                        </div>
                     </div>
+                    <div class="goal-priority priority-high">High</div>
                 </div>
                 
-                <div class="goal-progress">
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <div class="progress-amount" style="color: #ef4444;">$3,251.30</div>
+                        <div class="progress-target">Target: $0 (debt free)</div>
+                    </div>
                     <div class="progress-bar">
-                        <div class="progress-fill gradient-yellow" style="width: 12%;" id="debt-progress"></div>
+                        <div class="progress-fill" style="width: 68%; background: linear-gradient(135deg, #8b5cf6, #7c3aed);"></div>
                     </div>
-                    <div class="progress-text">
-                        <span class="progress-current">$3,251</span>
-                        <span class="progress-target">to $0</span>
-                    </div>
+                    <div class="progress-percentage">68% of available credit used - Optimize payments</div>
                 </div>
-
-                <div class="goal-timeline">
-                    <div class="timeline-item">
-                        <div class="timeline-label">Balance</div>
-                        <div class="timeline-value">$3,251</div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-label">Payment</div>
-                        <div class="timeline-value">$200/mo</div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-label">Payoff</div>
-                        <div class="timeline-value">18 months</div>
-                    </div>
-                </div>
-
+                
                 <div class="goal-actions">
-                    <button class="action-btn btn-primary" onclick="makeDebtPayment()">💰 Make Payment</button>
-                    <button class="action-btn btn-secondary" onclick="optimizePayoff()">⚡ Optimize</button>
+                    <button class="btn btn-primary">Payment Strategy</button>
+                    <button class="btn btn-secondary">Make Payment</button>
                 </div>
             </div>
 
-            <!-- Savings Goal -->
-            <div class="goal-card glass-premium">
+            <!-- Education Fund -->
+            <div class="goal-card glass">
                 <div class="goal-header">
-                    <div class="goal-icon gradient-green">💰</div>
-                    <div class="goal-info">
-                        <h3>Monthly Surplus</h3>
-                        <p>Build sustainable savings</p>
+                    <div style="display: flex; align-items: center;">
+                        <div class="goal-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">🎓</div>
+                        <div class="goal-info">
+                            <h3>Private School Fund</h3>
+                            <div class="goal-type">Education Savings</div>
+                        </div>
                     </div>
+                    <div class="goal-priority priority-medium">Medium</div>
                 </div>
                 
-                <div class="goal-progress">
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <div class="progress-amount" style="color: #3b82f6;">$0</div>
+                        <div class="progress-target">Target: $50,000 (private school)</div>
+                    </div>
                     <div class="progress-bar">
-                        <div class="progress-fill gradient-green" style="width: 0%;" id="savings-progress"></div>
+                        <div class="progress-fill" style="width: 0%; background: linear-gradient(135deg, #3b82f6, #2563eb);"></div>
                     </div>
-                    <div class="progress-text">
-                        <span class="progress-current">-$2,685</span>
-                        <span class="progress-target">to +$500</span>
-                    </div>
+                    <div class="progress-percentage">0% - Currently saving $300/month</div>
                 </div>
-
-                <div class="goal-timeline">
-                    <div class="timeline-item">
-                        <div class="timeline-label">Target</div>
-                        <div class="timeline-value">+$500</div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-label">Rate</div>
-                        <div class="timeline-value">12%</div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-label">Timeline</div>
-                        <div class="timeline-value">6 months</div>
-                    </div>
-                </div>
-
+                
                 <div class="goal-actions">
-                    <button class="action-btn btn-primary" onclick="trackSavings()">📊 Track</button>
-                    <button class="action-btn btn-secondary" onclick="autoSave()">🔄 Auto-Save</button>
+                    <button class="btn btn-primary">Increase Savings</button>
+                    <button class="btn btn-secondary">View Timeline</button>
                 </div>
             </div>
-        </div>
 
-        <!-- Monthly Progress Tracker -->
-        <div class="progress-tracker glass-premium" style="border-radius: 20px; padding: 2rem;">
-            <div class="tracker-header">
-                <h3 style="font-size: 1.3rem; font-weight: 600;">3-Month Recovery Progress</h3>
-                <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem;">Track your journey to financial stability</div>
+            <!-- Investment Goal -->
+            <div class="goal-card glass-premium">
+                <div class="goal-header">
+                    <div style="display: flex; align-items: center;">
+                        <div class="goal-icon" style="background: linear-gradient(135deg, #10b981, #059669);">📈</div>
+                        <div class="goal-info">
+                            <h3>KiwiSaver Growth</h3>
+                            <div class="goal-type">Retirement Savings</div>
+                        </div>
+                    </div>
+                    <div class="goal-priority priority-medium">Medium</div>
+                </div>
+                
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <div class="progress-amount" style="color: #10b981;">$48,733.44</div>
+                        <div class="progress-target">Target: $100,000 (first milestone)</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 49%; background: linear-gradient(135deg, #10b981, #059669);"></div>
+                    </div>
+                    <div class="progress-percentage">49% - On track with employer contributions</div>
+                </div>
+                
+                <div class="goal-actions">
+                    <button class="btn btn-primary">Optimize Strategy</button>
+                    <button class="btn btn-secondary">View Performance</button>
+                </div>
+            </div>
+
+            <!-- Travel Fund -->
+            <div class="goal-card glass">
+                <div class="goal-header">
+                    <div style="display: flex; align-items: center;">
+                        <div class="goal-icon" style="background: linear-gradient(135deg, #06d6a0, #059669);">✈️</div>
+                        <div class="goal-info">
+                            <h3>Travel Fund</h3>
+                            <div class="goal-type">Lifestyle Goal</div>
+                        </div>
+                    </div>
+                    <div class="goal-priority priority-medium">Medium</div>
+                </div>
+                
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <div class="progress-amount" style="color: #06d6a0;">$0</div>
+                        <div class="progress-target">Target: $10,000 (Europe trip)</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%; background: linear-gradient(135deg, #06d6a0, #059669);"></div>
+                    </div>
+                    <div class="progress-percentage">0% - Currently saving $100/month</div>
+                </div>
+                
+                <div class="goal-actions">
+                    <button class="btn btn-primary">Plan Trip</button>
+                    <button class="btn btn-secondary">Adjust Savings</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Insights Section -->
+        <section class="ai-insights">
+            <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">AI Goal Insights</h2>
+            
+            <div class="insights-grid">
+                <div class="insight-card glass" style="border-left-color: #ef4444;">
+                    <h4>🚨 Urgent Action Required</h4>
+                    <p>Your $3,607 monthly deficit is preventing all other goals. Focus on reducing expenses by 36% or increasing income. Start with dining out (-$150/month) and subscriptions (-$50/month).</p>
+                </div>
+                
+                <div class="insight-card glass" style="border-left-color: #f59e0b;">
+                    <h4>💡 Smart Strategy</h4>
+                    <p>After fixing the deficit, prioritize emergency fund over debt payoff. With only $0.17 saved, you're at high financial risk. Build to $1,000 first, then tackle Visa debt.</p>
+                </div>
+                
+                <div class="insight-card glass" style="border-left-color: #10b981;">
+                    <h4>📈 Optimization Opportunity</h4>
+                    <p>Your KiwiSaver is performing well at $48,733. Consider increasing contributions by 1% when budget is fixed to reach $100K milestone 18 months sooner.</p>
+                </div>
+                
+                <div class="insight-card glass" style="border-left-color: #3b82f6;">
+                    <h4>🎯 Goal Timeline</h4>
+                    <p id="csvInsight">Upload recent CSV data to get personalized timeline analysis based on your actual spending patterns and income trends.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Add Goal Modal -->
+    <div class="modal" id="addGoalModal">
+        <div class="modal-content glass-premium">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New Financial Goal</h3>
+                <button class="close-btn" onclick="closeAddGoalModal()">&times;</button>
             </div>
             
-            <div class="tracker-grid">
-                <div class="tracker-card glass">
-                    <div class="tracker-title">
-                        🔥 Month 1: Emergency Actions
-                    </div>
-                    <div class="month-progress">
-                        <div class="month-info">
-                            <div class="month-name">Deficit Reduction</div>
-                            <div class="month-target">Target: -$1,300 (50% cut)</div>
-                        </div>
-                        <div class="month-status status-warning">IN PROGRESS</div>
-                    </div>
-                    <div class="month-progress">
-                        <div class="month-info">
-                            <div class="month-name">Emergency Fund</div>
-                            <div class="month-target">Target: $100</div>
-                        </div>
-                        <div class="month-status status-critical">BEHIND</div>
-                    </div>
-                    <div class="month-progress">
-                        <div class="month-info">
-                            <div class="month-name">Expense Cuts</div>
-                            <div class="month-target">Food: $600, Shopping: $300</div>
-                        </div>
-                        <div class="month-status status-warning">STARTING</div>
-                    </div>
-                </div>
-
-                <div class="tracker-card glass">
-                    <div class="tracker-title">
-                        ⚡ Month 2: Habit Building
-                    </div>
-                    <div class="month-progress">
-                        <div class="month-info">
-                            <div class="month-name">Break Even</div>
-                            <div class="month-target">Target: $0 monthly deficit</div>
-                        </div>
-                        <div class="month-status" style="background: rgba(107, 114, 128, 0.2); color: #9ca3af;">PENDING</div>
-                    </div>
-                    <div class="month-progress">
-                        <div class="month-info">
-                            <div class="month-name">Emergency Fund</div>
-                            <div class="month-target">Target: $350</div>
-                        </div>
-                        <div class="month-status" style="background: rgba(107, 114, 128, 0.2); color: #9ca3af;">PENDING</div>
-                    </div>
-                    <div class="month-progress">
-                        <div class="month-info">
-                            <div class="month-name">Additional Income</div>
-                            <div class="month-target">Target: +$300/month</div>
-                        </div>
-                        <div class="month-status" style="background: rgba(107, 114, 128, 0.2); color: #9ca3af;">PENDING</div>
-                    </div>
-                </div>
-
-                <div class="tracker-card glass">
-                    <div class="tracker-title">
-                        🚀 Month 3: Surplus Building
-                    </div>
-                    <div class="month-progress">
-                        <div class="month-info">
-                            <div class="month-name">Monthly Surplus</div>
-                            <div class="month-target">Target: +$324</div>
-                        </div>
-                        <div class="month-status" style="background: rgba(107, 114, 128, 0.2); color: #9ca3af;">PENDING</div>
-                    </div>
-                    <div class="month-progress">
-                        <div class="month-info">
-                            <div class="month-name">Emergency Fund</div>
-                            <div class="month-target">Target: $750</div>
-                        </div>
-                        <div class="month-status" style="background: rgba(107, 114, 128, 0.2); color: #9ca3af;">PENDING</div>
-                    </div>
-                    <div class="month-progress">
-                        <div class="month-info">
-                            <div class="month-name">Debt Payments</div>
-                            <div class="month-target">Extra $100 to credit card</div>
-                        </div>
-                        <div class="month-status" style="background: rgba(107, 114, 128, 0.2); color: #9ca3af;">PENDING</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="quick-actions">
-            <h3 style="margin-bottom: 1rem; text-align: center;">Quick Actions</h3>
-            <div class="actions-grid">
-                <div class="quick-action glass" onclick="quickAddEmergencyFund()">
-                    <div class="quick-action-icon">🛡️</div>
-                    <h4>Add to Emergency Fund</h4>
-                    <p>Quickly log emergency fund deposits</p>
+            <form id="addGoalForm">
+                <div class="form-group">
+                    <label for="goalName">Goal Name</label>
+                    <input type="text" id="goalName" placeholder="e.g., New Car Fund" required>
                 </div>
                 
-                <div class="quick-action glass" onclick="logExpenseReduction()">
-                    <div class="quick-action-icon">✂️</div>
-                    <h4>Log Expense Cut</h4>
-                    <p>Track money saved from budget cuts</p>
+                <div class="form-group">
+                    <label for="goalType">Goal Type</label>
+                    <select id="goalType" required>
+                        <option value="">Select type...</option>
+                        <option value="savings">Savings Goal</option>
+                        <option value="debt">Debt Payoff</option>
+                        <option value="investment">Investment</option>
+                        <option value="emergency">Emergency Fund</option>
+                        <option value="lifestyle">Lifestyle Goal</option>
+                    </select>
                 </div>
                 
-                <div class="quick-action glass" onclick="recordIncomeIncrease()">
-                    <div class="quick-action-icon">💰</div>
-                    <h4>Record Extra Income</h4>
-                    <p>Log additional income sources</p>
+                <div class="form-group">
+                    <label for="targetAmount">Target Amount ($)</label>
+                    <input type="number" id="targetAmount" placeholder="10000" min="0" step="0.01" required>
                 </div>
                 
-                <div class="quick-action glass" onclick="updateDebtBalance()">
-                    <div class="quick-action-icon">💳</div>
-                    <h4>Update Debt Balance</h4>
-                    <p>Track credit card payments</p>
+                <div class="form-group">
+                    <label for="currentAmount">Current Amount ($)</label>
+                    <input type="number" id="currentAmount" placeholder="0" min="0" step="0.01">
                 </div>
                 
-                <div class="quick-action glass" onclick="setWeeklyTarget()">
-                    <div class="quick-action-icon">🎯</div>
-                    <h4>Set Weekly Target</h4>
-                    <p>Define this week's financial goals</p>
+                <div class="form-group">
+                    <label for="targetDate">Target Date</label>
+                    <input type="date" id="targetDate" required>
                 </div>
                 
-                <div class="quick-action glass" onclick="viewProgress()">
-                    <div class="quick-action-icon">📈</div>
-                    <h4>View Detailed Progress</h4>
-                    <p>Analyze your financial journey</p>
+                <div class="form-group">
+                    <label for="priority">Priority</label>
+                    <select id="priority" required>
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                        <option value="critical">Critical</option>
+                    </select>
                 </div>
-            </div>
-        </div>
-
-        <!-- Navigation -->
-        <div class="nav-buttons">
-            <a href="csv-upload.html" class="nav-btn gradient-purple" style="color: white;">📊 Financial Analysis</a>
-            <a href="index.html" class="nav-btn" style="background: rgba(255,255,255,0.1); color: white;">← Back to Dashboard</a>
-            <button class="nav-btn gradient-green" style="color: white;" onclick="generateProgressReport()">📋 Progress Report</button>
+                
+                <div class="form-group">
+                    <label for="description">Description (Optional)</label>
+                    <textarea id="description" rows="3" placeholder="Additional details about this goal..."></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Add Goal</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeAddGoalModal()">Cancel</button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Celebration Modal -->
-    <div class="overlay" id="overlay"></div>
-    <div class="milestone-celebration" id="celebration">
-        <div class="celebration-icon">🎉</div>
-        <h3 id="celebration-title">Milestone Achieved!</h3>
-        <p id="celebration-message">You've reached a new financial milestone!</p>
-        <button class="action-btn btn-primary" onclick="closeCelebration()" style="margin-top: 1rem;">Continue</button>
-    </div>
-
-    <!-- PWA and Original JavaScript -->
     <script>
-        // Goal tracking data (in real app, this would come from your database)
-        let goalData = {
-            emergencyFund: {
-                current: 0.17,
-                target: 3000,
-                monthlyTarget: 250,
-                startDate: '2024-12-01',
-                targetDate: '2025-12-01'
-            },
-            budgetRecovery: {
-                currentDeficit: -2685,
-                targetSurplus: 324,
-                monthlyReduction: 1000,
-                timeline: 3 // months
-            },
-            creditCardDebt: {
-                current: 3251,
-                target: 0,
-                monthlyPayment: 200,
-                interestRate: 0.18
-            },
-            monthlySavings: {
-                current: -2685,
-                target: 500,
-                timeline: 6 // months
-            }
-        };
+        // Privacy Mode Toggle
+        const privacyToggle = document.getElementById('privacyToggle');
+        const mainContent = document.getElementById('mainContent');
+        
+        let privacyMode = localStorage.getItem('privacyMode') === 'true';
+        updatePrivacyMode();
 
-        // Initialize the page
-        document.addEventListener('DOMContentLoaded', function() {
-            updateAllProgress();
-            checkMilestones();
-            loadUserProgress();
-            initializePWA();
+        privacyToggle.addEventListener('click', () => {
+            privacyMode = !privacyMode;
+            localStorage.setItem('privacyMode', privacyMode);
+            updatePrivacyMode();
         });
 
-        // PWA Service Worker Registration
-        function initializePWA() {
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/sw.js')
-                    .then((registration) => {
-                        console.log('✅ SW registered: ', registration);
-                        
-                        // Check for updates
-                        registration.addEventListener('updatefound', () => {
-                            const newWorker = registration.installing;
-                            newWorker.addEventListener('statechange', () => {
-                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    showPWANotification('🔄 App updated! New features available.', 'info');
-                                }
-                            });
-                        });
-                    })
-                    .catch((registrationError) => {
-                        console.log('❌ SW registration failed: ', registrationError);
-                    });
-            }
-
-            // PWA Install Prompt
-            let deferredPrompt;
-            let installButton;
-
-            function createInstallButton() {
-                installButton = document.createElement('button');
-                installButton.id = 'install-button';
-                installButton.innerHTML = `
-                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                    Install App
-                `;
-                installButton.style.display = 'none';
-                document.body.appendChild(installButton);
-            }
-
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                
-                if (!installButton) {
-                    createInstallButton();
-                }
-                
-                setTimeout(() => {
-                    if (!localStorage.getItem('pwa-install-dismissed') && !isAppInstalled()) {
-                        installButton.style.display = 'flex';
-                    }
-                }, 5000);
-            });
-
-            document.addEventListener('click', (e) => {
-                if (e.target.id === 'install-button' || e.target.closest('#install-button')) {
-                    installPWA();
-                }
-            });
-
-            async function installPWA() {
-                if (!deferredPrompt) return;
-                
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                
-                if (outcome === 'accepted') {
-                    console.log('✅ User accepted PWA install');
-                    if (installButton) installButton.style.display = 'none';
-                    showPWANotification('🎉 FinanceOS installed! Track goals offline.', 'success');
-                } else {
-                    localStorage.setItem('pwa-install-dismissed', 'true');
-                    if (installButton) installButton.style.display = 'none';
-                }
-                
-                deferredPrompt = null;
-            }
-
-            window.addEventListener('appinstalled', () => {
-                console.log('🎉 FinanceOS installed successfully!');
-                if (installButton) installButton.style.display = 'none';
-                showPWANotification('🎯 Goals tracker ready offline!', 'success');
-            });
-
-            // Online/Offline status
-            window.addEventListener('online', () => {
-                showPWANotification('🌐 Back online! Goal data will sync.', 'success');
-            });
-
-            window.addEventListener('offline', () => {
-                showPWANotification('📱 Offline mode: Goals still trackable!', 'warning');
-            });
-
-            // Enhanced iOS PWA experience
-            if (isAppInstalled()) {
-                document.body.classList.add('pwa-installed');
-                
-                // Prevent zoom on iOS
-                document.addEventListener('touchstart', (e) => {
-                    if (e.touches.length > 1) {
-                        e.preventDefault();
-                    }
-                }, { passive: false });
-                
-                let lastTouchEnd = 0;
-                document.addEventListener('touchend', (e) => {
-                    const now = (new Date()).getTime();
-                    if (now - lastTouchEnd <= 300) {
-                        e.preventDefault();
-                    }
-                    lastTouchEnd = now;
-                }, false);
-            }
-        }
-
-        function isAppInstalled() {
-            return window.matchMedia('(display-mode: standalone)').matches || 
-                   window.navigator.standalone === true;
-        }
-
-        function showPWANotification(message, type = 'info') {
-            const colors = {
-                success: 'rgba(16, 185, 129, 0.2)',
-                error: 'rgba(239, 68, 68, 0.2)',
-                warning: 'rgba(245, 158, 11, 0.2)',
-                info: 'rgba(59, 130, 246, 0.2)'
-            };
-            
-            const notification = document.createElement('div');
-            notification.className = 'pwa-notification';
-            notification.style.background = colors[type];
-            notification.innerHTML = `
-                <p style="margin: 0; font-weight: 500;">${message}</p>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            // Show notification
-            setTimeout(() => notification.classList.add('show'), 100);
-            
-            // Auto-remove after 5 seconds
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 300);
-            }, 5000);
-        }
-
-        function updateAllProgress() {
-            updateEmergencyFundProgress();
-            updateBudgetProgress();
-            updateDebtProgress();
-            updateSavingsProgress();
-            updateHealthOverview();
-        }
-
-        function updateEmergencyFundProgress() {
-            const progress = (goalData.emergencyFund.current / goalData.emergencyFund.target) * 100;
-            document.getElementById('emergency-progress').style.width = `${Math.max(progress, 0.5)}%`;
-            
-            // Update display amounts
-            const currentElements = document.querySelectorAll('.progress-current');
-            if (currentElements[0]) {
-                currentElements[0].textContent = `$${goalData.emergencyFund.current.toFixed(2)}`;
-            }
-        }
-
-        function updateBudgetProgress() {
-            const totalReduction = Math.abs(goalData.budgetRecovery.currentDeficit);
-            const targetReduction = totalReduction + goalData.budgetRecovery.targetSurplus;
-            const progress = (1000 / targetReduction) * 100; // Assuming $1000 reduction so far
-            document.getElementById('budget-progress').style.width = `${progress}%`;
-        }
-
-        function updateDebtProgress() {
-            const progress = (500 / goalData.creditCardDebt.current) * 100; // Assuming $500 paid so far
-            document.getElementById('debt-progress').style.width = `${progress}%`;
-        }
-
-        function updateSavingsProgress() {
-            const totalImprovement = Math.abs(goalData.monthlySavings.current) + goalData.monthlySavings.target;
-            const progress = (500 / totalImprovement) * 100; // Assuming $500 improvement so far
-            document.getElementById('savings-progress').style.width = `${progress}%`;
-        }
-
-        function updateHealthOverview() {
-            // Emergency fund status
-            if (goalData.emergencyFund.current < 500) {
-                updateHealthCard('emergency-fund-amount', `$${goalData.emergencyFund.current.toFixed(2)}`, 'CRITICAL', 'status-critical');
-            } else if (goalData.emergencyFund.current < 1500) {
-                updateHealthCard('emergency-fund-amount', `$${goalData.emergencyFund.current.toFixed(2)}`, 'LOW', 'status-warning');
+        function updatePrivacyMode() {
+            if (privacyMode) {
+                mainContent.classList.add('privacy-mode');
+                privacyToggle.textContent = '🔓 Show Data';
+                privacyToggle.classList.add('active');
             } else {
-                updateHealthCard('emergency-fund-amount', `$${goalData.emergencyFund.current.toFixed(2)}`, 'GOOD', 'status-good');
+                mainContent.classList.remove('privacy-mode');
+                privacyToggle.textContent = '🔒 Privacy Mode';
+                privacyToggle.classList.remove('active');
             }
-
-            // Calculate days to break even
-            const monthsToBreakEven = Math.abs(goalData.budgetRecovery.currentDeficit) / goalData.budgetRecovery.monthlyReduction;
-            const daysToBreakEven = Math.ceil(monthsToBreakEven * 30);
-            document.getElementById('days-to-goals').textContent = daysToBreakEven;
         }
 
-        function updateHealthCard(elementId, value, status, statusClass) {
-            document.getElementById(elementId).textContent = value;
-            const statusElement = document.getElementById(elementId).nextElementSibling.nextElementSibling;
-            statusElement.textContent = status;
-            statusElement.className = `health-status ${statusClass}`;
-        }
-
-        // Quick action functions
-        function quickAddEmergencyFund() {
-            const amount = prompt('How much did you add to your emergency fund?', '25');
-            if (amount && !isNaN(amount)) {
-                const addAmount = parseFloat(amount);
-                goalData.emergencyFund.current += addAmount;
-                updateEmergencyFundProgress();
-                updateHealthOverview();
+        // Check CSV Data and Update Insights
+        function checkCSVData() {
+            const csvData = localStorage.getItem('csvData');
+            const csvAlert = document.getElementById('csvAlert');
+            const csvInsight = document.getElementById('csvInsight');
+            
+            if (csvData) {
+                const data = JSON.parse(csvData);
+                const uploadDate = localStorage.getItem('csvUploadDate');
                 
-                // Show celebration if milestone reached
-                if (goalData.emergencyFund.current >= 100 && goalData.emergencyFund.current - addAmount < 100) {
-                    showCelebration('First $100 Saved!', 'Great job building your emergency fund foundation!');
-                }
+                csvAlert.className = 'csv-alert';
+                csvAlert.innerHTML = `✅ Goals are being enhanced with your ${data.length} recent transactions. Last updated: ${new Date(uploadDate).toLocaleDateString()}`;
                 
-                saveProgress();
-                showSuccess(`Added $${addAmount} to emergency fund!`);
-            }
-        }
-
-        function logExpenseReduction() {
-            const categories = ['Food & Dining', 'Shopping & Retail', 'Entertainment', 'Other'];
-            const category = prompt(`Which category did you reduce spending in?\n${categories.map((c, i) => `${i + 1}. ${c}`).join('\n')}`);
-            const amount = prompt('How much did you save this week?', '50');
-            
-            if (amount && !isNaN(amount)) {
-                const savedAmount = parseFloat(amount);
-                // Update budget recovery progress
-                goalData.budgetRecovery.currentDeficit += savedAmount; // Reduce deficit
-                updateBudgetProgress();
-                saveProgress();
-                showSuccess(`Great! You saved $${savedAmount} in ${categories[parseInt(category) - 1] || 'expenses'}!`);
-            }
-        }
-
-        function recordIncomeIncrease() {
-            const sources = ['Side Work', 'Freelancing', 'Selling Items', 'Bonus', 'Other'];
-            const source = prompt(`What's your additional income source?\n${sources.map((s, i) => `${i + 1}. ${s}`).join('\n')}`);
-            const amount = prompt('How much extra income this month?', '200');
-            
-            if (amount && !isNaN(amount)) {
-                const incomeAmount = parseFloat(amount);
-                goalData.budgetRecovery.currentDeficit += incomeAmount; // Reduce deficit
-                updateBudgetProgress();
-                updateHealthOverview();
-                saveProgress();
-                showSuccess(`Excellent! $${incomeAmount} extra income from ${sources[parseInt(source) - 1] || 'additional source'}!`);
-            }
-        }
-
-        function updateDebtBalance() {
-            const currentBalance = prompt('What\'s your current credit card balance?', goalData.creditCardDebt.current);
-            if (currentBalance && !isNaN(currentBalance)) {
-                const newBalance = parseFloat(currentBalance);
-                const paidAmount = goalData.creditCardDebt.current - newBalance;
+                // Update CSV insight with actual data analysis
+                const monthlySpending = calculateMonthlySpending(data);
+                csvInsight.innerHTML = `Based on your CSV data: Average monthly spending is $${monthlySpending.toFixed(0)}. At this rate, emergency fund goal will take ${Math.ceil(15000 / (monthlySpending * 0.1))} months with 10% savings rate.`;
+            } else {
+                csvAlert.className = 'csv-alert no-data';
+                csvAlert.innerHTML = '📊 <a href="csv-upload.html" style="color: #f59e0b;">Upload CSV data</a> to get enhanced goal insights based on your actual spending patterns.';
                 
-                if (paidAmount > 0) {
-                    goalData.creditCardDebt.current = newBalance;
-                    updateDebtProgress();
-                    document.getElementById('debt-amount').textContent = `$${newBalance.toFixed(0)}`;
-                    
-                    if (newBalance === 0) {
-                        showCelebration('Debt Free!', 'Congratulations! You\'ve paid off your credit card!');
-                    }
-                    
-                    saveProgress();
-                    showSuccess(`Great! You paid off $${paidAmount.toFixed(2)}!`);
-                } else {
-                    showSuccess('Balance updated.');
-                }
+                csvInsight.innerHTML = 'Upload recent CSV data to get personalized timeline analysis based on your actual spending patterns and income trends.';
             }
         }
 
-        function setWeeklyTarget() {
-            const targets = [
-                'Spend max $150 on food',
-                'No shopping purchases over $50',
-                'Cook at home 5 days',
-                'Find one subscription to cancel',
-                'Earn $100 extra income'
-            ];
-            
-            const target = prompt(`Choose your weekly target:\n${targets.map((t, i) => `${i + 1}. ${t}`).join('\n')}\n\nOr enter your own:`);
-            
-            if (target) {
-                const targetText = isNaN(target) ? target : targets[parseInt(target) - 1];
-                localStorage.setItem('weeklyTarget', targetText);
-                showSuccess(`Weekly target set: ${targetText}`);
-            }
+        function calculateMonthlySpending(transactions) {
+            // Simple calculation - in real app this would be more sophisticated
+            const expenses = transactions.filter(t => t.amount < 0);
+            const totalExpenses = expenses.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+            return totalExpenses / (transactions.length / 30); // Rough monthly estimate
         }
 
-        function viewProgress() {
-            const progress = calculateOverallProgress();
-            alert(`Your Financial Recovery Progress:\n\n` +
-                  `Emergency Fund: ${((goalData.emergencyFund.current / goalData.emergencyFund.target) * 100).toFixed(1)}%\n` +
-                  `Budget Recovery: ${progress.budget.toFixed(1)}%\n` +
-                  `Debt Reduction: ${progress.debt.toFixed(1)}%\n` +
-                  `Overall Progress: ${progress.overall.toFixed(1)}%\n\n` +
-                  `Keep going! You're on track to financial stability!`);
+        // Modal Functions
+        function openAddGoalModal() {
+            document.getElementById('addGoalModal').classList.add('show');
         }
 
-        function generateProgressReport() {
-            const report = {
-                timestamp: new Date().toISOString(),
-                emergencyFund: {
-                    current: goalData.emergencyFund.current,
-                    target: goalData.emergencyFund.target,
-                    progress: ((goalData.emergencyFund.current / goalData.emergencyFund.target) * 100).toFixed(1) + '%'
-                },
-                budgetRecovery: {
-                    currentDeficit: goalData.budgetRecovery.currentDeficit,
-                    targetSurplus: goalData.budgetRecovery.targetSurplus,
-                    monthsToGoal: Math.ceil(Math.abs(goalData.budgetRecovery.currentDeficit) / goalData.budgetRecovery.monthlyReduction)
-                },
-                debt: {
-                    current: goalData.creditCardDebt.current,
-                    monthsToPayoff: Math.ceil(goalData.creditCardDebt.current / goalData.creditCardDebt.monthlyPayment)
-                }
+        function closeAddGoalModal() {
+            document.getElementById('addGoalModal').classList.remove('show');
+            document.getElementById('addGoalForm').reset();
+        }
+
+        // Add Goal Form Handler
+        document.getElementById('addGoalForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const goalData = {
+                id: Date.now(),
+                name: formData.get('goalName') || document.getElementById('goalName').value,
+                type: formData.get('goalType') || document.getElementById('goalType').value,
+                targetAmount: parseFloat(document.getElementById('targetAmount').value),
+                currentAmount: parseFloat(document.getElementById('currentAmount').value) || 0,
+                targetDate: document.getElementById('targetDate').value,
+                priority: document.getElementById('priority').value,
+                description: document.getElementById('description').value,
+                createdDate: new Date().toISOString()
             };
             
-            const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `financeos-progress-report-${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
+            // Save to localStorage
+            const existingGoals = JSON.parse(localStorage.getItem('userGoals') || '[]');
+            existingGoals.push(goalData);
+            localStorage.setItem('userGoals', JSON.stringify(existingGoals));
             
-            showSuccess('Progress report downloaded!');
-        }
-
-        // Goal management functions
-        function addToEmergencyFund() {
-            quickAddEmergencyFund();
-        }
-
-        function editGoal(goalType) {
-            if (goalType === 'emergency') {
-                const newTarget = prompt('What\'s your emergency fund target?', goalData.emergencyFund.target);
-                if (newTarget && !isNaN(newTarget)) {
-                    goalData.emergencyFund.target = parseFloat(newTarget);
-                    updateEmergencyFundProgress();
-                    saveProgress();
-                    showSuccess(`Emergency fund target updated to $${newTarget}!`);
-                }
-            }
-        }
-
-        function updateBudgetProgress() {
-            alert('Budget progress tracking coming soon! For now, use the "Log Expense Cut" and "Record Extra Income" quick actions.');
-        }
-
-        function viewBudgetPlan() {
-            window.location.href = 'csv-upload.html';
-        }
-
-        function makeDebtPayment() {
-            updateDebtBalance();
-        }
-
-        function optimizePayoff() {
-            const extraPayment = prompt('How much extra can you pay monthly toward debt?', '50');
-            if (extraPayment && !isNaN(extraPayment)) {
-                const extra = parseFloat(extraPayment);
-                const newMonthlyPayment = goalData.creditCardDebt.monthlyPayment + extra;
-                const monthsToPayoff = Math.ceil(goalData.creditCardDebt.current / newMonthlyPayment);
-                const interestSaved = goalData.creditCardDebt.current * (goalData.creditCardDebt.interestRate / 12) * 
-                                   (Math.ceil(goalData.creditCardDebt.current / goalData.creditCardDebt.monthlyPayment) - monthsToPayoff);
-                
-                alert(`Debt Optimization Results:\n\n` +
-                      `New monthly payment: $${newMonthlyPayment}\n` +
-                      `Payoff time: ${monthsToPayoff} months\n` +
-                      `Interest saved: $${interestSaved.toFixed(2)}\n\n` +
-                      `This saves you ${Math.ceil(goalData.creditCardDebt.current / goalData.creditCardDebt.monthlyPayment) - monthsToPayoff} months!`);
-            }
-        }
-
-        function trackSavings() {
-            viewProgress();
-        }
-
-        function autoSave() {
-            alert('Auto-save feature coming soon! This will automatically transfer surplus funds to savings.');
-        }
-
-        // Utility functions
-        function calculateOverallProgress() {
-            const emergencyProgress = (goalData.emergencyFund.current / goalData.emergencyFund.target) * 100;
-            const budgetProgress = ((Math.abs(goalData.budgetRecovery.currentDeficit) - 2685) / Math.abs(goalData.budgetRecovery.currentDeficit)) * 100;
-            const debtProgress = ((3251 - goalData.creditCardDebt.current) / 3251) * 100;
+            alert('Goal added successfully!');
+            closeAddGoalModal();
             
-            return {
-                emergency: emergencyProgress,
-                budget: Math.max(budgetProgress, 0),
-                debt: Math.max(debtProgress, 0),
-                overall: (emergencyProgress + Math.max(budgetProgress, 0) + Math.max(debtProgress, 0)) / 3
-            };
-        }
-
-        function checkMilestones() {
-            // Check for milestones and show celebrations
-            const lastCheck = localStorage.getItem('lastMilestoneCheck');
-            const today = new Date().toDateString();
-            
-            if (lastCheck !== today) {
-                // Check various milestones
-                if (goalData.emergencyFund.current >= 100 && parseFloat(localStorage.getItem('lastEmergencyAmount') || '0') < 100) {
-                    showCelebration('First $100 Saved!', 'You\'ve built the foundation of your emergency fund!');
-                }
-                
-                localStorage.setItem('lastMilestoneCheck', today);
-                localStorage.setItem('lastEmergencyAmount', goalData.emergencyFund.current.toString());
-            }
-        }
-
-        function showCelebration(title, message) {
-            document.getElementById('celebration-title').textContent = title;
-            document.getElementById('celebration-message').textContent = message;
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('celebration').style.display = 'block';
-        }
-
-        function closeCelebration() {
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('celebration').style.display = 'none';
-        }
-
-        function showSuccess(message) {
-            const successDiv = document.createElement('div');
-            successDiv.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: linear-gradient(135deg, #10b981, #059669);
-                color: white;
-                padding: 1rem 1.5rem;
-                border-radius: 12px;
-                font-weight: 500;
-                z-index: 1000;
-                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-            `;
-            successDiv.textContent = message;
-            document.body.appendChild(successDiv);
-            
+            // In a real app, this would refresh the goals grid
             setTimeout(() => {
-                successDiv.remove();
-            }, 3000);
-        }
+                location.reload();
+            }, 1000);
+        });
 
-        function saveProgress() {
-            localStorage.setItem('financeOS_goalData', JSON.stringify(goalData));
-        }
-
-        function loadUserProgress() {
-            const savedData = localStorage.getItem('financeOS_goalData');
-            if (savedData) {
-                const saved = JSON.parse(savedData);
-                // Merge saved data with defaults
-                goalData = { ...goalData, ...saved };
-                updateAllProgress();
+        // Close modal when clicking outside
+        document.getElementById('addGoalModal').addEventListener('click', (e) => {
+            if (e.target.id === 'addGoalModal') {
+                closeAddGoalModal();
             }
-        }
+        });
 
-        // Load saved weekly target
-        const savedTarget = localStorage.getItem('weeklyTarget');
-        if (savedTarget) {
-            // Could display this somewhere on the page
-            console.log('Current weekly target:', savedTarget);
+        // Initialize
+        checkCSVData();
+
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
         }
     </script>
 </body>
