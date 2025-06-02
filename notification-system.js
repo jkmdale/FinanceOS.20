@@ -1,421 +1,727 @@
-/**
- * Simple FinanceOS Notification System
- * Clean implementation without authentication dependencies
- */
+// FinanceOS Notification System
+// Handles PWA notifications, financial alerts, and user preferences
 
-class SimpleFinanceOSNotifications {
+class FinanceOSNotifications {
     constructor() {
-        this.permission = 'default';
-        this.notifications = {
-            csvUpload: {
-                id: 'csv-upload-reminder',
-                title: '📊 CSV Upload Reminder',
-                message: 'Time to upload your weekly bank statements to FinanceOS',
-                frequency: 'weekly',
-                enabled: true,
-                lastSent: null
-            },
-            emergencyFund: {
-                id: 'emergency-fund-low',
-                title: '🚨 Emergency Fund Critical',
-                message: 'Your emergency fund is critically low ($0.17). Take action now!',
-                frequency: 'weekly',
-                enabled: true,
-                lastSent: null,
-                priority: 'high'
-            },
-            budgetDeficit: {
-                id: 'budget-deficit-critical',
-                title: '🚨 Budget Deficit Critical',
-                message: 'You\'re spending $3,607 more than you earn monthly. Immediate action needed!',
-                frequency: 'weekly',
-                enabled: true,
-                lastSent: null,
-                priority: 'critical'
-            },
-            goalMilestone: {
-                id: 'goal-milestone',
-                title: '🎯 Goal Milestone Reached!',
-                message: 'Congratulations! You\'ve reached a financial milestone',
-                frequency: 'event',
-                enabled: true,
-                lastSent: null
-            },
-            budgetReview: {
-                id: 'budget-review',
-                title: '💰 Monthly Budget Review',
-                message: 'Review your spending and adjust your budget for next month',
-                frequency: 'monthly',
-                enabled: true,
-                lastSent: null
-            }
-        };
-        
-        console.log('Initializing Simple Notification System...');
+        this.isSupported = 'Notification' in window && 'serviceWorker' in navigator;
+        this.permission = this.isSupported ? Notification.permission : 'denied';
+        this.settings = this.loadSettings();
         this.init();
     }
 
-    async init() {
-        await this.requestPermission();
-        this.setupScheduler();
-        this.restoreSettings();
-        console.log('Simple Notification System initialized');
-        console.log('Permission status:', this.permission);
+    init() {
+        this.setupEventListeners();
+        this.checkCriticalAlerts();
+        this.schedulePeriodicChecks();
     }
 
+    // Default notification settings
+    getDefaultSettings() {
+        return {
+            enabled: true,
+            criticalAlerts: true,
+            budgetAlerts: true,
+            goalMilestones: true,
+            weeklyReports: true,
+            csvUploadReminders: true,
+            lowBalanceAlerts: true,
+            unusualSpending: true,
+            quietHours: {
+                enabled: true,
+                start: '22:00',
+                end: '07:00'
+            },
+            frequency: {
+                dailyCheck: true,
+                weeklyReport: true,
+                monthlySummary: true
+            }
+        };
+    }
+
+    // Load settings from localStorage
+    loadSettings() {
+        try {
+            const stored = localStorage.getItem('notificationSettings');
+            return stored ? { ...this.getDefaultSettings(), ...JSON.parse(stored) } : this.getDefaultSettings();
+        } catch (error) {
+            console.error('Error loading notification settings:', error);
+            return this.getDefaultSettings();
+        }
+    }
+
+    // Save settings to localStorage
+    saveSettings() {
+        try {
+            localStorage.setItem('notificationSettings', JSON.stringify(this.settings));
+        } catch (error) {
+            console.error('Error saving notification settings:', error);
+        }
+    }
+
+    // Request notification permission
     async requestPermission() {
-        if ('Notification' in window) {
+        if (!this.isSupported) {
+            return 'denied';
+        }
+
+        try {
             this.permission = await Notification.requestPermission();
-            
-            if (this.permission === 'granted') {
-                console.log('Notification permission granted');
-                this.showWelcomeNotification();
-            } else if (this.permission === 'denied') {
-                console.log('Notification permission denied');
-                this.showPermissionAlert();
-            }
-        } else {
-            console.log('Notifications not supported');
+            return this.permission;
+        } catch (error) {
+            console.error('Error requesting notification permission:', error);
+            return 'denied';
         }
     }
 
-    showWelcomeNotification() {
-        this.sendNotification({
-            title: '🔔 FinanceOS Notifications Enabled',
-            message: 'You\'ll receive smart financial reminders and alerts',
-            tag: 'welcome-notification'
-        });
-    }
+    // Check if currently in quiet hours
+    isQuietHours() {
+        if (!this.settings.quietHours.enabled) return false;
 
-    showPermissionAlert() {
-        const alert = document.createElement('div');
-        alert.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
-            padding: 1rem;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
-            z-index: 10001;
-            max-width: 300px;
-            font-size: 0.875rem;
-        `;
-        alert.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <span style="font-size: 1.5rem;">🔔</span>
-                <div>
-                    <strong>Enable Notifications</strong>
-                    <p style="margin: 0.25rem 0 0 0; opacity: 0.9;">Get smart financial reminders</p>
-                </div>
-                <button onclick="this.parentElement.parentElement.remove()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; cursor: pointer;">×</button>
-            </div>
-        `;
-        document.body.appendChild(alert);
-        
-        setTimeout(() => {
-            if (alert.parentElement) alert.remove();
-        }, 8000);
-    }
-
-    setupScheduler() {
-        // Check notifications every hour
-        setInterval(() => {
-            this.checkScheduledNotifications();
-        }, 60 * 60 * 1000);
-
-        // Initial check after 5 seconds
-        setTimeout(() => {
-            this.checkScheduledNotifications();
-        }, 5000);
-    }
-
-    checkScheduledNotifications() {
         const now = new Date();
+        const currentTime = now.getHours() * 60 + now.getMinutes();
         
-        Object.entries(this.notifications).forEach(([key, notification]) => {
-            if (!notification.enabled) return;
-            
-            if (this.shouldSendNotification(notification, now)) {
-                this.sendScheduledNotification(notification);
-            }
-        });
-    }
+        const startTime = this.parseTime(this.settings.quietHours.start);
+        const endTime = this.parseTime(this.settings.quietHours.end);
 
-    shouldSendNotification(notification, now) {
-        const lastSent = notification.lastSent ? new Date(notification.lastSent) : null;
-        
-        switch (notification.frequency) {
-            case 'weekly':
-                // Send on Sundays or if more than a week has passed
-                return !lastSent || 
-                       (now.getDay() === 0 && (!lastSent || now.getDate() !== lastSent.getDate())) ||
-                       (now - lastSent) >= 7 * 24 * 60 * 60 * 1000;
-                
-            case 'monthly':
-                // Send on 1st of month or if more than a month has passed
-                return !lastSent ||
-                       (now.getDate() === 1 && (!lastSent || now.getMonth() !== lastSent.getMonth())) ||
-                       (now - lastSent) >= 30 * 24 * 60 * 60 * 1000;
-                
-            case 'event':
-                // Event-based notifications are triggered manually
-                return false;
-                
-            default:
-                return false;
+        if (startTime > endTime) {
+            // Quiet hours span midnight
+            return currentTime >= startTime || currentTime <= endTime;
+        } else {
+            return currentTime >= startTime && currentTime <= endTime;
         }
     }
 
-    sendScheduledNotification(notification) {
-        // Update last sent time
-        notification.lastSent = new Date().toISOString();
-        this.saveSettings();
-        
-        // Send the notification
-        this.sendNotification({
-            title: notification.title,
-            message: notification.message,
-            tag: notification.id,
-            priority: notification.priority
-        });
-        
-        console.log('Sent scheduled notification:', notification.id);
+    parseTime(timeStr) {
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        return hours * 60 + minutes;
     }
 
-    sendNotification(options) {
+    // Send notification
+    async sendNotification(title, options = {}) {
+        if (!this.settings.enabled || this.isQuietHours()) {
+            console.log('Notification suppressed:', title);
+            return null;
+        }
+
         if (this.permission !== 'granted') {
-            console.log('Cannot send notification - permission not granted');
-            return;
+            console.log('Notification permission not granted');
+            return null;
         }
-        
-        const notification = new Notification(options.title, {
-            body: options.message,
-            icon: '/icons/icon-192x192.png',
-            badge: '/icons/icon-96x96.png',
-            tag: options.tag || 'financeos-notification',
-            requireInteraction: options.priority === 'critical' || options.priority === 'high',
-            silent: false
-        });
 
-        notification.onclick = (event) => {
-            event.preventDefault();
-            window.focus();
-            this.handleNotificationClick(options.tag);
+        try {
+            const notification = new Notification(title, {
+                icon: '/icons/icon-192x192.png',
+                badge: '/icons/icon-72x72.png',
+                tag: options.tag || 'general',
+                renotify: options.renotify || false,
+                silent: options.silent || false,
+                ...options
+            });
+
+            // Auto-close after 10 seconds unless it's critical
+            if (!options.persistent && options.priority !== 'critical') {
+                setTimeout(() => notification.close(), 10000);
+            }
+
+            return notification;
+        } catch (error) {
+            console.error('Error sending notification:', error);
+            return null;
+        }
+    }
+
+    // Critical financial alerts
+    sendCriticalAlert(type, message, actions = []) {
+        if (!this.settings.criticalAlerts) return;
+
+        const criticalOptions = {
+            body: message,
+            priority: 'critical',
+            persistent: true,
+            tag: `critical-${type}`,
+            renotify: true,
+            actions: actions.map(action => ({
+                action: action.id,
+                title: action.title
+            })),
+            data: { type: 'critical', category: type }
         };
 
-        // Auto-close after 8 seconds if not critical
-        if (options.priority !== 'critical' && options.priority !== 'high') {
-            setTimeout(() => {
-                notification.close();
-            }, 8000);
+        return this.sendNotification('🚨 Financial Alert', criticalOptions);
+    }
+
+    // Budget alerts
+    sendBudgetAlert(category, amount, budget, percentage) {
+        if (!this.settings.budgetAlerts) return;
+
+        const message = `${category}: $${amount.toFixed(2)} spent (${percentage.toFixed(0)}% of $${budget.toFixed(2)} budget)`;
+        
+        const options = {
+            body: message,
+            tag: `budget-${category}`,
+            data: { type: 'budget', category, amount, budget, percentage }
+        };
+
+        if (percentage >= 100) {
+            options.priority = 'high';
+            return this.sendNotification('📊 Budget Exceeded', options);
+        } else if (percentage >= 80) {
+            return this.sendNotification('⚠️ Budget Warning', options);
         }
     }
 
-    handleNotificationClick(notificationId) {
-        switch (notificationId) {
-            case 'csv-upload-reminder':
-                window.location.href = '/csv-upload.html';
-                break;
-                
-            case 'emergency-fund-low':
-            case 'goal-milestone':
-                window.location.href = '/goals.html';
-                break;
-                
-            case 'budget-deficit-critical':
-            case 'budget-review':
-                window.location.href = '/';
-                break;
-                
-            default:
-                window.location.href = '/';
+    // Goal milestone notifications
+    sendGoalMilestone(goalTitle, percentage, amount, target) {
+        if (!this.settings.goalMilestones) return;
+
+        const milestones = [25, 50, 75, 90, 100];
+        const milestone = milestones.find(m => percentage >= m && percentage < m + 5);
+        
+        if (milestone) {
+            const message = `${goalTitle}: ${milestone}% complete! $${amount.toFixed(2)} of $${target.toFixed(2)}`;
+            
+            const options = {
+                body: message,
+                tag: `goal-${goalTitle}`,
+                data: { type: 'goal', title: goalTitle, percentage, amount, target }
+            };
+
+            return this.sendNotification('🎯 Goal Progress', options);
         }
     }
 
+    // Weekly financial report
+    sendWeeklyReport() {
+        if (!this.settings.weeklyReports) return;
+
+        const dataManager = window.FinanceOSDataManager;
+        if (!dataManager) return;
+
+        const summary = dataManager.getAccountSummary();
+        const recentTransactions = dataManager.getRecentTransactions(5);
+        
+        const message = `Net Worth: ${dataManager.formatCurrency(summary.netWorth)}
+Monthly Flow: ${dataManager.formatCurrency(summary.monthlyFlow)}
+Recent transactions: ${recentTransactions.length}`;
+
+        const options = {
+            body: message,
+            tag: 'weekly-report',
+            data: { type: 'report', period: 'weekly' }
+        };
+
+        return this.sendNotification('📊 Weekly Financial Report', options);
+    }
+
+    // CSV upload reminders
+    sendCSVUploadReminder() {
+        if (!this.settings.csvUploadReminders) return;
+
+        const lastUpload = localStorage.getItem('csvUploadDate');
+        if (!lastUpload) return;
+
+        const daysSinceUpload = Math.floor((Date.now() - new Date(lastUpload)) / (1000 * 60 * 60 * 24));
+        
+        if (daysSinceUpload >= 7) {
+            const message = `It's been ${daysSinceUpload} days since your last upload. Keep your data current!`;
+            
+            const options = {
+                body: message,
+                tag: 'csv-reminder',
+                actions: [
+                    { action: 'upload', title: 'Upload Now' },
+                    { action: 'remind-later', title: 'Remind Later' }
+                ],
+                data: { type: 'reminder', category: 'csv-upload' }
+            };
+
+            return this.sendNotification('📤 Upload Reminder', options);
+        }
+    }
+
+    // Low balance alerts
+    sendLowBalanceAlert(accountName, balance, threshold = 100) {
+        if (!this.settings.lowBalanceAlerts) return;
+
+        if (balance <= threshold && balance > 0) {
+            const message = `${accountName} balance is low: ${window.FinanceOSDataManager?.formatCurrency(balance) || `$${balance.toFixed(2)}`}`;
+            
+            const options = {
+                body: message,
+                tag: `low-balance-${accountName}`,
+                priority: balance <= 10 ? 'high' : 'normal',
+                data: { type: 'low-balance', account: accountName, balance }
+            };
+
+            return this.sendNotification('⚠️ Low Balance Alert', options);
+        }
+    }
+
+    // Unusual spending detection
+    sendUnusualSpendingAlert(amount, category, average) {
+        if (!this.settings.unusualSpending) return;
+
+        if (amount > average * 2) {
+            const message = `Unusual ${category} spending: ${window.FinanceOSDataManager?.formatCurrency(amount) || `$${amount.toFixed(2)}`} (avg: ${window.FinanceOSDataManager?.formatCurrency(average) || `$${average.toFixed(2)}`})`;
+            
+            const options = {
+                body: message,
+                tag: `unusual-${category}`,
+                data: { type: 'unusual-spending', category, amount, average }
+            };
+
+            return this.sendNotification('💰 Unusual Spending', options);
+        }
+    }
+
+    // Check for critical alerts based on current financial data
+    checkCriticalAlerts() {
+        const dataManager = window.FinanceOSDataManager;
+        if (!dataManager) return;
+
+        const summary = dataManager.getAccountSummary();
+        
+        // Emergency fund critical alert
+        const emergencyFund = dataManager.accounts.find(a => a.name === 'My Savings')?.balance || 0;
+        if (emergencyFund < 1000) {
+            this.sendCriticalAlert(
+                'emergency-fund',
+                `Emergency fund critically low: ${dataManager.formatCurrency(emergencyFund)}. You need at least $1,000 for basic security.`,
+                [
+                    { id: 'start-saving', title: 'Start Saving' },
+                    { id: 'view-plan', title: 'View Plan' }
+                ]
+            );
+        }
+
+        // Budget deficit alert
+        if (summary.monthlyFlow < -1000) {
+            this.sendCriticalAlert(
+                'budget-deficit',
+                `Monthly budget deficit: ${dataManager.formatCurrency(summary.monthlyFlow)}. This is unsustainable and requires immediate action.`,
+                [
+                    { id: 'fix-budget', title: 'Fix Budget' },
+                    { id: 'view-expenses', title: 'View Expenses' }
+                ]
+            );
+        }
+
+        // Check low balances
+        dataManager.accounts.forEach(account => {
+            if (account.type === 'checking' || account.type === 'savings') {
+                this.sendLowBalanceAlert(account.name, account.balance);
+            }
+        });
+    }
+
+    // Schedule periodic checks
+    schedulePeriodicChecks() {
+        // Check every hour for critical alerts
+        setInterval(() => this.checkCriticalAlerts(), 60 * 60 * 1000);
+
+        // Daily check at 9 AM
+        const now = new Date();
+        const daily = new Date();
+        daily.setHours(9, 0, 0, 0);
+        if (daily <= now) {
+            daily.setDate(daily.getDate() + 1);
+        }
+
+        setTimeout(() => {
+            this.dailyCheck();
+            setInterval(() => this.dailyCheck(), 24 * 60 * 60 * 1000);
+        }, daily - now);
+
+        // Weekly report on Sundays at 6 PM
+        const weekly = new Date();
+        weekly.setDate(weekly.getDate() + (7 - weekly.getDay()));
+        weekly.setHours(18, 0, 0, 0);
+
+        setTimeout(() => {
+            this.sendWeeklyReport();
+            setInterval(() => this.sendWeeklyReport(), 7 * 24 * 60 * 60 * 1000);
+        }, weekly - now);
+    }
+
+    // Daily check routine
+    dailyCheck() {
+        if (!this.settings.frequency.dailyCheck) return;
+
+        this.checkCriticalAlerts();
+        this.sendCSVUploadReminder();
+        
+        // Check budget status
+        if (window.FinanceOSDataManager) {
+            const budgetStatus = window.FinanceOSDataManager.getBudgetStatus();
+            budgetStatus.forEach(category => {
+                if (category.percentage >= 80) {
+                    this.sendBudgetAlert(category.name, category.actual, category.budgeted, category.percentage);
+                }
+            });
+        }
+    }
+
+    // Show notification settings modal
     showNotificationSettings() {
+        this.createSettingsModal();
+    }
+
+    // Create settings modal
+    createSettingsModal() {
         // Remove existing modal if present
-        const existing = document.getElementById('notificationSettingsModal');
-        if (existing) existing.remove();
+        const existingModal = document.getElementById('notification-settings-modal');
+        if (existingModal) {
+            existingModal.remove();
+        }
 
         const modal = document.createElement('div');
-        modal.id = 'notificationSettingsModal';
-        modal.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            animation: fadeIn 0.3s ease;
-        `;
-
+        modal.id = 'notification-settings-modal';
+        modal.className = 'notification-modal glass';
         modal.innerHTML = `
-            <div style="
-                max-width: 600px;
-                width: 90%;
-                background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.15));
-                backdrop-filter: blur(20px);
-                border: 1px solid rgba(255, 255, 255, 0.2);
-                border-radius: 20px;
-                padding: 2rem;
-                animation: slideUp 0.3s ease;
-            ">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
-                    <h2 style="color: white; font-size: 1.5rem; margin: 0;">🔔 Notification Settings</h2>
-                    <button onclick="document.getElementById('notificationSettingsModal').remove()" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 0.5rem; border-radius: 6px; transition: background 0.2s;">&times;</button>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>🔔 Notification Settings</h3>
+                    <button class="modal-close" onclick="this.closest('.notification-modal').remove()">×</button>
                 </div>
                 
-                <div style="margin-bottom: 2rem;">
-                    <div style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                        <div style="display: flex; align-items: center; gap: 1rem; color: white;">
-                            <span>Notification Permission:</span>
-                            <span style="padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; ${this.permission === 'granted' ? 'background: rgba(16, 185, 129, 0.2); color: #10b981;' : 'background: rgba(239, 68, 68, 0.2); color: #ef4444;'}">${this.permission}</span>
-                            ${this.permission !== 'granted' ? '<button onclick="window.FinanceOSNotifications.requestPermission()" style="padding: 0.25rem 0.75rem; font-size: 0.75rem; border-radius: 6px; background: linear-gradient(135deg, #8b5cf6, #9333ea); color: white; border: none; cursor: pointer;">Enable</button>' : ''}
+                <div class="modal-body">
+                    ${!this.isSupported ? '<div class="alert-warning">⚠️ Notifications not supported in this browser</div>' : ''}
+                    ${this.permission !== 'granted' ? '<div class="alert-info">ℹ️ Click "Enable Notifications" to receive alerts</div>' : ''}
+                    
+                    <div class="setting-group">
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <input type="checkbox" ${this.settings.enabled ? 'checked' : ''} data-setting="enabled">
+                                Enable Notifications
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <h4>Alert Types</h4>
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <input type="checkbox" ${this.settings.criticalAlerts ? 'checked' : ''} data-setting="criticalAlerts">
+                                Critical Financial Alerts
+                            </label>
+                            <small>Emergency fund, budget deficit warnings</small>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <input type="checkbox" ${this.settings.budgetAlerts ? 'checked' : ''} data-setting="budgetAlerts">
+                                Budget Alerts
+                            </label>
+                            <small>When spending exceeds 80% of category budget</small>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <input type="checkbox" ${this.settings.goalMilestones ? 'checked' : ''} data-setting="goalMilestones">
+                                Goal Milestones
+                            </label>
+                            <small>Progress updates for savings goals</small>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <input type="checkbox" ${this.settings.lowBalanceAlerts ? 'checked' : ''} data-setting="lowBalanceAlerts">
+                                Low Balance Alerts
+                            </label>
+                            <small>When account balance drops below $100</small>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <h4>Reports</h4>
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <input type="checkbox" ${this.settings.weeklyReports ? 'checked' : ''} data-setting="weeklyReports">
+                                Weekly Reports
+                            </label>
+                            <small>Sunday evening financial summary</small>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <input type="checkbox" ${this.settings.csvUploadReminders ? 'checked' : ''} data-setting="csvUploadReminders">
+                                CSV Upload Reminders
+                            </label>
+                            <small>Remind to upload bank statements weekly</small>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <h4>Quiet Hours</h4>
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <input type="checkbox" ${this.settings.quietHours.enabled ? 'checked' : ''} data-setting="quietHours.enabled">
+                                Enable Quiet Hours
+                            </label>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                From: <input type="time" value="${this.settings.quietHours.start}" data-setting="quietHours.start" class="time-input">
+                                To: <input type="time" value="${this.settings.quietHours.end}" data-setting="quietHours.end" class="time-input">
+                            </label>
+                            <small>No notifications during these hours</small>
                         </div>
                     </div>
                 </div>
                 
-                <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem; max-height: 400px; overflow-y: auto;">
-                    ${Object.entries(this.notifications).map(([key, notification]) => `
-                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1);">
-                            <div style="flex: 1;">
-                                <h4 style="color: white; margin: 0 0 0.25rem 0; font-size: 1rem;">${notification.title}</h4>
-                                <p style="color: rgba(255, 255, 255, 0.7); margin: 0 0 0.5rem 0; font-size: 0.875rem;">${notification.message}</p>
-                                <div style="display: flex; gap: 0.5rem;">
-                                    <span style="background: rgba(59, 130, 246, 0.2); color: #3b82f6; padding: 0.125rem 0.5rem; border-radius: 8px; font-size: 0.75rem;">${notification.frequency}</span>
-                                    ${notification.priority ? `<span style="background: ${notification.priority === 'critical' ? 'rgba(239, 68, 68, 0.2); color: #ef4444;' : 'rgba(245, 158, 11, 0.2); color: #f59e0b;'}; padding: 0.125rem 0.5rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600;">${notification.priority}</span>` : ''}
-                                </div>
-                            </div>
-                            <div>
-                                <label style="position: relative; display: inline-block; width: 50px; height: 24px;">
-                                    <input type="checkbox" ${notification.enabled ? 'checked' : ''} onchange="window.FinanceOSNotifications.toggleNotification('${key}', this.checked)" style="opacity: 0; width: 0; height: 0;">
-                                    <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255, 255, 255, 0.2); transition: 0.3s; border-radius: 24px; ${notification.enabled ? 'background: linear-gradient(135deg, #8b5cf6, #9333ea);' : ''}"></span>
-                                    <span style="position: absolute; content: ''; height: 20px; width: 20px; left: 2px; bottom: 2px; background-color: white; transition: 0.3s; border-radius: 50%; ${notification.enabled ? 'transform: translateX(26px);' : ''}"></span>
-                                </label>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-                
-                <div style="display: flex; gap: 1rem; justify-content: center;">
-                    <button onclick="window.FinanceOSNotifications.testNotification()" style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #8b5cf6, #9333ea); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">📤 Send Test Notification</button>
-                    <button onclick="document.getElementById('notificationSettingsModal').remove()" style="padding: 0.75rem 1.5rem; background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">Close</button>
+                <div class="modal-footer">
+                    ${this.permission !== 'granted' ? 
+                        '<button class="btn-primary" onclick="window.FinanceOSNotifications.requestPermission().then(() => this.closest(\'.notification-modal\').remove())">Enable Notifications</button>' : ''}
+                    <button class="btn-secondary" onclick="window.FinanceOSNotifications.testNotification()">Test Notification</button>
+                    <button class="btn-primary" onclick="window.FinanceOSNotifications.saveSettingsFromModal(); this.closest('.notification-modal').remove()">Save Settings</button>
                 </div>
             </div>
-            
-            <style>
-                @keyframes fadeIn {
-                    from { opacity: 0; }
-                    to { opacity: 1; }
-                }
-                
-                @keyframes slideUp {
-                    from { 
-                        opacity: 0;
-                        transform: translateY(30px);
-                    }
-                    to { 
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-            </style>
         `;
 
-        document.body.appendChild(modal);
+        // Add styles if not already present
+        if (!document.getElementById('notification-modal-styles')) {
+            const styles = document.createElement('style');
+            styles.id = 'notification-modal-styles';
+            styles.textContent = `
+                .notification-modal {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.7);
+                    backdrop-filter: blur(10px);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1000;
+                }
+                
+                .modal-content {
+                    background: rgba(255, 255, 255, 0.1);
+                    backdrop-filter: blur(20px);
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    border-radius: 20px;
+                    width: 90%;
+                    max-width: 500px;
+                    max-height: 80vh;
+                    overflow-y: auto;
+                }
+                
+                .modal-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 20px;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                }
+                
+                .modal-header h3 {
+                    color: white;
+                    margin: 0;
+                }
+                
+                .modal-close {
+                    background: none;
+                    border: none;
+                    color: white;
+                    font-size: 24px;
+                    cursor: pointer;
+                    padding: 0;
+                    width: 30px;
+                    height: 30px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                
+                .modal-body {
+                    padding: 20px;
+                }
+                
+                .setting-group {
+                    margin-bottom: 20px;
+                }
+                
+                .setting-group h4 {
+                    color: white;
+                    margin: 0 0 10px 0;
+                    font-size: 16px;
+                }
+                
+                .setting-item {
+                    margin-bottom: 15px;
+                }
+                
+                .setting-label {
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    cursor: pointer;
+                }
+                
+                .setting-label input[type="checkbox"] {
+                    margin: 0;
+                }
+                
+                .setting-label small {
+                    color: rgba(255, 255, 255, 0.7);
+                    display: block;
+                    margin-top: 5px;
+                    margin-left: 25px;
+                }
+                
+                .time-input {
+                    background: rgba(255, 255, 255, 0.1);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    border-radius: 5px;
+                    color: white;
+                    padding: 5px;
+                    margin: 0 10px;
+                }
+                
+                .modal-footer {
+                    padding: 20px;
+                    border-top: 1px solid rgba(255, 255, 255, 0.1);
+                    display: flex;
+                    gap: 10px;
+                    justify-content: flex-end;
+                }
+                
+                .btn-primary, .btn-secondary {
+                    padding: 10px 20px;
+                    border: none;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-weight: 500;
+                }
+                
+                .btn-primary {
+                    background: linear-gradient(135deg, #8b5cf6, #9333ea);
+                    color: white;
+                }
+                
+                .btn-secondary {
+                    background: rgba(255, 255, 255, 0.1);
+                    color: white;
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                }
+                
+                .alert-warning, .alert-info {
+                    padding: 10px;
+                    border-radius: 10px;
+                    margin-bottom: 15px;
+                }
+                
+                .alert-warning {
+                    background: rgba(245, 158, 11, 0.2);
+                    border: 1px solid rgba(245, 158, 11, 0.3);
+                    color: #fbbf24;
+                }
+                
+                .alert-info {
+                    background: rgba(59, 130, 246, 0.2);
+                    border: 1px solid rgba(59, 130, 246, 0.3);
+                    color: #60a5fa;
+                }
+            `;
+            document.head.appendChild(styles);
+        }
 
-        // Close on background click
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.remove();
+        document.body.appendChild(modal);
+    }
+
+    // Save settings from modal
+    saveSettingsFromModal() {
+        const modal = document.getElementById('notification-settings-modal');
+        if (!modal) return;
+
+        const checkboxes = modal.querySelectorAll('input[type="checkbox"]');
+        const timeInputs = modal.querySelectorAll('input[type="time"]');
+
+        checkboxes.forEach(checkbox => {
+            const setting = checkbox.dataset.setting;
+            if (setting.includes('.')) {
+                const [parent, child] = setting.split('.');
+                this.settings[parent][child] = checkbox.checked;
+            } else {
+                this.settings[setting] = checkbox.checked;
             }
         });
+
+        timeInputs.forEach(input => {
+            const setting = input.dataset.setting;
+            if (setting.includes('.')) {
+                const [parent, child] = setting.split('.');
+                this.settings[parent][child] = input.value;
+            }
+        });
+
+        this.saveSettings();
+        console.log('Notification settings saved:', this.settings);
     }
 
-    toggleNotification(notificationKey, enabled) {
-        if (this.notifications[notificationKey]) {
-            this.notifications[notificationKey].enabled = enabled;
-            this.saveSettings();
-            console.log(`Notification ${notificationKey} ${enabled ? 'enabled' : 'disabled'}`);
-        }
-    }
-
+    // Test notification
     testNotification() {
-        this.sendNotification({
-            title: '🧪 Test Notification',
-            message: 'This is a test notification from FinanceOS. Notifications are working perfectly!',
+        this.sendNotification('🧪 Test Notification', {
+            body: 'FinanceOS notifications are working correctly!',
             tag: 'test-notification'
         });
     }
 
-    saveSettings() {
-        localStorage.setItem('financeosNotificationSettings', JSON.stringify(this.notifications));
-    }
-
-    restoreSettings() {
-        const saved = localStorage.getItem('financeosNotificationSettings');
-        if (saved) {
-            try {
-                const savedNotifications = JSON.parse(saved);
-                Object.keys(this.notifications).forEach(key => {
-                    if (savedNotifications[key]) {
-                        this.notifications[key] = {
-                            ...this.notifications[key],
-                            ...savedNotifications[key]
-                        };
-                    }
-                });
-            } catch (error) {
-                console.error('Error restoring notification settings:', error);
-            }
+    // Event listeners
+    setupEventListeners() {
+        // Listen for notification clicks
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'notification-click') {
+                    this.handleNotificationClick(event.data);
+                }
+            });
         }
+
+        // Listen for visibility change to check alerts when app becomes active
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                this.checkCriticalAlerts();
+            }
+        });
     }
 
-    // Manual trigger methods
-    triggerCSVUploadReminder() {
-        this.sendScheduledNotification(this.notifications.csvUpload);
-    }
-
-    triggerEmergencyFundAlert() {
-        this.sendScheduledNotification(this.notifications.emergencyFund);
-    }
-
-    triggerBudgetDeficitAlert() {
-        this.sendScheduledNotification(this.notifications.budgetDeficit);
-    }
-
-    triggerGoalMilestone(goalName, percentage) {
-        const notification = { ...this.notifications.goalMilestone };
-        notification.message = `Congratulations! You've reached ${percentage}% of your ${goalName} goal!`;
-        this.sendScheduledNotification(notification);
+    // Handle notification clicks
+    handleNotificationClick(data) {
+        switch (data.action) {
+            case 'upload':
+                window.location.href = 'csv-upload.html';
+                break;
+            case 'start-saving':
+            case 'view-plan':
+            case 'fix-budget':
+                window.location.href = 'goals.html';
+                break;
+            case 'view-expenses':
+                window.location.href = 'index.html';
+                break;
+            default:
+                // Default action - focus the app
+                window.focus();
+        }
     }
 }
 
-// Create global notification manager instance
-window.FinanceOSNotifications = new SimpleFinanceOSNotifications();
+// Initialize notification system
+window.FinanceOSNotifications = new FinanceOSNotifications();
 
-// Event listeners for CSV upload and goal progress
-window.addEventListener('csvUploadSuccess', () => {
-    if (window.FinanceOSNotifications) {
-        window.FinanceOSNotifications.notifications.csvUpload.lastSent = new Date().toISOString();
-        window.FinanceOSNotifications.saveSettings();
-    }
-});
+// Request permission on first load if notifications are enabled
+if (window.FinanceOSNotifications.settings.enabled && 
+    window.FinanceOSNotifications.permission === 'default') {
+    // Delay request to avoid being too aggressive
+    setTimeout(() => {
+        window.FinanceOSNotifications.requestPermission();
+    }, 5000);
+}
 
-window.addEventListener('goalProgress', (event) => {
-    if (window.FinanceOSNotifications && event.detail) {
-        const { goalName, percentage } = event.detail;
-        if (percentage >= 25 && percentage % 25 === 0) {
-            window.FinanceOSNotifications.triggerGoalMilestone(goalName, percentage);
-        }
-    }
-});
-
-console.log('Simple FinanceOS Notification System loaded successfully');
+console.log('FinanceOS Notification System loaded successfully');
