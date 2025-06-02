@@ -2,12 +2,12 @@
   "name": "FinanceOS - Personal Finance Operating System",
   "short_name": "FinanceOS",
   "description": "Complete personal finance management with AI coaching for married couples. Track accounts, budgets, goals, and get intelligent financial guidance.",
-  "start_url": "/",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#0f172a",
   "theme_color": "#8b5cf6",
-  "scope": "/",
   "lang": "en-US",
   "dir": "ltr",
   
@@ -20,55 +20,55 @@
   
   "icons": [
     {
-      "src": "icons/icon-72x72.png",
+      "src": "./icons/icon-72x72.png",
       "sizes": "72x72",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "icons/icon-96x96.png",
+      "src": "./icons/icon-96x96.png",
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "icons/icon-128x128.png",
+      "src": "./icons/icon-128x128.png",
       "sizes": "128x128",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "icons/icon-144x144.png",
+      "src": "./icons/icon-144x144.png",
       "sizes": "144x144",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "icons/icon-152x152.png",
+      "src": "./icons/icon-152x152.png",
       "sizes": "152x152",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "icons/icon-192x192.png",
+      "src": "./icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "icons/icon-384x384.png",
+      "src": "./icons/icon-384x384.png",
       "sizes": "384x384",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "icons/icon-512x512.png",
+      "src": "./icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "icons/apple-touch-icon.png",
+      "src": "./icons/apple-touch-icon.png",
       "sizes": "180x180",
       "type": "image/png",
       "purpose": "any"
@@ -80,10 +80,10 @@
       "name": "Upload Bank Statements",
       "short_name": "Upload CSV",
       "description": "Upload and process weekly bank statement CSV files",
-      "url": "/csv-upload.html",
+      "url": "./csv-upload.html",
       "icons": [
         {
-          "src": "icons/shortcut-upload.png",
+          "src": "./icons/icon-96x96.png",
           "sizes": "96x96",
           "type": "image/png"
         }
@@ -93,10 +93,10 @@
       "name": "View Financial Goals",
       "short_name": "Goals",
       "description": "Track progress on savings goals and get AI coaching",
-      "url": "/goals.html",
+      "url": "./goals.html",
       "icons": [
         {
-          "src": "icons/shortcut-goals.png",
+          "src": "./icons/icon-96x96.png",
           "sizes": "96x96",
           "type": "image/png"
         }
@@ -106,10 +106,10 @@
       "name": "Dashboard Overview",
       "short_name": "Dashboard",
       "description": "View account balances and financial summary",
-      "url": "/index.html",
+      "url": "./index.html",
       "icons": [
         {
-          "src": "icons/shortcut-dashboard.png",
+          "src": "./icons/icon-96x96.png",
           "sizes": "96x96",
           "type": "image/png"
         }
@@ -119,10 +119,10 @@
       "name": "Emergency Fund Alert",
       "short_name": "Emergency",
       "description": "Critical: Build your emergency fund immediately",
-      "url": "/goals.html#emergency-fund",
+      "url": "./goals.html#emergency-fund",
       "icons": [
         {
-          "src": "icons/shortcut-emergency.png",
+          "src": "./icons/icon-96x96.png",
           "sizes": "96x96",
           "type": "image/png"
         }
@@ -132,32 +132,18 @@
   
   "screenshots": [
     {
-      "src": "screenshots/dashboard-wide.png",
+      "src": "./screenshots/dashboard-wide.png",
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
       "label": "FinanceOS Dashboard showing account overview and financial summary"
     },
     {
-      "src": "screenshots/dashboard-narrow.png",
+      "src": "./screenshots/dashboard-narrow.png",
       "sizes": "414x896",
       "type": "image/png",
       "form_factor": "narrow",
       "label": "Mobile view of FinanceOS with account cards and quick actions"
-    },
-    {
-      "src": "screenshots/goals-wide.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Financial goals tracking with AI coaching insights"
-    },
-    {
-      "src": "screenshots/upload-narrow.png",
-      "sizes": "414x896",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "CSV upload interface for bank statement processing"
     }
   ],
   
@@ -183,12 +169,12 @@
   "protocol_handlers": [
     {
       "protocol": "web+financeos",
-      "url": "/?action=%s"
+      "url": "./?action=%s"
     }
   ],
   
   "share_target": {
-    "action": "/csv-upload.html",
+    "action": "./csv-upload.html",
     "method": "GET",
     "params": {
       "title": "title",
@@ -199,7 +185,7 @@
   
   "file_handlers": [
     {
-      "action": "/csv-upload.html",
+      "action": "./csv-upload.html",
       "accept": {
         "text/csv": [".csv"],
         "application/vnd.ms-excel": [".xls"],
@@ -215,27 +201,5 @@
     "browser"
   ],
   
-  "id": "/?standalone=true",
-  
-  "version": "1.0.0",
-  
-  "permissions": [
-    "notifications",
-    "storage"
-  ],
-  
-  "features": [
-    "Cross Platform",
-    "Offline Support", 
-    "Push Notifications",
-    "File Handling",
-    "AI Coaching",
-    "Bank Statement Processing",
-    "Goal Tracking",
-    "Budget Management",
-    "Privacy Mode",
-    "Biometric Authentication"
-  ],
-  
-  "iarc_rating_id": "e58c174a-81d2-5c3c-32cc-34b8de4a52e9"
+  "id": "./?standalone=true"
 }
