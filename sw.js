@@ -1,245 +1,118 @@
-// FinanceOS Service Worker - Advanced PWA functionality
-const CACHE_NAME = 'financeos-v1.0.0';
+// FinanceOS Service Worker
+// Handles offline functionality, caching, and background sync
 
-// Resources to cache for offline functionality
-const urlsToCache = [
+const CACHE_NAME = 'financeos-v2.0.0';
+const STATIC_CACHE = 'financeos-static-v2.0.0';
+const DYNAMIC_CACHE = 'financeos-dynamic-v2.0.0';
+const CSV_CACHE = 'financeos-csv-v1.0.0';
+
+// Files to cache immediately (App Shell)
+const STATIC_FILES = [
   '/',
   '/index.html',
-  '/goals.html', 
   '/csv-upload.html',
-  '/manifest.json'
-  // Note: Icons will be added when created
+  '/goals.html',
+  '/styles.css',
+  '/manifest.json',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png',
+  // Add other essential assets
 ];
 
-// Install event - cache resources
+// Dynamic files that can be cached on request
+const DYNAMIC_FILES = [
+  '/icons/',
+  '/screenshots/',
+  // API responses, user data, etc.
+];
+
+// Install Event - Cache App Shell
 self.addEventListener('install', (event) => {
-  console.log('🔧 FinanceOS Service Worker installing...');
+  console.log('[SW] Installing Service Worker...');
   
   event.waitUntil(
-    caches.open(CACHE_NAME)
+    caches.open(STATIC_CACHE)
       .then((cache) => {
-        console.log('📦 Caching core files');
-        return cache.addAll(urlsToCache);
+        console.log('[SW] Caching App Shell');
+        return cache.addAll(STATIC_FILES);
       })
       .then(() => {
-        console.log('✅ FinanceOS Service Worker installed');
-        // Skip waiting to activate immediately
-        return self.skipWaiting();
+        console.log('[SW] App Shell cached successfully');
+        return self.skipWaiting(); // Force activation
       })
       .catch((error) => {
-        console.error('❌ Cache failed:', error);
+        console.error('[SW] Error caching app shell:', error);
       })
   );
 });
 
-// Activate event - clean old caches
+// Activate Event - Clean up old caches
 self.addEventListener('activate', (event) => {
-  console.log('🚀 FinanceOS Service Worker activating...');
+  console.log('[SW] Activating Service Worker...');
   
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('🗑️ Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    }).then(() => {
-      console.log('✅ Service Worker activated');
-      // Claim all clients immediately
-      return self.clients.claim();
-    })
-  );
-});
-
-// Fetch event - serve from cache, fallback to network
-self.addEventListener('fetch', (event) => {
-  // Only handle GET requests
-  if (event.request.method !== 'GET') return;
-  
-  // Skip cross-origin requests
-  if (!event.request.url.startsWith(self.location.origin)) return;
-  
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Return cached version if available
-        if (response) {
-          console.log('📋 Serving from cache:', event.request.url);
-          return response;
-        }
-        
-        // Otherwise fetch from network
-        return fetch(event.request)
-          .then((response) => {
-            // Don't cache non-successful responses
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-            
-            // Clone the response before caching
-            const responseToCache = response.clone();
-            
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
-            
-            return response;
-          })
-          .catch(() => {
-            // Network failed - for navigation requests, show offline message
-            if (event.request.mode === 'navigate') {
-              return new Response(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                  <title>FinanceOS - Offline</title>
-                  <meta name="viewport" content="width=device-width, initial-scale=1">
-                  <style>
-                    body { 
-                      font-family: Arial, sans-serif; 
-                      background: linear-gradient(135deg, #0f172a, #1e1b4b); 
-                      color: white; 
-                      text-align: center; 
-                      padding: 50px 20px; 
-                      margin: 0;
-                    }
-                    .container { 
-                      max-width: 400px; 
-                      margin: 0 auto; 
-                      background: rgba(255,255,255,0.1); 
-                      padding: 40px; 
-                      border-radius: 20px; 
-                    }
-                    .icon { font-size: 60px; margin-bottom: 20px; }
-                    h1 { margin-bottom: 20px; }
-                    button { 
-                      background: linear-gradient(135deg, #8b5cf6, #9333ea); 
-                      color: white; 
-                      border: none; 
-                      padding: 12px 24px; 
-                      border-radius: 8px; 
-                      cursor: pointer; 
-                      margin-top: 20px;
-                    }
-                  </style>
-                </head>
-                <body>
-                  <div class="container">
-                    <div class="icon">📱</div>
-                    <h1>FinanceOS Offline</h1>
-                    <p>You're offline, but your financial goals are still accessible!</p>
-                    <p>Goal tracking works without internet connection.</p>
-                    <button onclick="window.location.reload()">Try Again</button>
-                    <br><br>
-                    <a href="/goals.html" style="color: #8b5cf6;">Go to Goals →</a>
-                  </div>
-                </body>
-                </html>
-              `, {
-                headers: { 'Content-Type': 'text/html' }
-              });
-            }
-            
-            // For other requests, return error
-            return new Response('Offline', { status: 503 });
-          });
+    caches.keys()
+      .then((cacheNames) => {
+        return Promise.all(
+          cacheNames
+            .filter((cacheName) => {
+              // Delete old versions of caches
+              return cacheName !== STATIC_CACHE && 
+                     cacheName !== DYNAMIC_CACHE && 
+                     cacheName !== CSV_CACHE &&
+                     cacheName.startsWith('financeos-');
+            })
+            .map((cacheName) => {
+              console.log('[SW] Deleting old cache:', cacheName);
+              return caches.delete(cacheName);
+            })
+        );
+      })
+      .then(() => {
+        console.log('[SW] Service Worker activated');
+        return self.clients.claim(); // Take control of pages
       })
   );
 });
 
-// Background sync for financial data
+// Fetch Event - Handle requests with caching strategies
+self.addEventListener('fetch', (event) => {
+  const { request } = event;
+  const url = new URL(request.url);
+  
+  // Skip non-HTTP requests
+  if (!request.url.startsWith('http')) {
+    return;
+  }
+  
+  // Handle different types of requests
+  if (isStaticAsset(request)) {
+    event.respondWith(cacheFirst(request, STATIC_CACHE));
+  } else if (isAPIRequest(request)) {
+    event.respondWith(networkFirst(request, DYNAMIC_CACHE));
+  } else if (isCSVUpload(request)) {
+    event.respondWith(handleCSVUpload(request));
+  } else {
+    event.respondWith(staleWhileRevalidate(request, DYNAMIC_CACHE));
+  }
+});
+
+// Background Sync - Handle offline CSV uploads
 self.addEventListener('sync', (event) => {
-  console.log('🔄 Background sync triggered:', event.tag);
+  console.log('[SW] Background sync triggered:', event.tag);
   
-  if (event.tag === 'financial-data-sync') {
-    event.waitUntil(syncFinancialData());
-  }
-  
-  if (event.tag === 'goal-progress-sync') {
-    event.waitUntil(syncGoalProgress());
+  if (event.tag === 'csv-upload-sync') {
+    event.waitUntil(syncPendingCSVUploads());
+  } else if (event.tag === 'goal-update-sync') {
+    event.waitUntil(syncPendingGoalUpdates());
+  } else if (event.tag === 'transaction-sync') {
+    event.waitUntil(syncPendingTransactions());
   }
 });
 
-// Push notifications for budget alerts
-self.addEventListener('push', (event) => {
-  console.log('🔔 Push notification received');
-  
-  const data = event.data ? event.data.json() : {};
-  
-  const options = {
-    body: data.body || 'New financial update available!',
-    icon: '/icons/icon-192x192.png',
-    badge: '/icons/icon-72x72.png',
-    vibrate: [200, 100, 200],
-    data: {
-      url: data.url || '/goals.html',
-      dateOfArrival: Date.now()
-    },
-    actions: [
-      {
-        action: 'view-goals',
-        title: 'View Goals'
-      },
-      {
-        action: 'add-funds',
-        title: 'Add Funds'
-      }
-    ],
-    requireInteraction: true,
-    tag: 'financeos-notification'
-  };
-  
-  event.waitUntil(
-    self.registration.showNotification(
-      data.title || '🎯 FinanceOS Update', 
-      options
-    )
-  );
-});
-
-// Handle notification clicks
-self.addEventListener('notificationclick', (event) => {
-  console.log('🔔 Notification clicked:', event.action);
-  
-  event.notification.close();
-  
-  // Handle action clicks
-  let targetUrl = '/';
-  
-  if (event.action === 'view-goals') {
-    targetUrl = '/goals.html';
-  } else if (event.action === 'add-funds') {
-    targetUrl = '/goals.html#emergency-fund';
-  } else if (event.notification.data && event.notification.data.url) {
-    targetUrl = event.notification.data.url;
-  }
-  
-  event.waitUntil(
-    clients.matchAll({ type: 'window' }).then(clientList => {
-      // If app is already open, focus it
-      for (const client of clientList) {
-        if (client.url.includes(self.location.origin) && 'focus' in client) {
-          client.navigate(targetUrl);
-          return client.focus();
-        }
-      }
-      // Otherwise open new window
-      if (clients.openWindow) {
-        return clients.openWindow(targetUrl);
-      }
-    })
-  );
-});
-
-// Handle messages from the main app
+// Message Handler - Communication with main thread
 self.addEventListener('message', (event) => {
-  console.log('💬 Message received:', event.data);
-  
-  const { type, data } = event.data || {};
+  const { type, data } = event.data;
   
   switch (type) {
     case 'SKIP_WAITING':
@@ -250,136 +123,424 @@ self.addEventListener('message', (event) => {
       event.ports[0].postMessage({ version: CACHE_NAME });
       break;
       
-    case 'CACHE_GOAL_DATA':
-      cacheGoalData(data);
+    case 'CLEAR_CACHE':
+      clearAllCaches()
+        .then(() => event.ports[0].postMessage({ success: true }))
+        .catch((error) => event.ports[0].postMessage({ error: error.message }));
       break;
       
-    case 'TRIGGER_SYNC':
-      if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
-        self.registration.sync.register('goal-progress-sync');
-      }
+    case 'CACHE_CSV_DATA':
+      cacheCSVData(data)
+        .then(() => event.ports[0].postMessage({ success: true }))
+        .catch((error) => event.ports[0].postMessage({ error: error.message }));
       break;
+      
+    default:
+      console.log('[SW] Unknown message type:', type);
   }
 });
 
-// Helper functions for background operations
-async function syncFinancialData() {
-  try {
-    console.log('💰 Syncing financial data...');
-    
-    // Get stored financial data
-    const goalData = getStoredData('financeOS_goalData');
-    const transactions = getStoredData('financeOS_transactions');
-    
-    if (goalData || transactions) {
-      console.log('📊 Found offline financial data to sync');
-      // In a real app, this would sync to your backend
-      // For now, we'll just log that sync would happen
-      console.log('✅ Financial data sync completed');
-      
-      // Show success notification
-      showSyncNotification('💰 Financial data synced!');
-    }
-  } catch (error) {
-    console.error('❌ Financial data sync failed:', error);
-  }
-}
-
-async function syncGoalProgress() {
-  try {
-    console.log('🎯 Syncing goal progress...');
-    
-    const goalData = getStoredData('financeOS_goalData');
-    if (goalData) {
-      console.log('📈 Goal progress ready for sync');
-      
-      // Check for milestones to celebrate
-      checkMilestones(goalData);
-    }
-    
-    console.log('✅ Goal progress sync completed');
-  } catch (error) {
-    console.error('❌ Goal progress sync failed:', error);
-  }
-}
-
-function getStoredData(key) {
-  try {
-    const data = typeof localStorage !== 'undefined' ? localStorage.getItem(key) : null;
-    return data ? JSON.parse(data) : null;
-  } catch {
-    return null;
-  }
-}
-
-async function cacheGoalData(data) {
-  try {
-    console.log('💾 Caching goal data for offline use');
-    // Could store in IndexedDB for more robust offline storage
-    // For now, localStorage handling is done by the main app
-  } catch (error) {
-    console.error('❌ Failed to cache goal data:', error);
-  }
-}
-
-function checkMilestones(goalData) {
-  if (!goalData || !goalData.emergencyFund) return;
+// Push Notification Handler
+self.addEventListener('push', (event) => {
+  console.log('[SW] Push notification received');
   
-  const currentAmount = goalData.emergencyFund.current || 0;
-  const lastNotified = parseFloat(localStorage.getItem('lastMilestoneNotified') || '0');
-  
-  // Check for $100 milestones
-  const milestoneReached = Math.floor(currentAmount / 100) * 100;
-  
-  if (milestoneReached > lastNotified && milestoneReached >= 100) {
-    showMilestoneNotification(milestoneReached);
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('lastMilestoneNotified', milestoneReached.toString());
-    }
-  }
-}
-
-function showMilestoneNotification(amount) {
-  self.registration.showNotification('🎉 Milestone Achieved!', {
-    body: `You've saved $${amount} in your emergency fund! Keep going!`,
+  let notificationData = {
+    title: 'FinanceOS',
+    body: 'You have a new financial notification',
     icon: '/icons/icon-192x192.png',
-    badge: '/icons/icon-72x72.png',
-    tag: 'milestone-achievement',
-    requireInteraction: true,
+    badge: '/icons/icon-96x96.png',
+    tag: 'financeos-notification',
+    requireInteraction: false,
     actions: [
       {
-        action: 'view-goals',
-        title: 'View Progress'
+        action: 'view',
+        title: 'View Dashboard',
+        icon: '/icons/dashboard-96x96.png'
+      },
+      {
+        action: 'dismiss',
+        title: 'Dismiss',
+        icon: '/icons/close-96x96.png'
       }
     ]
-  });
-}
-
-function showSyncNotification(message) {
-  self.registration.showNotification('FinanceOS Sync', {
-    body: message,
-    icon: '/icons/icon-192x192.png',
-    badge: '/icons/icon-72x72.png',
-    tag: 'sync-notification',
-    silent: true
-  });
-}
-
-// Online/offline status monitoring
-self.addEventListener('online', () => {
-  console.log('🌐 Back online - triggering sync');
-  if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
-    self.registration.sync.register('financial-data-sync');
+  };
+  
+  if (event.data) {
+    try {
+      const pushData = event.data.json();
+      notificationData = { ...notificationData, ...pushData };
+    } catch (error) {
+      console.error('[SW] Error parsing push data:', error);
+    }
   }
+  
+  event.waitUntil(
+    self.registration.showNotification(notificationData.title, notificationData)
+  );
 });
 
-// Error handling
-self.addEventListener('error', (event) => {
-  console.error('❌ Service Worker error:', event.error);
+// Notification Click Handler
+self.addEventListener('notificationclick', (event) => {
+  console.log('[SW] Notification clicked:', event.action);
+  
+  event.notification.close();
+  
+  const action = event.action || 'view';
+  let url = '/';
+  
+  switch (action) {
+    case 'view':
+      url = '/';
+      break;
+    case 'upload':
+      url = '/csv-upload.html';
+      break;
+    case 'goals':
+      url = '/goals.html';
+      break;
+    default:
+      url = '/';
+  }
+  
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clientList) => {
+        // Check if app is already open
+        for (const client of clientList) {
+          if (client.url.includes(url) && 'focus' in client) {
+            return client.focus();
+          }
+        }
+        
+        // Open new window
+        if (clients.openWindow) {
+          return clients.openWindow(url);
+        }
+      })
+  );
 });
 
-self.addEventListener('unhandledrejection', (event) => {
-  console.error('❌ Service Worker unhandled rejection:', event.reason);
-});
+// =============================================
+// CACHING STRATEGIES
+// =============================================
 
-console.log('🎯 FinanceOS Service Worker loaded successfully!');
+// Cache First Strategy - For static assets
+function cacheFirst(request, cacheName) {
+  return caches.open(cacheName)
+    .then((cache) => {
+      return cache.match(request)
+        .then((cachedResponse) => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          
+          return fetch(request)
+            .then((networkResponse) => {
+              if (networkResponse.ok) {
+                cache.put(request, networkResponse.clone());
+              }
+              return networkResponse;
+            });
+        });
+    })
+    .catch(() => {
+      // Return offline fallback if available
+      return caches.match('/offline.html');
+    });
+}
+
+// Network First Strategy - For API requests
+function networkFirst(request, cacheName) {
+  return fetch(request)
+    .then((networkResponse) => {
+      if (networkResponse.ok) {
+        return caches.open(cacheName)
+          .then((cache) => {
+            cache.put(request, networkResponse.clone());
+            return networkResponse;
+          });
+      }
+      return networkResponse;
+    })
+    .catch(() => {
+      return caches.open(cacheName)
+        .then((cache) => {
+          return cache.match(request);
+        });
+    });
+}
+
+// Stale While Revalidate - For dynamic content
+function staleWhileRevalidate(request, cacheName) {
+  return caches.open(cacheName)
+    .then((cache) => {
+      return cache.match(request)
+        .then((cachedResponse) => {
+          const fetchPromise = fetch(request)
+            .then((networkResponse) => {
+              if (networkResponse.ok) {
+                cache.put(request, networkResponse.clone());
+              }
+              return networkResponse;
+            });
+          
+          return cachedResponse || fetchPromise;
+        });
+    });
+}
+
+// =============================================
+// HELPER FUNCTIONS
+// =============================================
+
+function isStaticAsset(request) {
+  const url = new URL(request.url);
+  return STATIC_FILES.includes(url.pathname) ||
+         url.pathname.includes('/icons/') ||
+         url.pathname.includes('/styles.css') ||
+         url.pathname.includes('/manifest.json');
+}
+
+function isAPIRequest(request) {
+  const url = new URL(request.url);
+  return url.pathname.startsWith('/api/');
+}
+
+function isCSVUpload(request) {
+  return request.method === 'POST' && 
+         request.url.includes('csv') ||
+         request.url.includes('upload');
+}
+
+// =============================================
+// CSV AND DATA HANDLING
+// =============================================
+
+function handleCSVUpload(request) {
+  // Try network first for uploads
+  return fetch(request)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Network request failed');
+      }
+      return response;
+    })
+    .catch(() => {
+      // Store for background sync if offline
+      return storeForBackgroundSync(request, 'csv-upload');
+    });
+}
+
+function storeForBackgroundSync(request, type) {
+  return request.clone().text()
+    .then((body) => {
+      const syncData = {
+        url: request.url,
+        method: request.method,
+        headers: [...request.headers.entries()],
+        body: body,
+        timestamp: Date.now(),
+        type: type
+      };
+      
+      return addToIndexedDB('pending-sync', syncData)
+        .then(() => {
+          return self.registration.sync.register(`${type}-sync`);
+        })
+        .then(() => {
+          return new Response(
+            JSON.stringify({ 
+              success: false, 
+              message: 'Stored for background sync',
+              offline: true 
+            }),
+            { 
+              status: 202, 
+              headers: { 'Content-Type': 'application/json' } 
+            }
+          );
+        });
+    });
+}
+
+function syncPendingCSVUploads() {
+  return getAllFromIndexedDB('pending-sync')
+    .then((pendingRequests) => {
+      const csvUploads = pendingRequests.filter(req => req.type === 'csv-upload');
+      
+      return Promise.all(
+        csvUploads.map((syncData) => {
+          const request = new Request(syncData.url, {
+            method: syncData.method,
+            headers: new Headers(syncData.headers),
+            body: syncData.body
+          });
+          
+          return fetch(request)
+            .then((response) => {
+              if (response.ok) {
+                return removeFromIndexedDB('pending-sync', syncData.id);
+              }
+              throw new Error('Sync failed');
+            })
+            .catch((error) => {
+              console.error('[SW] CSV sync failed:', error);
+              // Keep in queue for next sync attempt
+            });
+        })
+      );
+    });
+}
+
+function syncPendingGoalUpdates() {
+  // Similar to CSV sync but for goal updates
+  return getAllFromIndexedDB('pending-sync')
+    .then((pendingRequests) => {
+      const goalUpdates = pendingRequests.filter(req => req.type === 'goal-update');
+      
+      return Promise.all(
+        goalUpdates.map((syncData) => {
+          // Process goal update sync
+          return processGoalSync(syncData);
+        })
+      );
+    });
+}
+
+function syncPendingTransactions() {
+  // Sync any pending transaction updates
+  return getAllFromIndexedDB('pending-sync')
+    .then((pendingRequests) => {
+      const transactions = pendingRequests.filter(req => req.type === 'transaction');
+      
+      return Promise.all(
+        transactions.map((syncData) => {
+          return processTransactionSync(syncData);
+        })
+      );
+    });
+}
+
+function cacheCSVData(data) {
+  return caches.open(CSV_CACHE)
+    .then((cache) => {
+      const response = new Response(JSON.stringify(data), {
+        headers: { 'Content-Type': 'application/json' }
+      });
+      return cache.put('/csv-data', response);
+    });
+}
+
+// =============================================
+// INDEXEDDB HELPERS
+// =============================================
+
+function openIndexedDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('FinanceOSDB', 1);
+    
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+    
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      
+      if (!db.objectStoreNames.contains('pending-sync')) {
+        const store = db.createObjectStore('pending-sync', { 
+          keyPath: 'id', 
+          autoIncrement: true 
+        });
+        store.createIndex('type', 'type', { unique: false });
+        store.createIndex('timestamp', 'timestamp', { unique: false });
+      }
+      
+      if (!db.objectStoreNames.contains('csv-data')) {
+        db.createObjectStore('csv-data', { keyPath: 'id' });
+      }
+      
+      if (!db.objectStoreNames.contains('goals')) {
+        db.createObjectStore('goals', { keyPath: 'id' });
+      }
+    };
+  });
+}
+
+function addToIndexedDB(storeName, data) {
+  return openIndexedDB()
+    .then((db) => {
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction([storeName], 'readwrite');
+        const store = transaction.objectStore(storeName);
+        const request = store.add(data);
+        
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+      });
+    });
+}
+
+function getAllFromIndexedDB(storeName) {
+  return openIndexedDB()
+    .then((db) => {
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction([storeName], 'readonly');
+        const store = transaction.objectStore(storeName);
+        const request = store.getAll();
+        
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+      });
+    });
+}
+
+function removeFromIndexedDB(storeName, id) {
+  return openIndexedDB()
+    .then((db) => {
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction([storeName], 'readwrite');
+        const store = transaction.objectStore(storeName);
+        const request = store.delete(id);
+        
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+      });
+    });
+}
+
+// =============================================
+// UTILITY FUNCTIONS
+// =============================================
+
+function clearAllCaches() {
+  return caches.keys()
+    .then((cacheNames) => {
+      return Promise.all(
+        cacheNames
+          .filter((cacheName) => cacheName.startsWith('financeos-'))
+          .map((cacheName) => caches.delete(cacheName))
+      );
+    });
+}
+
+function processGoalSync(syncData) {
+  // Implementation for syncing goal updates
+  return fetch(new Request(syncData.url, {
+    method: syncData.method,
+    headers: new Headers(syncData.headers),
+    body: syncData.body
+  }));
+}
+
+function processTransactionSync(syncData) {
+  // Implementation for syncing transaction updates
+  return fetch(new Request(syncData.url, {
+    method: syncData.method,
+    headers: new Headers(syncData.headers),
+    body: syncData.body
+  }));
+}
+
+// Log service worker status
+console.log('[SW] FinanceOS Service Worker loaded successfully');
+console.log('[SW] Cache version:', CACHE_NAME);
+console.log('[SW] Static files to cache:', STATIC_FILES.length);
