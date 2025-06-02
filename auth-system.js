@@ -1,82 +1,128 @@
 /**
- * FinanceOS Enhanced Authentication System
- * Handles biometric authentication, session management, and logout
+ * FinanceOS Robust Authentication System
+ * Properly debugged with timeout handling and graceful fallbacks
  */
 
-class FinanceOSAuth {
+class RobustFinanceOSAuth {
     constructor() {
         this.isAuthenticated = false;
-        this.authTimeout = 5 * 60 * 1000; // 5 minutes timeout
+        this.authTimeout = 5 * 60 * 1000; // 5 minutes
         this.lastActivity = Date.now();
         this.biometricSupported = false;
+        this.biometricTimeout = 10000; // 10 second timeout for biometric
         this.authModal = null;
+        this.debugMode = true; // Enable detailed logging
         
+        this.log('Starting FinanceOS Authentication System...');
         this.init();
     }
 
-    async init() {
-        // Check biometric support
-        this.biometricSupported = await this.checkBiometricSupport();
-        
-        // Create auth modal
-        this.createAuthModal();
-        
-        // Check authentication status on page load
-        this.checkAuthStatus();
-        
-        // Set up activity monitoring
-        this.setupActivityMonitoring();
-        
-        // Listen for page visibility changes
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') {
-                this.checkAuthStatus();
-            }
-        });
-        
-        console.log('FinanceOS Auth System initialized');
-        console.log('Biometric support:', this.biometricSupported);
+    log(message, data = null) {
+        if (this.debugMode) {
+            console.log(`[FinanceOS Auth] ${message}`, data || '');
+        }
     }
 
-    async checkBiometricSupport() {
-        if (!('PublicKeyCredential' in window)) {
-            return false;
-        }
-        
+    async init() {
         try {
-            const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-            return available;
+            this.log('Initializing authentication system');
+            
+            // Check biometric support with timeout
+            this.biometricSupported = await this.checkBiometricSupportSafely();
+            this.log('Biometric support check completed', this.biometricSupported);
+            
+            // Create auth modal
+            await this.createAuthModal();
+            this.log('Auth modal created');
+            
+            // Check auth status after small delay to ensure DOM is ready
+            setTimeout(() => {
+                this.checkAuthStatus();
+                this.setupActivityMonitoring();
+                this.setupVisibilityHandling();
+            }, 100);
+            
+            this.log('Authentication system initialized successfully');
+            
         } catch (error) {
-            console.log('Biometric check failed:', error);
-            return false;
+            this.log('Error during init', error);
+            // Fallback to simple passcode-only auth
+            this.biometricSupported = false;
+            this.createAuthModal();
+            setTimeout(() => this.checkAuthStatus(), 100);
         }
+    }
+
+    async checkBiometricSupportSafely() {
+        return new Promise((resolve) => {
+            // Set timeout to prevent hanging
+            const timeout = setTimeout(() => {
+                this.log('Biometric check timed out, falling back to passcode only');
+                resolve(false);
+            }, 3000);
+
+            try {
+                if (!('PublicKeyCredential' in window)) {
+                    this.log('PublicKeyCredential not available');
+                    clearTimeout(timeout);
+                    resolve(false);
+                    return;
+                }
+
+                PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
+                    .then((available) => {
+                        clearTimeout(timeout);
+                        this.log('Biometric availability result', available);
+                        resolve(available);
+                    })
+                    .catch((error) => {
+                        clearTimeout(timeout);
+                        this.log('Biometric check failed', error);
+                        resolve(false);
+                    });
+
+            } catch (error) {
+                clearTimeout(timeout);
+                this.log('Biometric check exception', error);
+                resolve(false);
+            }
+        });
     }
 
     createAuthModal() {
-        // Remove existing modal if present
-        const existingModal = document.getElementById('authModal');
-        if (existingModal) {
-            existingModal.remove();
+        this.log('Creating authentication modal');
+        
+        // Remove any existing modal
+        const existing = document.getElementById('robustAuthModal');
+        if (existing) {
+            this.log('Removing existing modal');
+            existing.remove();
         }
 
         const modalHTML = `
-            <div id="authModal" class="auth-modal">
-                <div class="auth-modal-content glass-premium">
+            <div id="robustAuthModal" class="robust-auth-modal">
+                <div class="robust-auth-content">
                     <div class="auth-header">
-                        <div class="logo">
+                        <div class="logo-section">
                             <div class="logo-icon">$</div>
-                            <span class="logo-text">FinanceOS</span>
+                            <h1>FinanceOS</h1>
                         </div>
                         <h2>Secure Access Required</h2>
-                        <p>Please authenticate to continue</p>
+                        <p>Please authenticate to access your financial data</p>
                     </div>
                     
-                    <div class="auth-content">
+                    <div class="auth-methods">
                         ${this.biometricSupported ? `
-                            <button class="auth-btn btn-primary" id="biometricAuthBtn">
-                                <span class="auth-icon">👆</span>
-                                Use Fingerprint
-                            </button>
+                            <div class="biometric-section">
+                                <button class="auth-method-btn biometric-btn" id="biometricBtn">
+                                    <div class="method-icon">👆</div>
+                                    <div class="method-text">
+                                        <span class="method-title">Use Biometric</span>
+                                        <span class="method-subtitle">Fingerprint or Face ID</span>
+                                    </div>
+                                </button>
+                                <div class="biometric-status" id="biometricStatus"></div>
+                            </div>
                             
                             <div class="auth-divider">
                                 <span>or</span>
@@ -84,171 +130,218 @@ class FinanceOSAuth {
                         ` : ''}
                         
                         <div class="passcode-section">
-                            <label for="passcode">Enter Passcode</label>
-                            <input type="password" id="passcode" placeholder="Enter your passcode" maxlength="6">
-                            <button class="auth-btn btn-secondary" id="passcodeAuthBtn">
-                                <span class="auth-icon">🔑</span>
-                                Sign In
+                            <label for="authPasscode">Enter Passcode</label>
+                            <div class="passcode-input-group">
+                                <input 
+                                    type="password" 
+                                    id="authPasscode" 
+                                    placeholder="6-digit passcode" 
+                                    maxlength="6"
+                                    pattern="[0-9]*"
+                                    inputmode="numeric"
+                                >
+                                <button class="show-passcode-btn" id="showPasscodeBtn" type="button">👁️</button>
+                            </div>
+                            <button class="auth-method-btn passcode-btn" id="passcodeBtn">
+                                <div class="method-icon">🔑</div>
+                                <span>Sign In with Passcode</span>
                             </button>
                         </div>
-                        
-                        <div class="auth-error" id="authError"></div>
+                    </div>
+                    
+                    <div class="auth-error" id="authError"></div>
+                    
+                    <div class="auth-footer">
+                        <p>Default passcode: 123456</p>
+                        <button class="debug-btn" id="debugBtn">Debug Info</button>
                     </div>
                 </div>
             </div>
         `;
 
         document.body.insertAdjacentHTML('beforeend', modalHTML);
-        this.authModal = document.getElementById('authModal');
+        this.authModal = document.getElementById('robustAuthModal');
         
-        // Add event listeners
-        this.setupAuthModalEvents();
-        
-        // Add styles
         this.addAuthStyles();
-    }
-
-    setupAuthModalEvents() {
-        const biometricBtn = document.getElementById('biometricAuthBtn');
-        const passcodeBtn = document.getElementById('passcodeAuthBtn');
-        const passcodeInput = document.getElementById('passcode');
-
-        if (biometricBtn) {
-            biometricBtn.addEventListener('click', () => this.authenticateWithBiometric());
-        }
-
-        if (passcodeBtn) {
-            passcodeBtn.addEventListener('click', () => this.authenticateWithPasscode());
-        }
-
-        if (passcodeInput) {
-            passcodeInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    this.authenticateWithPasscode();
-                }
-            });
-        }
+        this.setupAuthEventListeners();
+        
+        this.log('Auth modal created and styled');
     }
 
     addAuthStyles() {
+        const existingStyles = document.getElementById('robustAuthStyles');
+        if (existingStyles) existingStyles.remove();
+
         const styles = `
-            <style id="authModalStyles">
-                .auth-modal {
+            <style id="robustAuthStyles">
+                .robust-auth-modal {
                     position: fixed;
                     top: 0;
                     left: 0;
                     width: 100%;
                     height: 100%;
-                    background: rgba(0, 0, 0, 0.9);
-                    backdrop-filter: blur(10px);
+                    background: rgba(15, 23, 42, 0.98);
+                    backdrop-filter: blur(20px);
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     z-index: 10000;
-                    animation: fadeIn 0.3s ease-out;
+                    animation: authFadeIn 0.4s ease-out;
+                    padding: 1rem;
                 }
 
-                .auth-modal-content {
-                    max-width: 400px;
-                    width: 90%;
-                    padding: 2rem;
-                    border-radius: 20px;
-                    text-align: center;
-                    animation: slideUp 0.3s ease-out;
+                .robust-auth-content {
+                    background: linear-gradient(135deg, 
+                        rgba(139, 92, 246, 0.15) 0%, 
+                        rgba(59, 130, 246, 0.15) 50%, 
+                        rgba(147, 51, 234, 0.15) 100%);
+                    backdrop-filter: blur(25px);
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    border-radius: 24px;
+                    padding: 2.5rem 2rem;
+                    max-width: 450px;
+                    width: 100%;
+                    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+                    animation: authSlideUp 0.4s ease-out;
                 }
 
                 .auth-header {
+                    text-align: center;
                     margin-bottom: 2rem;
                 }
 
-                .auth-header .logo {
+                .logo-section {
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    gap: 0.75rem;
-                    margin-bottom: 1rem;
+                    gap: 1rem;
+                    margin-bottom: 1.5rem;
                 }
 
-                .auth-header .logo-icon {
-                    width: 50px;
-                    height: 50px;
-                    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-                    border-radius: 12px;
+                .logo-icon {
+                    width: 60px;
+                    height: 60px;
+                    background: linear-gradient(135deg, #10b981, #059669);
+                    border-radius: 16px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    font-size: 1.5rem;
+                    font-size: 2rem;
                     font-weight: bold;
                     color: white;
+                    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
                 }
 
-                .auth-header .logo-text {
-                    font-size: 1.75rem;
+                .auth-header h1 {
+                    font-size: 2rem;
                     font-weight: 700;
                     background: linear-gradient(135deg, #8b5cf6, #3b82f6);
                     -webkit-background-clip: text;
                     -webkit-text-fill-color: transparent;
                     background-clip: text;
+                    margin: 0;
                 }
 
                 .auth-header h2 {
                     color: white;
-                    margin-bottom: 0.5rem;
                     font-size: 1.5rem;
+                    margin: 1rem 0 0.5rem 0;
+                    font-weight: 600;
                 }
 
                 .auth-header p {
                     color: rgba(255, 255, 255, 0.7);
+                    margin: 0;
                     font-size: 1rem;
                 }
 
-                .auth-content {
+                .auth-methods {
                     display: flex;
                     flex-direction: column;
-                    gap: 1rem;
+                    gap: 1.5rem;
                 }
 
-                .auth-btn {
+                .auth-method-btn {
                     display: flex;
                     align-items: center;
-                    justify-content: center;
-                    gap: 0.75rem;
-                    padding: 1rem 1.5rem;
-                    border: none;
-                    border-radius: 12px;
-                    font-weight: 600;
-                    font-size: 1rem;
+                    gap: 1rem;
+                    padding: 1.25rem 1.5rem;
+                    border: 2px solid rgba(255, 255, 255, 0.15);
+                    border-radius: 16px;
+                    background: rgba(255, 255, 255, 0.08);
+                    color: white;
                     cursor: pointer;
                     transition: all 0.3s ease;
+                    font-size: 1rem;
+                    font-weight: 600;
                     width: 100%;
+                    backdrop-filter: blur(10px);
                 }
 
-                .auth-btn:hover {
+                .auth-method-btn:hover {
+                    border-color: rgba(139, 92, 246, 0.5);
+                    background: rgba(139, 92, 246, 0.15);
                     transform: translateY(-2px);
+                    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
                 }
 
-                .auth-btn.btn-primary {
-                    background: linear-gradient(135deg, #8b5cf6, #9333ea);
-                    color: white;
-                    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+                .auth-method-btn:active {
+                    transform: translateY(0);
                 }
 
-                .auth-btn.btn-primary:hover {
-                    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+                .auth-method-btn:disabled {
+                    opacity: 0.6;
+                    cursor: not-allowed;
+                    transform: none;
                 }
 
-                .auth-btn.btn-secondary {
-                    background: rgba(255, 255, 255, 0.1);
-                    color: white;
-                    border: 1px solid rgba(255, 255, 255, 0.2);
+                .biometric-btn {
+                    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2));
                 }
 
-                .auth-btn.btn-secondary:hover {
-                    background: rgba(255, 255, 255, 0.2);
+                .method-icon {
+                    font-size: 2rem;
+                    min-width: 3rem;
+                    text-align: center;
                 }
 
-                .auth-icon {
-                    font-size: 1.25rem;
+                .method-text {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-start;
+                    flex: 1;
+                }
+
+                .method-title {
+                    font-weight: 600;
+                    font-size: 1.1rem;
+                }
+
+                .method-subtitle {
+                    font-size: 0.9rem;
+                    opacity: 0.7;
+                    font-weight: 400;
+                }
+
+                .biometric-status {
+                    margin-top: 0.5rem;
+                    padding: 0.5rem;
+                    border-radius: 8px;
+                    font-size: 0.9rem;
+                    text-align: center;
+                    min-height: 1.5rem;
+                }
+
+                .biometric-status.processing {
+                    background: rgba(59, 130, 246, 0.15);
+                    color: #3b82f6;
+                    border: 1px solid rgba(59, 130, 246, 0.3);
+                }
+
+                .biometric-status.error {
+                    background: rgba(239, 68, 68, 0.15);
+                    color: #ef4444;
+                    border: 1px solid rgba(239, 68, 68, 0.3);
                 }
 
                 .auth-divider {
@@ -256,6 +349,7 @@ class FinanceOSAuth {
                     align-items: center;
                     margin: 0.5rem 0;
                     color: rgba(255, 255, 255, 0.5);
+                    font-size: 0.9rem;
                 }
 
                 .auth-divider::before,
@@ -268,233 +362,479 @@ class FinanceOSAuth {
 
                 .auth-divider span {
                     padding: 0 1rem;
-                    font-size: 0.875rem;
-                }
-
-                .passcode-section {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 0.75rem;
                 }
 
                 .passcode-section label {
+                    display: block;
                     color: white;
                     font-weight: 500;
-                    text-align: left;
+                    margin-bottom: 0.75rem;
+                    font-size: 1rem;
                 }
 
-                .passcode-section input {
-                    padding: 0.75rem;
-                    border: 1px solid rgba(255, 255, 255, 0.2);
-                    border-radius: 8px;
+                .passcode-input-group {
+                    position: relative;
+                    margin-bottom: 1rem;
+                }
+
+                .passcode-input-group input {
+                    width: 100%;
+                    padding: 1rem 3rem 1rem 1rem;
+                    border: 2px solid rgba(255, 255, 255, 0.2);
+                    border-radius: 12px;
                     background: rgba(255, 255, 255, 0.1);
                     color: white;
-                    font-size: 1.125rem;
+                    font-size: 1.25rem;
                     text-align: center;
-                    letter-spacing: 0.25rem;
+                    letter-spacing: 0.5rem;
+                    transition: all 0.3s ease;
+                    backdrop-filter: blur(10px);
                 }
 
-                .passcode-section input::placeholder {
-                    color: rgba(255, 255, 255, 0.5);
-                    letter-spacing: normal;
-                }
-
-                .passcode-section input:focus {
+                .passcode-input-group input:focus {
                     outline: none;
                     border-color: #8b5cf6;
                     box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+                    background: rgba(255, 255, 255, 0.15);
+                }
+
+                .passcode-input-group input::placeholder {
+                    color: rgba(255, 255, 255, 0.5);
+                    letter-spacing: normal;
+                    font-size: 1rem;
+                }
+
+                .show-passcode-btn {
+                    position: absolute;
+                    right: 1rem;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    background: none;
+                    border: none;
+                    color: rgba(255, 255, 255, 0.6);
+                    cursor: pointer;
+                    font-size: 1.25rem;
+                    padding: 0.25rem;
+                    border-radius: 4px;
+                    transition: color 0.2s ease;
+                }
+
+                .show-passcode-btn:hover {
+                    color: rgba(255, 255, 255, 0.9);
                 }
 
                 .auth-error {
-                    color: #ef4444;
-                    font-size: 0.875rem;
-                    margin-top: 0.5rem;
-                    min-height: 1.25rem;
+                    background: rgba(239, 68, 68, 0.15);
+                    border: 1px solid rgba(239, 68, 68, 0.3);
+                    color: #fca5a5;
+                    padding: 1rem;
+                    border-radius: 12px;
+                    margin-top: 1rem;
+                    font-size: 0.9rem;
+                    text-align: center;
+                    min-height: 1rem;
+                    display: none;
                 }
 
-                @keyframes fadeIn {
+                .auth-error.show {
+                    display: block;
+                    animation: authShake 0.5s ease-in-out;
+                }
+
+                .auth-footer {
+                    margin-top: 1.5rem;
+                    text-align: center;
+                    color: rgba(255, 255, 255, 0.5);
+                    font-size: 0.85rem;
+                }
+
+                .auth-footer p {
+                    margin: 0 0 0.5rem 0;
+                }
+
+                .debug-btn {
+                    background: rgba(255, 255, 255, 0.1);
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    color: rgba(255, 255, 255, 0.7);
+                    padding: 0.5rem 1rem;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-size: 0.8rem;
+                    transition: all 0.2s ease;
+                }
+
+                .debug-btn:hover {
+                    background: rgba(255, 255, 255, 0.15);
+                    color: white;
+                }
+
+                @keyframes authFadeIn {
                     from { opacity: 0; }
                     to { opacity: 1; }
                 }
 
-                @keyframes slideUp {
+                @keyframes authSlideUp {
                     from { 
                         opacity: 0;
-                        transform: translateY(30px);
+                        transform: translateY(50px) scale(0.95);
                     }
                     to { 
                         opacity: 1;
-                        transform: translateY(0);
+                        transform: translateY(0) scale(1);
                     }
                 }
 
+                @keyframes authShake {
+                    0%, 100% { transform: translateX(0); }
+                    10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+                    20%, 40%, 60%, 80% { transform: translateX(8px); }
+                }
+
+                @keyframes authPulse {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.7; }
+                }
+
+                .processing .biometric-btn {
+                    animation: authPulse 1.5s infinite;
+                }
+
+                /* Mobile optimizations */
                 @media (max-width: 480px) {
-                    .auth-modal-content {
-                        padding: 1.5rem;
+                    .robust-auth-content {
+                        padding: 2rem 1.5rem;
                         margin: 1rem;
+                    }
+
+                    .logo-section {
+                        flex-direction: column;
+                        gap: 0.5rem;
+                    }
+
+                    .auth-header h1 {
+                        font-size: 1.75rem;
+                    }
+
+                    .auth-method-btn {
+                        padding: 1rem;
+                        gap: 0.75rem;
+                    }
+
+                    .method-icon {
+                        font-size: 1.75rem;
+                        min-width: 2.5rem;
                     }
                 }
             </style>
         `;
 
-        // Remove existing styles and add new ones
-        const existingStyles = document.getElementById('authModalStyles');
-        if (existingStyles) {
-            existingStyles.remove();
-        }
         document.head.insertAdjacentHTML('beforeend', styles);
     }
 
-    async authenticateWithBiometric() {
-        const errorDiv = document.getElementById('authError');
-        const biometricBtn = document.getElementById('biometricAuthBtn');
+    setupAuthEventListeners() {
+        this.log('Setting up event listeners');
         
+        const biometricBtn = document.getElementById('biometricBtn');
+        const passcodeBtn = document.getElementById('passcodeBtn');
+        const passcodeInput = document.getElementById('authPasscode');
+        const showPasscodeBtn = document.getElementById('showPasscodeBtn');
+        const debugBtn = document.getElementById('debugBtn');
+
+        if (biometricBtn) {
+            biometricBtn.addEventListener('click', () => this.handleBiometricAuth());
+        }
+
+        if (passcodeBtn) {
+            passcodeBtn.addEventListener('click', () => this.handlePasscodeAuth());
+        }
+
+        if (passcodeInput) {
+            passcodeInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.handlePasscodeAuth();
+                }
+            });
+
+            passcodeInput.addEventListener('input', (e) => {
+                // Only allow numbers
+                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+            });
+        }
+
+        if (showPasscodeBtn) {
+            showPasscodeBtn.addEventListener('click', () => {
+                const input = document.getElementById('authPasscode');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    showPasscodeBtn.textContent = '🙈';
+                } else {
+                    input.type = 'password';
+                    showPasscodeBtn.textContent = '👁️';
+                }
+            });
+        }
+
+        if (debugBtn) {
+            debugBtn.addEventListener('click', () => this.showDebugInfo());
+        }
+
+        this.log('Event listeners set up successfully');
+    }
+
+    async handleBiometricAuth() {
+        this.log('Starting biometric authentication');
+        
+        const biometricBtn = document.getElementById('biometricBtn');
+        const biometricStatus = document.getElementById('biometricStatus');
+        const errorDiv = document.getElementById('authError');
+
+        if (!biometricBtn || !biometricStatus) {
+            this.log('Biometric elements not found');
+            return;
+        }
+
         try {
-            biometricBtn.innerHTML = '<span class="auth-icon">⏳</span>Authenticating...';
+            // Update UI to show processing
             biometricBtn.disabled = true;
-            errorDiv.textContent = '';
+            biometricBtn.innerHTML = `
+                <div class="method-icon">⏳</div>
+                <div class="method-text">
+                    <span class="method-title">Authenticating...</span>
+                    <span class="method-subtitle">Use your biometric sensor</span>
+                </div>
+            `;
+            
+            biometricStatus.className = 'biometric-status processing';
+            biometricStatus.textContent = 'Please use your fingerprint or face ID...';
+            errorDiv.classList.remove('show');
 
-            const challenge = new Uint8Array(32);
-            crypto.getRandomValues(challenge);
+            this.log('Starting biometric credential request');
 
-            const assertion = await navigator.credentials.get({
+            // Create credential request with timeout
+            const credentialPromise = navigator.credentials.get({
                 publicKey: {
-                    challenge: challenge,
-                    timeout: 60000,
+                    challenge: new Uint8Array(32),
+                    timeout: this.biometricTimeout,
                     userVerification: "required",
                     allowCredentials: []
                 }
             });
 
-            if (assertion) {
-                this.onAuthSuccess();
+            // Add our own timeout as backup
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error('Biometric authentication timed out')), this.biometricTimeout);
+            });
+
+            const result = await Promise.race([credentialPromise, timeoutPromise]);
+
+            if (result) {
+                this.log('Biometric authentication successful');
+                this.onAuthSuccess('biometric');
             } else {
-                throw new Error('Authentication failed');
+                throw new Error('No credential returned');
             }
 
         } catch (error) {
-            console.error('Biometric authentication failed:', error);
-            errorDiv.textContent = 'Biometric authentication failed. Please try passcode.';
-            biometricBtn.innerHTML = '<span class="auth-icon">👆</span>Use Fingerprint';
+            this.log('Biometric authentication failed', error);
+            
+            biometricStatus.className = 'biometric-status error';
+            biometricStatus.textContent = 'Biometric authentication failed. Please use passcode.';
+            
+            this.showError('Biometric authentication failed. Please try the passcode method.');
+            
+            // Reset biometric button
             biometricBtn.disabled = false;
+            biometricBtn.innerHTML = `
+                <div class="method-icon">👆</div>
+                <div class="method-text">
+                    <span class="method-title">Use Biometric</span>
+                    <span class="method-subtitle">Fingerprint or Face ID</span>
+                </div>
+            `;
+
+            // Focus on passcode input
+            setTimeout(() => {
+                const passcodeInput = document.getElementById('authPasscode');
+                if (passcodeInput) passcodeInput.focus();
+            }, 1000);
         }
     }
 
-    authenticateWithPasscode() {
-        const passcodeInput = document.getElementById('passcode');
-        const passcodeBtn = document.getElementById('passcodeAuthBtn');
+    handlePasscodeAuth() {
+        this.log('Starting passcode authentication');
+        
+        const passcodeInput = document.getElementById('authPasscode');
+        const passcodeBtn = document.getElementById('passcodeBtn');
         const errorDiv = document.getElementById('authError');
-        
-        const passcode = passcodeInput.value.trim();
-        
-        if (!passcode) {
-            errorDiv.textContent = 'Please enter your passcode';
+
+        if (!passcodeInput || !passcodeBtn) {
+            this.log('Passcode elements not found');
             return;
         }
 
-        // Default passcode for demo - in production, this would be hashed/encrypted
-        const correctPasscode = localStorage.getItem('financeosPasscode') || '123456';
-        
-        if (passcode === correctPasscode) {
-            this.onAuthSuccess();
-        } else {
-            errorDiv.textContent = 'Incorrect passcode. Try again.';
-            passcodeInput.value = '';
+        const enteredPasscode = passcodeInput.value.trim();
+        const storedPasscode = localStorage.getItem('financeosPasscode') || '123456';
+
+        if (!enteredPasscode) {
+            this.showError('Please enter your 6-digit passcode');
             passcodeInput.focus();
-            
-            // Add shake animation
-            passcodeInput.style.animation = 'shake 0.5s ease-in-out';
+            return;
+        }
+
+        if (enteredPasscode.length < 4) {
+            this.showError('Passcode must be at least 4 digits');
+            passcodeInput.focus();
+            return;
+        }
+
+        // Update button to show processing
+        const originalText = passcodeBtn.innerHTML;
+        passcodeBtn.disabled = true;
+        passcodeBtn.innerHTML = `
+            <div class="method-icon">⏳</div>
+            <span>Verifying...</span>
+        `;
+
+        // Add small delay for UX
+        setTimeout(() => {
+            if (enteredPasscode === storedPasscode) {
+                this.log('Passcode authentication successful');
+                this.onAuthSuccess('passcode');
+            } else {
+                this.log('Passcode authentication failed');
+                this.showError('Incorrect passcode. Please try again.');
+                
+                passcodeInput.value = '';
+                passcodeInput.focus();
+                passcodeInput.style.animation = 'authShake 0.5s ease-in-out';
+                setTimeout(() => {
+                    if (passcodeInput) passcodeInput.style.animation = '';
+                }, 500);
+                
+                // Reset button
+                passcodeBtn.disabled = false;
+                passcodeBtn.innerHTML = originalText;
+            }
+        }, 800);
+    }
+
+    onAuthSuccess(method) {
+        this.log('Authentication successful via', method);
+        
+        this.isAuthenticated = true;
+        this.lastActivity = Date.now();
+        localStorage.setItem('financeosAuthTime', Date.now().toString());
+        localStorage.setItem('financeosAuthMethod', method);
+        
+        // Hide modal with animation
+        this.hideAuthModal();
+        
+        // Show success notification
+        this.showSuccessNotification(method);
+        
+        // Add logout button to navigation
+        setTimeout(() => this.addLogoutButton(), 500);
+    }
+
+    hideAuthModal() {
+        if (this.authModal) {
+            this.authModal.style.animation = 'authFadeIn 0.3s ease-out reverse';
             setTimeout(() => {
-                passcodeInput.style.animation = '';
-            }, 500);
+                if (this.authModal) {
+                    this.authModal.remove();
+                    this.authModal = null;
+                }
+            }, 300);
         }
     }
 
-    onAuthSuccess() {
-        this.isAuthenticated = true;
-        this.lastActivity = Date.now();
+    showSuccessNotification(method) {
+        const methodText = method === 'biometric' ? 'biometric authentication' : 'passcode';
         
-        // Store auth timestamp
-        localStorage.setItem('financeosAuthTime', Date.now().toString());
-        
-        // Hide modal
-        this.hideAuthModal();
-        
-        // Show success message briefly
-        this.showAuthSuccess();
-        
-        console.log('Authentication successful');
-    }
-
-    showAuthSuccess() {
-        const successHTML = `
-            <div id="authSuccess" class="auth-success">
-                <div class="auth-success-content">
-                    <span class="success-icon">✅</span>
-                    <span>Welcome back!</span>
+        const notification = document.createElement('div');
+        notification.id = 'authSuccessNotification';
+        notification.innerHTML = `
+            <div style="
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #10b981, #059669);
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 12px;
+                box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+                z-index: 10001;
+                animation: slideInRight 0.4s ease-out;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                font-weight: 600;
+                max-width: 300px;
+            ">
+                <span style="font-size: 1.5rem;">✅</span>
+                <div>
+                    <div>Welcome back!</div>
+                    <div style="font-size: 0.8rem; opacity: 0.9;">Authenticated via ${methodText}</div>
                 </div>
             </div>
         `;
 
-        document.body.insertAdjacentHTML('beforeend', successHTML);
+        document.body.appendChild(notification);
 
-        // Add success styles
-        const successStyles = `
-            <style>
-                .auth-success {
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background: linear-gradient(135deg, #10b981, #059669);
-                    color: white;
-                    padding: 1rem 1.5rem;
-                    border-radius: 12px;
-                    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
-                    z-index: 10001;
-                    animation: slideInRight 0.3s ease-out;
+        // Add slide-in animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    opacity: 0;
+                    transform: translateX(100px);
                 }
-
-                .auth-success-content {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    font-weight: 600;
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
                 }
-
-                @keyframes slideInRight {
-                    from {
-                        opacity: 0;
-                        transform: translateX(100px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateX(0);
-                    }
-                }
-            </style>
-        `;
-
-        document.head.insertAdjacentHTML('beforeend', successStyles);
-
-        // Remove after 3 seconds
-        setTimeout(() => {
-            const successEl = document.getElementById('authSuccess');
-            if (successEl) {
-                successEl.remove();
             }
-        }, 3000);
+        `;
+        document.head.appendChild(style);
+
+        // Remove after 4 seconds
+        setTimeout(() => {
+            if (notification) {
+                notification.style.animation = 'slideInRight 0.3s ease-out reverse';
+                setTimeout(() => notification.remove(), 300);
+            }
+            style.remove();
+        }, 4000);
+    }
+
+    showError(message) {
+        const errorDiv = document.getElementById('authError');
+        if (errorDiv) {
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                errorDiv.classList.remove('show');
+            }, 5000);
+        }
+        this.log('Auth error:', message);
     }
 
     checkAuthStatus() {
         const authTime = localStorage.getItem('financeosAuthTime');
         const now = Date.now();
         
-        // Check if authenticated recently (within timeout period)
+        this.log('Checking auth status', { authTime, now, timeout: this.authTimeout });
+        
         if (authTime && (now - parseInt(authTime)) < this.authTimeout) {
+            this.log('User is authenticated, hiding modal');
             this.isAuthenticated = true;
             this.lastActivity = now;
             this.hideAuthModal();
+            this.addLogoutButton();
         } else {
+            this.log('User needs to authenticate, showing modal');
             this.isAuthenticated = false;
             this.showAuthModal();
         }
@@ -502,213 +842,187 @@ class FinanceOSAuth {
 
     showAuthModal() {
         if (this.authModal) {
+            this.log('Showing auth modal');
             this.authModal.style.display = 'flex';
             
-            // Focus on passcode input after modal animation
+            // Focus on appropriate input after animation
             setTimeout(() => {
-                const passcodeInput = document.getElementById('passcode');
-                if (passcodeInput) {
-                    passcodeInput.focus();
+                if (this.biometricSupported) {
+                    // Focus on first button for keyboard navigation
+                    const biometricBtn = document.getElementById('biometricBtn');
+                    if (biometricBtn) biometricBtn.focus();
+                } else {
+                    // Focus on passcode input
+                    const passcodeInput = document.getElementById('authPasscode');
+                    if (passcodeInput) passcodeInput.focus();
                 }
-            }, 300);
-        }
-    }
-
-    hideAuthModal() {
-        if (this.authModal) {
-            this.authModal.style.display = 'none';
+            }, 400);
         }
     }
 
     setupActivityMonitoring() {
-        const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+        this.log('Setting up activity monitoring');
         
+        const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click', 'touchend'];
+        
+        const updateActivity = () => {
+            if (this.isAuthenticated) {
+                this.lastActivity = Date.now();
+                localStorage.setItem('financeosAuthTime', Date.now().toString());
+            }
+        };
+
         events.forEach(event => {
-            document.addEventListener(event, () => {
-                if (this.isAuthenticated) {
-                    this.lastActivity = Date.now();
-                    localStorage.setItem('financeosAuthTime', Date.now().toString());
-                }
-            }, true);
+            document.addEventListener(event, updateActivity, { passive: true });
         });
 
-        // Check for inactivity every minute
+        // Check for timeout every 30 seconds
         setInterval(() => {
             if (this.isAuthenticated && (Date.now() - this.lastActivity) > this.authTimeout) {
+                this.log('Session timed out due to inactivity');
                 this.logout();
             }
-        }, 60000);
+        }, 30000);
+    }
+
+    setupVisibilityHandling() {
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                this.log('Page became visible, checking auth status');
+                setTimeout(() => this.checkAuthStatus(), 100);
+            }
+        });
     }
 
     logout() {
+        this.log('Logging out user');
+        
         this.isAuthenticated = false;
         localStorage.removeItem('financeosAuthTime');
+        localStorage.removeItem('financeosAuthMethod');
         
-        // Show logout notification
         this.showLogoutNotification();
         
-        // Show auth modal after brief delay
         setTimeout(() => {
+            this.createAuthModal();
             this.showAuthModal();
-        }, 1000);
-        
-        console.log('User logged out');
+        }, 1500);
     }
 
     showLogoutNotification() {
-        const logoutHTML = `
-            <div id="logoutNotification" class="logout-notification">
-                <div class="logout-content">
-                    <span class="logout-icon">🔒</span>
-                    <span>Session expired. Please sign in again.</span>
-                </div>
+        const notification = document.createElement('div');
+        notification.innerHTML = `
+            <div style="
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #ef4444, #dc2626);
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 12px;
+                box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3);
+                z-index: 10001;
+                animation: slideInRight 0.4s ease-out;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                font-weight: 600;
+            ">
+                <span style="font-size: 1.5rem;">🔒</span>
+                <span>Session expired - Please sign in again</span>
             </div>
         `;
 
-        document.body.insertAdjacentHTML('beforeend', logoutHTML);
+        document.body.appendChild(notification);
 
-        // Add logout styles
-        const logoutStyles = `
-            <style>
-                .logout-notification {
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background: linear-gradient(135deg, #ef4444, #dc2626);
-                    color: white;
-                    padding: 1rem 1.5rem;
-                    border-radius: 12px;
-                    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3);
-                    z-index: 10001;
-                    animation: slideInRight 0.3s ease-out;
-                }
-
-                .logout-content {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    font-weight: 600;
-                }
-            </style>
-        `;
-
-        document.head.insertAdjacentHTML('beforeend', logoutStyles);
-
-        // Remove after 3 seconds
         setTimeout(() => {
-            const logoutEl = document.getElementById('logoutNotification');
-            if (logoutEl) {
-                logoutEl.remove();
+            if (notification) {
+                notification.style.animation = 'slideInRight 0.3s ease-out reverse';
+                setTimeout(() => notification.remove(), 300);
             }
-        }, 3000);
+        }, 1500);
     }
 
-    // Method to manually trigger logout
+    addLogoutButton() {
+        const navElements = document.querySelectorAll('.nav');
+        
+        navElements.forEach(nav => {
+            if (!nav.querySelector('.logout-btn')) {
+                const logoutBtn = document.createElement('button');
+                logoutBtn.className = 'nav-button logout-btn';
+                logoutBtn.innerHTML = '🚪 Logout';
+                logoutBtn.title = 'Logout securely';
+                logoutBtn.addEventListener('click', () => {
+                    if (confirm('Are you sure you want to logout securely?')) {
+                        this.logout();
+                    }
+                });
+                
+                nav.appendChild(logoutBtn);
+                this.log('Logout button added to navigation');
+            }
+        });
+    }
+
+    showDebugInfo() {
+        const debugInfo = {
+            isAuthenticated: this.isAuthenticated,
+            biometricSupported: this.biometricSupported,
+            lastActivity: new Date(this.lastActivity).toLocaleString(),
+            authTimeout: this.authTimeout / 1000 + ' seconds',
+            userAgent: navigator.userAgent,
+            storedAuthTime: localStorage.getItem('financeosAuthTime'),
+            storedPasscode: localStorage.getItem('financeosPasscode') || 'default (123456)',
+            publicKeyCredentialSupport: 'PublicKeyCredential' in window
+        };
+
+        console.group('FinanceOS Auth Debug Info');
+        console.table(debugInfo);
+        console.groupEnd();
+
+        alert('Debug info logged to console. Check browser developer tools.');
+    }
+
+    // Public methods
     manualLogout() {
         this.logout();
     }
 
-    // Method to check if user is authenticated
     isUserAuthenticated() {
         return this.isAuthenticated;
     }
 
-    // Method to set custom passcode
     setPasscode(newPasscode) {
         if (newPasscode && newPasscode.length >= 4) {
             localStorage.setItem('financeosPasscode', newPasscode);
+            this.log('Passcode updated');
             return true;
         }
+        this.log('Invalid passcode length');
         return false;
     }
 
-    // Method to register biometric authentication
-    async registerBiometric() {
-        if (!this.biometricSupported) {
-            throw new Error('Biometric authentication not supported');
-        }
-
-        try {
-            const challenge = new Uint8Array(32);
-            crypto.getRandomValues(challenge);
-
-            const credential = await navigator.credentials.create({
-                publicKey: {
-                    challenge: challenge,
-                    rp: { name: "FinanceOS" },
-                    user: {
-                        id: new TextEncoder().encode("financeos-user"),
-                        name: "FinanceOS User",
-                        displayName: "FinanceOS User"
-                    },
-                    pubKeyCredParams: [
-                        { alg: -7, type: "public-key" },
-                        { alg: -257, type: "public-key" }
-                    ],
-                    authenticatorSelection: {
-                        authenticatorAttachment: "platform",
-                        userVerification: "required",
-                        requireResidentKey: false
-                    },
-                    timeout: 60000,
-                    attestation: "direct"
-                }
-            });
-
-            if (credential) {
-                localStorage.setItem('financeoseBiometricRegistered', 'true');
-                return true;
-            }
-            return false;
-
-        } catch (error) {
-            console.error('Biometric registration failed:', error);
-            throw error;
-        }
+    getAuthStatus() {
+        return {
+            isAuthenticated: this.isAuthenticated,
+            biometricSupported: this.biometricSupported,
+            lastActivity: this.lastActivity,
+            timeUntilTimeout: this.authTimeout - (Date.now() - this.lastActivity)
+        };
     }
 }
 
-// Create global auth instance
-window.FinanceOSAuth = new FinanceOSAuth();
+// Initialize the robust authentication system
+window.FinanceOSAuth = new RobustFinanceOSAuth();
 
-// Add logout button functionality globally
-function addLogoutButton() {
-    const navElements = document.querySelectorAll('.nav');
-    
-    navElements.forEach(nav => {
-        // Check if logout button already exists
-        if (!nav.querySelector('.logout-btn')) {
-            const logoutBtn = document.createElement('button');
-            logoutBtn.className = 'nav-button logout-btn';
-            logoutBtn.innerHTML = '🚪 Logout';
-            logoutBtn.addEventListener('click', () => {
-                if (confirm('Are you sure you want to logout?')) {
-                    window.FinanceOSAuth.manualLogout();
-                }
-            });
-            
-            nav.appendChild(logoutBtn);
-        }
-    });
-}
+// Global helper functions
+window.financeOSAuthHelpers = {
+    logout: () => window.FinanceOSAuth.manualLogout(),
+    getStatus: () => window.FinanceOSAuth.getAuthStatus(),
+    setPasscode: (code) => window.FinanceOSAuth.setPasscode(code),
+    debug: () => window.FinanceOSAuth.showDebugInfo()
+};
 
-// Initialize logout button when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', addLogoutButton);
-} else {
-    addLogoutButton();
-}
-
-// Add shake animation for failed attempts
-const shakeStyles = `
-    <style>
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
-    </style>
-`;
-document.head.insertAdjacentHTML('beforeend', shakeStyles);
-
-console.log('FinanceOS Enhanced Authentication System loaded');
+console.log('FinanceOS Robust Authentication System loaded successfully');
+console.log('Available methods: window.financeOSAuthHelpers');
+console.log('Debug: window.FinanceOSAuth.showDebugInfo()');
