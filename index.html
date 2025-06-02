@@ -56,16 +56,17 @@
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            padding: 48px 40px;
+            border-radius: 24px;
+            padding: 60px 50px;
             text-align: center;
-            max-width: 460px;
+            max-width: 520px;
             width: 95%;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            min-height: 580px;
+            min-height: 650px;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            margin: 20px;
         }
         
         .login-logo {
@@ -215,9 +216,9 @@
     </style>
 </head>
 <body>
-    <!-- Session Info (hidden until logged in) -->
+    <!-- Session Info (hidden - banking app style) -->
     <div class="session-info" id="sessionInfo" style="display: none;">
-        <span>Session: <span id="sessionTime">5:00</span></span>
+        <span>User: demo</span>
         <button class="logout-button" onclick="logout()">Logout</button>
     </div>
 
@@ -476,41 +477,75 @@
     <script src="data-manager.js"></script>
     <script src="notification-system.js"></script>
     <script>
-        // Session Management - 5 MINUTES TIMEOUT, NO WARNING
-        let sessionTimer;
-        let sessionTimeLeft = 5 * 60; // 5 minutes in seconds
+        // Session Management - BANKING APP STYLE (No visible timer)
         let isAuthenticated = false;
+        let lastActivityTime = Date.now();
+        const SESSION_TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             checkAuthentication();
             setupPrivacyMode();
+            setupActivityTracking();
         });
 
-        // Authentication Check
+        // Banking app style session tracking
+        function setupActivityTracking() {
+            // Update activity time on any interaction
+            ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'].forEach(event => {
+                document.addEventListener(event, updateActivityTime, { passive: true });
+            });
+
+            // Check session when app comes back into focus (like banking apps)
+            window.addEventListener('focus', checkSessionOnFocus);
+            window.addEventListener('pageshow', checkSessionOnFocus);
+            document.addEventListener('visibilitychange', checkSessionOnFocus);
+        }
+
+        function updateActivityTime() {
+            if (isAuthenticated) {
+                lastActivityTime = Date.now();
+                localStorage.setItem('financeos-last-activity', lastActivityTime.toString());
+            }
+        }
+
+        function checkSessionOnFocus() {
+            if (isAuthenticated) {
+                const currentTime = Date.now();
+                const timeSinceActivity = currentTime - lastActivityTime;
+                
+                if (timeSinceActivity > SESSION_TIMEOUT) {
+                    // Session expired - logout like banking app
+                    logout();
+                }
+            }
+        }
+
+        // Authentication Check - Banking App Style
         function checkAuthentication() {
             const authToken = localStorage.getItem('financeos-token');
-            const loginTime = localStorage.getItem('financeos-login-time');
+            const lastActivity = localStorage.getItem('financeos-last-activity');
             
-            if (!authToken || !loginTime) {
+            if (!authToken || !lastActivity) {
                 showLogin();
                 return;
             }
             
-            // Check if session has expired (5 minutes)
+            // Check if session has expired (5 minutes since last activity)
             const currentTime = Date.now();
-            const sessionDuration = 5 * 60 * 1000; // 5 minutes
+            const timeSinceActivity = currentTime - parseInt(lastActivity);
             
-            if (currentTime - parseInt(loginTime) > sessionDuration) {
+            if (timeSinceActivity > SESSION_TIMEOUT) {
+                // Session expired - clear and show login
+                localStorage.removeItem('financeos-token');
+                localStorage.removeItem('financeos-last-activity');
                 showLogin();
                 return;
             }
             
             // Valid session - show main app
+            lastActivityTime = parseInt(lastActivity);
             showMainApp();
-            
-            // Update login time to extend session
-            localStorage.setItem('financeos-login-time', currentTime.toString());
         }
 
         function showLogin() {
@@ -518,10 +553,6 @@
             document.getElementById('mainApp').style.display = 'none';
             document.getElementById('sessionInfo').style.display = 'none';
             isAuthenticated = false;
-            
-            if (sessionTimer) {
-                clearInterval(sessionTimer);
-            }
         }
 
         function showMainApp() {
@@ -530,7 +561,8 @@
             document.getElementById('sessionInfo').style.display = 'block';
             isAuthenticated = true;
             
-            startSessionTimer();
+            // Update activity time
+            updateActivityTime();
             checkCSVData();
         }
 
@@ -555,7 +587,7 @@
                 if (username === 'demo' && password === 'demo123') {
                     // Successful login
                     localStorage.setItem('financeos-token', 'authenticated');
-                    localStorage.setItem('financeos-login-time', Date.now().toString());
+                    localStorage.setItem('financeos-last-activity', Date.now().toString());
                     showMainApp();
                 } else {
                     // Failed login
@@ -580,7 +612,7 @@
             
             if (fullPin === '1234') {
                 localStorage.setItem('financeos-token', 'authenticated');
-                localStorage.setItem('financeos-login-time', Date.now().toString());
+                localStorage.setItem('financeos-last-activity', Date.now().toString());
                 showMainApp();
             } else {
                 alert('Invalid PIN. Demo PIN is 1234');
@@ -600,7 +632,7 @@
                 
                 if (confirmBiometric) {
                     localStorage.setItem('financeos-token', 'authenticated');
-                    localStorage.setItem('financeos-login-time', Date.now().toString());
+                    localStorage.setItem('financeos-last-activity', Date.now().toString());
                     showMainApp();
                 }
             } else {
@@ -669,37 +701,10 @@
             }
         }
 
-        // Session Timer - 5 MINUTES, NO WARNING
-        function startSessionTimer() {
-            sessionTimeLeft = 5 * 60; // Reset to 5 minutes
-            updateSessionDisplay();
-            
-            sessionTimer = setInterval(() => {
-                sessionTimeLeft--;
-                updateSessionDisplay();
-                
-                // NO WARNING - Just logout when time runs out
-                if (sessionTimeLeft <= 0) {
-                    logout();
-                }
-            }, 1000);
-        }
-
-        function updateSessionDisplay() {
-            const minutes = Math.floor(sessionTimeLeft / 60);
-            const seconds = sessionTimeLeft % 60;
-            document.getElementById('sessionTime').textContent = 
-                `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        // Logout Function
+        // Logout Function - Banking App Style
         function logout() {
-            if (sessionTimer) {
-                clearInterval(sessionTimer);
-            }
-            
             localStorage.removeItem('financeos-token');
-            localStorage.removeItem('financeos-login-time');
+            localStorage.removeItem('financeos-last-activity');
             
             // Clear form fields
             document.getElementById('loginUsername').value = '';
@@ -712,19 +717,6 @@
             showLoginForm();
             showLogin();
         }
-
-        // Extend session on activity - reset to 2 minutes on activity
-        document.addEventListener('mousemove', () => {
-            if (isAuthenticated) {
-                sessionTimeLeft = Math.max(sessionTimeLeft, 2 * 60); // Keep at least 2 minutes
-            }
-        });
-
-        document.addEventListener('keydown', () => {
-            if (isAuthenticated) {
-                sessionTimeLeft = Math.max(sessionTimeLeft, 2 * 60);
-            }
-        });
 
         // Enter key handling
         document.addEventListener('keydown', (e) => {
