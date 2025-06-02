@@ -1,37 +1,136 @@
 {
-  "name": "FinanceOS",
-  "short_name": "FinanceOS", 
-  "description": "Personal Finance Operating System",
-  "start_url": "/FinanceOS.20/",
+  "name": "FinanceOS - Personal Finance System",
+  "short_name": "FinanceOS",
+  "description": "Complete personal finance management with AI coaching and CSV processing",
+  "start_url": "/",
   "display": "standalone",
-  "orientation": "portrait-primary",
   "background_color": "#0f172a",
   "theme_color": "#8b5cf6",
-  "scope": "/FinanceOS.20/",
-  "prefer_related_applications": false,
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "id": "financeos-pwa",
+  "categories": ["finance", "productivity", "lifestyle"],
+  "lang": "en-US",
+  "dir": "ltr",
   "icons": [
     {
-      "src": "./icons/icon-192x192.png",
-      "sizes": "192x192", 
+      "src": "icons/icon-72x72.png",
+      "sizes": "72x72",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable any"
     },
     {
-      "src": "./icons/icon-512x512.png",
+      "src": "icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icons/icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/png", 
-      "purpose": "any maskable"
-    },
-    {
-      "src": "./icons/icon-1024x1024.png",
-      "sizes": "1024x1024",
-      "type": "image/png", 
-      "purpose": "any maskable"
-    },
-    {
-      "src": "./icons/apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "maskable any"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "Upload CSV",
+      "short_name": "Upload",
+      "description": "Upload bank statements and process transactions",
+      "url": "/csv-upload.html",
+      "icons": [
+        {
+          "src": "icons/upload-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "View Goals",
+      "short_name": "Goals",
+      "description": "Track financial goals and progress",
+      "url": "/goals.html",
+      "icons": [
+        {
+          "src": "icons/goals-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "View account overview and financial summary",
+      "url": "/",
+      "icons": [
+        {
+          "src": "icons/dashboard-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/dashboard-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "FinanceOS Dashboard on mobile"
+    },
+    {
+      "src": "screenshots/dashboard-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "FinanceOS Dashboard on desktop"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "protocol_handlers": [
+    {
+      "protocol": "web+financeos",
+      "url": "/?action=%s"
+    }
+  ],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  }
 }
