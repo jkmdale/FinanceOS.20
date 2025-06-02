@@ -1,608 +1,821 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinanceOS - Dashboard</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#8b5cf6">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
-            min-height: 100vh;
-            color: white;
-            overflow-x: hidden;
-        }
-
-        /* Glass Effects */
-        .glass {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
-        .glass-premium {
-            background: linear-gradient(135deg, 
-                rgba(139, 92, 246, 0.15) 0%, 
-                rgba(59, 130, 246, 0.15) 50%, 
-                rgba(147, 51, 234, 0.15) 100%);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-        }
-
-        /* Header */
-        .header {
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            font-weight: bold;
-        }
-
-        .logo-text {
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        /* Navigation */
-        .nav {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .nav-button {
-            padding: 0.5rem 1rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .nav-button:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-1px);
-        }
-
-        .nav-button.active {
-            background: linear-gradient(135deg, #8b5cf6, #9333ea);
-            border-color: rgba(139, 92, 246, 0.5);
-        }
-
-        /* Privacy Toggle */
-        .privacy-toggle {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid rgba(239, 68, 68, 0.4);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .privacy-toggle:hover {
-            background: rgba(239, 68, 68, 0.3);
-        }
-
-        .privacy-toggle.active {
-            background: rgba(16, 185, 129, 0.2);
-            border-color: rgba(16, 185, 129, 0.4);
-        }
-
-        /* Main Content */
-        .main-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem 1.5rem;
-        }
-
-        /* Financial Summary */
-        .financial-summary {
-            margin-bottom: 2rem;
-        }
-
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .summary-card {
-            padding: 1.5rem;
-            border-radius: 16px;
-            text-align: center;
-        }
-
-        .summary-card h3 {
-            font-size: 0.875rem;
-            font-weight: 600;
-            opacity: 0.8;
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .summary-card .amount {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .summary-card .change {
-            font-size: 0.875rem;
-            opacity: 0.8;
-        }
-
-        /* Account Grid */
-        .accounts-section {
-            margin-bottom: 2rem;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .section-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .accounts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .account-card {
-            padding: 1.5rem;
-            border-radius: 16px;
-            transition: all 0.3s ease;
-        }
-
-        .account-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 48px rgba(139, 92, 246, 0.3);
-        }
-
-        .account-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .account-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 0.75rem;
-            font-size: 1.25rem;
-        }
-
-        .account-info h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .account-info .account-type {
-            font-size: 0.875rem;
-            opacity: 0.7;
-        }
-
-        .account-balance {
-            font-size: 1.75rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .account-available {
-            font-size: 0.875rem;
-            opacity: 0.8;
-        }
-
-        /* Quick Actions */
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .action-button {
-            background: linear-gradient(135deg, #8b5cf6, #9333ea);
-            border: none;
-            border-radius: 12px;
-            padding: 1rem;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .action-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
-        }
-
-        /* Emergency Alert */
-        .emergency-alert {
-            background: rgba(239, 68, 68, 0.2);
-            border: 2px solid rgba(239, 68, 68, 0.3);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 2rem;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-
-        .alert-title {
-            font-weight: 700;
-            color: #ef4444;
-            margin-bottom: 0.5rem;
-        }
-
-        .alert-text {
-            font-size: 0.875rem;
-            opacity: 0.9;
-        }
-
-        /* Privacy Mode Styles */
-        .privacy-mode .amount,
-        .privacy-mode .account-balance {
-            filter: blur(8px);
-            transition: filter 0.3s ease;
-        }
-
-        .privacy-mode .amount:hover,
-        .privacy-mode .account-balance:hover {
-            filter: blur(0px);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .nav {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .summary-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .accounts-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .quick-actions {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        /* CSV Upload Indicator */
-        .csv-status {
-            background: rgba(16, 185, 129, 0.15);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            border-radius: 8px;
-            padding: 0.75rem;
-            margin-bottom: 1rem;
-            font-size: 0.875rem;
-        }
-
-        .csv-status.no-data {
-            background: rgba(245, 158, 11, 0.15);
-            border-color: rgba(245, 158, 11, 0.3);
-        }
-    </style>
-</head>
-<body>
-    <!-- Header -->
-    <header class="header glass">
-        <div class="header-content">
-            <div class="logo">
-                <div class="logo-icon">$</div>
-                <span class="logo-text">FinanceOS</span>
-            </div>
-            
-            <nav class="nav">
-                <a href="index.html" class="nav-button active">Dashboard</a>
-                <a href="csv-upload.html" class="nav-button">Upload CSV</a>
-                <a href="goals.html" class="nav-button">Goals</a>
-                <button class="privacy-toggle" id="privacyToggle">🔒 Privacy Mode</button>
-            </nav>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="main-content" id="mainContent">
-        <!-- CSV Data Status -->
-        <div class="csv-status no-data" id="csvStatus">
-            📊 No recent CSV data found. <a href="csv-upload.html" style="color: #f59e0b;">Upload bank statements</a> to see transaction analysis.
-        </div>
-
-        <!-- Emergency Alert -->
-        <div class="emergency-alert">
-            <div class="alert-title">🚨 Financial Alert: Emergency Fund Critical</div>
-            <div class="alert-text">
-                Your emergency fund has only $0.17. With a monthly deficit of $3,607, you're at high financial risk. 
-                <strong>Immediate action required.</strong>
-            </div>
-        </div>
-
-        <!-- Financial Summary -->
-        <section class="financial-summary">
-            <h2 class="section-title">Financial Overview</h2>
-            
-            <div class="summary-grid">
-                <div class="summary-card glass-premium">
-                    <h3>Total Assets</h3>
-                    <div class="amount" style="color: #10b981;">$65,383.44</div>
-                    <div class="change">Available across all accounts</div>
-                </div>
-                
-                <div class="summary-card glass-premium">
-                    <h3>Total Debt</h3>
-                    <div class="amount" style="color: #ef4444;">$274,851.32</div>
-                    <div class="change">Including mortgage & credit</div>
-                </div>
-                
-                <div class="summary-card glass-premium">
-                    <h3>Net Worth</h3>
-                    <div class="amount" style="color: #ef4444;">-$209,467.88</div>
-                    <div class="change">Mortgage impact included</div>
-                </div>
-                
-                <div class="summary-card glass-premium">
-                    <h3>Monthly Cash Flow</h3>
-                    <div class="amount" style="color: #ef4444;">-$3,607</div>
-                    <div class="change">Expenses exceed income</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Accounts Section -->
-        <section class="accounts-section">
-            <div class="section-header">
-                <h2 class="section-title">Your Accounts</h2>
-            </div>
-
-            <div class="accounts-grid">
-                <!-- Personal Accounts -->
-                <div class="account-card glass">
-                    <div class="account-header">
-                        <div class="account-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">💳</div>
-                        <div class="account-info">
-                            <h3>My Spending</h3>
-                            <div class="account-type">Personal Checking</div>
-                        </div>
-                    </div>
-                    <div class="account-balance" style="color: #10b981;">$25.92</div>
-                    <div class="account-available">$25.92 Available</div>
-                </div>
-
-                <div class="account-card glass">
-                    <div class="account-header">
-                        <div class="account-icon" style="background: linear-gradient(135deg, #10b981, #059669);">💰</div>
-                        <div class="account-info">
-                            <h3>My Savings</h3>
-                            <div class="account-type">Personal Savings</div>
-                        </div>
-                    </div>
-                    <div class="account-balance" style="color: #ef4444;">$0.17</div>
-                    <div class="account-available">$0.17 Available</div>
-                </div>
-
-                <!-- Joint Accounts -->
-                <div class="account-card glass-premium">
-                    <div class="account-header">
-                        <div class="account-icon" style="background: linear-gradient(135deg, #8b5cf6, #9333ea);">🏠</div>
-                        <div class="account-info">
-                            <h3>House Kitty</h3>
-                            <div class="account-type">Joint Savings</div>
-                        </div>
-                    </div>
-                    <div class="account-balance" style="color: #10b981;">$65,357.00</div>
-                    <div class="account-available">$65,357.00 Available</div>
-                </div>
-
-                <div class="account-card glass">
-                    <div class="account-header">
-                        <div class="account-icon" style="background: linear-gradient(135deg, #f97316, #ea580c);">🧾</div>
-                        <div class="account-info">
-                            <h3>Mortgage And Billing</h3>
-                            <div class="account-type">Bill Payment Account</div>
-                        </div>
-                    </div>
-                    <div class="account-balance" style="color: #10b981;">$126.35</div>
-                    <div class="account-available">$126.35 Available</div>
-                </div>
-
-                <div class="account-card glass">
-                    <div class="account-header">
-                        <div class="account-icon" style="background: linear-gradient(135deg, #eab308, #ca8a04);">⏳</div>
-                        <div class="account-info">
-                            <h3>Holding</h3>
-                            <div class="account-type">Temporary Account</div>
-                        </div>
-                    </div>
-                    <div class="account-balance" style="color: #10b981;">$240.40</div>
-                    <div class="account-available">$240.40 Available</div>
-                </div>
-
-                <!-- Credit & Loans -->
-                <div class="account-card glass">
-                    <div class="account-header">
-                        <div class="account-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">💳</div>
-                        <div class="account-info">
-                            <h3>Low Rate Visa</h3>
-                            <div class="account-type">Credit Card</div>
-                        </div>
-                    </div>
-                    <div class="account-balance" style="color: #ef4444;">-$3,251.30</div>
-                    <div class="account-available">$6,748.70 Available Credit</div>
-                </div>
-
-                <div class="account-card glass">
-                    <div class="account-header">
-                        <div class="account-icon" style="background: linear-gradient(135deg, #6366f1, #4f46e5);">🏠</div>
-                        <div class="account-info">
-                            <h3>Home Loans</h3>
-                            <div class="account-type">Mortgage</div>
-                        </div>
-                    </div>
-                    <div class="account-balance" style="color: #ef4444;">$271,600.02</div>
-                    <div class="account-available">Principal Balance</div>
-                </div>
-
-                <!-- Investments -->
-                <div class="account-card glass-premium">
-                    <div class="account-header">
-                        <div class="account-icon" style="background: linear-gradient(135deg, #10b981, #047857);">📈</div>
-                        <div class="account-info">
-                            <h3>ANZ KiwiSaver Scheme</h3>
-                            <div class="account-type">Retirement Savings</div>
-                        </div>
-                    </div>
-                    <div class="account-balance" style="color: #10b981;">$48,733.44</div>
-                    <div class="account-available">Investment Balance</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Quick Actions -->
-        <section class="quick-actions">
-            <a href="csv-upload.html" class="action-button">
-                📤 Upload CSV
-            </a>
-            <a href="goals.html" class="action-button">
-                🎯 View Goals
-            </a>
-            <button class="action-button" onclick="addTransaction()">
-                ➕ Add Transaction
-            </button>
-            <button class="action-button" onclick="viewReports()">
-                📊 View Reports
-            </button>
-        </section>
-    </main>
-
-    <script>
-        // Privacy Mode Toggle
-        const privacyToggle = document.getElementById('privacyToggle');
-        const mainContent = document.getElementById('mainContent');
-        
-        let privacyMode = localStorage.getItem('privacyMode') === 'true';
-        updatePrivacyMode();
-
-        privacyToggle.addEventListener('click', () => {
-            privacyMode = !privacyMode;
-            localStorage.setItem('privacyMode', privacyMode);
-            updatePrivacyMode();
-        });
-
-        function updatePrivacyMode() {
-            if (privacyMode) {
-                mainContent.classList.add('privacy-mode');
-                privacyToggle.textContent = '🔓 Show Data';
-                privacyToggle.classList.add('active');
-            } else {
-                mainContent.classList.remove('privacy-mode');
-                privacyToggle.textContent = '🔒 Privacy Mode';
-                privacyToggle.classList.remove('active');
-            }
-        }
-
-        // Check for CSV data
-        function checkCSVData() {
-            const csvData = localStorage.getItem('csvData');
-            const csvStatus = document.getElementById('csvStatus');
-            
-            if (csvData) {
-                const data = JSON.parse(csvData);
-                csvStatus.className = 'csv-status';
-                csvStatus.innerHTML = `✅ CSV data loaded: ${data.length} transactions from ${data[0]?.date || 'unknown date'}. Last updated: ${new Date(localStorage.getItem('csvUploadDate')).toLocaleDateString()}`;
-            } else {
-                csvStatus.className = 'csv-status no-data';
-                csvStatus.innerHTML = '📊 No recent CSV data found. <a href="csv-upload.html" style="color: #f59e0b;">Upload bank statements</a> to see transaction analysis.';
-            }
-        }
-
-        // Quick action functions
-        function addTransaction() {
-            alert('Add Transaction feature coming soon!');
-        }
-
-        function viewReports() {
-            alert('Reports feature coming soon!');
-        }
-
-        // Initialize
-        checkCSVData();
-
-        // Register service worker
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
-        }
-    </script>
-</body>
-</html>
+/* FinanceOS Premium Design System */
+/* Complete glassmorphism theme with dark mode support */
+
+/* CSS Custom Properties (Variables) */
+:root {
+  /* Color Palette */
+  --primary-purple: #8b5cf6;
+  --primary-purple-dark: #9333ea;
+  --secondary-blue: #3b82f6;
+  --secondary-blue-dark: #2563eb;
+  --success-green: #10b981;
+  --success-green-dark: #059669;
+  --error-red: #ef4444;
+  --error-red-dark: #dc2626;
+  --warning-orange: #f97316;
+  --warning-orange-dark: #ea580c;
+  --warning-yellow: #eab308;
+  --warning-yellow-dark: #ca8a04;
+  
+  /* Background Colors */
+  --bg-dark: #0f172a;
+  --bg-medium: #1e1b4b;
+  --bg-light: #312e81;
+  
+  /* Text Colors */
+  --text-primary: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.8);
+  --text-tertiary: rgba(255, 255, 255, 0.6);
+  --text-quaternary: rgba(255, 255, 255, 0.4);
+  
+  /* Glass Effects */
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-bg-premium: rgba(255, 255, 255, 0.12);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --glass-border-premium: rgba(255, 255, 255, 0.2);
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-3xl: 32px;
+  
+  /* Shadows */
+  --shadow-sm: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.3);
+  --shadow-premium: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(139, 92, 246, 0.2);
+  
+  /* Transitions */
+  --transition-fast: all 0.15s ease-out;
+  --transition-normal: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: all 0.5s ease-in-out;
+}
+
+/* Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-medium) 25%, var(--bg-light) 50%, var(--bg-medium) 75%, var(--bg-dark) 100%);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Alternative Background Patterns */
+.app-background {
+  background: linear-gradient(135deg, var(--bg-dark), var(--bg-medium), var(--bg-light));
+}
+
+.app-background-radial {
+  background: radial-gradient(circle at 20% 50%, var(--bg-medium) 0%, var(--bg-dark) 50%, var(--bg-medium) 100%);
+}
+
+/* Typography Scale */
+.text-xs { font-size: 12px; line-height: 16px; }
+.text-sm { font-size: 14px; line-height: 20px; }
+.text-base { font-size: 16px; line-height: 24px; }
+.text-lg { font-size: 18px; line-height: 28px; }
+.text-xl { font-size: 20px; line-height: 28px; }
+.text-2xl { font-size: 24px; line-height: 32px; }
+.text-3xl { font-size: 30px; line-height: 36px; }
+.text-4xl { font-size: 36px; line-height: 40px; }
+
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+.font-extrabold { font-weight: 800; }
+
+/* Glass Effects */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-md);
+}
+
+.glass-premium {
+  background: linear-gradient(135deg, 
+    rgba(139, 92, 246, 0.15) 0%, 
+    rgba(59, 130, 246, 0.15) 50%, 
+    rgba(147, 51, 234, 0.15) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border-premium);
+  box-shadow: var(--shadow-premium);
+}
+
+/* Gradient Backgrounds */
+.gradient-purple {
+  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-dark) 100%);
+}
+
+.gradient-blue {
+  background: linear-gradient(135deg, var(--secondary-blue) 0%, var(--secondary-blue-dark) 100%);
+}
+
+.gradient-green {
+  background: linear-gradient(135deg, var(--success-green) 0%, var(--success-green-dark) 100%);
+}
+
+.gradient-red {
+  background: linear-gradient(135deg, var(--error-red) 0%, var(--error-red-dark) 100%);
+}
+
+.gradient-orange {
+  background: linear-gradient(135deg, var(--warning-orange) 0%, var(--warning-orange-dark) 100%);
+}
+
+.gradient-yellow {
+  background: linear-gradient(135deg, var(--warning-yellow) 0%, var(--warning-yellow-dark) 100%);
+}
+
+/* Text Gradients */
+.text-gradient {
+  background: linear-gradient(135deg, var(--primary-purple), var(--secondary-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-green {
+  background: linear-gradient(135deg, var(--success-green), var(--success-green-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Header Styles */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-md) var(--spacing-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  text-decoration: none;
+  color: var(--text-primary);
+}
+
+.logo-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--primary-purple), var(--secondary-blue));
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+}
+
+.logo-text {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.nav-button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: var(--transition-normal);
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.nav-button:hover {
+  color: var(--text-primary);
+  background: var(--glass-bg);
+  border-color: var(--glass-border);
+}
+
+.nav-button.active {
+  color: var(--primary-purple);
+  background: rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.privacy-toggle {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-normal);
+  font-size: 14px;
+}
+
+.privacy-toggle:hover {
+  background: var(--glass-bg-premium);
+  color: var(--text-primary);
+}
+
+.privacy-toggle.active {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+}
+
+/* Main Content */
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  min-height: calc(100vh - 80px);
+}
+
+/* Page Headers */
+.page-header {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+}
+
+.page-title {
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  background: linear-gradient(135deg, var(--primary-purple), var(--secondary-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.page-subtitle {
+  font-size: 18px;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Section Styles */
+.section-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xl);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Cards */
+.card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-normal);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.card-premium {
+  background: linear-gradient(135deg, 
+    rgba(139, 92, 246, 0.15), 
+    rgba(59, 130, 246, 0.15));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border-premium);
+  border-radius: var(--radius-2xl);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-premium);
+  transition: var(--transition-normal);
+}
+
+/* Buttons */
+.btn {
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-normal);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  border: none;
+  font-size: 14px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-purple), var(--primary-purple-dark));
+  color: white;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+}
+
+.btn-secondary {
+  background: var(--glass-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--glass-border);
+}
+
+.btn-secondary:hover {
+  background: var(--glass-bg-premium);
+  transform: translateY(-1px);
+}
+
+/* Financial Summary Section */
+.financial-summary {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.summary-card {
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-xl);
+  transition: var(--transition-normal);
+}
+
+.summary-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-premium);
+}
+
+.summary-card h3 {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.summary-card .amount {
+  font-size: 36px;
+  font-weight: 800;
+  margin-bottom: var(--spacing-sm);
+}
+
+.summary-card .change {
+  font-size: 14px;
+  color: var(--text-tertiary);
+}
+
+/* Account Styles */
+.accounts-section {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.accounts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.account-card {
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-xl);
+  transition: var(--transition-normal);
+  cursor: pointer;
+}
+
+.account-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+
+.account-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.account-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.account-info h3 {
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: var(--spacing-xs);
+}
+
+.account-type {
+  color: var(--text-tertiary);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.account-balance {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: var(--spacing-sm);
+}
+
+.account-available {
+  color: var(--text-tertiary);
+  font-size: 14px;
+}
+
+/* Alert Styles */
+.emergency-alert {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.2));
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  animation: pulse-alert 2s infinite;
+}
+
+@keyframes pulse-alert {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+}
+
+.alert-title {
+  color: var(--error-red);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+}
+
+.alert-text {
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* CSV Status */
+.csv-status {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.csv-status.no-data {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+}
+
+/* Quick Actions */
+.quick-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+  margin-top: var(--spacing-2xl);
+  justify-content: center;
+}
+
+.action-button {
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: var(--transition-normal);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.action-button:hover {
+  background: var(--glass-bg-premium);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Privacy Mode */
+.privacy-mode .account-balance,
+.privacy-mode .amount,
+.privacy-mode .progress-amounts,
+.privacy-mode .transaction-amount {
+  filter: blur(8px);
+  transition: filter 0.3s ease;
+}
+
+.privacy-mode .account-balance:hover,
+.privacy-mode .amount:hover,
+.privacy-mode .progress-amounts:hover,
+.privacy-mode .transaction-amount:hover {
+  filter: blur(0px);
+}
+
+/* Animation Classes */
+.hover-scale {
+  transition: var(--transition-normal);
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 48px rgba(139, 92, 246, 0.3);
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+}
+
+.transition-all {
+  transition: var(--transition-normal);
+}
+
+.transition-fast {
+  transition: var(--transition-fast);
+}
+
+.transition-slow {
+  transition: var(--transition-slow);
+}
+
+/* Loading Animations */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-pulse {
+  animation: pulse 2s infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Form Styles */
+input, textarea, select {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  color: var(--text-primary);
+  font-size: 16px;
+  transition: var(--transition-normal);
+  width: 100%;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-quaternary);
+}
+
+label {
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-bottom: var(--spacing-sm);
+  display: block;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  
+  .nav {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .main-content {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+  
+  .page-title {
+    font-size: 36px;
+  }
+  
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .accounts-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .quick-actions {
+    flex-direction: column;
+  }
+  
+  .action-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 28px;
+  }
+  
+  .section-title {
+    font-size: 24px;
+  }
+  
+  .account-card,
+  .summary-card {
+    padding: var(--spacing-md);
+  }
+  
+  .logo-text {
+    display: none;
+  }
+}
+
+/* Print Styles */
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+  
+  .glass, .glass-premium {
+    background: white;
+    border: 1px solid #ccc;
+    backdrop-filter: none;
+  }
+  
+  .header, .quick-actions {
+    display: none;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  :root {
+    --text-primary: #ffffff;
+    --text-secondary: #ffffff;
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --glass-bg: rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Dark mode support (already implemented) */
+@media (prefers-color-scheme: light) {
+  /* Light mode overrides would go here if needed */
+  /* Currently, the app is designed for dark mode only */
+}
+
+/* Utility Classes */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: var(--spacing-sm); }
+.gap-4 { gap: var(--spacing-md); }
+.gap-6 { gap: var(--spacing-lg); }
+
+.mb-2 { margin-bottom: var(--spacing-sm); }
+.mb-4 { margin-bottom: var(--spacing-md); }
+.mb-6 { margin-bottom: var(--spacing-lg); }
+.mb-8 { margin-bottom: var(--spacing-xl); }
+
+.p-4 { padding: var(--spacing-md); }
+.p-6 { padding: var(--spacing-lg); }
+.p-8 { padding: var(--spacing-xl); }
+
+.rounded { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+.rounded-xl { border-radius: var(--radius-xl); }
+
+.shadow { box-shadow: var(--shadow-md); }
+.shadow-lg { box-shadow: var(--shadow-lg); }
+
+/* Color Utilities */
+.text-white { color: white; }
+.text-gray-300 { color: var(--text-secondary); }
+.text-gray-400 { color: var(--text-tertiary); }
+.text-purple-400 { color: var(--primary-purple); }
+.text-blue-400 { color: var(--secondary-blue); }
+.text-green-400 { color: var(--success-green); }
+.text-red-400 { color: var(--error-red); }
+.text-yellow-400 { color: var(--warning-yellow); }
+
+/* Border Utilities */
+.border { border: 1px solid var(--glass-border); }
+.border-purple { border-color: var(--primary-purple); }
+.border-red { border-color: var(--error-red); }
+.border-green { border-color: var(--success-green); }
