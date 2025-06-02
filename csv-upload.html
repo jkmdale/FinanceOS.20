@@ -7,6 +7,214 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8b5cf6">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        .upload-section {
+            margin-bottom: 2rem;
+        }
+
+        .upload-area {
+            border: 2px dashed rgba(139, 92, 246, 0.5);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 2rem;
+        }
+
+        .upload-area:hover {
+            border-color: rgba(139, 92, 246, 0.8);
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .upload-area.dragover {
+            border-color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.1);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+        }
+
+        .upload-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-subtext {
+            opacity: 0.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-button {
+            background: linear-gradient(135deg, #8b5cf6, #9333ea);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+        }
+
+        .format-guide {
+            margin-bottom: 2rem;
+        }
+
+        .format-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .format-card {
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid;
+        }
+
+        .format-card h4 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .format-card ul {
+            list-style: none;
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+
+        .format-card li {
+            margin-bottom: 0.25rem;
+        }
+
+        .processing-status {
+            display: none;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .processing-status.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #8b5cf6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results-section {
+            display: none;
+        }
+
+        .results-section.show {
+            display: block;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .result-card {
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .result-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-label {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+
+        .transaction-preview {
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .transaction-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            backdrop-filter: blur(20px);
+        }
+
+        .transaction-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 2fr 1fr;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            align-items: center;
+        }
+
+        .transaction-amount {
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .upload-area {
+                padding: 2rem 1rem;
+            }
+
+            .format-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .transaction-row {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -229,27 +437,12 @@
             processingStatus.classList.add('show');
             resultsSection.classList.remove('show');
 
-            // Use FinanceOS Data Manager if available
-            if (window.FinanceOSData) {
-                window.FinanceOSData.processCSVFiles(files)
-                    .then(results => {
-                        showResults(results.newTransactions, results.summary.duplicates);
-                    })
-                    .catch(error => {
-                        console.error('CSV processing error:', error);
-                        alert('Error processing CSV files. Please check the format and try again.');
-                        processingStatus.classList.remove('show');
-                    });
-            } else {
-                // Fallback processing
-                setTimeout(() => {
-                    processCSVFilesFallback(files);
-                }, 2000);
-            }
+            setTimeout(() => {
+                processCSVFiles(files);
+            }, 2000);
         }
 
-        // Fallback CSV processing if data manager not available
-        function processCSVFilesFallback(files) {
+        function processCSVFiles(files) {
             let allTransactions = [];
             let duplicateCount = 0;
             let processedFiles = 0;
@@ -258,7 +451,7 @@
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const content = e.target.result;
-                    const transactions = parseCSVFallback(content, file.name);
+                    const transactions = parseCSV(content, file.name);
                     
                     // Simple duplicate detection
                     const existingData = JSON.parse(localStorage.getItem('csvData') || '[]');
@@ -282,7 +475,7 @@
             });
         }
 
-        function parseCSVFallback(content, filename) {
+        function parseCSV(content, filename) {
             const lines = content.split('\n').filter(line => line.trim());
             if (lines.length < 2) return [];
             
@@ -355,7 +548,6 @@
                 transaction.category = categorizeTransaction(values[descIndex]);
             }
 
-            // Only return transaction if we have essential data
             if (transaction.date && transaction.description) {
                 return transaction;
             }
@@ -366,11 +558,10 @@
         function parseDate(dateStr) {
             if (!dateStr) return null;
             
-            // Try different date formats
             const formats = [
-                /(\d{1,2})\/(\d{1,2})\/(\d{4})/,     // DD/MM/YYYY
-                /(\d{4})-(\d{1,2})-(\d{1,2})/,       // YYYY-MM-DD
-                /(\d{1,2})-(\d{1,2})-(\d{4})/        // DD-MM-YYYY
+                /(\d{1,2})\/(\d{1,2})\/(\d{4})/,
+                /(\d{4})-(\d{1,2})-(\d{1,2})/,
+                /(\d{1,2})-(\d{1,2})-(\d{4})/
             ];
 
             for (const format of formats) {
@@ -378,9 +569,9 @@
                 if (match) {
                     let day, month, year;
                     
-                    if (format === formats[1]) { // YYYY-MM-DD
+                    if (format === formats[1]) {
                         [, year, month, day] = match;
-                    } else { // DD/MM/YYYY, DD-MM-YYYY
+                    } else {
                         [, day, month, year] = match;
                     }
                     
@@ -391,13 +582,12 @@
                 }
             }
 
-            return new Date().toISOString().split('T')[0]; // Fallback to today
+            return new Date().toISOString().split('T')[0];
         }
 
         function parseAmount(amountStr) {
             if (!amountStr) return 0;
             
-            // Clean and parse amount
             let cleanAmount = amountStr.toString()
                 .replace(/[$,\s]/g, '')
                 .replace(/[()]/g, '')
@@ -418,7 +608,6 @@
             
             const desc = description.toLowerCase();
             
-            // NZ-specific categorization
             if (desc.includes('countdown') || desc.includes('pak n save') || desc.includes('new world') || desc.includes('fresh choice')) {
                 return 'Groceries';
             } else if (desc.includes('bp ') || desc.includes('z energy') || desc.includes('mobil') || desc.includes('gull')) {
@@ -444,7 +633,6 @@
             processingStatus.classList.remove('show');
             resultsSection.classList.add('show');
             
-            // Update result numbers
             document.getElementById('newTransactions').textContent = transactions.length;
             document.getElementById('duplicatesFound').textContent = duplicateCount;
             document.getElementById('categorized').textContent = transactions.filter(t => t.category !== 'Uncategorized').length;
@@ -456,10 +644,7 @@
                 document.getElementById('dateRange').textContent = `${startDate} - ${endDate}`;
             }
             
-            // Show transaction preview
             displayTransactionPreview(transactions.slice(0, 10));
-            
-            // Store processed data
             window.processedTransactions = transactions;
         }
 
@@ -490,22 +675,17 @@
         // Save data functionality
         document.getElementById('saveData').addEventListener('click', () => {
             if (window.processedTransactions) {
-                // Merge with existing data
                 const existingData = JSON.parse(localStorage.getItem('csvData') || '[]');
                 const mergedData = [...existingData, ...window.processedTransactions];
                 
-                // Store in localStorage
                 localStorage.setItem('csvData', JSON.stringify(mergedData));
                 localStorage.setItem('csvUploadDate', new Date().toISOString());
                 
-                // Trigger CSV upload event for notifications
                 if (window.FinanceOSNotifications) {
                     window.dispatchEvent(new CustomEvent('csvUploadSuccess'));
                 }
                 
                 alert('Data saved successfully! You can now view it on the dashboard.');
-                
-                // Redirect to dashboard
                 window.location.href = 'index.html';
             }
         });
@@ -553,222 +733,11 @@
             }
         });
 
-        // Initialize
         if (window.FinanceOSHelpers) {
             window.FinanceOSHelpers.initializePage();
         }
 
         console.log('FinanceOS CSV Upload loaded successfully - No authentication required');
     </script>
-
-    <style>
-        /* Additional styles for upload functionality */
-        .upload-section {
-            margin-bottom: 2rem;
-        }
-
-        .upload-area {
-            border: 2px dashed rgba(139, 92, 246, 0.5);
-            border-radius: 16px;
-            padding: 3rem 2rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            margin-bottom: 2rem;
-        }
-
-        .upload-area:hover {
-            border-color: rgba(139, 92, 246, 0.8);
-            background: rgba(139, 92, 246, 0.05);
-        }
-
-        .upload-area.dragover {
-            border-color: #8b5cf6;
-            background: rgba(139, 92, 246, 0.1);
-            transform: scale(1.02);
-        }
-
-        .upload-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            opacity: 0.7;
-        }
-
-        .upload-text {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .upload-subtext {
-            opacity: 0.7;
-            margin-bottom: 1.5rem;
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        .upload-button {
-            background: linear-gradient(135deg, #8b5cf6, #9333ea);
-            border: none;
-            border-radius: 8px;
-            padding: 0.75rem 1.5rem;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .upload-button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
-        }
-
-        .format-guide {
-            margin-bottom: 2rem;
-        }
-
-        .format-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1rem;
-        }
-
-        .format-card {
-            padding: 1.5rem;
-            border-radius: 12px;
-            border-left: 4px solid;
-        }
-
-        .format-card h4 {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .format-card ul {
-            list-style: none;
-            font-size: 0.875rem;
-            opacity: 0.8;
-        }
-
-        .format-card li {
-            margin-bottom: 0.25rem;
-        }
-
-        .processing-status {
-            display: none;
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-
-        .processing-status.show {
-            display: block;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #8b5cf6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .results-section {
-            display: none;
-        }
-
-        .results-section.show {
-            display: block;
-        }
-
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .result-card {
-            padding: 1.5rem;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .result-number {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .result-label {
-            font-size: 0.875rem;
-            opacity: 0.8;
-        }
-
-        .transaction-preview {
-            max-height: 400px;
-            overflow-y: auto;
-            border-radius: 12px;
-            margin-bottom: 2rem;
-        }
-
-        .transaction-header {
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            font-weight: 600;
-            position: sticky;
-            top: 0;
-            backdrop-filter: blur(20px);
-        }
-
-        .transaction-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr 2fr 1fr;
-            gap: 1rem;
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            align-items: center;
-        }
-
-        .transaction-amount {
-            font-weight: 600;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-top: 2rem;
-        }
-
-        @media (max-width: 768px) {
-            .upload-area {
-                padding: 2rem 1rem;
-            }
-
-            .format-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .transaction-row {
-                grid-template-columns: 1fr;
-                gap: 0.5rem;
-            }
-
-            .action-buttons {
-                flex-direction: column;
-            }
-        }
-    </style>
 </body>
 </html>
