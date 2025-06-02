@@ -222,7 +222,7 @@
             handleFiles(e.target.files);
         });
 
-        // File processing using data manager
+        // File processing
         function handleFiles(files) {
             if (files.length === 0) return;
 
@@ -284,25 +284,160 @@
 
         function parseCSVFallback(content, filename) {
             const lines = content.split('\n').filter(line => line.trim());
+            if (lines.length < 2) return [];
+            
             const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
             
             const transactions = [];
             for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+                const values = parseCSVLine(lines[i]);
                 if (values.length >= 3) {
-                    const transaction = {
-                        id: 'txn_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-                        date: values[0] || '',
-                        amount: parseFloat(values[1]?.replace(/[^-\d.]/g, '') || '0'),
-                        description: values[2] || '',
-                        category: 'Uncategorized',
-                        sourceFile: filename
-                    };
-                    transactions.push(transaction);
+                    const transaction = mapToStandardFormat(values, headers, filename);
+                    if (transaction) {
+                        transactions.push(transaction);
+                    }
                 }
             }
             
             return transactions;
+        }
+
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim().replace(/^"|"$/g, ''));
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            result.push(current.trim().replace(/^"|"$/g, ''));
+            return result;
+        }
+
+        function mapToStandardFormat(values, headers, filename) {
+            const transaction = {
+                id: 'txn_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                date: null,
+                amount: 0,
+                description: '',
+                category: 'Uncategorized',
+                sourceFile: filename
+            };
+
+            // Map common field positions
+            const dateIndex = headers.findIndex(h => h.toLowerCase().includes('date'));
+            const amountIndex = headers.findIndex(h => h.toLowerCase().includes('amount'));
+            const descIndex = headers.findIndex(h => 
+                h.toLowerCase().includes('description') || 
+                h.toLowerCase().includes('memo') || 
+                h.toLowerCase().includes('payee') ||
+                h.toLowerCase().includes('particulars')
+            );
+
+            if (dateIndex >= 0 && values[dateIndex]) {
+                transaction.date = parseDate(values[dateIndex]);
+            }
+            
+            if (amountIndex >= 0 && values[amountIndex]) {
+                transaction.amount = parseAmount(values[amountIndex]);
+            }
+            
+            if (descIndex >= 0 && values[descIndex]) {
+                transaction.description = values[descIndex];
+                transaction.category = categorizeTransaction(values[descIndex]);
+            }
+
+            // Only return transaction if we have essential data
+            if (transaction.date && transaction.description) {
+                return transaction;
+            }
+            
+            return null;
+        }
+
+        function parseDate(dateStr) {
+            if (!dateStr) return null;
+            
+            // Try different date formats
+            const formats = [
+                /(\d{1,2})\/(\d{1,2})\/(\d{4})/,     // DD/MM/YYYY
+                /(\d{4})-(\d{1,2})-(\d{1,2})/,       // YYYY-MM-DD
+                /(\d{1,2})-(\d{1,2})-(\d{4})/        // DD-MM-YYYY
+            ];
+
+            for (const format of formats) {
+                const match = dateStr.match(format);
+                if (match) {
+                    let day, month, year;
+                    
+                    if (format === formats[1]) { // YYYY-MM-DD
+                        [, year, month, day] = match;
+                    } else { // DD/MM/YYYY, DD-MM-YYYY
+                        [, day, month, year] = match;
+                    }
+                    
+                    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                    if (!isNaN(date.getTime())) {
+                        return date.toISOString().split('T')[0];
+                    }
+                }
+            }
+
+            return new Date().toISOString().split('T')[0]; // Fallback to today
+        }
+
+        function parseAmount(amountStr) {
+            if (!amountStr) return 0;
+            
+            // Clean and parse amount
+            let cleanAmount = amountStr.toString()
+                .replace(/[$,\s]/g, '')
+                .replace(/[()]/g, '')
+                .trim();
+            
+            const isNegative = amountStr.includes('(') || amountStr.includes('-') || 
+                              amountStr.toLowerCase().includes('dr');
+            
+            const numericMatch = cleanAmount.match(/\d+\.?\d*/);
+            if (!numericMatch) return 0;
+            
+            let amount = parseFloat(numericMatch[0]);
+            return isNegative ? -Math.abs(amount) : amount;
+        }
+
+        function categorizeTransaction(description) {
+            if (!description) return 'Uncategorized';
+            
+            const desc = description.toLowerCase();
+            
+            // NZ-specific categorization
+            if (desc.includes('countdown') || desc.includes('pak n save') || desc.includes('new world') || desc.includes('fresh choice')) {
+                return 'Groceries';
+            } else if (desc.includes('bp ') || desc.includes('z energy') || desc.includes('mobil') || desc.includes('gull')) {
+                return 'Fuel';
+            } else if (desc.includes('eftpos') || desc.includes('atm')) {
+                return 'Cash Withdrawal';
+            } else if (desc.includes('interest')) {
+                return 'Income';
+            } else if (desc.includes('fee')) {
+                return 'Bank Fees';
+            } else if (desc.includes('mortgage') || desc.includes('rent')) {
+                return 'Housing';
+            } else if (desc.includes('mcdonald') || desc.includes('kfc') || desc.includes('burger') || desc.includes('pizza')) {
+                return 'Dining Out';
+            } else if (desc.includes('spark') || desc.includes('vodafone') || desc.includes('2degrees') || desc.includes('sky')) {
+                return 'Utilities';
+            }
+            
+            return 'Uncategorized';
         }
 
         function showResults(transactions, duplicateCount) {
@@ -418,12 +553,222 @@
             }
         });
 
-        // Initialize data manager if available
+        // Initialize
         if (window.FinanceOSHelpers) {
             window.FinanceOSHelpers.initializePage();
         }
 
         console.log('FinanceOS CSV Upload loaded successfully - No authentication required');
     </script>
+
+    <style>
+        /* Additional styles for upload functionality */
+        .upload-section {
+            margin-bottom: 2rem;
+        }
+
+        .upload-area {
+            border: 2px dashed rgba(139, 92, 246, 0.5);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 2rem;
+        }
+
+        .upload-area:hover {
+            border-color: rgba(139, 92, 246, 0.8);
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .upload-area.dragover {
+            border-color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.1);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+        }
+
+        .upload-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-subtext {
+            opacity: 0.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-button {
+            background: linear-gradient(135deg, #8b5cf6, #9333ea);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+        }
+
+        .format-guide {
+            margin-bottom: 2rem;
+        }
+
+        .format-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .format-card {
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid;
+        }
+
+        .format-card h4 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .format-card ul {
+            list-style: none;
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+
+        .format-card li {
+            margin-bottom: 0.25rem;
+        }
+
+        .processing-status {
+            display: none;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .processing-status.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #8b5cf6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results-section {
+            display: none;
+        }
+
+        .results-section.show {
+            display: block;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .result-card {
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .result-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-label {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+
+        .transaction-preview {
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .transaction-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            backdrop-filter: blur(20px);
+        }
+
+        .transaction-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 2fr 1fr;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            align-items: center;
+        }
+
+        .transaction-amount {
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .upload-area {
+                padding: 2rem 1rem;
+            }
+
+            .format-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .transaction-row {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
 </body>
 </html>
