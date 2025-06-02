@@ -3,606 +3,671 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinanceOS - Dashboard</title>
+    <title>FinanceOS - Secure Login</title>
+    <link rel="stylesheet" href="styles.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8b5cf6">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
+        .login-container {
             min-height: 100vh;
-            color: white;
-            overflow-x: hidden;
-        }
-
-        /* Glass Effects */
-        .glass {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
-        .glass-premium {
-            background: linear-gradient(135deg, 
-                rgba(139, 92, 246, 0.15) 0%, 
-                rgba(59, 130, 246, 0.15) 50%, 
-                rgba(147, 51, 234, 0.15) 100%);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-        }
-
-        /* Header */
-        .header {
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.25rem;
-            font-weight: bold;
+            padding: 2rem;
+            position: relative;
         }
 
-        .logo-text {
-            font-size: 1.5rem;
+        .login-background {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+        }
+
+        .login-background::before {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .login-background::after {
+            content: '';
+            position: absolute;
+            bottom: 20%;
+            right: 15%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 4s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            padding: 3rem 2rem;
+            border-radius: 24px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .app-logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0 auto 1rem;
+            box-shadow: 0 8px 32px rgba(16, 185, 129, 0.3);
+        }
+
+        .app-title {
+            font-size: 2rem;
             font-weight: 700;
             background: linear-gradient(135deg, #8b5cf6, #3b82f6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            margin-bottom: 0.5rem;
         }
 
-        /* Navigation */
-        .nav {
+        .app-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+        }
+
+        .auth-methods {
             display: flex;
+            flex-direction: column;
             gap: 1rem;
         }
 
-        .nav-button {
-            padding: 0.5rem 1rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
+        .biometric-button {
+            background: linear-gradient(135deg, #8b5cf6, #9333ea);
+            border: none;
+            border-radius: 16px;
+            padding: 1rem 2rem;
             color: white;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            min-height: 60px;
         }
 
-        .nav-button:hover {
+        .biometric-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(139, 92, 246, 0.4);
+        }
+
+        .biometric-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .biometric-icon {
+            font-size: 1.5rem;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.875rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .divider span {
+            padding: 0 1rem;
+        }
+
+        .password-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+
+        .password-toggle:hover {
+            color: white;
+        }
+
+        .login-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1rem;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-button:hover {
             background: rgba(255, 255, 255, 0.2);
             transform: translateY(-1px);
         }
 
-        .nav-button.active {
-            background: linear-gradient(135deg, #8b5cf6, #9333ea);
-            border-color: rgba(139, 92, 246, 0.5);
-        }
-
-        /* Privacy Toggle */
-        .privacy-toggle {
+        .error-message {
             background: rgba(239, 68, 68, 0.2);
             border: 1px solid rgba(239, 68, 68, 0.4);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .privacy-toggle:hover {
-            background: rgba(239, 68, 68, 0.3);
-        }
-
-        .privacy-toggle.active {
-            background: rgba(16, 185, 129, 0.2);
-            border-color: rgba(16, 185, 129, 0.4);
-        }
-
-        /* Main Content */
-        .main-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem 1.5rem;
-        }
-
-        /* Financial Summary */
-        .financial-summary {
-            margin-bottom: 2rem;
-        }
-
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .summary-card {
-            padding: 1.5rem;
-            border-radius: 16px;
-            text-align: center;
-        }
-
-        .summary-card h3 {
-            font-size: 0.875rem;
-            font-weight: 600;
-            opacity: 0.8;
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .summary-card .amount {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .summary-card .change {
-            font-size: 0.875rem;
-            opacity: 0.8;
-        }
-
-        /* Account Grid */
-        .accounts-section {
-            margin-bottom: 2rem;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .section-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .accounts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .account-card {
-            padding: 1.5rem;
-            border-radius: 16px;
-            transition: all 0.3s ease;
-        }
-
-        .account-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 48px rgba(139, 92, 246, 0.3);
-        }
-
-        .account-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .account-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 0.75rem;
-            font-size: 1.25rem;
-        }
-
-        .account-info h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .account-info .account-type {
-            font-size: 0.875rem;
-            opacity: 0.7;
-        }
-
-        .account-balance {
-            font-size: 1.75rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .account-available {
-            font-size: 0.875rem;
-            opacity: 0.8;
-        }
-
-        /* Quick Actions */
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .action-button {
-            background: linear-gradient(135deg, #8b5cf6, #9333ea);
-            border: none;
-            border-radius: 12px;
-            padding: 1rem;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .action-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
-        }
-
-        /* Emergency Alert */
-        .emergency-alert {
-            background: rgba(239, 68, 68, 0.2);
-            border: 2px solid rgba(239, 68, 68, 0.3);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 2rem;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-
-        .alert-title {
-            font-weight: 700;
-            color: #ef4444;
-            margin-bottom: 0.5rem;
-        }
-
-        .alert-text {
-            font-size: 0.875rem;
-            opacity: 0.9;
-        }
-
-        /* Privacy Mode Styles */
-        .privacy-mode .amount,
-        .privacy-mode .account-balance {
-            filter: blur(8px);
-            transition: filter 0.3s ease;
-        }
-
-        .privacy-mode .amount:hover,
-        .privacy-mode .account-balance:hover {
-            filter: blur(0px);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .nav {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .summary-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .accounts-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .quick-actions {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        /* CSV Upload Indicator */
-        .csv-status {
-            background: rgba(16, 185, 129, 0.15);
-            border: 1px solid rgba(16, 185, 129, 0.3);
             border-radius: 8px;
             padding: 0.75rem;
-            margin-bottom: 1rem;
+            color: #fef2f2;
             font-size: 0.875rem;
+            margin-top: 1rem;
+            display: none;
         }
 
-        .csv-status.no-data {
-            background: rgba(245, 158, 11, 0.15);
-            border-color: rgba(245, 158, 11, 0.3);
+        .error-message.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .setup-biometric {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .setup-biometric button {
+            background: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .setup-biometric button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 1rem;
+            }
+
+            .login-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .app-title {
+                font-size: 1.75rem;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header glass">
-        <div class="header-content">
-            <div class="logo">
-                <div class="logo-icon">$</div>
-                <span class="logo-text">FinanceOS</span>
+    <div class="login-container app-background">
+        <div class="login-background"></div>
+        
+        <div class="login-card glass-premium">
+            <div class="logo-section">
+                <div class="app-logo">$</div>
+                <h1 class="app-title">FinanceOS</h1>
+                <p class="app-subtitle">Secure access to your financial data</p>
             </div>
-            
-            <nav class="nav">
-                <a href="index.html" class="nav-button active">Dashboard</a>
-                <a href="csv-upload.html" class="nav-button">Upload CSV</a>
-                <a href="goals.html" class="nav-button">Goals</a>
-                <button class="privacy-toggle" id="privacyToggle">🔒 Privacy Mode</button>
-            </nav>
+
+            <div class="auth-methods">
+                <!-- Biometric Authentication -->
+                <button class="biometric-button" id="biometricButton">
+                    <span class="biometric-icon">👆</span>
+                    <span id="biometricText">Use Fingerprint</span>
+                </button>
+
+                <div class="divider">
+                    <span>or enter password</span>
+                </div>
+
+                <!-- Password Authentication -->
+                <form class="password-form" id="passwordForm">
+                    <div class="form-group">
+                        <input 
+                            type="password" 
+                            id="passwordInput"
+                            class="form-input"
+                            placeholder="Enter your password"
+                            required
+                        >
+                        <button type="button" class="password-toggle" id="passwordToggle">👁️</button>
+                    </div>
+                    
+                    <button type="submit" class="login-button" id="loginButton">
+                        <span id="loginText">Sign In</span>
+                    </button>
+                </form>
+
+                <div class="error-message" id="errorMessage"></div>
+            </div>
+
+            <!-- Biometric Setup -->
+            <div class="setup-biometric" id="setupBiometric" style="display: none;">
+                <p style="margin-bottom: 0.75rem; font-size: 0.875rem; opacity: 0.8;">
+                    Set up fingerprint authentication for faster access
+                </p>
+                <button id="setupBiometricButton">Set Up Fingerprint</button>
+            </div>
         </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="main-content" id="mainContent">
-        <!-- CSV Data Status -->
-        <div class="csv-status no-data" id="csvStatus">
-            📊 No recent CSV data found. <a href="csv-upload.html" style="color: #f59e0b;">Upload bank statements</a> to see transaction analysis.
-        </div>
-
-        <!-- Emergency Alert -->
-        <div class="emergency-alert">
-            <div class="alert-title">🚨 Financial Alert: Emergency Fund Critical</div>
-            <div class="alert-text">
-                Your emergency fund has only $0.17. With a monthly deficit of $3,607, you're at high financial risk. 
-                <strong>Immediate action required.</strong>
-            </div>
-        </div>
-
-        <!-- Financial Summary -->
-        <section class="financial-summary">
-            <h2 class="section-title">Financial Overview</h2>
-            
-            <div class="summary-grid">
-                <div class="summary-card glass-premium">
-                    <h3>Total Assets</h3>
-                    <div class="amount" style="color: #10b981;">$65,383.44</div>
-                    <div class="change">Available across all accounts</div>
-                </div>
-                
-                <div class="summary-card glass-premium">
-                    <h3>Total Debt</h3>
-                    <div class="amount" style="color: #ef4444;">$274,851.32</div>
-                    <div class="change">Including mortgage & credit</div>
-                </div>
-                
-                <div class="summary-card glass-premium">
-                    <h3>Net Worth</h3>
-                    <div class="amount" style="color: #ef4444;">-$209,467.88</div>
-                    <div class="change">Mortgage impact included</div>
-                </div>
-                
-                <div class="summary-card glass-premium">
-                    <h3>Monthly Cash Flow</h3>
-                    <div class="amount" style="color: #ef4444;">-$3,607</div>
-                    <div class="change">Expenses exceed income</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Accounts Section -->
-        <section class="accounts-section">
-            <div class="section-header">
-                <h2 class="section-title">Your Accounts</h2>
-            </div>
-
-            <div class="accounts-grid">
-                <!-- Personal Accounts -->
-                <div class="account-card glass">
-                    <div class="account-header">
-                        <div class="account-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">💳</div>
-                        <div class="account-info">
-                            <h3>My Spending</h3>
-                            <div class="account-type">Personal Checking</div>
-                        </div>
-                    </div>
-                    <div class="account-balance" style="color: #10b981;">$25.92</div>
-                    <div class="account-available">$25.92 Available</div>
-                </div>
-
-                <div class="account-card glass">
-                    <div class="account-header">
-                        <div class="account-icon" style="background: linear-gradient(135deg, #10b981, #059669);">💰</div>
-                        <div class="account-info">
-                            <h3>My Savings</h3>
-                            <div class="account-type">Personal Savings</div>
-                        </div>
-                    </div>
-                    <div class="account-balance" style="color: #ef4444;">$0.17</div>
-                    <div class="account-available">$0.17 Available</div>
-                </div>
-
-                <!-- Joint Accounts -->
-                <div class="account-card glass-premium">
-                    <div class="account-header">
-                        <div class="account-icon" style="background: linear-gradient(135deg, #8b5cf6, #9333ea);">🏠</div>
-                        <div class="account-info">
-                            <h3>House Kitty</h3>
-                            <div class="account-type">Joint Savings</div>
-                        </div>
-                    </div>
-                    <div class="account-balance" style="color: #10b981;">$65,357.00</div>
-                    <div class="account-available">$65,357.00 Available</div>
-                </div>
-
-                <div class="account-card glass">
-                    <div class="account-header">
-                        <div class="account-icon" style="background: linear-gradient(135deg, #f97316, #ea580c);">🧾</div>
-                        <div class="account-info">
-                            <h3>Mortgage And Billing</h3>
-                            <div class="account-type">Bill Payment Account</div>
-                        </div>
-                    </div>
-                    <div class="account-balance" style="color: #10b981;">$126.35</div>
-                    <div class="account-available">$126.35 Available</div>
-                </div>
-
-                <div class="account-card glass">
-                    <div class="account-header">
-                        <div class="account-icon" style="background: linear-gradient(135deg, #eab308, #ca8a04);">⏳</div>
-                        <div class="account-info">
-                            <h3>Holding</h3>
-                            <div class="account-type">Temporary Account</div>
-                        </div>
-                    </div>
-                    <div class="account-balance" style="color: #10b981;">$240.40</div>
-                    <div class="account-available">$240.40 Available</div>
-                </div>
-
-                <!-- Credit & Loans -->
-                <div class="account-card glass">
-                    <div class="account-header">
-                        <div class="account-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">💳</div>
-                        <div class="account-info">
-                            <h3>Low Rate Visa</h3>
-                            <div class="account-type">Credit Card</div>
-                        </div>
-                    </div>
-                    <div class="account-balance" style="color: #ef4444;">-$3,251.30</div>
-                    <div class="account-available">$6,748.70 Available Credit</div>
-                </div>
-
-                <div class="account-card glass">
-                    <div class="account-header">
-                        <div class="account-icon" style="background: linear-gradient(135deg, #6366f1, #4f46e5);">🏠</div>
-                        <div class="account-info">
-                            <h3>Home Loans</h3>
-                            <div class="account-type">Mortgage</div>
-                        </div>
-                    </div>
-                    <div class="account-balance" style="color: #ef4444;">$271,600.02</div>
-                    <div class="account-available">Principal Balance</div>
-                </div>
-
-                <!-- Investments -->
-                <div class="account-card glass-premium">
-                    <div class="account-header">
-                        <div class="account-icon" style="background: linear-gradient(135deg, #10b981, #047857);">📈</div>
-                        <div class="account-info">
-                            <h3>ANZ KiwiSaver Scheme</h3>
-                            <div class="account-type">Retirement Savings</div>
-                        </div>
-                    </div>
-                    <div class="account-balance" style="color: #10b981;">$48,733.44</div>
-                    <div class="account-available">Investment Balance</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Quick Actions -->
-        <section class="quick-actions">
-            <a href="csv-upload.html" class="action-button">
-                📤 Upload CSV
-            </a>
-            <a href="goals.html" class="action-button">
-                🎯 View Goals
-            </a>
-            <button class="action-button" onclick="addTransaction()">
-                ➕ Add Transaction
-            </button>
-            <button class="action-button" onclick="viewReports()">
-                📊 View Reports
-            </button>
-        </section>
-    </main>
+    </div>
 
     <script>
-        // Privacy Mode Toggle
-        const privacyToggle = document.getElementById('privacyToggle');
-        const mainContent = document.getElementById('mainContent');
-        
-        let privacyMode = localStorage.getItem('privacyMode') === 'true';
-        updatePrivacyMode();
+        class FinanceOSAuth {
+            constructor() {
+                this.initializeAuth();
+                this.setupEventListeners();
+                this.checkBiometricAvailability();
+            }
 
-        privacyToggle.addEventListener('click', () => {
-            privacyMode = !privacyMode;
-            localStorage.setItem('privacyMode', privacyMode);
-            updatePrivacyMode();
-        });
+            async initializeAuth() {
+                // Check if user is already authenticated in this session
+                if (this.isAuthenticated()) {
+                    this.redirectToApp();
+                    return;
+                }
 
-        function updatePrivacyMode() {
-            if (privacyMode) {
-                mainContent.classList.add('privacy-mode');
-                privacyToggle.textContent = '🔓 Show Data';
-                privacyToggle.classList.add('active');
-            } else {
-                mainContent.classList.remove('privacy-mode');
-                privacyToggle.textContent = '🔒 Privacy Mode';
-                privacyToggle.classList.remove('active');
+                // Check for existing biometric setup
+                const biometricEnabled = localStorage.getItem('biometricEnabled') === 'true';
+                if (biometricEnabled) {
+                    this.attemptBiometricAuth();
+                }
+            }
+
+            setupEventListeners() {
+                // Biometric button
+                document.getElementById('biometricButton').addEventListener('click', () => {
+                    this.attemptBiometricAuth();
+                });
+
+                // Password form
+                document.getElementById('passwordForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.attemptPasswordAuth();
+                });
+
+                // Password toggle
+                document.getElementById('passwordToggle').addEventListener('click', () => {
+                    this.togglePasswordVisibility();
+                });
+
+                // Setup biometric
+                document.getElementById('setupBiometricButton').addEventListener('click', () => {
+                    this.setupBiometric();
+                });
+            }
+
+            async checkBiometricAvailability() {
+                const isAvailable = await this.isBiometricAvailable();
+                const biometricButton = document.getElementById('biometricButton');
+                const setupSection = document.getElementById('setupBiometric');
+                
+                if (!isAvailable) {
+                    biometricButton.disabled = true;
+                    biometricButton.innerHTML = '<span class="biometric-icon">🔒</span><span>Biometric Not Available</span>';
+                    biometricButton.style.background = 'rgba(107, 114, 128, 0.5)';
+                    return;
+                }
+
+                const biometricEnabled = localStorage.getItem('biometricEnabled') === 'true';
+                if (!biometricEnabled) {
+                    setupSection.style.display = 'block';
+                }
+            }
+
+            async isBiometricAvailable() {
+                if (!('PublicKeyCredential' in window)) return false;
+                
+                try {
+                    const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+                    return available;
+                } catch (error) {
+                    console.log('Biometric check failed:', error);
+                    return false;
+                }
+            }
+
+            async attemptBiometricAuth() {
+                if (!await this.isBiometricAvailable()) {
+                    this.showError('Biometric authentication not available');
+                    return;
+                }
+
+                this.setButtonLoading('biometricButton', true);
+
+                try {
+                    // For demo purposes, we'll simulate biometric auth
+                    // In production, this would use WebAuthn API
+                    await this.simulateBiometricAuth();
+                    
+                    this.authenticateUser();
+                } catch (error) {
+                    console.error('Biometric auth failed:', error);
+                    this.showError('Biometric authentication failed. Please try again or use password.');
+                } finally {
+                    this.setButtonLoading('biometricButton', false);
+                }
+            }
+
+            async simulateBiometricAuth() {
+                // Simulate biometric authentication process
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        // Simulate success/failure based on random chance for demo
+                        // In production, this would be actual biometric verification
+                        const success = Math.random() > 0.1; // 90% success rate for demo
+                        if (success) {
+                            resolve();
+                        } else {
+                            reject(new Error('Biometric verification failed'));
+                        }
+                    }, 1500);
+                });
+            }
+
+            async attemptPasswordAuth() {
+                const password = document.getElementById('passwordInput').value;
+                
+                if (!password) {
+                    this.showError('Please enter a password');
+                    return;
+                }
+
+                this.setButtonLoading('loginButton', true);
+
+                try {
+                    // Simulate password verification
+                    await this.verifyPassword(password);
+                    this.authenticateUser();
+                } catch (error) {
+                    this.showError('Invalid password. Please try again.');
+                } finally {
+                    this.setButtonLoading('loginButton', false);
+                }
+            }
+
+            async verifyPassword(password) {
+                // Simple password verification for demo
+                // In production, this would hash and verify against stored credentials
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        // Accept multiple demo passwords
+                        const validPasswords = ['finance123', 'demo', 'password', '123456'];
+                        if (validPasswords.includes(password.toLowerCase())) {
+                            resolve();
+                        } else {
+                            reject(new Error('Invalid password'));
+                        }
+                    }, 1000);
+                });
+            }
+
+            async setupBiometric() {
+                if (!await this.isBiometricAvailable()) {
+                    this.showError('Biometric authentication not available on this device');
+                    return;
+                }
+
+                try {
+                    // Simulate biometric setup
+                    await this.simulateBiometricSetup();
+                    
+                    localStorage.setItem('biometricEnabled', 'true');
+                    localStorage.setItem('biometricSetupDate', new Date().toISOString());
+                    
+                    document.getElementById('setupBiometric').style.display = 'none';
+                    
+                    // Update biometric button
+                    const biometricButton = document.getElementById('biometricButton');
+                    biometricButton.disabled = false;
+                    biometricButton.innerHTML = '<span class="biometric-icon">👆</span><span>Use Fingerprint</span>';
+                    
+                    this.showError('Biometric authentication set up successfully!', 'success');
+                    
+                } catch (error) {
+                    this.showError('Failed to set up biometric authentication');
+                }
+            }
+
+            async simulateBiometricSetup() {
+                return new Promise((resolve) => {
+                    setTimeout(resolve, 2000);
+                });
+            }
+
+            authenticateUser() {
+                // Set session authentication
+                sessionStorage.setItem('financeOSAuthenticated', 'true');
+                sessionStorage.setItem('authTime', Date.now().toString());
+                
+                // Set up notifications after successful login
+                this.requestNotificationPermission();
+                
+                this.redirectToApp();
+            }
+
+            isAuthenticated() {
+                const authenticated = sessionStorage.getItem('financeOSAuthenticated') === 'true';
+                const authTime = parseInt(sessionStorage.getItem('authTime') || '0');
+                const currentTime = Date.now();
+                
+                // Session expires after 4 hours
+                const sessionDuration = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
+                
+                return authenticated && (currentTime - authTime < sessionDuration);
+            }
+
+            redirectToApp() {
+                // Check if we came from a specific page
+                const returnUrl = new URLSearchParams(window.location.search).get('return') || 'index.html';
+                window.location.href = returnUrl;
+            }
+
+            setButtonLoading(buttonId, loading) {
+                const button = document.getElementById(buttonId);
+                const text = buttonId === 'biometricButton' ? 
+                    document.getElementById('biometricText') : 
+                    document.getElementById('loginText');
+                
+                if (loading) {
+                    button.disabled = true;
+                    const spinner = '<div class="loading-spinner"></div>';
+                    if (buttonId === 'biometricButton') {
+                        button.innerHTML = spinner + '<span>Authenticating...</span>';
+                    } else {
+                        text.innerHTML = spinner;
+                    }
+                } else {
+                    button.disabled = false;
+                    if (buttonId === 'biometricButton') {
+                        button.innerHTML = '<span class="biometric-icon">👆</span><span>Use Fingerprint</span>';
+                    } else {
+                        text.textContent = 'Sign In';
+                    }
+                }
+            }
+
+            togglePasswordVisibility() {
+                const passwordInput = document.getElementById('passwordInput');
+                const toggleButton = document.getElementById('passwordToggle');
+                
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    toggleButton.textContent = '🙈';
+                } else {
+                    passwordInput.type = 'password';
+                    toggleButton.textContent = '👁️';
+                }
+            }
+
+            showError(message, type = 'error') {
+                const errorDiv = document.getElementById('errorMessage');
+                errorDiv.textContent = message;
+                errorDiv.className = `error-message show ${type}`;
+                
+                if (type === 'success') {
+                    errorDiv.style.background = 'rgba(16, 185, 129, 0.2)';
+                    errorDiv.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+                    errorDiv.style.color = '#f0fdf4';
+                }
+                
+                setTimeout(() => {
+                    errorDiv.classList.remove('show');
+                    if (type === 'success') {
+                        errorDiv.style.background = '';
+                        errorDiv.style.borderColor = '';
+                        errorDiv.style.color = '';
+                    }
+                }, 5000);
+            }
+
+            async requestNotificationPermission() {
+                if ('Notification' in window && Notification.permission === 'default') {
+                    try {
+                        const permission = await Notification.requestPermission();
+                        if (permission === 'granted') {
+                            console.log('Notification permission granted');
+                            // Initialize notification scheduling
+                            this.initializeNotifications();
+                        }
+                    } catch (error) {
+                        console.error('Error requesting notification permission:', error);
+                    }
+                }
+            }
+
+            initializeNotifications() {
+                // This will be called after successful authentication
+                // to set up notification scheduling
+                if ('serviceWorker' in navigator && 'Notification' in window) {
+                    navigator.serviceWorker.ready.then((registration) => {
+                        // Set up default CSV reminder notification
+                        this.scheduleCSVReminder();
+                    });
+                }
+            }
+
+            scheduleCSVReminder() {
+                // Schedule weekly CSV upload reminder
+                const now = new Date();
+                const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+                
+                localStorage.setItem('csvReminderScheduled', nextWeek.toISOString());
+                console.log('CSV reminder scheduled for:', nextWeek);
+            }
+
+            // Static method for logout
+            static logout() {
+                sessionStorage.removeItem('financeOSAuthenticated');
+                sessionStorage.removeItem('authTime');
+                window.location.href = 'login.html';
+            }
+
+            // Static method to check authentication across the app
+            static requireAuth() {
+                const authenticated = sessionStorage.getItem('financeOSAuthenticated') === 'true';
+                const authTime = parseInt(sessionStorage.getItem('authTime') || '0');
+                const currentTime = Date.now();
+                const sessionDuration = 4 * 60 * 60 * 1000; // 4 hours
+                
+                if (!authenticated || (currentTime - authTime > sessionDuration)) {
+                    // Redirect to login with return URL
+                    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+                    window.location.href = `login.html?return=${currentPage}`;
+                    return false;
+                }
+                return true;
             }
         }
 
-        // Check for CSV data
-        function checkCSVData() {
-            const csvData = localStorage.getItem('csvData');
-            const csvStatus = document.getElementById('csvStatus');
-            
-            if (csvData) {
-                const data = JSON.parse(csvData);
-                csvStatus.className = 'csv-status';
-                csvStatus.innerHTML = `✅ CSV data loaded: ${data.length} transactions from ${data[0]?.date || 'unknown date'}. Last updated: ${new Date(localStorage.getItem('csvUploadDate')).toLocaleDateString()}`;
-            } else {
-                csvStatus.className = 'csv-status no-data';
-                csvStatus.innerHTML = '📊 No recent CSV data found. <a href="csv-upload.html" style="color: #f59e0b;">Upload bank statements</a> to see transaction analysis.';
-            }
-        }
+        // Initialize authentication system
+        const auth = new FinanceOSAuth();
 
-        // Quick action functions
-        function addTransaction() {
-            alert('Add Transaction feature coming soon!');
-        }
-
-        function viewReports() {
-            alert('Reports feature coming soon!');
-        }
-
-        // Initialize
-        checkCSVData();
-
-        // Register service worker
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
-        }
+        // Make logout function globally available
+        window.FinanceOSAuth = FinanceOSAuth;
     </script>
 </body>
 </html>
