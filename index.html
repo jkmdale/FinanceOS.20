@@ -44,12 +44,14 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
+            height: 100vh;
             background: linear-gradient(135deg, #0f172a, #1e1b4b, #312e81);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 10000;
+            padding: 20px;
+            box-sizing: border-box;
         }
         
         .login-container {
@@ -57,28 +59,58 @@
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 24px;
-            padding: 60px 50px;
+            padding: 40px 30px;
             text-align: center;
-            max-width: 520px;
-            width: 95%;
+            width: 100%;
+            max-width: 500px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            min-height: 650px;
+            min-height: 80vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            margin: 20px;
+            gap: 20px;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .login-container {
+                min-height: 85vh;
+                max-height: 90vh;
+                padding: 30px 25px;
+                margin: 0;
+                width: calc(100% - 40px);
+                max-width: none;
+            }
+            
+            .login-logo {
+                width: 100px !important;
+                height: 100px !important;
+                font-size: 42px !important;
+            }
+            
+            .login-input {
+                padding: 18px 24px !important;
+                font-size: 20px !important;
+                margin-bottom: 24px !important;
+            }
+            
+            .login-button, .biometric-button {
+                padding: 18px !important;
+                font-size: 20px !important;
+                margin-bottom: 24px !important;
+            }
         }
         
         .login-logo {
-            width: 80px;
-            height: 80px;
+            width: 90px;
+            height: 90px;
             background: linear-gradient(135deg, #8b5cf6, #3b82f6);
             border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 24px;
-            font-size: 32px;
+            margin: 0 auto 20px;
+            font-size: 36px;
             color: white;
             font-weight: bold;
         }
@@ -147,6 +179,11 @@
             background: rgba(255, 255, 255, 0.2);
         }
         
+        .biometric-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
         .forgot-password {
             color: #8b5cf6;
             text-decoration: none;
@@ -213,6 +250,29 @@
             border-color: #8b5cf6;
             box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
         }
+        
+        @media (max-width: 480px) {
+            .pin-digit {
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+            }
+        }
+        
+        .biometric-status {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 5px;
+        }
+        
+        .demo-credentials {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
@@ -226,8 +286,8 @@
     <div class="login-overlay" id="loginOverlay">
         <div class="login-container">
             <div class="login-logo">$</div>
-            <h2 style="color: white; margin-bottom: 12px; font-size: 28px;">FinanceOS</h2>
-            <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 40px; font-size: 16px;">
+            <h2 style="color: white; margin-bottom: 8px; font-size: 32px;">FinanceOS</h2>
+            <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 30px; font-size: 16px;">
                 Your Personal Finance Operating System
             </p>
             
@@ -244,20 +304,21 @@
                     <span id="loginButtonText">Login</span>
                 </button>
                 
-                <button onclick="showBiometricLogin()" class="biometric-button" id="biometricButton">
+                <button onclick="startBiometricLogin()" class="biometric-button" id="biometricButton">
                     🔐 Use Biometric Login
+                    <div class="biometric-status" id="biometricStatus">Checking biometric support...</div>
                 </button>
                 
                 <button onclick="showPinLogin()" class="biometric-button">
                     🔢 Use PIN
                 </button>
                 
-                <div style="margin-top: 20px;">
+                <div style="margin-top: 15px;">
                     <a href="#" onclick="showPasswordReset()" class="forgot-password">Forgot Password?</a>
                 </div>
                 
-                <div style="margin-top: 20px; font-size: 12px; color: rgba(255, 255, 255, 0.6);">
-                    Demo: username=<strong>demo</strong>, password=<strong>demo123</strong>
+                <div class="demo-credentials">
+                    Demo: username=<strong>demo</strong>, password=<strong>demo123</strong>, PIN=<strong>1234</strong>
                 </div>
             </div>
             
@@ -272,7 +333,7 @@
                 </div>
                 <button onclick="loginWithPin()" class="login-button">Login with PIN</button>
                 <button onclick="showLoginForm()" class="biometric-button">Back to Password</button>
-                <div style="margin-top: 15px; font-size: 12px; color: rgba(255, 255, 255, 0.6);">
+                <div class="demo-credentials">
                     Demo PIN: <strong>1234</strong>
                 </div>
             </div>
@@ -481,13 +542,149 @@
         let isAuthenticated = false;
         let lastActivityTime = Date.now();
         const SESSION_TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
+        let biometricAvailable = false;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             checkAuthentication();
             setupPrivacyMode();
             setupActivityTracking();
+            checkBiometricSupport();
         });
+
+        // Real Biometric Authentication Support
+        async function checkBiometricSupport() {
+            const statusElement = document.getElementById('biometricStatus');
+            const biometricButton = document.getElementById('biometricButton');
+            
+            try {
+                // Check if WebAuthn is supported
+                if (!window.PublicKeyCredential) {
+                    statusElement.textContent = 'Biometric authentication not supported on this device';
+                    biometricButton.disabled = true;
+                    return;
+                }
+                
+                // Check if platform authenticator is available
+                const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+                
+                if (available) {
+                    statusElement.textContent = 'Biometric authentication available';
+                    statusElement.style.color = '#34d399';
+                    biometricAvailable = true;
+                } else {
+                    statusElement.textContent = 'No biometric authenticator found';
+                    biometricButton.disabled = true;
+                }
+            } catch (error) {
+                console.error('Biometric check error:', error);
+                statusElement.textContent = 'Error checking biometric support';
+                biometricButton.disabled = true;
+            }
+        }
+
+        async function startBiometricLogin() {
+            if (!biometricAvailable) {
+                alert('Biometric authentication is not available on this device.');
+                return;
+            }
+
+            const biometricButton = document.getElementById('biometricButton');
+            biometricButton.disabled = true;
+            biometricButton.innerHTML = '🔐 Authenticating...<div class="biometric-status">Please use your fingerprint or face</div>';
+
+            try {
+                // Check if we have existing credentials
+                const existingCredential = localStorage.getItem('financeos-credential-id');
+                
+                if (existingCredential) {
+                    // Authenticate with existing credential
+                    await authenticateWithBiometric();
+                } else {
+                    // Register new credential
+                    await registerBiometric();
+                }
+            } catch (error) {
+                console.error('Biometric login error:', error);
+                alert('Biometric authentication failed. Please try again or use password login.');
+                resetBiometricButton();
+            }
+        }
+
+        async function registerBiometric() {
+            const challenge = new Uint8Array(32);
+            crypto.getRandomValues(challenge);
+            
+            const credential = await navigator.credentials.create({
+                publicKey: {
+                    challenge: challenge,
+                    rp: {
+                        name: "FinanceOS",
+                        id: window.location.hostname
+                    },
+                    user: {
+                        id: new TextEncoder().encode("demo-user"),
+                        name: "demo",
+                        displayName: "Demo User"
+                    },
+                    pubKeyCredParams: [
+                        {
+                            type: "public-key",
+                            alg: -7 // ES256
+                        },
+                        {
+                            type: "public-key", 
+                            alg: -257 // RS256
+                        }
+                    ],
+                    authenticatorSelection: {
+                        authenticatorAttachment: "platform",
+                        userVerification: "required",
+                        requireResidentKey: false
+                    },
+                    timeout: 60000,
+                    attestation: "direct"
+                }
+            });
+
+            if (credential) {
+                // Store credential ID for future use
+                localStorage.setItem('financeos-credential-id', credential.id);
+                localStorage.setItem('financeos-token', 'authenticated');
+                localStorage.setItem('financeos-last-activity', Date.now().toString());
+                showMainApp();
+            }
+        }
+
+        async function authenticateWithBiometric() {
+            const credentialId = localStorage.getItem('financeos-credential-id');
+            const challenge = new Uint8Array(32);
+            crypto.getRandomValues(challenge);
+
+            const assertion = await navigator.credentials.get({
+                publicKey: {
+                    challenge: challenge,
+                    allowCredentials: [{
+                        id: Uint8Array.from(atob(credentialId), c => c.charCodeAt(0)),
+                        type: 'public-key'
+                    }],
+                    userVerification: "required",
+                    timeout: 60000
+                }
+            });
+
+            if (assertion) {
+                localStorage.setItem('financeos-token', 'authenticated');
+                localStorage.setItem('financeos-last-activity', Date.now().toString());
+                showMainApp();
+            }
+        }
+
+        function resetBiometricButton() {
+            const biometricButton = document.getElementById('biometricButton');
+            biometricButton.disabled = false;
+            biometricButton.innerHTML = '🔐 Use Biometric Login<div class="biometric-status">Biometric authentication available</div>';
+        }
 
         // Banking app style session tracking
         function setupActivityTracking() {
@@ -622,21 +819,6 @@
                 document.getElementById('pin3').value = '';
                 document.getElementById('pin4').value = '';
                 document.getElementById('pin1').focus();
-            }
-        }
-
-        function showBiometricLogin() {
-            if (navigator.credentials) {
-                // Simulate biometric authentication
-                const confirmBiometric = confirm('Simulate biometric authentication?\n(In a real app, this would use your fingerprint or face)');
-                
-                if (confirmBiometric) {
-                    localStorage.setItem('financeos-token', 'authenticated');
-                    localStorage.setItem('financeos-last-activity', Date.now().toString());
-                    showMainApp();
-                }
-            } else {
-                alert('Biometric authentication not supported in this browser.\nThis feature requires a secure HTTPS connection and modern browser.');
             }
         }
 
@@ -790,7 +972,7 @@
             alert('Reports feature coming soon!');
         }
 
-        console.log('FinanceOS Dashboard loaded with 5-minute session timeout');
+        console.log('FinanceOS Dashboard loaded with real biometric authentication');
     </script>
 </body>
 </html>
