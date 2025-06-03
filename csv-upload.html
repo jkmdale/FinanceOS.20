@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="styles.css">
     <style>
         .upload-container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -24,6 +24,11 @@
             margin-bottom: 30px;
             cursor: pointer;
             position: relative;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         
         .upload-zone.dragover {
@@ -35,6 +40,17 @@
         .upload-zone:hover {
             border-color: #a855f7;
             background: rgba(139, 92, 246, 0.1);
+        }
+        
+        .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 10;
         }
         
         .upload-icon {
@@ -57,15 +73,6 @@
             line-height: 1.5;
         }
         
-        .file-input-hidden {
-            position: absolute;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-            z-index: 2;
-        }
-        
         .upload-button {
             background: linear-gradient(135deg, #8b5cf6, #9333ea);
             color: white;
@@ -79,11 +86,30 @@
             display: inline-flex;
             align-items: center;
             gap: 10px;
+            z-index: 20;
+            position: relative;
+            pointer-events: none; /* Prevent interfering with file input */
         }
         
-        .upload-button:hover {
+        .manual-upload-button {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 16px 40px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .manual-upload-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
         }
         
         .file-preview {
@@ -224,6 +250,36 @@
             font-family: monospace;
             font-size: 12px;
             color: rgba(255, 255, 255, 0.8);
+            overflow-x: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .upload-container {
+                padding: 15px;
+            }
+            
+            .upload-zone {
+                padding: 40px 20px;
+                min-height: 180px;
+            }
+            
+            .upload-text {
+                font-size: 20px;
+            }
+            
+            .upload-hint {
+                font-size: 14px;
+            }
+            
+            .file-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .file-status {
+                align-self: flex-end;
+            }
         }
     </style>
 </head>
@@ -260,7 +316,7 @@
             <div class="upload-zone" id="uploadZone">
                 <input type="file" 
                        id="fileInput" 
-                       class="file-input-hidden" 
+                       class="file-input" 
                        accept=".csv,.xlsx,.xls" 
                        multiple>
                 
@@ -271,8 +327,15 @@
                     Maximum file size: 10MB per file
                 </div>
                 
-                <button type="button" class="upload-button" onclick="triggerFileInput()">
+                <div class="upload-button">
                     📂 Choose Files
+                </div>
+            </div>
+            
+            <!-- Alternative upload method -->
+            <div style="text-align: center;">
+                <button type="button" class="manual-upload-button" onclick="triggerFileInput()">
+                    📋 Browse for Files Manually
                 </button>
             </div>
 
@@ -287,6 +350,15 @@
                 <button class="process-button" id="processButton" onclick="processFiles()">
                     ⚡ Process Files
                 </button>
+            </div>
+
+            <!-- Processing Status -->
+            <div id="processingStatus" style="display: none; text-align: center; margin: 20px 0;">
+                <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 10px; padding: 20px;">
+                    <div style="font-size: 24px; margin-bottom: 10px;">⚡</div>
+                    <div style="color: #fbbf24; font-weight: 600;">Processing your files...</div>
+                    <div style="color: rgba(255, 255, 255, 0.7); font-size: 14px; margin-top: 5px;">This may take a few moments</div>
+                </div>
             </div>
 
             <!-- Results -->
@@ -327,6 +399,7 @@ Date,Amount,Description,Balance<br>
             checkAuth();
             setupFileUpload();
             setupPrivacyMode();
+            console.log('CSV Upload page initialized');
         });
 
         // Simple auth check
@@ -337,6 +410,7 @@ Date,Amount,Description,Balance<br>
                 return;
             }
             isAuthenticated = true;
+            console.log('User authenticated');
         }
 
         function logout() {
@@ -350,11 +424,24 @@ Date,Amount,Description,Balance<br>
             const uploadZone = document.getElementById('uploadZone');
             const fileInput = document.getElementById('fileInput');
 
-            // File input change event
-            fileInput.addEventListener('change', handleFileSelect);
+            console.log('Setting up file upload...');
+            console.log('Upload zone:', uploadZone);
+            console.log('File input:', fileInput);
+
+            // File input change event - MOST IMPORTANT
+            fileInput.addEventListener('change', function(e) {
+                console.log('File input changed!', e.target.files);
+                handleFileSelect(e);
+            });
+
+            // Click event on upload zone
+            uploadZone.addEventListener('click', function(e) {
+                console.log('Upload zone clicked');
+                e.preventDefault();
+                triggerFileInput();
+            });
 
             // Drag and drop events
-            uploadZone.addEventListener('click', triggerFileInput);
             uploadZone.addEventListener('dragover', handleDragOver);
             uploadZone.addEventListener('dragleave', handleDragLeave);
             uploadZone.addEventListener('drop', handleDrop);
@@ -364,10 +451,14 @@ Date,Amount,Description,Balance<br>
                 uploadZone.addEventListener(eventName, preventDefaults, false);
                 document.body.addEventListener(eventName, preventDefaults, false);
             });
+
+            console.log('File upload setup complete');
         }
 
         function triggerFileInput() {
-            document.getElementById('fileInput').click();
+            console.log('Triggering file input...');
+            const fileInput = document.getElementById('fileInput');
+            fileInput.click();
         }
 
         function preventDefaults(e) {
@@ -377,16 +468,19 @@ Date,Amount,Description,Balance<br>
 
         function handleDragOver(e) {
             e.preventDefault();
+            console.log('Drag over');
             document.getElementById('uploadZone').classList.add('dragover');
         }
 
         function handleDragLeave(e) {
             e.preventDefault();
+            console.log('Drag leave');
             document.getElementById('uploadZone').classList.remove('dragover');
         }
 
         function handleDrop(e) {
             e.preventDefault();
+            console.log('Files dropped!', e.dataTransfer.files);
             document.getElementById('uploadZone').classList.remove('dragover');
             
             const files = Array.from(e.dataTransfer.files);
@@ -394,16 +488,24 @@ Date,Amount,Description,Balance<br>
         }
 
         function handleFileSelect(e) {
+            console.log('Files selected:', e.target.files);
             const files = Array.from(e.target.files);
             addFiles(files);
         }
 
         function addFiles(files) {
+            console.log('Adding files:', files);
+            
+            if (files.length === 0) {
+                console.log('No files to add');
+                return;
+            }
+
             const validFiles = files.filter(file => {
-                const isValid = file.name.toLowerCase().match(/\.(csv|xlsx|xls)$/);
+                const isValidType = file.name.toLowerCase().match(/\.(csv|xlsx|xls)$/);
                 const isValidSize = file.size <= 10 * 1024 * 1024; // 10MB limit
                 
-                if (!isValid) {
+                if (!isValidType) {
                     alert(`Invalid file type: ${file.name}. Please use CSV or Excel files.`);
                     return false;
                 }
@@ -415,6 +517,8 @@ Date,Amount,Description,Balance<br>
                 
                 return true;
             });
+
+            console.log('Valid files:', validFiles);
 
             if (validFiles.length === 0) return;
 
@@ -430,12 +534,15 @@ Date,Amount,Description,Balance<br>
                 }
             });
 
+            console.log('Selected files:', selectedFiles);
             displayFiles();
         }
 
         function displayFiles() {
             const filePreview = document.getElementById('filePreview');
             const fileList = document.getElementById('fileList');
+
+            console.log('Displaying files:', selectedFiles);
 
             if (selectedFiles.length === 0) {
                 filePreview.classList.remove('show');
@@ -463,11 +570,16 @@ Date,Amount,Description,Balance<br>
         }
 
         function removeFile(index) {
+            console.log('Removing file at index:', index);
             selectedFiles.splice(index, 1);
             displayFiles();
+            
+            // Clear the file input
+            document.getElementById('fileInput').value = '';
         }
 
         function clearAllFiles() {
+            console.log('Clearing all files');
             selectedFiles = [];
             displayFiles();
             document.getElementById('fileInput').value = '';
@@ -493,14 +605,19 @@ Date,Amount,Description,Balance<br>
 
         // File Processing
         function processFiles() {
+            console.log('Processing files:', selectedFiles);
+            
             if (selectedFiles.length === 0) {
                 alert('Please select files to process');
                 return;
             }
 
             const processButton = document.getElementById('processButton');
+            const processingStatus = document.getElementById('processingStatus');
+            
             processButton.disabled = true;
             processButton.textContent = '⚡ Processing...';
+            processingStatus.style.display = 'block';
 
             let processedCount = 0;
             let successCount = 0;
@@ -511,17 +628,20 @@ Date,Amount,Description,Balance<br>
                 fileObj.status = 'processing';
                 updateFileStatus(fileObj.id, 'processing');
 
-                // Simulate file processing
+                // Simulate file processing with actual file reading
                 setTimeout(() => {
                     const reader = new FileReader();
                     
                     reader.onload = function(e) {
                         try {
                             const content = e.target.result;
+                            console.log('File content loaded:', content.substring(0, 200));
                             
                             // Simple CSV parsing simulation
                             const lines = content.split('\n').filter(line => line.trim());
                             const transactionCount = Math.max(0, lines.length - 1); // Minus header
+                            
+                            console.log(`Processed ${fileObj.file.name}: ${transactionCount} transactions`);
                             
                             // Mark as success
                             fileObj.status = 'success';
@@ -546,6 +666,7 @@ Date,Amount,Description,Balance<br>
                     };
                     
                     reader.onerror = function() {
+                        console.error('Failed to read file:', fileObj.file.name);
                         fileObj.status = 'error';
                         updateFileStatus(fileObj.id, 'error', 'Failed to read');
                         processedCount++;
@@ -570,9 +691,14 @@ Date,Amount,Description,Balance<br>
         }
 
         function finishProcessing(successCount, totalTransactions) {
+            console.log('Processing finished:', { successCount, totalTransactions });
+            
             const processButton = document.getElementById('processButton');
+            const processingStatus = document.getElementById('processingStatus');
+            
             processButton.disabled = false;
             processButton.textContent = '⚡ Process Files';
+            processingStatus.style.display = 'none';
 
             // Show results
             showResults(successCount === selectedFiles.length, successCount, totalTransactions);
@@ -617,6 +743,8 @@ Date,Amount,Description,Balance<br>
         }
 
         function saveProcessedData(transactionCount) {
+            console.log('Saving processed data:', transactionCount);
+            
             // Save demo data
             const existingData = JSON.parse(localStorage.getItem('csvData') || '[]');
             const newData = Array.from({length: transactionCount}, (_, i) => ({
@@ -629,6 +757,8 @@ Date,Amount,Description,Balance<br>
             
             localStorage.setItem('csvData', JSON.stringify([...existingData, ...newData]));
             localStorage.setItem('csvUploadDate', new Date().toISOString());
+            
+            console.log('Data saved to localStorage');
         }
 
         // Utility Functions
