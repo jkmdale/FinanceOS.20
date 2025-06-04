@@ -1,90 +1,64 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload - FinanceOS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a, #312e81);
             color: white;
             min-height: 100vh;
         }
-        
-        /* Navigation */
         .navbar {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
             position: fixed;
             top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 20px 0;
+            width: 100%;
+            box-sizing: border-box;
         }
-        
-        .nav-container {
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             max-width: 1200px;
             margin: 0 auto;
+        }
+        .logo {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
+            font-weight: bold;
+            font-size: 18px;
         }
-        
-        .nav-logo {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            color: white;
-            font-weight: 700;
-        }
-        
         .logo-icon {
             width: 48px;
             height: 48px;
-            margin-right: 12px;
-            border-radius: 12px;
             background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-right: 12px;
             font-size: 24px;
-            font-weight: bold;
         }
-        
         .nav-links {
             display: flex;
-            align-items: center;
-            gap: 32px;
-            list-style: none;
+            gap: 30px;
         }
-        
         .nav-links a {
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255,255,255,0.7);
             text-decoration: none;
-            font-weight: 500;
-            font-size: 1rem;
             padding: 12px 20px;
             border-radius: 8px;
-            transition: all 0.3s ease;
-            position: relative;
+            font-size: 16px;
         }
-        
-        .nav-links a:hover {
-            color: white;
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
         .nav-links a.active {
             color: #8b5cf6;
             background: rgba(139, 92, 246, 0.1);
+            position: relative;
         }
-        
         .nav-links a.active::after {
             content: '';
             position: absolute;
@@ -96,94 +70,75 @@
             background: #8b5cf6;
             border-radius: 50%;
         }
-        
         .nav-actions {
             display: flex;
-            align-items: center;
-            gap: 16px;
+            gap: 15px;
         }
-        
-        .privacy-toggle, .logout-btn {
+        .btn {
             padding: 8px 16px;
+            border: none;
             border-radius: 8px;
-            font-size: 0.875rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            font-size: 14px;
         }
-        
-        .privacy-toggle {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .btn-privacy {
+            background: rgba(255,255,255,0.1);
             color: white;
         }
-        
-        .logout-btn {
+        .btn-logout {
             background: linear-gradient(135deg, #ef4444, #dc2626);
             color: white;
-            border: none;
         }
-        
-        /* Main Content */
-        .main-content {
+        .main {
             margin-top: 100px;
             padding: 24px;
             max-width: 1200px;
             margin-left: auto;
             margin-right: auto;
         }
-        
-        .page-header {
+        .header {
             text-align: center;
-            margin-bottom: 32px;
+            margin-bottom: 40px;
         }
-        
-        .page-title {
+        .title {
             font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 8px;
+            font-weight: bold;
+            margin-bottom: 10px;
             background: linear-gradient(135deg, #8b5cf6, #3b82f6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        
-        .page-subtitle {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1.125rem;
+        .subtitle {
+            color: rgba(255,255,255,0.7);
+            font-size: 18px;
         }
-        
-        /* Instructions */
-        .upload-instructions {
+        .instructions {
             background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.15));
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255,255,255,0.2);
             border-radius: 20px;
             padding: 24px;
             margin-bottom: 32px;
         }
-        
-        .instructions-title {
-            font-size: 1.25rem;
-            font-weight: 600;
+        .instructions h2 {
+            font-size: 20px;
             margin-bottom: 16px;
         }
-        
-        .instructions-list {
+        .steps {
             list-style: none;
+            padding: 0;
         }
-        
-        .instructions-list li {
+        .steps li {
             display: flex;
             align-items: flex-start;
             margin-bottom: 12px;
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255,255,255,0.7);
             line-height: 1.5;
         }
-        
-        .step-number {
+        .step-num {
             background: linear-gradient(135deg, #8b5cf6, #9333ea);
             color: white;
             font-weight: 600;
-            font-size: 0.875rem;
+            font-size: 14px;
             width: 24px;
             height: 24px;
             border-radius: 50%;
@@ -193,60 +148,45 @@
             margin-right: 12px;
             flex-shrink: 0;
         }
-        
-        /* Supported Banks */
-        .supported-banks {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+        .banks {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
             border-radius: 16px;
             padding: 20px;
             margin-bottom: 32px;
         }
-        
-        .banks-title {
-            font-size: 1rem;
-            font-weight: 600;
+        .banks h3 {
+            font-size: 16px;
             margin-bottom: 12px;
         }
-        
         .banks-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 12px;
         }
-        
-        .bank-item {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .bank {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 8px;
             padding: 12px;
             text-align: center;
-            font-size: 0.875rem;
-            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
         }
-        
-        /* Upload Zone */
         .upload-zone {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px);
-            border: 2px dashed rgba(255, 255, 255, 0.15);
+            background: rgba(255,255,255,0.08);
+            border: 2px dashed rgba(255,255,255,0.15);
             border-radius: 20px;
             padding: 48px 24px;
             text-align: center;
-            transition: all 0.3s ease;
             cursor: pointer;
             margin-bottom: 32px;
+            transition: all 0.3s ease;
         }
-        
-        .upload-zone:hover,
-        .upload-zone.dragover {
+        .upload-zone:hover {
             border-color: #8b5cf6;
             background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.15));
-            transform: translateY(-2px);
-            box-shadow: 0 12px 48px rgba(139, 92, 246, 0.3);
         }
-        
         .upload-icon {
             width: 64px;
             height: 64px;
@@ -256,91 +196,222 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
+            font-size: 32px;
         }
-        
         .upload-title {
-            font-size: 1.5rem;
+            font-size: 24px;
             font-weight: 600;
             margin-bottom: 8px;
         }
-        
-        .upload-subtitle {
-            color: rgba(255, 255, 255, 0.7);
+        .upload-desc {
+            color: rgba(255,255,255,0.7);
             margin-bottom: 20px;
             line-height: 1.5;
         }
-        
-        .upload-button {
+        .upload-btn {
             background: linear-gradient(135deg, #8b5cf6, #9333ea);
             color: white;
             border: none;
             padding: 12px 24px;
             border-radius: 10px;
-            font-size: 1rem;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
             margin-bottom: 16px;
         }
-        
-        .upload-button:hover {
+        .upload-btn:hover {
             opacity: 0.9;
-            transform: translateY(-1px);
         }
-        
+        .file-types {
+            font-size: 14px;
+            color: rgba(255,255,255,0.5);
+        }
         .file-input {
             display: none;
         }
-        
-        .file-types {
-            font-size: 0.875rem;
-            color: rgba(255, 255, 255, 0.5);
+        .results {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.15));
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 24px;
+            display: none;
         }
-        
-        /* File Preview */
-        .file-preview {
-            margin-top: 24px;
+        .results.show {
+            display: block;
         }
-        
-        .file-list {
+        .results h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .results-grid {
             display: grid;
-            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
         }
-        
-        .file-item {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
+        .result {
+            text-align: center;
             padding: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
         }
-        
-        .file-info {
-            display: flex;
-            align-items: center;
+        .result-label {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 8px;
+            text-transform: uppercase;
         }
-        
-        .file-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #10b981, #059669);
-            border-radius: 8px;
+        .result-value {
+            font-size: 24px;
+            font-weight: bold;
+            font-family: monospace;
+            color: #10b981;
+        }
+        .result-actions {
             display: flex;
-            align-items: center;
+            gap: 12px;
             justify-content: center;
-            margin-right: 12px;
-            font-size: 1.125rem;
         }
-        
-        .file-details h4 {
-            font-size: 1rem;
+        .result-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
             font-weight: 600;
-            margin-bottom: 4px;
+            cursor: pointer;
         }
-        
-        .file-details p {
-            font-size: 0.875rem;
-            color:
+        .result-btn.secondary {
+            background: rgba(255,255,255,0.1);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="logo">
+                <div class="logo-icon">$</div>
+                FinanceOS
+            </div>
+            <div class="nav-links">
+                <a href="index.html">Dashboard</a>
+                <a href="budget.html">Budget</a>
+                <a href="goals.html">Goals</a>
+                <a href="csv-upload.html" class="active">Upload</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn btn-privacy">Privacy Mode</button>
+                <button class="btn btn-logout">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="header">
+            <h1 class="title">Upload Bank Statements</h1>
+            <p class="subtitle">Import your weekly CSV files to automatically update your budget and goals</p>
+        </div>
+
+        <div class="instructions">
+            <h2>How to Upload Your Bank Statements</h2>
+            <ol class="steps">
+                <li>
+                    <span class="step-num">1</span>
+                    <span>Download CSV statements from your NZ bank's online banking platform</span>
+                </li>
+                <li>
+                    <span class="step-num">2</span>
+                    <span>Select weekly or monthly statement periods for best results</span>
+                </li>
+                <li>
+                    <span class="step-num">3</span>
+                    <span>Upload files using the drag-and-drop area below or click to browse</span>
+                </li>
+                <li>
+                    <span class="step-num">4</span>
+                    <span>Review categorized transactions and confirm the import</span>
+                </li>
+                <li>
+                    <span class="step-num">5</span>
+                    <span>Your budget and goals will automatically update with new data</span>
+                </li>
+            </ol>
+        </div>
+
+        <div class="banks">
+            <h3>Supported New Zealand Banks</h3>
+            <div class="banks-grid">
+                <div class="bank">ANZ</div>
+                <div class="bank">ASB</div>
+                <div class="bank">BNZ</div>
+                <div class="bank">Kiwibank</div>
+                <div class="bank">Westpac</div>
+                <div class="bank">TSB</div>
+                <div class="bank">Co-operative Bank</div>
+                <div class="bank">SBS Bank</div>
+            </div>
+        </div>
+
+        <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+            <div class="upload-icon">📤</div>
+            <h2 class="upload-title">Drop your CSV files here</h2>
+            <p class="upload-desc">
+                Drag and drop your bank statement files, or click the button below to browse your computer.
+                Multiple files can be uploaded at once.
+            </p>
+            <button class="upload-btn" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">
+                Choose Files
+            </button>
+            <input type="file" id="fileInput" class="file-input" multiple accept=".csv,.xls,.xlsx,.qif,.ofx">
+            <p class="file-types">Supports: CSV, Excel, QIF, OFX files</p>
+        </div>
+
+        <div class="results" id="results">
+            <h2>Import Complete</h2>
+            <div class="results-grid">
+                <div class="result">
+                    <div class="result-label">Files Processed</div>
+                    <div class="result-value">3</div>
+                </div>
+                <div class="result">
+                    <div class="result-label">Transactions Added</div>
+                    <div class="result-value">47</div>
+                </div>
+                <div class="result">
+                    <div class="result-label">Duplicates Skipped</div>
+                    <div class="result-value">5</div>
+                </div>
+                <div class="result">
+                    <div class="result-label">Categories Updated</div>
+                    <div class="result-value">8</div>
+                </div>
+            </div>
+            <div class="result-actions">
+                <button class="result-btn" onclick="window.location.href='budget.html'">
+                    View Updated Budget
+                </button>
+                <button class="result-btn secondary" onclick="resetUpload()">
+                    Upload More Files
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                // Simulate processing
+                setTimeout(() => {
+                    document.getElementById('results').classList.add('show');
+                }, 2000);
+            }
+        });
+
+        function resetUpload() {
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('fileInput').value = '';
+        }
+    </script>
+</body>
+</html>
