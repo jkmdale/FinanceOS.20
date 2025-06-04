@@ -525,29 +525,193 @@
                 padding: 32px 16px;
             }
             
+            .upload-title {
+                font-size: 1.25rem;
+            }
+            
+            .upload-subtitle {
+                font-size: 0.9rem;
+                line-height: 1.4;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+            
             .banks-grid {
-                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+                gap: 8px;
+            }
+            
+            .bank-item {
+                padding: 8px;
+                font-size: 0.75rem;
+            }
+            
+            .instructions-list li {
+                margin-bottom: 10px;
+                font-size: 0.85rem;
+                line-height: 1.4;
+            }
+            
+            .step-number {
+                margin-top: 1px;
+                width: 20px;
+                height: 20px;
+                font-size: 0.75rem;
+                margin-right: 10px;
             }
             
             .results-grid {
-                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                grid-template-columns: repeat(2, 1fr);
                 gap: 12px;
+            }
+            
+            .result-item {
+                padding: 12px 8px;
+            }
+            
+            .result-label {
+                font-size: 0.75rem;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+            
+            .result-value {
+                font-size: 1.25rem;
             }
             
             .result-actions {
                 flex-direction: column;
+                gap: 8px;
             }
             
             .file-item {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 12px;
+                padding: 12px;
             }
             
             .file-actions {
                 width: 100%;
                 justify-content: space-between;
             }
+            
+            .file-details h4 {
+                font-size: 0.9rem;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+            
+            .file-details p {
+                font-size: 0.8rem;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .nav-container {
+                padding: 0 12px;
+            }
+            
+            .logo-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+            
+            .page-title {
+                font-size: 1.75rem;
+            }
+            
+            .upload-zone {
+                padding: 24px 12px;
+            }
+            
+            .upload-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 1.5rem;
+                margin-bottom: 16px;
+            }
+            
+            .upload-title {
+                font-size: 1.1rem;
+                margin-bottom: 6px;
+            }
+            
+            .upload-subtitle {
+                font-size: 0.8rem;
+                margin-bottom: 16px;
+            }
+            
+            .upload-button {
+                font-size: 0.9rem;
+                padding: 10px 20px;
+            }
+            
+            .instructions-title {
+                font-size: 1.1rem;
+            }
+            
+            .instructions-list li {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+                font-size: 0.8rem;
+            }
+            
+            .step-number {
+                align-self: flex-start;
+                width: 18px;
+                height: 18px;
+                font-size: 0.7rem;
+            }
+            
+            .banks-title {
+                font-size: 0.9rem;
+            }
+            
+            .banks-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+            }
+            
+            .bank-item {
+                padding: 6px;
+                font-size: 0.7rem;
+            }
+            
+            .results-title {
+                font-size: 1.1rem;
+            }
+            
+            .file-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+        }
+        
+        /* Text wrapping utilities */
+        .text-wrap {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+        
+        /* Prevent text overflow */
+        * {
+            box-sizing: border-box;
+        }
+        
+        .upload-instructions *,
+        .supported-banks *,
+        .results-summary *,
+        .file-item * {
+            max-width: 100%;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
         }
     </style>
 </head>
