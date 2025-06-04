@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Goals - FinanceOS</title>
+    <title>Upload - FinanceOS</title>
     <style>
         body {
             margin: 0;
@@ -135,79 +135,245 @@
             font-size: 18px;
         }
         
-        .goals-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 24px;
-        }
-        
-        .goal-card {
-            background: rgba(255, 255, 255, 0.08);
+        .upload-instructions {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.15));
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 20px;
             padding: 24px;
+            margin-bottom: 32px;
         }
         
-        .goal-card.critical {
-            border: 2px solid rgba(239, 68, 68, 0.5);
-        }
-        
-        .goal-header {
-            display: flex;
-            justify-content: space-between;
+        .instructions-title {
+            font-size: 20px;
+            font-weight: 600;
             margin-bottom: 16px;
         }
         
-        .goal-title {
-            font-size: 20px;
-            font-weight: 600;
+        .instructions-list {
+            list-style: none;
+            padding: 0;
         }
         
-        .goal-priority {
-            font-size: 12px;
-            padding: 4px 8px;
-            border-radius: 6px;
-            text-transform: uppercase;
-        }
-        
-        .priority-critical {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-        }
-        
-        .priority-high {
-            background: rgba(249, 115, 22, 0.2);
-            color: #f97316;
-        }
-        
-        .priority-medium {
-            background: rgba(59, 130, 246, 0.2);
-            color: #3b82f6;
-        }
-        
-        .goal-description {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 14px;
-            line-height: 1.4;
-            margin-bottom: 20px;
-        }
-        
-        .progress-header {
+        .instructions-list li {
             display: flex;
-            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.5;
+        }
+        
+        .step-number {
+            background: linear-gradient(135deg, #8b5cf6, #9333ea);
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .supported-banks {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 32px;
+        }
+        
+        .banks-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .banks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+        }
+        
+        .bank-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .upload-zone {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 48px 24px;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 32px;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-zone:hover {
+            border-color: #8b5cf6;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.15));
+            transform: translateY(-2px);
+        }
+        
+        .upload-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+        
+        .upload-title {
+            font-size: 24px;
+            font-weight: 600;
             margin-bottom: 8px;
         }
         
-        .progress-amounts {
-            font-family: monospace;
+        .upload-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .upload-button {
+            background: linear-gradient(135deg, #8b5cf6, #9333ea);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 16px;
+        }
+        
+        .upload-button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .file-types {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .file-preview {
+            display: none;
+            margin-top: 24px;
+        }
+        
+        .file-list {
+            display: grid;
+            gap: 12px;
+        }
+        
+        .file-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .file-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 18px;
+        }
+        
+        .file-details h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .file-details p {
             font-size: 14px;
             color: rgba(255, 255, 255, 0.7);
         }
         
-        .progress-percentage {
-            font-weight: 600;
+        .file-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .file-action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 6px;
+            padding: 6px 12px;
             font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .file-action-btn.remove {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+        
+        .processing-status {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 32px;
+            display: none;
+        }
+        
+        .processing-status.active {
+            display: block;
+        }
+        
+        .status-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .status-icon {
+            margin-right: 12px;
+            font-size: 24px;
+        }
+        
+        .status-title {
+            font-size: 16px;
+            font-weight: 600;
         }
         
         .progress-bar {
@@ -216,261 +382,68 @@
             background: rgba(255, 255, 255, 0.1);
             border-radius: 4px;
             overflow: hidden;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
         
         .progress-fill {
             height: 100%;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
             border-radius: 4px;
+            transition: width 0.3s ease;
         }
         
-        .progress-critical {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-        }
-        
-        .progress-good {
-            background: linear-gradient(135deg, #10b981, #059669);
-        }
-        
-        .goal-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-        
-        .goal-stat {
-            text-align: center;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-        }
-        
-        .goal-stat-label {
-            font-size: 12px;
+        .status-text {
+            font-size: 14px;
             color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 4px;
+        }
+        
+        .results-summary {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.15));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 32px;
+            display: none;
+        }
+        
+        .results-summary.active {
+            display: block;
+        }
+        
+        .results-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .result-item {
+            text-align: center;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+        
+        .result-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
             text-transform: uppercase;
         }
         
-        .goal-stat-value {
-            font-size: 16px;
-            font-weight: 600;
+        .result-value {
+            font-size: 24px;
+            font-weight: bold;
             font-family: monospace;
         }
         
-        .goal-actions {
+        .result-actions {
             display: flex;
-            gap: 8px;
-        }
-        
-        .goal-action-btn {
-            flex: 1;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #8b5cf6, #9333ea);
-            color: white;
-        }
-        
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-        
-        .positive { color: #10b981; }
-        .negative { color: #ef4444; }
-        .neutral { color: white; }
-        
-        @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .goals-grid { grid-template-columns: 1fr; }
-            .page-title { font-size: 2rem; }
-        }
-    </style>
-</head>
-<body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="nav-logo">
-                <div class="logo-icon">$</div>
-                <span>FinanceOS</span>
-            </a>
-            
-            <ul class="nav-links">
-                <li><a href="index.html">Dashboard</a></li>
-                <li><a href="budget.html">Budget</a></li>
-                <li><a href="goals.html" class="active">Goals</a></li>
-                <li><a href="csv-upload.html">Upload</a></li>
-            </ul>
-            
-            <div class="nav-actions">
-                <button class="privacy-toggle">Privacy Mode</button>
-                <button class="logout-btn">Logout</button>
-            </div>
-        </div>
-    </nav>
-
-    <main class="main-content">
-        <div class="page-header">
-            <h1 class="page-title">Financial Goals</h1>
-            <p class="page-subtitle">Track your progress toward financial freedom</p>
-        </div>
-
-        <div class="goals-grid">
-            <div class="goal-card critical">
-                <div class="goal-header">
-                    <div>
-                        <h3 class="goal-title">Emergency Fund</h3>
-                        <div class="goal-priority priority-critical">Critical</div>
-                    </div>
-                </div>
-                <p class="goal-description">
-                    Build a safety net of 3-6 months expenses. Currently at extreme risk with only $0.17 saved.
-                    Financial experts recommend $15,000 minimum for your family situation.
-                </p>
-                
-                <div class="progress-header">
-                    <span class="progress-amounts">$0.17 / $15,000</span>
-                    <span class="progress-percentage negative">0.001%</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill progress-critical" style="width: 0.1%"></div>
-                </div>
-
-                <div class="goal-stats">
-                    <div class="goal-stat">
-                        <div class="goal-stat-label">Monthly Target</div>
-                        <div class="goal-stat-value negative">$0</div>
-                    </div>
-                    <div class="goal-stat">
-                        <div class="goal-stat-label">Time Left</div>
-                        <div class="goal-stat-value negative">Indefinite</div>
-                    </div>
-                </div>
-
-                <div class="goal-actions">
-                    <button class="goal-action-btn btn-primary">Start Saving</button>
-                    <button class="goal-action-btn btn-secondary">Edit Goal</button>
-                </div>
-            </div>
-
-            <div class="goal-card">
-                <div class="goal-header">
-                    <div>
-                        <h3 class="goal-title">Pay Off Visa Debt</h3>
-                        <div class="goal-priority priority-high">High</div>
-                    </div>
-                </div>
-                <p class="goal-description">
-                    Eliminate the Low Rate Visa debt to free up monthly cash flow and reduce interest payments.
-                    Current balance is costing approximately $135/month in interest.
-                </p>
-                
-                <div class="progress-header">
-                    <span class="progress-amounts">$0 / $3,251</span>
-                    <span class="progress-percentage negative">0%</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill progress-critical" style="width: 0%"></div>
-                </div>
-
-                <div class="goal-stats">
-                    <div class="goal-stat">
-                        <div class="goal-stat-label">Monthly Payment</div>
-                        <div class="goal-stat-value neutral">$100</div>
-                    </div>
-                    <div class="goal-stat">
-                        <div class="goal-stat-label">Payoff Date</div>
-                        <div class="goal-stat-value neutral">Dec 2027</div>
-                    </div>
-                </div>
-
-                <div class="goal-actions">
-                    <button class="goal-action-btn btn-primary">Optimize Payment</button>
-                    <button class="goal-action-btn btn-secondary">Edit Goal</button>
-                </div>
-            </div>
-
-            <div class="goal-card">
-                <div class="goal-header">
-                    <div>
-                        <h3 class="goal-title">KiwiSaver Growth</h3>
-                        <div class="goal-priority priority-medium">Medium</div>
-                    </div>
-                </div>
-                <p class="goal-description">
-                    Grow retirement savings from current $48,733 to $100,000 by maximizing contributions and 
-                    investment returns over the next 5 years.
-                </p>
-                
-                <div class="progress-header">
-                    <span class="progress-amounts">$48,733 / $100,000</span>
-                    <span class="progress-percentage positive">48.7%</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill progress-good" style="width: 48.7%"></div>
-                </div>
-
-                <div class="goal-stats">
-                    <div class="goal-stat">
-                        <div class="goal-stat-label">Monthly Contribution</div>
-                        <div class="goal-stat-value positive">$271</div>
-                    </div>
-                    <div class="goal-stat">
-                        <div class="goal-stat-label">Target Date</div>
-                        <div class="goal-stat-value neutral">Dec 2029</div>
-                    </div>
-                </div>
-
-                <div class="goal-actions">
-                    <button class="goal-action-btn btn-primary">Review Strategy</button>
-                    <button class="goal-action-btn btn-secondary">Edit Goal</button>
-                </div>
-            </div>
-
-            <div class="goal-card">
-                <div class="goal-header">
-                    <div>
-                        <h3 class="goal-title">Private School Fund</h3>
-                        <div class="goal-priority priority-medium">Medium</div>
-                    </div>
-                </div>
-                <p class="goal-description">
-                    Save for private school education costs. Currently contributing $300/month toward 
-                    this long-term education investment for your children.
-                </p>
-                
-                <div class="progress-header">
-                    <span class="progress-amounts">$300 / $17,000</span>
-                    <span class="progress-percentage neutral">1.8%</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill progress-good" style="width: 1.8%"></div>
-                </div>
-
-                <div class="goal-stats">
-                    <div class="goal-stat">
-                        <div class="goal-stat-label">Monthly Savings</div>
-                        <div class="goal-stat-value positive">$300</div>
-                    </div>
-                    <div class="goal-stat">
-                        <div class="goal-stat-label">Target Date</div>
-                        <div class="goal-stat-value neutral">Jan 2030</div>
-                    </div>
-                </div>
-
-                <div class="goal-actions">
-                    <button class="goal-action-btn btn-primary">Adjust Amount</button>
-                    <button class="goal-action-btn btn-secondary">Edit Goal</button>
-                </div>
-            </div>
-        </div>
-    </main>
-</body>
-</html>
+            gap
