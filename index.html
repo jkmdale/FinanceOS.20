@@ -3,1113 +3,679 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinanceOS - Dashboard</title>
-    <link rel="manifest" href="manifest.json">
+    <title>Dashboard - FinanceOS</title>
     <meta name="theme-color" content="#8b5cf6">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    
     <style>
-        .session-info {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            padding: 10px 15px;
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.8);
-            z-index: 1000;
+        :root {
+            --primary-purple: #8b5cf6;
+            --secondary-blue: #3b82f6;
+            --success-green: #10b981;
+            --error-red: #ef4444;
+            --warning-orange: #f97316;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --text-primary: rgba(255, 255, 255, 0.9);
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-muted: rgba(255, 255, 255, 0.5);
         }
-        
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .glass-premium {
+            background: linear-gradient(135deg, 
+                rgba(139, 92, 246, 0.15) 0%, 
+                rgba(59, 130, 246, 0.15) 50%, 
+                rgba(147, 51, 234, 0.15) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Navigation Styles */
+        .main-nav {
+            background: linear-gradient(135deg, 
+                rgba(139, 92, 246, 0.15) 0%, 
+                rgba(59, 130, 246, 0.15) 50%, 
+                rgba(147, 51, 234, 0.15) 100%);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 20px;
+            margin-bottom: 20px;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link.active {
+            color: var(--text-primary);
+            background: rgba(139, 92, 246, 0.2);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .privacy-toggle, .logout-button {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .privacy-toggle {
+            background: rgba(249, 115, 22, 0.2);
+            color: #f97316;
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+
         .logout-button {
             background: rgba(239, 68, 68, 0.2);
             color: #ef4444;
             border: 1px solid rgba(239, 68, 68, 0.3);
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-left: 10px;
         }
-        
-        .logout-button:hover {
-            background: rgba(239, 68, 68, 0.3);
-            transform: translateY(-1px);
-        }
-        
-        .login-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background: linear-gradient(135deg, #0f172a, #1e1b4b, #312e81);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            padding: 10px;
-            box-sizing: border-box;
-        }
-        
-        .login-container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 24px;
-            padding: 50px 40px;
-            text-align: center;
-            width: 100%;
-            max-width: 600px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 25px;
-        }
-        
-        /* Mobile optimizations - MUCH LARGER */
-        @media (max-width: 768px) {
-            .login-overlay {
-                padding: 0;
-            }
-            
-            .login-container {
-                height: 100vh;
-                width: 100%;
-                max-width: none;
-                padding: 60px 40px;
-                border-radius: 0;
-                gap: 30px;
-                justify-content: center;
-            }
-            
-            .login-logo {
-                width: 120px !important;
-                height: 120px !important;
-                font-size: 48px !important;
-                margin-bottom: 30px !important;
-            }
-            
-            .login-input {
-                padding: 24px 28px !important;
-                font-size: 22px !important;
-                margin-bottom: 30px !important;
-                min-height: 60px;
-                box-sizing: border-box;
-            }
-            
-            .login-button, .biometric-button {
-                padding: 24px !important;
-                font-size: 22px !important;
-                margin-bottom: 30px !important;
-                min-height: 70px;
-            }
-            
-            .pin-digit {
-                width: 60px !important;
-                height: 60px !important;
-                font-size: 28px !important;
-            }
-        }
-        
-        .login-logo {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
-            border-radius: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 40px;
-            color: white;
-            font-weight: bold;
-        }
-        
-        .login-input {
-            width: 100%;
-            padding: 20px 24px;
-            margin-bottom: 25px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 16px;
-            color: white;
-            font-size: 20px;
-            box-sizing: border-box;
-        }
-        
-        .login-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-        
-        .login-input:focus {
-            outline: none;
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
-        }
-        
-        .login-button {
-            width: 100%;
-            padding: 20px;
-            background: linear-gradient(135deg, #8b5cf6, #9333ea);
-            color: white;
-            border: none;
-            border-radius: 16px;
-            font-size: 20px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 25px;
-            transition: all 0.3s ease;
-        }
-        
-        .login-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
-        }
-        
-        .login-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .biometric-button {
-            width: 100%;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 16px;
-            font-size: 20px;
-            cursor: pointer;
-            margin-bottom: 25px;
-            transition: all 0.3s ease;
-        }
-        
-        .biometric-button:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .biometric-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .forgot-password {
-            color: #8b5cf6;
-            text-decoration: none;
-            font-size: 16px;
-            transition: color 0.3s ease;
-        }
-        
-        .forgot-password:hover {
-            color: #a78bfa;
-        }
-        
-        .password-toggle {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
+
+        .nav-mobile-toggle {
+            display: none;
             background: none;
             border: none;
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--text-primary);
+            font-size: 1.5rem;
             cursor: pointer;
-            font-size: 20px;
-        }
-        
-        .password-field {
-            position: relative;
-        }
-        
-        .loading-spinner {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-top: 3px solid white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .pin-input {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin: 30px 0;
-        }
-        
-        .pin-digit {
-            width: 55px;
-            height: 55px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 12px;
-            color: white;
-            font-size: 26px;
-            text-align: center;
-            font-weight: bold;
-        }
-        
-        .pin-digit:focus {
-            outline: none;
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
-        }
-        
-        .biometric-status {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.6);
-            margin-top: 8px;
-        }
-        
-        .demo-credentials {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.6);
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
         }
 
-        /* Fix navigation and cards */
-        .nav {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            flex-wrap: wrap;
+        .nav-mobile-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px;
         }
 
-        .nav-button {
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            cursor: pointer;
-            display: inline-block;
-            min-height: 44px;
-            box-sizing: border-box;
-            line-height: 1.2;
+        .nav-mobile-menu.open {
+            display: block;
         }
 
-        .nav-button:hover, .nav-button.active {
-            background: rgba(139, 92, 246, 0.2);
-            color: white;
-            border-color: rgba(139, 92, 246, 0.3);
-        }
-
-        /* Fix card overflow issues */
-        .summary-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 24px;
-            text-align: center;
-            min-height: 140px;
+        .nav-mobile-links {
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            box-sizing: border-box;
+            gap: 12px;
+            margin-bottom: 16px;
         }
 
-        .summary-card h3 {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 16px;
-            margin: 0 0 12px 0;
-            font-weight: 500;
+        .nav-mobile-actions {
+            display: flex;
+            gap: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .summary-card .amount {
-            font-size: 28px;
-            font-weight: bold;
-            margin: 8px 0;
-            line-height: 1.1;
-            word-break: break-all;
-            hyphens: auto;
+        /* Dashboard Styles */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
         }
 
-        .summary-card .change {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 14px;
-            margin-top: 8px;
-            line-height: 1.3;
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 40px;
         }
 
-        .summary-grid {
+        .dashboard-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .dashboard-header p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        /* Account Cards */
+        .accounts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
             margin-bottom: 40px;
         }
 
-        @media (max-width: 768px) {
-            .summary-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-                gap: 15px;
-            }
-            
-            .summary-card .amount {
-                font-size: 22px;
-            }
-            
-            .nav-button {
-                font-size: 14px;
-                padding: 10px 16px;
-            }
+        .account-card {
+            padding: 24px;
+            border-radius: 20px;
+            position: relative;
+            transition: transform 0.3s ease;
         }
 
-        /* Account cards fix */
-        .account-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 20px;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
+        .account-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .account-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .account-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .account-type {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 8px;
+            border-radius: 6px;
         }
 
         .account-balance {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 12px 0;
-            line-height: 1.1;
-            word-break: break-word;
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+            margin-bottom: 8px;
+        }
+
+        .account-available {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .positive { color: var(--success-green); }
+        .negative { color: var(--error-red); }
+        .warning { color: var(--warning-orange); }
+
+        .alert-critical {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.2));
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            margin: 40px 0;
+        }
+
+        .quick-actions h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .action-card {
+            padding: 20px;
+            border-radius: 16px;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s ease;
+            text-align: center;
+        }
+
+        .action-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .action-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .action-card h3 {
+            margin-bottom: 4px;
+            font-size: 1.1rem;
+        }
+
+        .action-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Financial Summary */
+        .financial-summary {
+            margin: 40px 0;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .summary-card {
+            padding: 24px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .summary-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+        }
+
+        .summary-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+
+        .summary-change {
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* Emergency Alert */
+        .emergency-alert {
+            margin: 30px 0;
+            padding: 24px;
+            border-radius: 16px;
+        }
+
+        .alert-content {
+            display: grid;
+            gap: 16px;
+        }
+
+        .alert-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 16px;
+            border-radius: 12px;
+            border-left: 4px solid var(--error-red);
         }
 
         @media (max-width: 768px) {
-            .account-balance {
-                font-size: 20px;
+            .nav-links, .nav-actions {
+                display: none;
+            }
+            
+            .nav-mobile-toggle {
+                display: block;
+            }
+
+            .dashboard-header h1 {
+                font-size: 2rem;
+            }
+
+            .accounts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
 </head>
 <body>
-    <!-- Session Info (hidden - banking app style) -->
-    <div class="session-info" id="sessionInfo" style="display: none;">
-        <span>User: demo</span>
-        <button class="logout-button" onclick="logout()">Logout</button>
-    </div>
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <!-- Logo -->
+            <a href="index.html" class="nav-logo">
+                <div class="logo-icon">$</div>
+                <span class="logo-text">FinanceOS</span>
+            </a>
 
-    <!-- Login Overlay (shown when not authenticated) -->
-    <div class="login-overlay" id="loginOverlay">
-        <div class="login-container">
-            <div class="login-logo">$</div>
-            <h2 style="color: white; margin-bottom: 8px; font-size: 36px;">FinanceOS</h2>
-            <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 20px; font-size: 18px;">
-                Your Personal Finance Operating System
-            </p>
-            
-            <!-- Username/Password Login -->
-            <div id="loginForm">
-                <input type="text" id="loginUsername" class="login-input" placeholder="Username" autocomplete="username">
-                
-                <div class="password-field">
-                    <input type="password" id="loginPassword" class="login-input" placeholder="Password" autocomplete="current-password">
-                    <button type="button" class="password-toggle" onclick="togglePassword()">👁️</button>
+            <!-- Desktop Navigation -->
+            <div class="nav-links">
+                <a href="index.html" class="nav-link active" data-page="dashboard">
+                    <span>🏠</span> Dashboard
+                </a>
+                <a href="budget.html" class="nav-link" data-page="budget">
+                    <span>📊</span> Budget
+                </a>
+                <a href="goals.html" class="nav-link" data-page="goals">
+                    <span>🎯</span> Goals
+                </a>
+                <a href="csv-upload.html" class="nav-link" data-page="upload">
+                    <span>📤</span> Upload
+                </a>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="nav-actions">
+                <button class="privacy-toggle" id="privacyToggle">🔒 Privacy</button>
+                <button class="logout-button" onclick="logout()">📱 Logout</button>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button class="nav-mobile-toggle" onclick="toggleMobileMenu()">
+                <span id="menuIcon">☰</span>
+            </button>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div class="nav-mobile-menu" id="mobileMenu">
+            <div class="nav-mobile-links">
+                <a href="index.html" class="nav-link active" data-page="dashboard">🏠 Dashboard</a>
+                <a href="budget.html" class="nav-link" data-page="budget">📊 Budget</a>
+                <a href="goals.html" class="nav-link" data-page="goals">🎯 Goals</a>
+                <a href="csv-upload.html" class="nav-link" data-page="upload">📤 Upload</a>
+            </div>
+            <div class="nav-mobile-actions">
+                <button class="privacy-toggle" onclick="togglePrivacy()">🔒 Privacy</button>
+                <button class="logout-button" onclick="logout()">📱 Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <h1>🏠 Financial Dashboard</h1>
+            <p>Your complete financial overview and quick access to all FinanceOS features</p>
+        </div>
+
+        <!-- Emergency Alert -->
+        <div class="emergency-alert glass-premium alert-critical">
+            <h3 style="color: var(--error-red); margin-bottom: 16px; text-align: center;">
+                🚨 Critical Financial Alerts
+            </h3>
+            <div class="alert-content">
+                <div class="alert-item">
+                    <strong>Emergency Fund Crisis:</strong> You have only $0.17 in emergency savings. 
+                    Target: $17,733 (3 months expenses). This is your #1 financial priority.
                 </div>
-                
-                <button onclick="login()" class="login-button" id="loginButton">
-                    <span id="loginButtonText">Login</span>
-                </button>
-                
-                <button onclick="startBiometricLogin()" class="biometric-button" id="biometricButton">
-                    🔐 Use Biometric Login
-                    <div class="biometric-status" id="biometricStatus">Checking biometric support...</div>
-                </button>
-                
-                <button onclick="showPinLogin()" class="biometric-button">
-                    🔢 Use PIN
-                </button>
-                
-                <div style="margin-top: 15px;">
-                    <a href="#" onclick="showPasswordReset()" class="forgot-password">Forgot Password?</a>
-                </div>
-                
-                <div class="demo-credentials">
-                    Demo: username=<strong>demo</strong>, password=<strong>demo123</strong>, PIN=<strong>1234</strong>
+                <div class="alert-item">
+                    <strong>Monthly Budget Deficit:</strong> You're spending $177 more than budgeted. 
+                    Main culprits: Food (+$163), Discretionary (+$123).
                 </div>
             </div>
-            
-            <!-- PIN Login -->
-            <div id="pinForm" style="display: none;">
-                <h3 style="color: white; margin-bottom: 20px; font-size: 28px;">Enter PIN</h3>
-                <div class="pin-input">
-                    <input type="password" class="pin-digit" maxlength="1" id="pin1" oninput="movePinFocus(1)" onkeydown="handlePinBackspace(event, 1)">
-                    <input type="password" class="pin-digit" maxlength="1" id="pin2" oninput="movePinFocus(2)" onkeydown="handlePinBackspace(event, 2)">
-                    <input type="password" class="pin-digit" maxlength="1" id="pin3" oninput="movePinFocus(3)" onkeydown="handlePinBackspace(event, 3)">
-                    <input type="password" class="pin-digit" maxlength="1" id="pin4" oninput="movePinFocus(4)" onkeydown="handlePinBackspace(event, 4)">
+        </div>
+
+        <!-- Account Overview -->
+        <div class="accounts-grid">
+            <!-- Checking Account -->
+            <div class="account-card glass">
+                <div class="account-header">
+                    <div class="account-name">My Spending</div>
+                    <div class="account-type">Checking</div>
                 </div>
-                <button onclick="loginWithPin()" class="login-button">Login with PIN</button>
-                <button onclick="showLoginForm()" class="biometric-button">Back to Password</button>
-                <div class="demo-credentials">
-                    Demo PIN: <strong>1234</strong>
+                <div class="account-balance positive">$25.92</div>
+                <div class="account-available">Available: $25.92</div>
+            </div>
+
+            <!-- Savings Account -->
+            <div class="account-card glass alert-critical">
+                <div class="account-header">
+                    <div class="account-name">My Savings</div>
+                    <div class="account-type">Emergency Fund</div>
+                </div>
+                <div class="account-balance warning">$0.17</div>
+                <div class="account-available">CRITICAL: Build emergency fund!</div>
+            </div>
+
+            <!-- House Kitty -->
+            <div class="account-card glass-premium">
+                <div class="account-header">
+                    <div class="account-name">House Kitty</div>
+                    <div class="account-type">Joint Savings</div>
+                </div>
+                <div class="account-balance positive">$65,357.00</div>
+                <div class="account-available">Available: $65,357.00</div>
+            </div>
+
+            <!-- Credit Card -->
+            <div class="account-card glass">
+                <div class="account-header">
+                    <div class="account-name">Low Rate Visa</div>
+                    <div class="account-type">Credit Card</div>
+                </div>
+                <div class="account-balance negative">-$3,251.30</div>
+                <div class="account-available">Available: $6,748.70</div>
+            </div>
+
+            <!-- KiwiSaver -->
+            <div class="account-card glass-premium">
+                <div class="account-header">
+                    <div class="account-name">ANZ KiwiSaver</div>
+                    <div class="account-type">Retirement</div>
+                </div>
+                <div class="account-balance positive">$48,733.44</div>
+                <div class="account-available">Long-term savings</div>
+            </div>
+
+            <!-- Mortgage -->
+            <div class="account-card glass">
+                <div class="account-header">
+                    <div class="account-name">Home Loans</div>
+                    <div class="account-type">Mortgage</div>
+                </div>
+                <div class="account-balance negative">-$271,600.02</div>
+                <div class="account-available">4.99% interest rate</div>
+            </div>
+        </div>
+
+        <!-- Financial Summary -->
+        <div class="financial-summary">
+            <h2 style="text-align: center; margin-bottom: 20px;">📈 Financial Summary</h2>
+            <div class="summary-grid">
+                <div class="summary-card glass">
+                    <div class="summary-value positive">$110,616.09</div>
+                    <div class="summary-label">Total Assets</div>
+                    <div class="summary-change positive">+2.3% this month</div>
+                </div>
+                
+                <div class="summary-card glass">
+                    <div class="summary-value negative">-$274,851.32</div>
+                    <div class="summary-label">Total Liabilities</div>
+                    <div class="summary-change negative">-0.8% this month</div>
+                </div>
+                
+                <div class="summary-card glass-premium">
+                    <div class="summary-value negative">-$164,235.23</div>
+                    <div class="summary-label">Net Worth</div>
+                    <div class="summary-change positive">+3.1% this month</div>
+                </div>
+                
+                <div class="summary-card glass">
+                    <div class="summary-value positive">$393.00</div>
+                    <div class="summary-label">Monthly Cash Flow</div>
+                    <div class="summary-change warning">-$177 variance</div>
                 </div>
             </div>
-            
-            <!-- Password Reset -->
-            <div id="resetForm" style="display: none;">
-                <h3 style="color: white; margin-bottom: 20px; font-size: 28px;">Reset Password</h3>
-                <input type="email" class="login-input" placeholder="Email Address" id="resetEmail">
-                <button onclick="sendPasswordReset()" class="login-button">Send Reset Link</button>
-                <button onclick="showLoginForm()" class="biometric-button">Back to Login</button>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h2>⚡ Quick Actions</h2>
+            <div class="actions-grid">
+                <a href="budget.html" class="action-card glass-premium">
+                    <span class="action-icon">📊</span>
+                    <h3>View Budget</h3>
+                    <p>Analyze spending & variance</p>
+                </a>
+                
+                <a href="goals.html" class="action-card glass-premium">
+                    <span class="action-icon">🎯</span>
+                    <h3>Track Goals</h3>
+                    <p>Emergency fund & savings</p>
+                </a>
+                
+                <a href="csv-upload.html" class="action-card glass-premium">
+                    <span class="action-icon">📤</span>
+                    <h3>Upload Bank Data</h3>
+                    <p>Import CSV statements</p>
+                </a>
+                
+                <a href="budget.html#chartsToggle" class="action-card glass-premium">
+                    <span class="action-icon">📈</span>
+                    <h3>Visual Analysis</h3>
+                    <p>Charts & insights</p>
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- Main App Content (hidden until authenticated) -->
-    <div id="mainApp" style="display: none;">
-        <!-- Header -->
-        <header class="header glass">
-            <div class="header-content">
-                <div class="logo">
-                    <div class="logo-icon">$</div>
-                    <span class="logo-text">FinanceOS</span>
-                </div>
-                
-                <nav class="nav">
-                    <a href="index.html" class="nav-button active" onclick="showDashboard(event)">Dashboard</a>
-                    <a href="csv-upload.html" class="nav-button" onclick="showCSVUpload(event)">Upload CSV</a>
-                    <a href="goals.html" class="nav-button" onclick="showGoals(event)">Goals</a>
-                    <button class="privacy-toggle nav-button" id="privacyToggle">🔒 Privacy Mode</button>
-                    <button class="nav-button" id="notificationSettings">🔔 Notifications</button>
-                    <button class="logout-button" onclick="logout()">🚪 Logout</button>
-                </nav>
-            </div>
-        </header>
-
-        <!-- Main Content -->
-        <main class="main-content" id="mainContent">
-            <!-- CSV Data Status -->
-            <div class="csv-status no-data" id="csvStatus">
-                📊 No recent CSV data found. <a href="#" onclick="showCSVUpload(event)" style="color: #f59e0b;">Upload bank statements</a> to see transaction analysis.
-            </div>
-
-            <!-- Emergency Alert -->
-            <div class="emergency-alert">
-                <div class="alert-title">🚨 Financial Alert: Emergency Fund Critical</div>
-                <div class="alert-text">
-                    Your emergency fund has only $0.17. With a monthly deficit of $3,607, you're at high financial risk. 
-                    <strong>Immediate action required.</strong>
-                </div>
-            </div>
-
-            <!-- Financial Summary -->
-            <section class="financial-summary">
-                <h2 class="section-title">Financial Overview</h2>
-                
-                <div class="summary-grid">
-                    <div class="summary-card glass-premium">
-                        <h3>Total Assets</h3>
-                        <div class="amount" style="color: #10b981;">$65,383.44</div>
-                        <div class="change">Available across all accounts</div>
-                    </div>
-                    
-                    <div class="summary-card glass-premium">
-                        <h3>Total Debt</h3>
-                        <div class="amount" style="color: #ef4444;">$274,851.32</div>
-                        <div class="change">Including mortgage & credit</div>
-                    </div>
-                    
-                    <div class="summary-card glass-premium">
-                        <h3>Net Worth</h3>
-                        <div class="amount" style="color: #ef4444;">-$209,467.88</div>
-                        <div class="change">Mortgage impact included</div>
-                    </div>
-                    
-                    <div class="summary-card glass-premium">
-                        <h3>Monthly Cash Flow</h3>
-                        <div class="amount" style="color: #ef4444;">-$3,607</div>
-                        <div class="change">Expenses exceed income</div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Accounts Section -->
-            <section class="accounts-section">
-                <div class="section-header">
-                    <h2 class="section-title">Your Accounts</h2>
-                </div>
-
-                <div class="accounts-grid">
-                    <!-- Personal Accounts -->
-                    <div class="account-card glass">
-                        <div class="account-header">
-                            <div class="account-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">💳</div>
-                            <div class="account-info">
-                                <h3>My Spending</h3>
-                                <div class="account-type">Personal Checking</div>
-                            </div>
-                        </div>
-                        <div class="account-balance" style="color: #10b981;">$25.92</div>
-                        <div class="account-available">$25.92 Available</div>
-                    </div>
-
-                    <div class="account-card glass">
-                        <div class="account-header">
-                            <div class="account-icon" style="background: linear-gradient(135deg, #10b981, #059669);">💰</div>
-                            <div class="account-info">
-                                <h3>My Savings</h3>
-                                <div class="account-type">Personal Savings</div>
-                            </div>
-                        </div>
-                        <div class="account-balance" style="color: #ef4444;">$0.17</div>
-                        <div class="account-available">$0.17 Available</div>
-                    </div>
-
-                    <!-- Joint Accounts -->
-                    <div class="account-card glass-premium">
-                        <div class="account-header">
-                            <div class="account-icon" style="background: linear-gradient(135deg, #8b5cf6, #9333ea);">🏠</div>
-                            <div class="account-info">
-                                <h3>House Kitty</h3>
-                                <div class="account-type">Joint Savings</div>
-                            </div>
-                        </div>
-                        <div class="account-balance" style="color: #10b981;">$65,357.00</div>
-                        <div class="account-available">$65,357.00 Available</div>
-                    </div>
-
-                    <div class="account-card glass">
-                        <div class="account-header">
-                            <div class="account-icon" style="background: linear-gradient(135deg, #f97316, #ea580c);">🧾</div>
-                            <div class="account-info">
-                                <h3>Mortgage And Billing</h3>
-                                <div class="account-type">Bill Payment Account</div>
-                            </div>
-                        </div>
-                        <div class="account-balance" style="color: #10b981;">$126.35</div>
-                        <div class="account-available">$126.35 Available</div>
-                    </div>
-
-                    <div class="account-card glass">
-                        <div class="account-header">
-                            <div class="account-icon" style="background: linear-gradient(135deg, #eab308, #ca8a04);">⏳</div>
-                            <div class="account-info">
-                                <h3>Holding</h3>
-                                <div class="account-type">Temporary Account</div>
-                            </div>
-                        </div>
-                        <div class="account-balance" style="color: #10b981;">$240.40</div>
-                        <div class="account-available">$240.40 Available</div>
-                    </div>
-
-                    <!-- Credit & Loans -->
-                    <div class="account-card glass">
-                        <div class="account-header">
-                            <div class="account-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">💳</div>
-                            <div class="account-info">
-                                <h3>Low Rate Visa</h3>
-                                <div class="account-type">Credit Card</div>
-                            </div>
-                        </div>
-                        <div class="account-balance" style="color: #ef4444;">-$3,251.30</div>
-                        <div class="account-available">$6,748.70 Available Credit</div>
-                    </div>
-
-                    <div class="account-card glass">
-                        <div class="account-header">
-                            <div class="account-icon" style="background: linear-gradient(135deg, #6366f1, #4f46e5);">🏠</div>
-                            <div class="account-info">
-                                <h3>Home Loans</h3>
-                                <div class="account-type">Mortgage</div>
-                            </div>
-                        </div>
-                        <div class="account-balance" style="color: #ef4444;">$271,600.02</div>
-                        <div class="account-available">Principal Balance</div>
-                    </div>
-
-                    <!-- Investments -->
-                    <div class="account-card glass-premium">
-                        <div class="account-header">
-                            <div class="account-icon" style="background: linear-gradient(135deg, #10b981, #047857);">📈</div>
-                            <div class="account-info">
-                                <h3>ANZ KiwiSaver Scheme</h3>
-                                <div class="account-type">Retirement Savings</div>
-                            </div>
-                        </div>
-                        <div class="account-balance" style="color: #10b981;">$48,733.44</div>
-                        <div class="account-available">Investment Balance</div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Quick Actions -->
-            <section class="quick-actions">
-                <button class="action-button" onclick="showCSVUpload(event)">📤 Upload CSV</button>
-                <button class="action-button" onclick="showGoals(event)">🎯 View Goals</button>
-                <button class="action-button" onclick="addTransaction()">➕ Add Transaction</button>
-                <button class="action-button" onclick="viewReports()">📊 View Reports</button>
-            </section>
-        </main>
-    </div>
-
-    <script src="data-manager.js"></script>
-    <script src="notification-system.js"></script>
     <script>
-        // Session Management - BANKING APP STYLE (No visible timer)
-        let isAuthenticated = false;
-        let lastActivityTime = Date.now();
-        const SESSION_TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
-        let biometricAvailable = false;
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            checkAuthentication();
-            setupPrivacyMode();
-            setupActivityTracking();
-            checkBiometricSupport();
-        });
-
-        // Navigation functions
-        function showCSVUpload(e) {
-            if (e) e.preventDefault();
-            window.location.href = 'csv-upload.html';
-        }
-
-        function showGoals(e) {
-            if (e) e.preventDefault();
-            window.location.href = 'goals.html';
-        }
-
-        function showDashboard(e) {
-            if (e) e.preventDefault();
-            window.location.href = 'index.html';
-        }
-
-        // Real Biometric Authentication Support
-        async function checkBiometricSupport() {
-            const statusElement = document.getElementById('biometricStatus');
-            const biometricButton = document.getElementById('biometricButton');
+        // Navigation Functions
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const icon = document.getElementById('menuIcon');
             
-            try {
-                // Check if WebAuthn is supported
-                if (!window.PublicKeyCredential) {
-                    statusElement.textContent = 'Biometric authentication not supported on this device';
-                    biometricButton.disabled = true;
-                    return;
-                }
-                
-                // Check if platform authenticator is available
-                const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-                
-                if (available) {
-                    statusElement.textContent = 'Biometric authentication available';
-                    statusElement.style.color = '#34d399';
-                    biometricAvailable = true;
-                } else {
-                    statusElement.textContent = 'No biometric authenticator found';
-                    biometricButton.disabled = true;
-                }
-            } catch (error) {
-                console.error('Biometric check error:', error);
-                statusElement.textContent = 'Error checking biometric support';
-                biometricButton.disabled = true;
+            if (menu && icon) {
+                menu.classList.toggle('open');
+                icon.textContent = menu.classList.contains('open') ? '✕' : '☰';
             }
         }
 
-        async function startBiometricLogin() {
-            if (!biometricAvailable) {
-                alert('Biometric authentication is not available on this device.');
-                return;
-            }
-
-            const biometricButton = document.getElementById('biometricButton');
-            biometricButton.disabled = true;
-            biometricButton.innerHTML = '🔐 Authenticating...<div class="biometric-status">Please use your fingerprint or face</div>';
-
-            try {
-                // Check if we have existing credentials
-                const existingCredential = localStorage.getItem('financeos-credential-id');
-                
-                if (existingCredential) {
-                    // Authenticate with existing credential
-                    await authenticateWithBiometric();
-                } else {
-                    // Register new credential
-                    await registerBiometric();
-                }
-            } catch (error) {
-                console.error('Biometric login error:', error);
-                alert('Biometric authentication failed. Please try again or use password login.');
-                resetBiometricButton();
-            }
-        }
-
-        async function registerBiometric() {
-            const challenge = new Uint8Array(32);
-            crypto.getRandomValues(challenge);
-            
-            const credential = await navigator.credentials.create({
-                publicKey: {
-                    challenge: challenge,
-                    rp: {
-                        name: "FinanceOS",
-                        id: window.location.hostname
-                    },
-                    user: {
-                        id: new TextEncoder().encode("demo-user"),
-                        name: "demo",
-                        displayName: "Demo User"
-                    },
-                    pubKeyCredParams: [
-                        {
-                            type: "public-key",
-                            alg: -7 // ES256
-                        },
-                        {
-                            type: "public-key", 
-                            alg: -257 // RS256
-                        }
-                    ],
-                    authenticatorSelection: {
-                        authenticatorAttachment: "platform",
-                        userVerification: "required",
-                        requireResidentKey: false
-                    },
-                    timeout: 60000,
-                    attestation: "direct"
-                }
-            });
-
-            if (credential) {
-                // Store credential ID for future use
-                localStorage.setItem('financeos-credential-id', credential.id);
-                localStorage.setItem('financeos-token', 'authenticated');
-                localStorage.setItem('financeos-last-activity', Date.now().toString());
-                showMainApp();
-            }
-        }
-
-        async function authenticateWithBiometric() {
-            const credentialId = localStorage.getItem('financeos-credential-id');
-            const challenge = new Uint8Array(32);
-            crypto.getRandomValues(challenge);
-
-            const assertion = await navigator.credentials.get({
-                publicKey: {
-                    challenge: challenge,
-                    allowCredentials: [{
-                        id: Uint8Array.from(atob(credentialId), c => c.charCodeAt(0)),
-                        type: 'public-key'
-                    }],
-                    userVerification: "required",
-                    timeout: 60000
-                }
-            });
-
-            if (assertion) {
-                localStorage.setItem('financeos-token', 'authenticated');
-                localStorage.setItem('financeos-last-activity', Date.now().toString());
-                showMainApp();
-            }
-        }
-
-        function resetBiometricButton() {
-            const biometricButton = document.getElementById('biometricButton');
-            biometricButton.disabled = false;
-            biometricButton.innerHTML = '🔐 Use Biometric Login<div class="biometric-status">Biometric authentication available</div>';
-        }
-
-        // Banking app style session tracking
-        function setupActivityTracking() {
-            // Update activity time on any interaction
-            ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'].forEach(event => {
-                document.addEventListener(event, updateActivityTime, { passive: true });
-            });
-
-            // Check session when app comes back into focus (like banking apps)
-            window.addEventListener('focus', checkSessionOnFocus);
-            window.addEventListener('pageshow', checkSessionOnFocus);
-            document.addEventListener('visibilitychange', checkSessionOnFocus);
-        }
-
-        function updateActivityTime() {
-            if (isAuthenticated) {
-                lastActivityTime = Date.now();
-                localStorage.setItem('financeos-last-activity', lastActivityTime.toString());
-            }
-        }
-
-        function checkSessionOnFocus() {
-            if (isAuthenticated) {
-                const currentTime = Date.now();
-                const timeSinceActivity = currentTime - lastActivityTime;
-                
-                if (timeSinceActivity > SESSION_TIMEOUT) {
-                    // Session expired - logout like banking app
-                    logout();
-                }
-            }
-        }
-
-        // Authentication Check - Banking App Style
-        function checkAuthentication() {
-            const authToken = localStorage.getItem('financeos-token');
-            const lastActivity = localStorage.getItem('financeos-last-activity');
-            
-            if (!authToken || !lastActivity) {
-                showLogin();
-                return;
-            }
-            
-            // Check if session has expired (5 minutes since last activity)
-            const currentTime = Date.now();
-            const timeSinceActivity = currentTime - parseInt(lastActivity);
-            
-            if (timeSinceActivity > SESSION_TIMEOUT) {
-                // Session expired - clear and show login
-                localStorage.removeItem('financeos-token');
-                localStorage.removeItem('financeos-last-activity');
-                showLogin();
-                return;
-            }
-            
-            // Valid session - show main app
-            lastActivityTime = parseInt(lastActivity);
-            showMainApp();
-        }
-
-        function showLogin() {
-            document.getElementById('loginOverlay').style.display = 'flex';
-            document.getElementById('mainApp').style.display = 'none';
-            document.getElementById('sessionInfo').style.display = 'none';
-            isAuthenticated = false;
-        }
-
-        function showMainApp() {
-            document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-            document.getElementById('sessionInfo').style.display = 'block';
-            isAuthenticated = true;
-            
-            // Update activity time
-            updateActivityTime();
-            checkCSVData();
-        }
-
-        // Login Functions
-        function login() {
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
-            const button = document.getElementById('loginButton');
-            const buttonText = document.getElementById('loginButtonText');
-            
-            if (!username || !password) {
-                alert('Please enter both username and password');
-                return;
-            }
-            
-            // Show loading
-            button.disabled = true;
-            buttonText.innerHTML = '<span class="loading-spinner"></span> Logging in...';
-            
-            // Simulate authentication delay
-            setTimeout(() => {
-                if (username === 'demo' && password === 'demo123') {
-                    // Successful login
-                    localStorage.setItem('financeos-token', 'authenticated');
-                    localStorage.setItem('financeos-last-activity', Date.now().toString());
-                    showMainApp();
-                } else {
-                    // Failed login
-                    alert('Invalid credentials. Use demo/demo123');
-                    button.disabled = false;
-                    buttonText.textContent = 'Login';
-                }
-            }, 1500);
-        }
-
-        function loginWithPin() {
-            const pin1 = document.getElementById('pin1').value;
-            const pin2 = document.getElementById('pin2').value;
-            const pin3 = document.getElementById('pin3').value;
-            const pin4 = document.getElementById('pin4').value;
-            const fullPin = pin1 + pin2 + pin3 + pin4;
-            
-            if (fullPin.length !== 4) {
-                alert('Please enter a 4-digit PIN');
-                return;
-            }
-            
-            if (fullPin === '1234') {
-                localStorage.setItem('financeos-token', 'authenticated');
-                localStorage.setItem('financeos-last-activity', Date.now().toString());
-                showMainApp();
-            } else {
-                alert('Invalid PIN. Demo PIN is 1234');
-                // Clear PIN fields
-                document.getElementById('pin1').value = '';
-                document.getElementById('pin2').value = '';
-                document.getElementById('pin3').value = '';
-                document.getElementById('pin4').value = '';
-                document.getElementById('pin1').focus();
-            }
-        }
-
-        // Form Navigation
-        function showLoginForm() {
-            document.getElementById('loginForm').style.display = 'block';
-            document.getElementById('pinForm').style.display = 'none';
-            document.getElementById('resetForm').style.display = 'none';
-        }
-
-        function showPinLogin() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('pinForm').style.display = 'block';
-            document.getElementById('resetForm').style.display = 'none';
-            document.getElementById('pin1').focus();
-        }
-
-        function showPasswordReset() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('pinForm').style.display = 'none';
-            document.getElementById('resetForm').style.display = 'block';
-        }
-
-        function sendPasswordReset() {
-            const email = document.getElementById('resetEmail').value;
-            if (!email) {
-                alert('Please enter your email address');
-                return;
-            }
-            
-            alert(`Password reset instructions sent to ${email}\n\nFor demo purposes:\nUsername: demo\nPassword: demo123\nPIN: 1234`);
-            showLoginForm();
-        }
-
-        // Utility Functions
-        function togglePassword() {
-            const passwordField = document.getElementById('loginPassword');
-            const toggleButton = document.querySelector('.password-toggle');
-            
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                toggleButton.textContent = '🙈';
-            } else {
-                passwordField.type = 'password';
-                toggleButton.textContent = '👁️';
-            }
-        }
-
-        function movePinFocus(currentDigit) {
-            const currentInput = document.getElementById(`pin${currentDigit}`);
-            if (currentInput.value.length === 1 && currentDigit < 4) {
-                document.getElementById(`pin${currentDigit + 1}`).focus();
-            }
-        }
-
-        function handlePinBackspace(event, currentDigit) {
-            if (event.key === 'Backspace' && currentDigit > 1) {
-                const currentInput = document.getElementById(`pin${currentDigit}`);
-                if (currentInput.value.length === 0) {
-                    document.getElementById(`pin${currentDigit - 1}`).focus();
-                }
-            }
-        }
-
-        // Logout Function - Banking App Style
         function logout() {
-            localStorage.removeItem('financeos-token');
-            localStorage.removeItem('financeos-last-activity');
-            
-            // Clear form fields
-            document.getElementById('loginUsername').value = '';
-            document.getElementById('loginPassword').value = '';
-            document.getElementById('resetEmail').value = '';
-            ['pin1', 'pin2', 'pin3', 'pin4'].forEach(id => {
-                document.getElementById(id).value = '';
-            });
-            
-            showLoginForm();
-            showLogin();
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = 'index.html';
+            }
         }
 
-        // Enter key handling
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                if (document.getElementById('loginForm').style.display !== 'none') {
-                    login();
-                } else if (document.getElementById('resetForm').style.display !== 'none') {
-                    sendPasswordReset();
-                }
+        function togglePrivacy() {
+            const button = document.getElementById('privacyToggle');
+            const isPrivate = button.textContent.includes('🔒');
+            
+            if (isPrivate) {
+                button.innerHTML = '🔓 Show Data';
+                document.querySelectorAll('.account-balance, .summary-value').forEach(el => {
+                    el.style.filter = 'blur(8px)';
+                });
+            } else {
+                button.innerHTML = '🔒 Privacy';
+                document.querySelectorAll('.account-balance, .summary-value').forEach(el => {
+                    el.style.filter = 'none';
+                });
+            }
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const nav = document.querySelector('.main-nav');
+            const menu = document.getElementById('mobileMenu');
+            
+            if (nav && menu && !nav.contains(e.target) && menu.classList.contains('open')) {
+                menu.classList.remove('open');
+                const icon = document.getElementById('menuIcon');
+                if (icon) icon.textContent = '☰';
             }
         });
 
-        // Privacy Mode and other existing functions
-        function setupPrivacyMode() {
-            const privacyToggle = document.getElementById('privacyToggle');
-            const mainContent = document.getElementById('mainContent');
-            
-            if (!privacyToggle) return;
-            
-            let privacyMode = localStorage.getItem('privacyMode') === 'true';
-            updatePrivacyMode();
-
-            privacyToggle.addEventListener('click', () => {
-                privacyMode = !privacyMode;
-                localStorage.setItem('privacyMode', privacyMode);
-                updatePrivacyMode();
+        // Initialize PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
             });
-
-            function updatePrivacyMode() {
-                if (privacyMode) {
-                    mainContent.classList.add('privacy-mode');
-                    privacyToggle.textContent = '🔓 Show Data';
-                    privacyToggle.classList.add('active');
-                } else {
-                    mainContent.classList.remove('privacy-mode');
-                    privacyToggle.textContent = '🔒 Privacy Mode';
-                    privacyToggle.classList.remove('active');
-                }
-            }
         }
 
-        function checkCSVData() {
-            const csvData = localStorage.getItem('csvData');
-            const csvStatus = document.getElementById('csvStatus');
-            
-            if (csvData) {
-                const data = JSON.parse(csvData);
-                csvStatus.className = 'csv-status';
-                csvStatus.innerHTML = `✅ CSV data loaded: ${data.length} transactions from ${data[0]?.date || 'unknown date'}. Last updated: ${new Date(localStorage.getItem('csvUploadDate')).toLocaleDateString()}`;
-            } else {
-                csvStatus.className = 'csv-status no-data';
-                csvStatus.innerHTML = '📊 No recent CSV data found. <a href="#" onclick="showCSVUpload(event)" style="color: #f59e0b;">Upload bank statements</a> to see transaction analysis.';
-            }
-        }
-
-        // Notification Settings
-        document.getElementById('notificationSettings')?.addEventListener('click', () => {
-            if (window.FinanceOSNotifications) {
-                window.FinanceOSNotifications.showNotificationSettings();
-            } else {
-                alert('Notification system will be available once notifications.js is loaded');
-            }
-        });
-
-        // Quick action functions
-        function addTransaction() {
-            alert('Add Transaction feature coming soon!');
-        }
-
-        function viewReports() {
-            alert('Reports feature coming soon!');
-        }
-
-        console.log('FinanceOS Dashboard loaded with real biometric authentication');
+        console.log('Dashboard loaded successfully');
     </script>
 </body>
 </html>
