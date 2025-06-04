@@ -18,7 +18,6 @@
             --glass-border: rgba(255, 255, 255, 0.15);
             --text-primary: rgba(255, 255, 255, 0.9);
             --text-secondary: rgba(255, 255, 255, 0.7);
-            --text-muted: rgba(255, 255, 255, 0.5);
         }
 
         * {
@@ -52,7 +51,7 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
 
-        /* Navigation Styles */
+        /* UNIFIED NAVIGATION - BIGGER SIZE */
         .main-nav {
             background: linear-gradient(135deg, 
                 rgba(139, 92, 246, 0.15) 0%, 
@@ -60,8 +59,8 @@
                 rgba(147, 51, 234, 0.15) 100%);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 12px 20px;
-            margin-bottom: 20px;
+            padding: 20px 24px; /* Increased from 12px 20px */
+            margin-bottom: 24px; /* Increased from 20px */
         }
 
         .nav-container {
@@ -70,73 +69,94 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 20px;
+            gap: 24px; /* Increased from 20px */
         }
 
         .nav-logo {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 16px; /* Increased from 12px */
             text-decoration: none;
             color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .nav-logo:hover {
+            transform: translateX(-2px);
         }
 
         .logo-icon {
-            width: 32px;
-            height: 32px;
+            width: 48px; /* Increased from 32px */
+            height: 48px; /* Increased from 32px */
             background: linear-gradient(135deg, #10b981, #059669);
-            border-radius: 8px;
+            border-radius: 12px; /* Increased from 8px */
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 24px; /* Increased from 18px */
             font-weight: bold;
             color: white;
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3); /* Bigger shadow */
         }
 
         .logo-text {
-            font-size: 1.25rem;
+            font-size: 1.75rem; /* Increased from 1.25rem */
             font-weight: 700;
         }
 
         .nav-links {
             display: flex;
-            gap: 8px;
+            gap: 12px; /* Increased from 8px */
             align-items: center;
         }
 
         .nav-link {
-            padding: 8px 16px;
-            border-radius: 8px;
+            padding: 12px 20px; /* Increased from 8px 16px */
+            border-radius: 12px; /* Increased from 8px */
             text-decoration: none;
             color: var(--text-secondary);
-            font-size: 0.9rem;
+            font-size: 1rem; /* Increased from 0.9rem */
             font-weight: 500;
             transition: all 0.2s ease;
             white-space: nowrap;
+            position: relative;
         }
 
         .nav-link:hover {
             color: var(--text-primary);
             background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px); /* Increased from -1px */
         }
 
         .nav-link.active {
-            color: var(--text-primary);
-            background: rgba(139, 92, 246, 0.2);
+            color: white;
+            background: rgba(139, 92, 246, 0.3);
+            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.2); /* Bigger shadow */
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 4px; /* Increased from 2px */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px; /* Increased from 4px */
+            height: 6px; /* Increased from 4px */
+            background: #8b5cf6;
+            border-radius: 50%;
         }
 
         .nav-actions {
             display: flex;
-            gap: 8px;
+            gap: 12px; /* Increased from 8px */
             align-items: center;
         }
 
         .privacy-toggle, .logout-button {
-            padding: 6px 12px;
-            border-radius: 6px;
+            padding: 10px 16px; /* Increased from 6px 12px */
+            border-radius: 8px; /* Increased from 6px */
             border: none;
-            font-size: 0.8rem;
+            font-size: 0.9rem; /* Increased from 0.8rem */
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -150,6 +170,7 @@
 
         .privacy-toggle:hover {
             background: rgba(249, 115, 22, 0.3);
+            transform: translateY(-2px); /* Increased from -1px */
         }
 
         .logout-button {
@@ -160,6 +181,7 @@
 
         .logout-button:hover {
             background: rgba(239, 68, 68, 0.3);
+            transform: translateY(-2px); /* Increased from -1px */
         }
 
         .nav-mobile-toggle {
@@ -167,8 +189,15 @@
             background: none;
             border: none;
             color: var(--text-primary);
-            font-size: 1.5rem;
+            font-size: 2rem; /* Increased from 1.5rem */
             cursor: pointer;
+            padding: 8px; /* Increased from 4px */
+            border-radius: 8px; /* Increased from 4px */
+            transition: all 0.2s ease;
+        }
+
+        .nav-mobile-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .nav-mobile-menu {
@@ -180,7 +209,8 @@
             background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 20px;
+            padding: 24px; /* Increased from 20px */
+            z-index: 1000;
         }
 
         .nav-mobile-menu.open {
@@ -190,14 +220,14 @@
         .nav-mobile-links {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 16px; /* Increased from 12px */
+            margin-bottom: 20px; /* Increased from 16px */
         }
 
         .nav-mobile-actions {
             display: flex;
-            gap: 12px;
-            padding-top: 12px;
+            gap: 16px; /* Increased from 12px */
+            padding-top: 16px; /* Increased from 12px */
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
@@ -469,54 +499,51 @@
                 grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
                 gap: 12px;
             }
+
+            .logo-text {
+                font-size: 1.5rem; /* Smaller on mobile */
+            }
+
+            .logo-icon {
+                width: 40px; /* Smaller on mobile */
+                height: 40px;
+                font-size: 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
+    <!-- UNIFIED NAVIGATION - BIGGER SIZE -->
     <nav class="main-nav">
         <div class="nav-container">
-            <!-- Logo -->
             <a href="index.html" class="nav-logo">
                 <div class="logo-icon">$</div>
                 <span class="logo-text">FinanceOS</span>
             </a>
 
-            <!-- Desktop Navigation -->
             <div class="nav-links">
-                <a href="index.html" class="nav-link" data-page="dashboard">
-                    <span>🏠</span> Dashboard
-                </a>
-                <a href="budget.html" class="nav-link" data-page="budget">
-                    <span>📊</span> Budget
-                </a>
-                <a href="goals.html" class="nav-link" data-page="goals">
-                    <span>🎯</span> Goals
-                </a>
-                <a href="csv-upload.html" class="nav-link active" data-page="upload">
-                    <span>📤</span> Upload
-                </a>
+                <a href="index.html" class="nav-link">🏠 Dashboard</a>
+                <a href="budget.html" class="nav-link">📊 Budget</a>
+                <a href="goals.html" class="nav-link">🎯 Goals</a>
+                <a href="csv-upload.html" class="nav-link active">📤 Upload</a>
             </div>
 
-            <!-- Action Buttons -->
             <div class="nav-actions">
                 <button class="privacy-toggle" id="privacyToggle">🔒 Privacy</button>
                 <button class="logout-button" onclick="logout()">📱 Logout</button>
             </div>
 
-            <!-- Mobile Menu Toggle -->
             <button class="nav-mobile-toggle" onclick="toggleMobileMenu()">
                 <span id="menuIcon">☰</span>
             </button>
         </div>
 
-        <!-- Mobile Navigation -->
         <div class="nav-mobile-menu" id="mobileMenu">
             <div class="nav-mobile-links">
-                <a href="index.html" class="nav-link" data-page="dashboard">🏠 Dashboard</a>
-                <a href="budget.html" class="nav-link" data-page="budget">📊 Budget</a>
-                <a href="goals.html" class="nav-link" data-page="goals">🎯 Goals</a>
-                <a href="csv-upload.html" class="nav-link active" data-page="upload">📤 Upload</a>
+                <a href="index.html" class="nav-link">🏠 Dashboard</a>
+                <a href="budget.html" class="nav-link">📊 Budget</a>
+                <a href="goals.html" class="nav-link">🎯 Goals</a>
+                <a href="csv-upload.html" class="nav-link active">📤 Upload</a>
             </div>
             <div class="nav-mobile-actions">
                 <button class="privacy-toggle" onclick="togglePrivacy()">🔒 Privacy</button>
@@ -527,7 +554,6 @@
 
     <!-- Main Content -->
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <h1>📤 Upload Bank Statements</h1>
             <p>Import your CSV/Excel bank statements to automatically categorize transactions and update your budget</p>
@@ -609,7 +635,7 @@
     </div>
 
     <script>
-        // Navigation Functions
+        // UNIFIED NAVIGATION JAVASCRIPT - Same on every page
         function toggleMobileMenu() {
             const menu = document.getElementById('mobileMenu');
             const icon = document.getElementById('menuIcon');
@@ -622,11 +648,8 @@
 
         function logout() {
             if (confirm('Are you sure you want to logout?')) {
-                // Clear any stored data
                 localStorage.clear();
                 sessionStorage.clear();
-                
-                // Redirect to login or home page
                 window.location.href = 'index.html';
             }
         }
@@ -637,18 +660,28 @@
             
             if (isPrivate) {
                 button.innerHTML = '🔓 Show Data';
-                // Hide all financial amounts
                 document.querySelectorAll('.amount, .balance').forEach(el => {
                     el.style.filter = 'blur(8px)';
                 });
             } else {
                 button.innerHTML = '🔒 Privacy';
-                // Show all financial amounts
                 document.querySelectorAll('.amount, .balance').forEach(el => {
                     el.style.filter = 'none';
                 });
             }
         }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const nav = document.querySelector('.main-nav');
+            const menu = document.getElementById('mobileMenu');
+            
+            if (nav && menu && !nav.contains(e.target) && menu.classList.contains('open')) {
+                menu.classList.remove('open');
+                const icon = document.getElementById('menuIcon');
+                if (icon) icon.textContent = '☰';
+            }
+        });
 
         // File Upload Functions
         const dropZone = document.getElementById('dropZone');
@@ -684,22 +717,18 @@
         function handleFiles(files) {
             if (files.length === 0) return;
 
-            // Show progress section
             progressSection.style.display = 'block';
             progressFill.style.width = '0%';
             progressText.textContent = 'Processing files...';
 
-            // Clear previous file list
             fileList.innerHTML = '';
 
-            // Process each file
             files.forEach((file, index) => {
                 processFile(file, index, files.length);
             });
         }
 
         function processFile(file, index, totalFiles) {
-            // Create file item
             const fileItem = document.createElement('div');
             fileItem.className = 'file-item';
             fileItem.innerHTML = `
@@ -714,22 +743,18 @@
             `;
             fileList.appendChild(fileItem);
 
-            // Simulate file processing
             setTimeout(() => {
                 const statusEl = fileItem.querySelector('.file-status');
                 
                 if (isValidFile(file)) {
                     statusEl.className = 'file-status status-success';
                     statusEl.textContent = 'Success';
-                    
-                    // Simulate reading CSV content
                     readFileContent(file);
                 } else {
                     statusEl.className = 'file-status status-error';
                     statusEl.textContent = 'Invalid Format';
                 }
 
-                // Update progress
                 const progress = ((index + 1) / totalFiles) * 100;
                 progressFill.style.width = progress + '%';
                 
@@ -746,18 +771,7 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 const content = e.target.result;
-                
-                // Here you would process the CSV content
-                // For now, just log it
                 console.log('File content:', content.substring(0, 200) + '...');
-                
-                // In a real app, you would:
-                // 1. Parse the CSV
-                // 2. Categorize transactions
-                // 3. Update budget data
-                // 4. Save to localStorage/database
-                
-                // Show success notification
                 showNotification(`${file.name} processed successfully!`, 'success');
             };
             reader.readAsText(file);
@@ -788,7 +802,6 @@
         }
 
         function showNotification(message, type = 'info') {
-            // Simple notification system
             const notification = document.createElement('div');
             notification.style.cssText = `
                 position: fixed;
@@ -812,25 +825,9 @@
         }
 
         function openManualEntry() {
-            // Navigate to manual transaction entry
-            // For now, just show an alert
             alert('Manual transaction entry coming soon!');
-            // In a real app, this would open a modal or navigate to a form
         }
 
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', (e) => {
-            const nav = document.querySelector('.main-nav');
-            const menu = document.getElementById('mobileMenu');
-            
-            if (nav && menu && !nav.contains(e.target) && menu.classList.contains('open')) {
-                menu.classList.remove('open');
-                const icon = document.getElementById('menuIcon');
-                if (icon) icon.textContent = '☰';
-            }
-        });
-
-        // Initialize page
         console.log('CSV Upload page loaded successfully');
     </script>
 </body>
