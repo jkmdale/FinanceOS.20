@@ -6,59 +6,87 @@
     <style>
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #0f172a, #312e81);
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
+            background-attachment: fixed;
             color: white;
             min-height: 100vh;
         }
+        
+        /* Navigation */
         .navbar {
-            background: rgba(0,0,0,0.3);
-            padding: 20px;
             position: fixed;
             top: 0;
-            width: 100%;
-            box-sizing: border-box;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 20px 0;
         }
-        .nav-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        
+        .nav-container {
             max-width: 1200px;
             margin: 0 auto;
-        }
-        .logo {
             display: flex;
             align-items: center;
-            font-weight: bold;
-            font-size: 18px;
+            justify-content: space-between;
+            padding: 0 24px;
         }
+        
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            font-weight: 700;
+        }
+        
         .logo-icon {
             width: 48px;
             height: 48px;
-            background: linear-gradient(135deg, #10b981, #059669);
+            margin-right: 12px;
             border-radius: 12px;
+            background: linear-gradient(135deg, #10b981, #059669);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 12px;
             font-size: 24px;
+            font-weight: bold;
         }
+        
         .nav-links {
             display: flex;
-            gap: 30px;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
         }
+        
         .nav-links a {
-            color: rgba(255,255,255,0.7);
+            color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
             padding: 12px 20px;
             border-radius: 8px;
-            font-size: 16px;
+            transition: all 0.3s ease;
+            position: relative;
         }
+        
+        .nav-links a:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
         .nav-links a.active {
             color: #8b5cf6;
             background: rgba(139, 92, 246, 0.1);
-            position: relative;
         }
+        
         .nav-links a.active::after {
             content: '';
             position: absolute;
@@ -70,330 +98,639 @@
             background: #8b5cf6;
             border-radius: 50%;
         }
+        
         .nav-actions {
             display: flex;
-            gap: 15px;
+            align-items: center;
+            gap: 16px;
         }
-        .btn {
+        
+        .privacy-toggle, .logout-btn {
             padding: 8px 16px;
-            border: none;
             border-radius: 8px;
+            font-size: 0.875rem;
             cursor: pointer;
-            font-size: 14px;
+            transition: all 0.3s ease;
+            border: none;
         }
-        .btn-privacy {
-            background: rgba(255,255,255,0.1);
+        
+        .privacy-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
         }
-        .btn-logout {
+        
+        .privacy-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .logout-btn {
             background: linear-gradient(135deg, #ef4444, #dc2626);
             color: white;
         }
-        .main {
+        
+        .logout-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        /* Main Content */
+        .main-content {
             margin-top: 100px;
             padding: 24px;
             max-width: 1200px;
             margin-left: auto;
             margin-right: auto;
         }
-        .header {
+        
+        .page-header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 32px;
         }
-        .title {
+        
+        .page-title {
             font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 10px;
+            font-weight: 700;
+            margin-bottom: 8px;
             background: linear-gradient(135deg, #8b5cf6, #3b82f6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        .subtitle {
-            color: rgba(255,255,255,0.7);
-            font-size: 18px;
+        
+        .page-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.125rem;
         }
-        .goals {
+        
+        /* Goals Overview */
+        .goals-overview {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.15));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .overview-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .overview-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        /* Goals Grid */
+        .goals-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 24px;
+            margin-bottom: 32px;
         }
-        .goal {
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.15);
+        
+        .goal-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 20px;
             padding: 24px;
+            transition: all 0.3s ease;
         }
-        .goal.critical {
+        
+        .goal-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 48px rgba(139, 92, 246, 0.3);
+        }
+        
+        .goal-card.critical {
             border: 2px solid rgba(239, 68, 68, 0.5);
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
         }
+        
         .goal-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 15px;
+            align-items: flex-start;
+            margin-bottom: 16px;
         }
+        
         .goal-title {
-            font-size: 20px;
+            font-size: 1.25rem;
             font-weight: 600;
+            color: white;
+            margin-bottom: 4px;
         }
-        .priority {
-            font-size: 12px;
+        
+        .goal-priority {
+            font-size: 0.75rem;
+            font-weight: 600;
             padding: 4px 8px;
             border-radius: 6px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
+        
         .priority-critical {
             background: rgba(239, 68, 68, 0.2);
             color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
+        
         .priority-high {
             background: rgba(249, 115, 22, 0.2);
             color: #f97316;
+            border: 1px solid rgba(249, 115, 22, 0.3);
         }
+        
         .priority-medium {
             background: rgba(59, 130, 246, 0.2);
             color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
         }
-        .description {
-            color: rgba(255,255,255,0.7);
-            font-size: 14px;
-            line-height: 1.4;
+        
+        .goal-description {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.875rem;
             margin-bottom: 20px;
+            line-height: 1.4;
         }
-        .progress-info {
+        
+        .progress-header {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             margin-bottom: 8px;
         }
+        
         .progress-amounts {
-            font-family: monospace;
-            font-size: 14px;
-            color: rgba(255,255,255,0.7);
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
         }
-        .progress-percent {
+        
+        .progress-percentage {
             font-weight: 600;
-            font-size: 14px;
+            font-size: 0.875rem;
         }
+        
         .progress-bar {
             width: 100%;
             height: 8px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 4px;
             overflow: hidden;
             margin-bottom: 16px;
         }
+        
         .progress-fill {
             height: 100%;
             border-radius: 4px;
+            transition: width 0.5s ease;
         }
-        .progress-critical {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
+        
+        .progress-critical { 
+            background: linear-gradient(135deg, #ef4444, #dc2626); 
         }
-        .progress-good {
-            background: linear-gradient(135deg, #10b981, #059669);
+        .progress-high { 
+            background: linear-gradient(135deg, #ef4444, #dc2626); 
         }
-        .stats {
+        .progress-medium { 
+            background: linear-gradient(135deg, #3b82f6, #2563eb); 
+        }
+        .progress-good { 
+            background: linear-gradient(135deg, #10b981, #059669); 
+        }
+        
+        .goal-stats {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
             margin-bottom: 16px;
         }
-        .stat {
+        
+        .goal-stat {
             text-align: center;
             padding: 12px;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 8px;
         }
-        .stat-label {
-            font-size: 12px;
-            color: rgba(255,255,255,0.7);
+        
+        .goal-stat-label {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
             margin-bottom: 4px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        .stat-value {
-            font-size: 16px;
+        
+        .goal-stat-value {
+            font-size: 1rem;
             font-weight: 600;
-            font-family: monospace;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
         }
-        .actions {
+        
+        .goal-actions {
             display: flex;
             gap: 8px;
         }
-        .action-btn {
+        
+        .goal-action-btn {
             flex: 1;
             padding: 8px 16px;
             border: none;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 0.875rem;
+            font-weight: 500;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
+        
         .btn-primary {
             background: linear-gradient(135deg, #8b5cf6, #9333ea);
             color: white;
         }
-        .btn-secondary {
-            background: rgba(255,255,255,0.1);
-            color: white;
+        
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
         }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Add Goal Button */
+        .add-goal-section {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .add-goal-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .add-goal-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+        }
+        
+        /* Colors */
         .positive { color: #10b981; }
         .negative { color: #ef4444; }
         .neutral { color: white; }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .main-content {
+                padding: 16px;
+                margin-top: 88px;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .goals-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .overview-stats {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 12px;
+            }
+            
+            .goal-stats {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .nav-container {
+                padding: 0 16px;
+            }
+            
+            .logo-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+            
+            .page-title {
+                font-size: 1.75rem;
+            }
+            
+            .goal-card {
+                padding: 20px;
+            }
+            
+            .goal-actions {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Navigation -->
     <nav class="navbar">
-        <div class="nav-content">
-            <div class="logo">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
                 <div class="logo-icon">$</div>
-                FinanceOS
-            </div>
-            <div class="nav-links">
-                <a href="index.html">Dashboard</a>
-                <a href="budget.html">Budget</a>
-                <a href="goals.html" class="active">Goals</a>
-                <a href="csv-upload.html">Upload</a>
-            </div>
+                <span>FinanceOS</span>
+            </a>
+            
+            <ul class="nav-links">
+                <li><a href="index.html">Dashboard</a></li>
+                <li><a href="budget.html">Budget</a></li>
+                <li><a href="goals.html" class="active">Goals</a></li>
+                <li><a href="csv-upload.html">Upload</a></li>
+            </ul>
+            
             <div class="nav-actions">
-                <button class="btn btn-privacy">Privacy Mode</button>
-                <button class="btn btn-logout">Logout</button>
+                <button class="privacy-toggle" onclick="togglePrivacy()">Privacy Mode</button>
+                <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
         </div>
     </nav>
 
-    <main class="main">
-        <div class="header">
-            <h1 class="title">Financial Goals</h1>
-            <p class="subtitle">Track your progress toward financial freedom</p>
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Financial Goals</h1>
+            <p class="page-subtitle">Track your progress toward financial freedom</p>
         </div>
 
-        <div class="goals">
-            <div class="goal critical">
-                <div class="goal-header">
-                    <h3 class="goal-title">Emergency Fund</h3>
-                    <span class="priority priority-critical">Critical</span>
+        <!-- Goals Overview -->
+        <div class="goals-overview">
+            <h2 class="overview-title">Goals Progress Overview</h2>
+            <div class="overview-stats">
+                <div class="stat-item">
+                    <div class="stat-label">Total Goals</div>
+                    <div class="stat-value neutral">4</div>
                 </div>
-                <p class="description">
+                <div class="stat-item">
+                    <div class="stat-label">On Track</div>
+                    <div class="stat-value positive">2</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Behind</div>
+                    <div class="stat-value negative">2</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Total Saved</div>
+                    <div class="stat-value positive">$49,033</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Target Amount</div>
+                    <div class="stat-value neutral">$135,000</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Overall Progress</div>
+                    <div class="stat-value neutral">36.3%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Goals Grid -->
+        <div class="goals-grid">
+            <!-- Emergency Fund Goal - CRITICAL -->
+            <div class="goal-card critical">
+                <div class="goal-header">
+                    <div>
+                        <h3 class="goal-title">Emergency Fund</h3>
+                        <div class="goal-priority priority-critical">Critical</div>
+                    </div>
+                </div>
+                <p class="goal-description">
                     Build a safety net of 3-6 months expenses. Currently at extreme risk with only $0.17 saved.
                     Financial experts recommend $15,000 minimum for your family situation.
                 </p>
-                <div class="progress-info">
+                
+                <div class="progress-header">
                     <span class="progress-amounts">$0.17 / $15,000</span>
-                    <span class="progress-percent negative">0.001%</span>
+                    <span class="progress-percentage negative">0.001%</span>
                 </div>
                 <div class="progress-bar">
-                    <div class="progress-fill progress-critical" style="width: 0.1%"></div>
+                    <div class="progress-fill progress-critical" style="width: 0.001%"></div>
                 </div>
-                <div class="stats">
-                    <div class="stat">
-                        <div class="stat-label">Monthly Target</div>
-                        <div class="stat-value negative">$0</div>
+
+                <div class="goal-stats">
+                    <div class="goal-stat">
+                        <div class="goal-stat-label">Monthly Target</div>
+                        <div class="goal-stat-value negative">$0</div>
                     </div>
-                    <div class="stat">
-                        <div class="stat-label">Time Left</div>
-                        <div class="stat-value negative">Indefinite</div>
+                    <div class="goal-stat">
+                        <div class="goal-stat-label">Time Left</div>
+                        <div class="goal-stat-value negative">Indefinite</div>
                     </div>
                 </div>
-                <div class="actions">
-                    <button class="action-btn btn-primary">Start Saving</button>
-                    <button class="action-btn btn-secondary">Edit Goal</button>
+
+                <div class="goal-actions">
+                    <button class="goal-action-btn btn-primary">Start Saving</button>
+                    <button class="goal-action-btn btn-secondary">Edit Goal</button>
                 </div>
             </div>
 
-            <div class="goal">
+            <!-- Debt Payoff Goal -->
+            <div class="goal-card">
                 <div class="goal-header">
-                    <h3 class="goal-title">Pay Off Visa Debt</h3>
-                    <span class="priority priority-high">High</span>
+                    <div>
+                        <h3 class="goal-title">Pay Off Visa Debt</h3>
+                        <div class="goal-priority priority-high">High</div>
+                    </div>
                 </div>
-                <p class="description">
+                <p class="goal-description">
                     Eliminate the Low Rate Visa debt to free up monthly cash flow and reduce interest payments.
                     Current balance is costing approximately $135/month in interest.
                 </p>
-                <div class="progress-info">
+                
+                <div class="progress-header">
                     <span class="progress-amounts">$0 / $3,251</span>
-                    <span class="progress-percent negative">0%</span>
+                    <span class="progress-percentage negative">0%</span>
                 </div>
                 <div class="progress-bar">
-                    <div class="progress-fill progress-critical" style="width: 0%"></div>
+                    <div class="progress-fill progress-high" style="width: 0%"></div>
                 </div>
-                <div class="stats">
-                    <div class="stat">
-                        <div class="stat-label">Monthly Payment</div>
-                        <div class="stat-value neutral">$100</div>
+
+                <div class="goal-stats">
+                    <div class="goal-stat">
+                        <div class="goal-stat-label">Monthly Payment</div>
+                        <div class="goal-stat-value neutral">$100</div>
                     </div>
-                    <div class="stat">
-                        <div class="stat-label">Payoff Date</div>
-                        <div class="stat-value neutral">Dec 2027</div>
+                    <div class="goal-stat">
+                        <div class="goal-stat-label">Payoff Date</div>
+                        <div class="goal-stat-value neutral">Dec 2027</div>
                     </div>
                 </div>
-                <div class="actions">
-                    <button class="action-btn btn-primary">Optimize Payment</button>
-                    <button class="action-btn btn-secondary">Edit Goal</button>
+
+                <div class="goal-actions">
+                    <button class="goal-action-btn btn-primary">Optimize Payment</button>
+                    <button class="goal-action-btn btn-secondary">Edit Goal</button>
                 </div>
             </div>
 
-            <div class="goal">
+            <!-- KiwiSaver Growth Goal -->
+            <div class="goal-card">
                 <div class="goal-header">
-                    <h3 class="goal-title">KiwiSaver Growth</h3>
-                    <span class="priority priority-medium">Medium</span>
+                    <div>
+                        <h3 class="goal-title">KiwiSaver Growth</h3>
+                        <div class="goal-priority priority-medium">Medium</div>
+                    </div>
                 </div>
-                <p class="description">
+                <p class="goal-description">
                     Grow retirement savings from current $48,733 to $100,000 by maximizing contributions and 
                     investment returns over the next 5 years.
                 </p>
-                <div class="progress-info">
+                
+                <div class="progress-header">
                     <span class="progress-amounts">$48,733 / $100,000</span>
-                    <span class="progress-percent positive">48.7%</span>
+                    <span class="progress-percentage positive">48.7%</span>
                 </div>
                 <div class="progress-bar">
                     <div class="progress-fill progress-good" style="width: 48.7%"></div>
                 </div>
-                <div class="stats">
-                    <div class="stat">
-                        <div class="stat-label">Monthly Contribution</div>
-                        <div class="stat-value positive">$271</div>
+
+                <div class="goal-stats">
+                    <div class="goal-stat">
+                        <div class="goal-stat-label">Monthly Contribution</div>
+                        <div class="goal-stat-value positive">$271</div>
                     </div>
-                    <div class="stat">
-                        <div class="stat-label">Target Date</div>
-                        <div class="stat-value neutral">Dec 2029</div>
+                    <div class="goal-stat">
+                        <div class="goal-stat-label">Target Date</div>
+                        <div class="goal-stat-value neutral">Dec 2029</div>
                     </div>
                 </div>
-                <div class="actions">
-                    <button class="action-btn btn-primary">Review Strategy</button>
-                    <button class="action-btn btn-secondary">Edit Goal</button>
+
+                <div class="goal-actions">
+                    <button class="goal-action-btn btn-primary">Review Strategy</button>
+                    <button class="goal-action-btn btn-secondary">Edit Goal</button>
                 </div>
             </div>
 
-            <div class="goal">
+            <!-- Private School Fund -->
+            <div class="goal-card">
                 <div class="goal-header">
-                    <h3 class="goal-title">Private School Fund</h3>
-                    <span class="priority priority-medium">Medium</span>
+                    <div>
+                        <h3 class="goal-title">Private School Fund</h3>
+                        <div class="goal-priority priority-medium">Medium</div>
+                    </div>
                 </div>
-                <p class="description">
+                <p class="goal-description">
                     Save for private school education costs. Currently contributing $300/month toward 
                     this long-term education investment for your children.
                 </p>
-                <div class="progress-info">
+                
+                <div class="progress-header">
                     <span class="progress-amounts">$300 / $17,000</span>
-                    <span class="progress-percent neutral">1.8%</span>
+                    <span class="progress-percentage neutral">1.8%</span>
                 </div>
                 <div class="progress-bar">
-                    <div class="progress-fill progress-good" style="width: 1.8%"></div>
+                    <div class="progress-fill progress-medium" style="width: 1.8%"></div>
                 </div>
-                <div class="stats">
-                    <div class="stat">
-                        <div class="stat-label">Monthly Savings</div>
-                        <div class="stat-value positive">$300</div>
+
+                <div class="goal-stats">
+                    <div class="goal-stat">
+                        <div class="goal-stat-label">Monthly Savings</div>
+                        <div class="goal-stat-value positive">$300</div>
                     </div>
-                    <div class="stat">
-                        <div class="stat-label">Target Date</div>
-                        <div class="stat-value neutral">Jan 2030</div>
+                    <div class="goal-stat">
+                        <div class="goal-stat-label">Target Date</div>
+                        <div class="goal-stat-value neutral">Jan 2030</div>
                     </div>
                 </div>
-                <div class="actions">
-                    <button class="action-btn btn-primary">Adjust Amount</button>
-                    <button class="action-btn btn-secondary">Edit Goal</button>
+
+                <div class="goal-actions">
+                    <button class="goal-action-btn btn-primary">Adjust Amount</button>
+                    <button class="goal-action-btn btn-secondary">Edit Goal</button>
                 </div>
             </div>
         </div>
+
+        <!-- Add New Goal -->
+        <div class="add-goal-section">
+            <button class="add-goal-btn">
+                <span>+</span>
+                Add New Goal
+            </button>
+        </div>
     </main>
+
+    <script>
+        // Privacy mode functionality
+        let privacyMode = false;
+
+        function togglePrivacy() {
+            privacyMode = !privacyMode;
+            const body = document.body;
+            const button = document.querySelector('.privacy-toggle');
+            
+            if (privacyMode) {
+                body.classList.add('privacy-mode');
+                button.textContent = 'Show Values';
+            } else {
+                body.classList.remove('privacy-mode');
+                button.textContent = 'Privacy Mode';
+            }
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
 </body>
 </html>
