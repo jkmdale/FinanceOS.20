@@ -626,7 +626,7 @@
                 Drag and drop your bank statement files, or click the button below to browse your computer.
                 Multiple files can be uploaded at once.
             </p>
-            <button class="upload-button" onclick="document.getElementById('fileInput').click()">
+            <button class="upload-button" onclick="event.stopPropagation(); document.getElementById('fileInput').click();">
                 Choose Files
             </button>
             <input type="file" id="fileInput" class="file-input" multiple accept=".csv,.xls,.xlsx,.qif,.ofx">
@@ -699,32 +699,84 @@
         const filePreview = document.getElementById('filePreview');
         const fileList = document.getElementById('fileList');
 
-        uploadZone.addEventListener('click', () => {
-            fileInput.click();
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadZone.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
         });
 
-        uploadZone.addEventListener('dragover', (e) => {
+        function preventDefaults(e) {
             e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // Highlight drop area when item is dragged over it
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadZone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
             uploadZone.style.borderColor = '#8b5cf6';
-        });
+            uploadZone.style.background = 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.15))';
+        }
 
-        uploadZone.addEventListener('dragleave', () => {
+        function unhighlight(e) {
             uploadZone.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+            uploadZone.style.background = 'rgba(255, 255, 255, 0.08)';
+        }
+
+        // Handle dropped files
+        uploadZone.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        // Handle click to browse
+        uploadZone.addEventListener('click', (e) => {
+            // Only trigger if clicking the zone itself, not buttons inside it
+            if (e.target === uploadZone || e.target.closest('.upload-zone') === uploadZone) {
+                fileInput.click();
+            }
         });
 
-        uploadZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadZone.style.borderColor = 'rgba(255, 255, 255, 0.15)';
-            handleFiles(e.dataTransfer.files);
-        });
-
+        // Handle file input change
         fileInput.addEventListener('change', (e) => {
-            handleFiles(e.target.files);
+            console.log('Files selected:', e.target.files.length);
+            if (e.target.files.length > 0) {
+                handleFiles(e.target.files);
+            }
         });
 
         function handleFiles(files) {
+            console.log('handleFiles called with:', files.length, 'files');
+            
+            if (!files || files.length === 0) {
+                console.log('No files to handle');
+                return;
+            }
+            
             selectedFiles = Array.from(files);
+            console.log('Selected files:', selectedFiles.map(f => f.name));
+            
             displayFilePreview();
+            
+            // Show a notification that files were selected
+            const uploadZone = document.getElementById('uploadZone');
+            const originalTitle = uploadZone.querySelector('.upload-title').textContent;
+            uploadZone.querySelector('.upload-title').textContent = `${files.length} file(s) selected!`;
+            uploadZone.style.borderColor = '#10b981';
+            
+            setTimeout(() => {
+                uploadZone.querySelector('.upload-title').textContent = originalTitle;
+                uploadZone.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+            }, 2000);
         }
 
         function displayFilePreview() {
