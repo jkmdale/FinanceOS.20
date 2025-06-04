@@ -2,24 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSV Upload - FinanceOS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Upload - FinanceOS</title>
     <meta name="theme-color" content="#8b5cf6">
     <link rel="manifest" href="manifest.json">
-    
     <style>
-        :root {
-            --primary-purple: #8b5cf6;
-            --secondary-blue: #3b82f6;
-            --success-green: #10b981;
-            --error-red: #ef4444;
-            --warning-orange: #f97316;
-            --glass-bg: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --text-primary: rgba(255, 255, 255, 0.9);
-            --text-secondary: rgba(255, 255, 255, 0.7);
-        }
-
+        /* Reset and Base Styles */
         * {
             margin: 0;
             padding: 0;
@@ -29,11 +17,31 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
+            background-attachment: fixed;
+            color: white;
             min-height: 100vh;
-            color: var(--text-primary);
             overflow-x: hidden;
         }
 
+        /* CSS Variables for Design System */
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-premium-bg: linear-gradient(135deg, 
+                rgba(139, 92, 246, 0.15) 0%, 
+                rgba(59, 130, 246, 0.15) 50%, 
+                rgba(147, 51, 234, 0.15) 100%);
+            --glass-premium-border: rgba(255, 255, 255, 0.2);
+            --gradient-purple: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
+            --gradient-blue: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+            --gradient-green: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+            --gradient-red: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+            --text-white: rgba(255, 255, 255, 0.9);
+            --text-gray: rgba(255, 255, 255, 0.7);
+            --text-light: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Glass Effects */
         .glass {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
@@ -42,793 +50,148 @@
         }
 
         .glass-premium {
-            background: linear-gradient(135deg, 
-                rgba(139, 92, 246, 0.15) 0%, 
-                rgba(59, 130, 246, 0.15) 50%, 
-                rgba(147, 51, 234, 0.15) 100%);
+            background: var(--glass-premium-bg);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--glass-premium-border);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
 
-        /* UNIFIED NAVIGATION - BIGGER SIZE */
-        .main-nav {
-            background: linear-gradient(135deg, 
-                rgba(139, 92, 246, 0.15) 0%, 
-                rgba(59, 130, 246, 0.15) 50%, 
-                rgba(147, 51, 234, 0.15) 100%);
+        /* Navigation Bar - BIGGER UNIFIED STYLE */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: var(--glass-bg);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 20px 24px; /* Increased from 12px 20px */
-            margin-bottom: 24px; /* Increased from 20px */
+            border-bottom: 1px solid var(--glass-border);
+            padding: 20px 0;
+            transition: all 0.3s ease;
         }
 
         .nav-container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 24px; /* Increased from 20px */
+            padding: 0 24px;
         }
 
         .nav-logo {
             display: flex;
             align-items: center;
-            gap: 16px; /* Increased from 12px */
             text-decoration: none;
-            color: var(--text-primary);
-            transition: all 0.2s ease;
-        }
-
-        .nav-logo:hover {
-            transform: translateX(-2px);
+            color: white;
+            font-weight: 700;
         }
 
         .logo-icon {
-            width: 48px; /* Increased from 32px */
-            height: 48px; /* Increased from 32px */
-            background: linear-gradient(135deg, #10b981, #059669);
-            border-radius: 12px; /* Increased from 8px */
+            width: 48px;
+            height: 48px;
+            margin-right: 12px;
+            border-radius: 12px;
+            background: var(--gradient-green);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px; /* Increased from 18px */
+            font-size: 24px;
             font-weight: bold;
-            color: white;
-            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3); /* Bigger shadow */
-        }
-
-        .logo-text {
-            font-size: 1.75rem; /* Increased from 1.25rem */
-            font-weight: 700;
         }
 
         .nav-links {
             display: flex;
-            gap: 12px; /* Increased from 8px */
             align-items: center;
+            gap: 32px;
+            list-style: none;
         }
 
-        .nav-link {
-            padding: 12px 20px; /* Increased from 8px 16px */
-            border-radius: 12px; /* Increased from 8px */
+        .nav-links a {
+            color: var(--text-gray);
             text-decoration: none;
-            color: var(--text-secondary);
-            font-size: 1rem; /* Increased from 0.9rem */
             font-weight: 500;
-            transition: all 0.2s ease;
-            white-space: nowrap;
+            font-size: 1rem;
+            padding: 12px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
             position: relative;
         }
 
-        .nav-link:hover {
-            color: var(--text-primary);
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px); /* Increased from -1px */
-        }
-
-        .nav-link.active {
+        .nav-links a:hover {
             color: white;
-            background: rgba(139, 92, 246, 0.3);
-            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.2); /* Bigger shadow */
+            background: rgba(255, 255, 255, 0.1);
         }
 
-        .nav-link.active::after {
+        .nav-links a.active {
+            color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .nav-links a.active::after {
             content: '';
             position: absolute;
-            bottom: 4px; /* Increased from 2px */
+            bottom: -8px;
             left: 50%;
             transform: translateX(-50%);
-            width: 6px; /* Increased from 4px */
-            height: 6px; /* Increased from 4px */
+            width: 6px;
+            height: 6px;
             background: #8b5cf6;
             border-radius: 50%;
         }
 
         .nav-actions {
             display: flex;
-            gap: 12px; /* Increased from 8px */
             align-items: center;
-        }
-
-        .privacy-toggle, .logout-button {
-            padding: 10px 16px; /* Increased from 6px 12px */
-            border-radius: 8px; /* Increased from 6px */
-            border: none;
-            font-size: 0.9rem; /* Increased from 0.8rem */
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            gap: 16px;
         }
 
         .privacy-toggle {
-            background: rgba(249, 115, 22, 0.2);
-            color: #f97316;
-            border: 1px solid rgba(249, 115, 22, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
         .privacy-toggle:hover {
-            background: rgba(249, 115, 22, 0.3);
-            transform: translateY(-2px); /* Increased from -1px */
+            background: rgba(255, 255, 255, 0.2);
         }
 
-        .logout-button {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
+        .logout-btn {
+            background: var(--gradient-red);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .logout-button:hover {
-            background: rgba(239, 68, 68, 0.3);
-            transform: translateY(-2px); /* Increased from -1px */
+        .logout-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
         }
 
-        .nav-mobile-toggle {
+        /* Mobile Menu */
+        .mobile-menu-btn {
             display: none;
             background: none;
             border: none;
-            color: var(--text-primary);
-            font-size: 2rem; /* Increased from 1.5rem */
-            cursor: pointer;
-            padding: 8px; /* Increased from 4px */
-            border-radius: 8px; /* Increased from 4px */
-            transition: all 0.2s ease;
-        }
-
-        .nav-mobile-toggle:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .nav-mobile-menu {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 24px; /* Increased from 20px */
-            z-index: 1000;
-        }
-
-        .nav-mobile-menu.open {
-            display: block;
-        }
-
-        .nav-mobile-links {
-            display: flex;
-            flex-direction: column;
-            gap: 16px; /* Increased from 12px */
-            margin-bottom: 20px; /* Increased from 16px */
-        }
-
-        .nav-mobile-actions {
-            display: flex;
-            gap: 16px; /* Increased from 12px */
-            padding-top: 16px; /* Increased from 12px */
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Main Content Styles */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .header p {
-            font-size: 1.1rem;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .upload-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .upload-card {
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-
-        .upload-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .upload-icon {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            display: block;
-        }
-
-        .upload-card h3 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .upload-card p {
-            color: var(--text-secondary);
-            margin-bottom: 24px;
-            line-height: 1.6;
-        }
-
-        .drop-zone {
-            border: 2px dashed rgba(139, 92, 246, 0.4);
-            border-radius: 16px;
-            padding: 40px 20px;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            min-height: 200px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .drop-zone:hover,
-        .drop-zone.drag-over {
-            border-color: var(--primary-purple);
-            background: rgba(139, 92, 246, 0.1);
-            transform: scale(1.02);
-        }
-
-        .drop-zone input[type="file"] {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .drop-zone-content {
-            pointer-events: none;
-        }
-
-        .drop-zone-icon {
-            font-size: 3rem;
-            color: var(--primary-purple);
-            margin-bottom: 16px;
-        }
-
-        .drop-zone h4 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .drop-zone p {
-            color: var(--text-secondary);
-            margin-bottom: 16px;
-        }
-
-        .file-formats {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .format-tag {
-            background: rgba(139, 92, 246, 0.2);
-            color: var(--primary-purple);
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .upload-btn {
-            background: linear-gradient(135deg, #8b5cf6, #9333ea);
             color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
+            font-size: 1.5rem;
             cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            padding: 8px;
         }
 
-        .upload-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
-        }
-
-        .upload-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .bank-support {
-            margin-top: 40px;
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-        }
-
-        .bank-logos {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 20px;
-            margin-top: 24px;
-        }
-
-        .bank-logo {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 16px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.2s ease;
-        }
-
-        .bank-logo:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .progress-section {
-            margin-top: 30px;
-            display: none;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 16px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        .file-list {
-            margin-top: 20px;
-        }
-
-        .file-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .file-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .file-status {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .status-processing {
-            background: rgba(249, 115, 22, 0.2);
-            color: #f97316;
-        }
-
-        .status-success {
-            background: rgba(16, 185, 129, 0.2);
-            color: #10b981;
-        }
-
-        .status-error {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-        }
-
-        @media (max-width: 768px) {
-            .nav-links, .nav-actions {
-                display: none;
-            }
-            
-            .nav-mobile-toggle {
-                display: block;
-            }
-
-            .upload-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .header h1 {
-                font-size: 2rem;
-            }
-
-            .bank-logos {
-                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-                gap: 12px;
-            }
-
-            .logo-text {
-                font-size: 1.5rem; /* Smaller on mobile */
-            }
-
-            .logo-icon {
-                width: 40px; /* Smaller on mobile */
-                height: 40px;
-                font-size: 20px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <!-- UNIFIED NAVIGATION - BIGGER SIZE -->
-    <nav class="main-nav">
-        <div class="nav-container">
-            <a href="index.html" class="nav-logo">
-                <div class="logo-icon">$</div>
-                <span class="logo-text">FinanceOS</span>
-            </a>
-
-            <div class="nav-links">
-                <a href="index.html" class="nav-link">🏠 Dashboard</a>
-                <a href="budget.html" class="nav-link">📊 Budget</a>
-                <a href="goals.html" class="nav-link">🎯 Goals</a>
-                <a href="csv-upload.html" class="nav-link active">📤 Upload</a>
-            </div>
-
-            <div class="nav-actions">
-                <button class="privacy-toggle" id="privacyToggle">🔒 Privacy</button>
-                <button class="logout-button" onclick="logout()">📱 Logout</button>
-            </div>
-
-            <button class="nav-mobile-toggle" onclick="toggleMobileMenu()">
-                <span id="menuIcon">☰</span>
-            </button>
-        </div>
-
-        <div class="nav-mobile-menu" id="mobileMenu">
-            <div class="nav-mobile-links">
-                <a href="index.html" class="nav-link">🏠 Dashboard</a>
-                <a href="budget.html" class="nav-link">📊 Budget</a>
-                <a href="goals.html" class="nav-link">🎯 Goals</a>
-                <a href="csv-upload.html" class="nav-link active">📤 Upload</a>
-            </div>
-            <div class="nav-mobile-actions">
-                <button class="privacy-toggle" onclick="togglePrivacy()">🔒 Privacy</button>
-                <button class="logout-button" onclick="logout()">📱 Logout</button>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="container">
-        <div class="header">
-            <h1>📤 Upload Bank Statements</h1>
-            <p>Import your CSV/Excel bank statements to automatically categorize transactions and update your budget</p>
-        </div>
-
-        <!-- Upload Grid -->
-        <div class="upload-grid">
-            <!-- Quick Upload -->
-            <div class="upload-card glass-premium">
-                <span class="upload-icon">⚡</span>
-                <h3>Quick Upload</h3>
-                <p>Drag and drop your bank statement files or click to browse. Supports CSV, Excel, and other formats.</p>
-                
-                <div class="drop-zone" id="dropZone">
-                    <input type="file" id="fileInput" multiple accept=".csv,.xlsx,.xls,.qif,.ofx">
-                    <div class="drop-zone-content">
-                        <div class="drop-zone-icon">📁</div>
-                        <h4>Drop files here or click to browse</h4>
-                        <p>Select your bank statement files</p>
-                        <div class="file-formats">
-                            <span class="format-tag">CSV</span>
-                            <span class="format-tag">Excel</span>
-                            <span class="format-tag">QIF</span>
-                            <span class="format-tag">OFX</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="progress-section" id="progressSection">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill"></div>
-                    </div>
-                    <p id="progressText">Processing files...</p>
-                </div>
-            </div>
-
-            <!-- Manual Entry -->
-            <div class="upload-card glass">
-                <span class="upload-icon">✏️</span>
-                <h3>Manual Entry</h3>
-                <p>Add individual transactions manually if you prefer hands-on control or don't have CSV files.</p>
-                <button class="upload-btn" onclick="openManualEntry()">
-                    <span>➕</span> Add Transaction
-                </button>
-            </div>
-        </div>
-
-        <!-- File List -->
-        <div class="file-list" id="fileList"></div>
-
-        <!-- Bank Support -->
-        <div class="bank-support glass">
-            <h3>🏦 Supported NZ Banks</h3>
-            <p>FinanceOS automatically detects and processes statements from all major New Zealand banks</p>
-            
-            <div class="bank-logos">
-                <div class="bank-logo">
-                    <strong>ANZ</strong><br>
-                    <small>Auto-detected</small>
-                </div>
-                <div class="bank-logo">
-                    <strong>ASB</strong><br>
-                    <small>Auto-detected</small>
-                </div>
-                <div class="bank-logo">
-                    <strong>BNZ</strong><br>
-                    <small>Auto-detected</small>
-                </div>
-                <div class="bank-logo">
-                    <strong>Kiwibank</strong><br>
-                    <small>Auto-detected</small>
-                </div>
-                <div class="bank-logo">
-                    <strong>Westpac</strong><br>
-                    <small>Auto-detected</small>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // UNIFIED NAVIGATION JAVASCRIPT - Same on every page
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobileMenu');
-            const icon = document.getElementById('menuIcon');
-            
-            if (menu && icon) {
-                menu.classList.toggle('open');
-                icon.textContent = menu.classList.contains('open') ? '✕' : '☰';
-            }
-        }
-
-        function logout() {
-            if (confirm('Are you sure you want to logout?')) {
-                localStorage.clear();
-                sessionStorage.clear();
-                window.location.href = 'index.html';
-            }
-        }
-
-        function togglePrivacy() {
-            const button = document.getElementById('privacyToggle');
-            const isPrivate = button.textContent.includes('🔒');
-            
-            if (isPrivate) {
-                button.innerHTML = '🔓 Show Data';
-                document.querySelectorAll('.amount, .balance').forEach(el => {
-                    el.style.filter = 'blur(8px)';
-                });
-            } else {
-                button.innerHTML = '🔒 Privacy';
-                document.querySelectorAll('.amount, .balance').forEach(el => {
-                    el.style.filter = 'none';
-                });
-            }
-        }
-
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', (e) => {
-            const nav = document.querySelector('.main-nav');
-            const menu = document.getElementById('mobileMenu');
-            
-            if (nav && menu && !nav.contains(e.target) && menu.classList.contains('open')) {
-                menu.classList.remove('open');
-                const icon = document.getElementById('menuIcon');
-                if (icon) icon.textContent = '☰';
-            }
-        });
-
-        // File Upload Functions
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
-        const progressSection = document.getElementById('progressSection');
-        const progressFill = document.getElementById('progressFill');
-        const progressText = document.getElementById('progressText');
-        const fileList = document.getElementById('fileList');
-
-        // Drag and drop handlers
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('drag-over');
-        });
-
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('drag-over');
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('drag-over');
-            
-            const files = Array.from(e.dataTransfer.files);
-            handleFiles(files);
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            const files = Array.from(e.target.files);
-            handleFiles(files);
-        });
-
-        function handleFiles(files) {
-            if (files.length === 0) return;
-
-            progressSection.style.display = 'block';
-            progressFill.style.width = '0%';
-            progressText.textContent = 'Processing files...';
-
-            fileList.innerHTML = '';
-
-            files.forEach((file, index) => {
-                processFile(file, index, files.length);
-            });
-        }
-
-        function processFile(file, index, totalFiles) {
-            const fileItem = document.createElement('div');
-            fileItem.className = 'file-item';
-            fileItem.innerHTML = `
-                <div class="file-info">
-                    <span>📄</span>
-                    <div>
-                        <strong>${file.name}</strong><br>
-                        <small>${formatFileSize(file.size)} • ${file.type || 'Unknown type'}</small>
-                    </div>
-                </div>
-                <div class="file-status status-processing">Processing...</div>
-            `;
-            fileList.appendChild(fileItem);
-
-            setTimeout(() => {
-                const statusEl = fileItem.querySelector('.file-status');
-                
-                if (isValidFile(file)) {
-                    statusEl.className = 'file-status status-success';
-                    statusEl.textContent = 'Success';
-                    readFileContent(file);
-                } else {
-                    statusEl.className = 'file-status status-error';
-                    statusEl.textContent = 'Invalid Format';
-                }
-
-                const progress = ((index + 1) / totalFiles) * 100;
-                progressFill.style.width = progress + '%';
-                
-                if (index === totalFiles - 1) {
-                    progressText.textContent = 'Processing complete!';
-                    setTimeout(() => {
-                        progressSection.style.display = 'none';
-                    }, 2000);
-                }
-            }, 1000 + (index * 500));
-        }
-
-        function readFileContent(file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const content = e.target.result;
-                console.log('File content:', content.substring(0, 200) + '...');
-                showNotification(`${file.name} processed successfully!`, 'success');
-            };
-            reader.readAsText(file);
-        }
-
-        function isValidFile(file) {
-            const validTypes = [
-                'text/csv',
-                'application/vnd.ms-excel',
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'application/x-qif'
-            ];
-            
-            const validExtensions = ['.csv', '.xlsx', '.xls', '.qif', '.ofx'];
-            const hasValidExtension = validExtensions.some(ext => 
-                file.name.toLowerCase().endsWith(ext)
-            );
-            
-            return validTypes.includes(file.type) || hasValidExtension;
-        }
-
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 12px 20px;
-                border-radius: 8px;
-                color: white;
-                font-weight: 500;
-                z-index: 10000;
-                animation: slideIn 0.3s ease;
-                background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
-            `;
-            notification.textContent = message;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
-
-        function openManualEntry() {
-            alert('Manual transaction entry coming soon!');
-        }
-
-        console.log('CSV Upload page loaded successfully');
-    </script>
-</body>
-</html>
+        /* Main Content */
+        .main-content {
+            margin-top: 100px;
+            padding: 24px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto
