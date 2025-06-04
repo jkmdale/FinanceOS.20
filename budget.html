@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Budget - FinanceOS</title>
+    <link rel="stylesheet" href="styles.css">
+    <meta name="theme-color" content="#8b5cf6">
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FinanceOS">
+    
+    <!-- Icons -->
+    <link rel="icon" href="icons/icon-192x192.png">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+</head>
+<body>
+    <div class="min-h-screen app-background">
+        <!-- Header -->
+        <div class="sticky top-0 z-40 backdrop-blur-md bg-slate-900/80 border-b border-white/10">
+            <div class="container mx-auto px-4 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <button onclick="window.history.back()" class="glass rounded-lg p-2 hover:bg-white/20 transition-colors">
+                            <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                        </button>
+                        <div>
+                            <h1 class="text-2xl font-bold text-white">Smart Budget</h1>
+                            <p class="text-gray-300">Track and optimize your spending</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-4">
+                        <button id="privacyToggle" class="glass rounded-lg p-2 hover:bg-white/20 transition-colors">
+                            <svg id="eyeIcon" class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                        </button>
+                        
+                        <button onclick="showAddExpense()" class="gradient-purple rounded-lg px-4 py-2 text-white font-semibold hover:opacity-90 transition-opacity flex items-center gap-2">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            Add Expense
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <div class="flex space-x-1 mt-4" id="navTabs">
+                    <button onclick="showTab('overview')" class="nav-tab active flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        Overview
+                    </button>
+                    <button onclick="showTab('categories')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path>
+                        </svg>
+                        Categories
+                    </button>
+                    <button onclick="showTab('trends')" class="nav-tab flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                        Trends
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="container mx-auto px-4 py-6">
+            <!-- Overview Tab -->
+            <div id="overviewTab" class="tab-content space-y-6">
+                <!-- Critical Alert Banner -->
+                <div class="glass rounded-2xl p-6 border-2 border-red-400/30 bg-gradient-to-r from-red-500/20 to-red-600/20 animate-pulse">
+                    <div class="flex items-center gap-3 mb-4">
+                        <svg class="h-8 w-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.864-.833-2.634 0L5.232 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                        <div>
+                            <h3 class="text-xl font-bold text-red-400">🚨 Budget Deficit Crisis</h3>
+                            <p class="text-red-300">You're spending <span class="currency-amount">$3,607</span> more than you earn monthly</p>
+                        </div>
+                    </div>
+                    <button onclick="showAICoach()" class="gradient-red rounded-lg px-6 py-3 text-white font-semibold hover:opacity-90 transition-opacity flex items-center gap-2">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        Get AI Coaching to Fix This Crisis
+                    </button>
+                </div>
+
+                <!-- Budget Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass-premium rounded-2xl p-6 hover:scale-105 transition-transform">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-white">Monthly Income</h3>
+                            <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-bold text-green-400 currency-amount">$6,304</div>
+                        <p class="text-sm text-gray-300 mt-1">Pathway Engineer (after tax)</p>
+                        <div class="mt-3 flex items-center text-green-400 text-sm">
+                            <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
+                            </svg>
+                            Stable monthly income
+                        </div>
+                    </div>
+
+                    <div class="glass-premium rounded-2xl p-6 hover:scale-105 transition-transform">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-white">Total Expenses</h3>
+                            <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center">
+                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-bold text-red-400 currency-amount">$9,911</div>
+                        <p class="text-sm text-gray-300 mt-1">
+                            <span class="currency-amount">$327</span> over budget
+                        </p>
+                        <div class="mt-3 flex items-center text-red-400 text-sm">
+                            <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
+                            </svg>
+                            3.4% over budget
+                        </div>
+                    </div>
+
+                    <div class="glass-premium rounded-2xl p-6 hover:scale-105 transition-transform">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-white">Net Position</h3>
+                            <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center">
+                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="text-3xl font-bold text-red-400">
+                            -<span class="currency-amount">$3,607</span>
+                        </div>
+                        <p class="text-sm text-gray-300 mt-1">157.2% of income spent</p>
+                        <div class="mt-3 flex items-center text-red-400 text-sm">
+                            <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path>
+                            </svg>
+                            Deficit spending
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category Performance Grid -->
+                <div class="glass-premium rounded-2xl p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="text-xl font-semibold text-white">Category Performance</h3>
+                            <p class="text-gray-300">Click any category to see detailed breakdown</p>
+                        </div>
+                        <button onclick="showTab('categories')" class="text-purple-400 hover:text-purple-300 text-sm font-medium flex items-center gap-1">
+                            View All Details 
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="categoryGrid">
+                        <!-- Categories will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button onclick="showAddExpense()" class="glass-premium rounded-2xl p-6 hover:bg-white/10 transition-all group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                            </div>
+                            <div class="text-left">
+                                <h3 class="font-semibold text-white group-hover:text-purple-400 transition-colors">Add New Budget Item</h3>
+                                <p class="text-sm text-gray-300">Create a new expense category</p>
+                            </div>
+                        </div>
+                    </button>
+
+                    <button onclick="showAICoach()" class="glass-premium rounded-2xl p-6 hover:bg-white/10 transition-all group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                            </div>
+                            <div class="text-left">
+                                <h3 class="font-semibold text-white group-hover:text-emerald-400 transition-colors">AI Budget Optimization</h3>
+                                <p class="text-sm text-gray-300">Get personalized advice</p>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Categories Tab -->
+            <div id="categoriesTab" class="tab-content space-y-6" style="display: none;">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Budget Categories</h2>
+                        <p class="text-gray-300">Detailed breakdown of all spending categories</p>
+                    </div>
+                    <button onclick="showAddExpense()" class="gradient-purple rounded-lg px-4 py-2 text-white font-semibold hover:opacity-90 transition-opacity flex items-center gap-2">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Add Category
+                    </button>
+                </div>
+
+                <div id="categoryDetails">
+                    <!-- Category details will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Trends Tab -->
+            <div id="trendsTab" class="tab-content" style="display: none;">
+                <div class="glass-premium rounded-2xl p-8 text-center">
+                    <svg class="h-16 w-16 text-purple-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                    <h3 class="text-xl font-semibold text-white mb-2">Trends Analysis</h3>
+                    <p class="text-gray-300">Coming soon - Historical spending patterns and forecasting</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Coach Modal -->
+        <div id="aiCoachModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;">
+            <div class="glass-premium rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 gradient-purple rounded-xl flex items-center justify-center">
+                            <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">AI Budget Coach</h3>
+                            <p class="text-gray-300">Let's fix your budget deficit</p>
+                        </div>
+                    </div>
+                    <button onclick="hideAICoach()" class="text-gray-400 hover:text-white text-xl">✕</button>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="glass rounded-lg p-4 border-l-4 border-red-400">
+                        <h4 class="font-semibold text-red-400 mb-2">🚨 Critical Issue Identified</h4>
+                        <p class="text-white">You're spending $3,607 more than you earn each month. This is unsustainable and needs immediate action.</p>
+                    </div>
+
+                    <div class="glass rounded-lg p-4 border-l-4 border-yellow-400">
+                        <h4 class="font-semibold text-yellow-400 mb-2">📊 Key Problem Areas</h4>
+                        <ul class="text-white space-y-1">
+                            <li>• Food: $163 over budget (dining out $90 over)</li>
+                            <li>• Discretionary: $123 over budget (shopping $95 over)</li>
+                            <li>• Transportation: $31 over budget</li>
+                            <li>• Emergency Fund: Critical - only $0.17 saved</li>
+                        </ul>
+                    </div>
+
+                    <div class="glass rounded-lg p-4 border-l-4 border-green-400">
+                        <h4 class="font-semibold text-green-400 mb-2">💡 Immediate Action Plan</h4>
+                        <div class="space-y-3 text-white">
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                                <span>Cut dining out from $340 to $150/month = $190 saved</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-6 h-
