@@ -1,3 +1,4 @@
+html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,762 +7,102 @@
     <title>Budget - FinanceOS</title>
     <meta name="theme-color" content="#8b5cf6">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    
     <style>
-        :root {
-            --primary-purple: #8b5cf6;
-            --secondary-blue: #3b82f6;
-            --success-green: #10b981;
-            --error-red: #ef4444;
-            --warning-orange: #f97316;
-            --glass-bg: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --text-primary: rgba(255, 255, 255, 0.9);
-            --text-secondary: rgba(255, 255, 255, 0.7);
-            --text-muted: rgba(255, 255, 255, 0.5);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
-            min-height: 100vh;
-            color: var(--text-primary);
-            overflow-x: hidden;
-        }
-
-        .glass {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
-        .glass-premium {
-            background: linear-gradient(135deg, 
-                rgba(139, 92, 246, 0.15) 0%, 
-                rgba(59, 130, 246, 0.15) 50%, 
-                rgba(147, 51, 234, 0.15) 100%);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-        }
-
-        .gradient-red { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
-        .gradient-green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
-        .gradient-blue { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
-        .gradient-purple { background: linear-gradient(135deg, #8b5cf6 0%, #9333ea 100%); }
-
-        .header {
-            padding: 20px;
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .header-info {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-top: 16px;
-        }
-
-        .info-card {
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 0.875rem;
-        }
-
-        .container {
-            padding: 20px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .budget-table-container {
-            border-radius: 20px;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-
-        .budget-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-
-        .budget-table th,
-        .budget-table td {
-            padding: 12px 16px;
-            text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .budget-table th {
-            background: rgba(139, 92, 246, 0.2);
-            font-weight: 600;
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-primary);
-        }
-
-        .budget-table tr:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .section-header {
-            background: rgba(59, 130, 246, 0.15);
-            font-weight: 700;
-            font-size: 1rem;
-            color: var(--text-primary);
-        }
-
-        .subsection-header {
-            background: rgba(255, 255, 255, 0.05);
-            font-weight: 600;
-            color: var(--text-secondary);
-            padding-left: 32px !important;
-        }
-
-        .category-row {
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .category-row:hover {
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .subcategory-row {
-            background: rgba(255, 255, 255, 0.02);
-            padding-left: 48px !important;
-        }
-
-        .subcategory-row.hidden {
-            display: none;
-        }
-
-        .amount {
-            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
-            font-weight: 600;
-            text-align: right;
-        }
-
-        .amount.positive {
-            color: var(--success-green);
-        }
-
-        .amount.negative {
-            color: var(--error-red);
-        }
-
-        .amount.warning {
-            color: var(--warning-orange);
-        }
-
-        .editable {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid transparent;
-            border-radius: 6px;
-            padding: 4px 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .editable:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: var(--primary-purple);
-        }
-
-        .editable input {
-            background: transparent;
-            border: none;
-            color: inherit;
-            font: inherit;
-            width: 100%;
-            text-align: right;
-        }
-
-        .editable input:focus {
-            outline: none;
-        }
-
-        .total-row {
-            background: rgba(139, 92, 246, 0.2);
-            font-weight: 700;
-            font-size: 1.1rem;
-            border-top: 2px solid var(--primary-purple);
-        }
-
-        .net-income-row {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2));
-            font-weight: 700;
-            font-size: 1.2rem;
-            border-top: 3px solid var(--success-green);
-        }
-
-        .net-income-row.deficit {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.2));
-            border-top-color: var(--error-red);
-        }
-
-        .expand-icon {
-            display: inline-block;
-            transition: transform 0.2s ease;
-            margin-right: 8px;
-            width: 12px;
-            height: 12px;
-        }
-
-        .expand-icon.expanded {
-            transform: rotate(90deg);
-        }
-
-        /* Charts Section Styles */
-        .charts-section {
-            margin-top: 32px;
-        }
-
-        .charts-toggle-btn {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            color: var(--text-primary);
-            padding: 12px 24px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-left: auto;
-        }
-
-        .charts-toggle-btn:hover {
-            background: rgba(139, 92, 246, 0.2);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.3);
-        }
-
-        .charts-toggle-btn.active {
-            background: var(--gradient-purple);
-        }
-
-        .charts-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .charts-container {
-            display: none;
-            animation: slideDown 0.3s ease-out;
-        }
-
-        .charts-container.visible {
-            display: block;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .metric-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .metric-card {
-            padding: 20px;
-            border-radius: 16px;
-            text-align: center;
-            transition: transform 0.2s ease;
-        }
-
-        .metric-card:hover {
-            transform: translateY(-4px);
-        }
-
-        .metric-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .metric-label {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .chart-card {
-            padding: 24px;
-            border-radius: 20px;
-            position: relative;
-        }
-
-        .chart-card h3 {
-            margin-bottom: 16px;
-            font-size: 1.25rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 300px;
-            margin-bottom: 16px;
-        }
-
-        .chart-insight {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 12px 16px;
-            border-radius: 12px;
-            border-left: 4px solid var(--primary-purple);
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        .alert-critical {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.2));
-            border: 2px solid rgba(239, 68, 68, 0.3);
-            animation: pulse 2s infinite;
-        }
-
-        .warning {
-            background: linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(234, 88, 12, 0.2));
-            border: 2px solid rgba(249, 115, 22, 0.3);
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-
-        .back-nav {
-            display: inline-flex;
-            align-items: center;
-            padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            text-decoration: none;
-            color: var(--text-primary);
-            margin-bottom: 20px;
-            transition: all 0.2s ease;
-        }
-
-        .back-nav:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateX(-2px);
-        }
-
-        @media (max-width: 768px) {
-            .header-info {
-                flex-direction: column;
-                gap: 12px;
-            }
-            
-            .budget-table {
-                font-size: 0.8rem;
-            }
-            
-            .budget-table th,
-            .budget-table td {
-                padding: 8px 12px;
-            }
-            
-            .amount {
-                font-size: 0.85rem;
-            }
-
-            .charts-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .chart-container {
-                height: 250px;
-            }
-
-            .charts-header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .charts-toggle-btn {
-                margin-left: 0;
-                justify-content: center;
-            }
-        }
+        /* Copy all the CSS from the first artifact above */
     </style>
 </head>
 <body>
-    <div class="container">
-        <a href="index.html" class="back-nav">
-            <span style="margin-right: 8px;">←</span>
-            Back to Dashboard
-        </a>
+    <!-- Copy all the HTML from the first artifact above -->
+    
+    <script>
+        // Initialize Chart.js defaults for dark theme
+        Chart.defaults.color = 'rgba(255, 255, 255, 0.8)';
+        Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
 
-        <div class="glass-premium header">
-            <h1>Monthly Budget</h1>
-            <p class="text-secondary">June 2025 - Complete Income vs Expenses Breakdown</p>
+        // Budget data
+        const budgetData = {
+            categories: ['Food', 'Discretionary', 'Transportation', 'Utilities', 'Housing', 'Insurance', 'Childcare', 'Savings'],
+            budgeted: [800, 300, 125, 213, 2427, 490, 508, 571],
+            actual: [963, 423, 156, 213, 2427, 490, 508, 271],
+            variance: [-163, -123, -31, 0, 0, 0, 0, 300]
+        };
+
+        let chartsInitialized = false;
+
+        // Toggle charts functionality
+        document.getElementById('chartsToggle').addEventListener('click', function() {
+            const container = document.getElementById('chartsContainer');
+            const button = this;
             
-            <div class="header-info">
-                <div class="info-card glass">
-                    <strong>Monthly Income:</strong> $6,304.00
-                </div>
-                <div class="info-card glass gradient-red">
-                    <strong>Monthly Expenses:</strong> $5,911.00
-                </div>
-                <div class="info-card glass gradient-red">
-                    <strong>Net Income:</strong> +$393.00
-                </div>
-            </div>
-        </div>
+            if (container.classList.contains('visible')) {
+                container.classList.remove('visible');
+                button.classList.remove('active');
+                button.innerHTML = '<span>📈</span><span>Show Visual Analysis</span>';
+            } else {
+                container.classList.add('visible');
+                button.classList.add('active');
+                button.innerHTML = '<span>📊</span><span>Hide Visual Analysis</span>';
+                
+                if (!chartsInitialized) {
+                    initializeCharts();
+                    chartsInitialized = true;
+                }
+            }
+        });
 
-        <!-- Budget Table -->
-        <div class="glass budget-table-container">
-            <table class="budget-table">
-                <thead>
-                    <tr>
-                        <th style="width: 40%;">Category</th>
-                        <th style="width: 20%;">Budgeted</th>
-                        <th style="width: 20%;">Actual</th>
-                        <th style="width: 20%;">Variance</th>
-                    </tr>
-                </thead>
-                <tbody id="budget-table-body">
-                    <!-- Income Section -->
-                    <tr class="section-header">
-                        <td colspan="4">INCOME</td>
-                    </tr>
-                    <tr>
-                        <td>Salary (Pathway Engineer, After Tax)</td>
-                        <td class="amount positive editable" data-category="salary">$6,304.00</td>
-                        <td class="amount positive">$6,304.00</td>
-                        <td class="amount">$0.00</td>
-                    </tr>
-                    <tr>
-                        <td>Other Income</td>
-                        <td class="amount editable" data-category="other-income">$0.00</td>
-                        <td class="amount">$0.00</td>
-                        <td class="amount">$0.00</td>
-                    </tr>
-                    <tr class="total-row">
-                        <td><strong>TOTAL INCOME</strong></td>
-                        <td class="amount positive"><strong>$6,304.00</strong></td>
-                        <td class="amount positive"><strong>$6,304.00</strong></td>
-                        <td class="amount"><strong>$0.00</strong></td>
-                    </tr>
+        function initializeCharts() {
+            const variancePercentages = budgetData.variance.map((variance, index) => {
+                const budgeted = budgetData.budgeted[index];
+                return budgeted > 0 ? ((variance / budgeted) * 100) : 0;
+            });
 
-                    <!-- Housing Section -->
-                    <tr class="section-header category-row" data-category="housing">
-                        <td>
-                            <span class="expand-icon expanded">▶</span>
-                            HOUSING
-                        </td>
-                        <td class="amount">$2,427.00</td>
-                        <td class="amount negative">$2,427.00</td>
-                        <td class="amount">$0.00</td>
-                    </tr>
-                    <tr class="subcategory-row" data-parent="housing">
-                        <td>Mortgage 1 (4.99% interest)</td>
-                        <td class="amount editable" data-category="mortgage1">$1,190.00</td>
-                        <td class="amount negative">$1,190.00</td>
-                        <td class="amount">$0.00</td>
-                    </tr>
-                    <tr class="subcategory-row" data-parent="housing">
-                        <td>Mortgage 2 (4.99% interest)</td>
-                        <td class="amount editable" data-category="mortgage2">$880.00</td>
-                        <td class="amount negative">$880.00</td>
-                        <td class="amount">$0.00</td>
-                    </tr>
-                    <tr class="subcategory-row" data-parent="housing">
-                        <td>Rates</td>
-                        <td class="amount editable" data-category="rates">$357.00</td>
-                        <td class="amount negative">$357.00</td>
-                        <td class="amount">$0.00</td>
-                    </tr>
+            // Variance Chart
+            const varianceCtx = document.getElementById('varianceChart').getContext('2d');
+            new Chart(varianceCtx, {
+                type: 'bar',
+                data: {
+                    labels: budgetData.categories,
+                    datasets: [{
+                        data: budgetData.variance,
+                        backgroundColor: budgetData.variance.map(v => v < 0 ? '#ef4444' : v > 0 ? '#10b981' : '#6b7280')
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const dollarAmount = context.raw;
+                                    const percentage = variancePercentages[context.dataIndex];
+                                    return [`Amount: $${Math.abs(dollarAmount)}`, `Percentage: ${percentage.toFixed(1)}%`];
+                                }
+                            }
+                        }
+                    }
+                }
+            });
 
-                    <!-- Food Section -->
-                    <tr class="section-header category-row" data-category="food">
-                        <td>
-                            <span class="expand-icon expanded">▶</span>
-                            FOOD
-                        </td>
-                        <td class="amount">$800.00</td>
-                        <td class="amount negative warning">$963.00</td>
-                        <td class="amount negative">-$163.00</td>
-                    </tr>
-                    <tr class="subcategory-row" data-parent="food">
-                        <td>Groceries</td>
-                        <td class="amount editable" data-category="groceries">$550.00</td>
-                        <td class="amount negative warning">$623.00</td>
-                        <td class="amount negative">-$73.00</td>
-                    </tr>
-                    <tr class="subcategory-row" data-parent="food">
-                        <td>Dining Out/Takeaway</td>
-                        <td class="amount editable" data-category="dining">$250.00</td>
-                        <td class="amount negative warning">$340.00</td>
-                        <td class="amount negative">-$90.00</td>
-                    </tr>
-
-                    <!-- Utilities Section -->
-                    <tr class="section-header category-row" data-category="utilities">
-                        <td>
-                            <span class="expand-icon expanded">▶</span>
-                            UTILITIES
-                        </td>
-                        <td class="amount">$213.00</td>
-                        <td class="amount negative">$213.00</td>
-                        <td class="amount">$0.00</td>
-                    </tr>
-                    <tr class="subcategory-row" data-parent="utilities">
-                        <td>Sky Network</td>
-                        <td class="amount editable" data-category="sky">$163.00</td>
-                        <td class="amount negative">$163.00</td>
-                        <td class="amount">$0.00</td>
-                    </tr>
-                    <tr class="subcategory-row" data-parent="utilities">
-                        <td>Mobile Phone</td>
-                        <td class="amount editable" data-category="mobile">$40.00</td>
-                        <td class="amount negative">$40.00</td>
-                        <td class="amount">$0.00</td>
-                    </tr>
-                    <tr class="subcategory-row" data-parent="utilities">
-                        <td>Internet/Streaming</td>
-                        <td class="amount editable" data-category="internet">$10.00</td>
-                        <td class="amount negative">$10.00</td>
-                        <td class="amount">$0.00</td>
-                    </tr>
-
-                    <!-- Insurance Section -->
-                    <tr class="section-header category-row" data-category="insurance">
-                        <td>
-                            <span class="expand-icon expanded">▶</span>
-                            INSURANCE
-                        </td>
-                        <td class="amount">$490.00</td>
-                        <td class="amount negative">$490.00</td>
-                        <td class="amount">$0.00</td>
-                    </tr>
-                    <tr class="subcategory-row" data-parent="insurance">
-                        <td>Vero Insurance</td>
-                        <td class="amount editable" data-category="vero">$350.00</td>
-                        <td class="amount negative">$350.00</td>
-                        <td class="amount">$0.00</td>
-                    </tr>
-                    <tr class="subcategory-row" data-parent="insurance">
-                        <td>Partners Life</td>
-                        <td class="amount editable" data-category="partners-life">$140.00</td>
-                        <td class="amount negative">$140.00</td>
-                        <td class="amount">$0.00</td>
-                    </tr>
-
-                    <!-- Childcare Section -->
-                    <tr class="section-header">
-                        <td>CHILDCARE</td>
-                        <td class="amount">$508.00</td>
-                        <td class="amount negative">$508.00</td>
-                        <td class="amount">$0.00</td>
-                    </tr>
-                    <tr>
-                        <td>Grow Active Daycare</td>
-                        <td class="amount editable" data-category="daycare">$508.00</td>
-                        <td class="amount negative">$508.00</td>
-                        <td class="amount">$0.00</td>
-                    </tr>
-
-                    <!-- Transportation Section -->
-                    <tr class="section-header">
-                        <td>TRANSPORTATION</td>
-                        <td class="amount">$125.00</td>
-                        <td class="amount negative warning">$156.00</td>
-                        <td class="amount negative">-$31.00</td>
-                    </tr>
-                    <tr>
-                        <td>Fuel</td>
-                        <td class="amount editable" data-category="fuel">$125.00</td>
-                        <td class="amount negative warning">$156.00</td>
-                        <td class="amount negative">-$31.00</td>
-                    </tr>
-
-                    <!-- Savings & Investments Section -->
-                    <tr class="section-header category-row" data-category="savings">
-                        <td>
-                            <span class="expand-icon expanded">▶</span>
-                            SAVINGS & INVESTMENTS
-                        </td>
-                        <td class="amount">$571.00</td>
-                        <td class="amount positive">$271.00</td>
-                        <td class="amount positive">$300.00</td>
-                    </tr>
-                    <tr class="subcategory-row" data-parent="savings">
-                        <td>Sharesies</td>
-                        <td class="amount editable" data-category="sharesies">$271.00</td>
-                        <td class="amount positive">$271.00</td>
-                        <td class="amount">$0.00</td>
-                    </tr>
-                    <tr class="subcategory-row" data-parent="savings">
-                        <td>Emergency Fund (CRITICAL!)</td>
-                        <td class="amount editable" data-category="emergency">$300.00</td>
-                        <td class="amount negative">$0.00</td>
-                        <td class="amount positive">$300.00</td>
-                    </tr>
-
-                    <!-- Education Section -->
-                    <tr class="section-header">
-                        <td>EDUCATION</td>
-                        <td class="amount">$300.00</td>
-                        <td class="amount positive">$300.00</td>
-                        <td class="amount">$0.00</td>
-                    </tr>
-                    <tr>
-                        <td>Private School Fund</td>
-                        <td class="amount editable" data-category="education">$300.00</td>
-                        <td class="amount positive">$300.00</td>
-                        <td class="amount">$0.00</td>
-                    </tr>
-
-                    <!-- Discretionary Section -->
-                    <tr class="section-header category-row" data-category="discretionary">
-                        <td>
-                            <span class="expand-icon expanded">▶</span>
-                            DISCRETIONARY
-                        </td>
-                        <td class="amount">$300.00</td>
-                        <td class="amount negative warning">$423.00</td>
-                        <td class="amount negative">-$123.00</td>
-                    </tr>
-                    <tr class="subcategory-row" data-parent="discretionary">
-                        <td>Shopping/Retail</td>
-                        <td class="amount editable" data-category="shopping">$150.00</td>
-                        <td class="amount negative warning">$223.00</td>
-                        <td class="amount negative">-$73.00</td>
-                    </tr>
-                    <tr class="subcategory-row" data-parent="discretionary">
-                        <td>Entertainment</td>
-                        <td class="amount editable" data-category="entertainment">$50.00</td>
-                        <td class="amount negative warning">$100.00</td>
-                        <td class="amount negative">-$50.00</td>
-                    </tr>
-                    <tr class="subcategory-row" data-parent="discretionary">
-                        <td>Travel Fund</td>
-                        <td class="amount editable" data-category="travel">$100.00</td>
-                        <td class="amount positive">$100.00</td>
-                        <td class="amount">$0.00</td>
-                    </tr>
-
-                    <!-- Total Expenses -->
-                    <tr class="total-row">
-                        <td><strong>TOTAL EXPENSES</strong></td>
-                        <td class="amount negative"><strong>$5,734.00</strong></td>
-                        <td class="amount negative"><strong>$5,911.00</strong></td>
-                        <td class="amount negative"><strong>-$177.00</strong></td>
-                    </tr>
-
-                    <!-- Net Income -->
-                    <tr class="net-income-row">
-                        <td><strong>NET INCOME (Income - Expenses)</strong></td>
-                        <td class="amount positive"><strong>$570.00</strong></td>
-                        <td class="amount positive"><strong>$393.00</strong></td>
-                        <td class="amount negative"><strong>-$177.00</strong></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Visual Analysis Section -->
-        <div class="charts-section">
-            <div class="glass-premium" style="padding: 24px; border-radius: 20px;">
-                <div class="charts-header">
-                    <div>
-                        <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 4px;">📊 Visual Budget Analysis</h2>
-                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Interactive charts and insights to optimize your spending</p>
-                    </div>
-                    <button id="chartsToggle" class="charts-toggle-btn">
-                        <span>📈</span>
-                        <span>Show Visual Analysis</span>
-                    </button>
-                </div>
-
-                <div id="chartsContainer" class="charts-container">
-                    <!-- Key Metrics Overview -->
-                    <div class="metric-cards">
-                        <div class="metric-card glass warning">
-                            <div class="metric-value" style="color: var(--warning-orange);">-$177</div>
-                            <div class="metric-label">Budget Variance</div>
-                        </div>
-                        <div class="metric-card glass alert-critical">
-                            <div class="metric-value" style="color: var(--error-red);">$0.17</div>
-                            <div class="metric-label">Emergency Fund</div>
-                        </div>
-                        <div class="metric-card glass warning">
-                            <div class="metric-value" style="color: var(--warning-orange);">38%</div>
-                            <div class="metric-label">Housing % of Income</div>
-                        </div>
-                        <div class="metric-card glass">
-                            <div class="metric-value" style="color: var(--success-green);">+$393</div>
-                            <div class="metric-label">Net Income</div>
-                        </div>
-                    </div>
-
-                    <!-- Charts Grid -->
-                    <div class="charts-grid">
-                        <!-- Budget Variance Chart -->
-                        <div class="chart-card glass-premium">
-                            <h3>📊 Budget vs Actual Variance ($ & %)</h3>
-                            <div class="chart-container">
-                                <canvas id="varianceChart"></canvas>
-                            </div>
-                            <div class="chart-insight">
-                                <strong>Overspending Alert:</strong> Food is 20.4% over budget (-$163), Discretionary is 41% over budget (-$123). Focus on meal planning and reducing shopping to improve cash flow.
-                            </div>
-                        </div>
-
-                        <!-- Expense Breakdown -->
-                        <div class="chart-card glass-premium">
-                            <h3>🏠 Monthly Expense Breakdown</h3>
-                            <div class="chart-container">
-                                <canvas id="expenseBreakdown"></canvas>
-                            </div>
-                            <div class="chart-insight">
-                                <strong>Expense Analysis:</strong> Housing (41%) and childcare (9%) are your largest fixed costs. Variable categories like food and discretionary offer the best optimization opportunities.
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Emergency Fund Alert -->
-                    <div class="glass-premium alert-critical" style="padding: 20px; border-radius: 16px; margin-top: 20px;">
-                        <h3 style="margin-bottom: 16px
+            // Expense Breakdown Chart
+            const expenseCtx = document.getElementById('expenseBreakdown').getContext('2d');
+            new Chart(expenseCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: budgetData.categories,
+                    datasets: [{
+                        data: budgetData.actual,
+                        backgroundColor: ['#ef4444', '#f97316', '#f59e0b', '#8b5cf6', '#3b82f6', '#06d6a0', '#10b981', '#84cc16']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+    </script>
+</body>
+</html>
