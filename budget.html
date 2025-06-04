@@ -6,101 +6,641 @@
     <title>Budget - FinanceOS</title>
     <meta name="theme-color" content="#8b5cf6">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    
     <style>
-        /* Copy all the CSS from the first artifact above */
+        :root {
+            --primary-purple: #8b5cf6;
+            --secondary-blue: #3b82f6;
+            --success-green: #10b981;
+            --error-red: #ef4444;
+            --warning-orange: #f97316;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --text-primary: rgba(255, 255, 255, 0.9);
+            --text-secondary: rgba(255, 255, 255, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            padding: 20px;
+        }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .glass-premium {
+            background: linear-gradient(135deg, 
+                rgba(139, 92, 246, 0.15) 0%, 
+                rgba(59, 130, 246, 0.15) 50%, 
+                rgba(147, 51, 234, 0.15) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .back-nav {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        .header {
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .info-cards {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .info-card {
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.875rem;
+        }
+
+        .budget-table-container {
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .budget-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .budget-table th,
+        .budget-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .budget-table th {
+            background: rgba(139, 92, 246, 0.2);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .section-header {
+            background: rgba(59, 130, 246, 0.15);
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .amount {
+            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .amount.positive { color: var(--success-green); }
+        .amount.negative { color: var(--error-red); }
+        .amount.warning { color: var(--warning-orange); }
+
+        .total-row {
+            background: rgba(139, 92, 246, 0.2);
+            font-weight: 700;
+            font-size: 1.1rem;
+            border-top: 2px solid var(--primary-purple);
+        }
+
+        .net-income-row {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2));
+            font-weight: 700;
+            font-size: 1.2rem;
+            border-top: 3px solid var(--success-green);
+        }
+
+        .charts-section {
+            margin-top: 32px;
+        }
+
+        .charts-toggle-btn {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .charts-toggle-btn:hover {
+            background: rgba(139, 92, 246, 0.2);
+        }
+
+        .charts-toggle-btn.active {
+            background: linear-gradient(135deg, #8b5cf6 0%, #9333ea 100%);
+        }
+
+        .charts-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .charts-container {
+            display: none;
+        }
+
+        .charts-container.visible {
+            display: block;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .chart-card {
+            padding: 24px;
+            border-radius: 20px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 16px 0;
+        }
+
+        @media (max-width: 768px) {
+            .info-cards {
+                flex-direction: column;
+            }
+            
+            .budget-table {
+                font-size: 0.8rem;
+            }
+            
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .charts-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- Copy all the HTML from the first artifact above -->
-    
+    <div class="container">
+        <a href="index.html" class="back-nav">← Back to Dashboard</a>
+
+        <div class="glass-premium header">
+            <h1>Monthly Budget</h1>
+            <p style="color: var(--text-secondary);">June 2025 - Complete Income vs Expenses Breakdown</p>
+            
+            <div class="info-cards">
+                <div class="info-card glass">
+                    <strong>Monthly Income:</strong> $6,304.00
+                </div>
+                <div class="info-card glass" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                    <strong>Monthly Expenses:</strong> $5,911.00
+                </div>
+                <div class="info-card glass" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                    <strong>Net Income:</strong> +$393.00
+                </div>
+            </div>
+        </div>
+
+        <!-- Budget Table -->
+        <div class="glass budget-table-container">
+            <table class="budget-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40%;">Category</th>
+                        <th style="width: 20%;">Budgeted</th>
+                        <th style="width: 20%;">Actual</th>
+                        <th style="width: 20%;">Variance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Income Section -->
+                    <tr class="section-header">
+                        <td colspan="4">INCOME</td>
+                    </tr>
+                    <tr>
+                        <td>Salary (Pathway Engineer, After Tax)</td>
+                        <td class="amount positive">$6,304.00</td>
+                        <td class="amount positive">$6,304.00</td>
+                        <td class="amount">$0.00</td>
+                    </tr>
+                    <tr>
+                        <td>Other Income</td>
+                        <td class="amount">$0.00</td>
+                        <td class="amount">$0.00</td>
+                        <td class="amount">$0.00</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td><strong>TOTAL INCOME</strong></td>
+                        <td class="amount positive"><strong>$6,304.00</strong></td>
+                        <td class="amount positive"><strong>$6,304.00</strong></td>
+                        <td class="amount"><strong>$0.00</strong></td>
+                    </tr>
+
+                    <!-- Housing Section -->
+                    <tr class="section-header">
+                        <td colspan="4">HOUSING</td>
+                    </tr>
+                    <tr>
+                        <td>Mortgage 1 (4.99% interest)</td>
+                        <td class="amount">$1,190.00</td>
+                        <td class="amount negative">$1,190.00</td>
+                        <td class="amount">$0.00</td>
+                    </tr>
+                    <tr>
+                        <td>Mortgage 2 (4.99% interest)</td>
+                        <td class="amount">$880.00</td>
+                        <td class="amount negative">$880.00</td>
+                        <td class="amount">$0.00</td>
+                    </tr>
+                    <tr>
+                        <td>Rates</td>
+                        <td class="amount">$357.00</td>
+                        <td class="amount negative">$357.00</td>
+                        <td class="amount">$0.00</td>
+                    </tr>
+
+                    <!-- Food Section -->
+                    <tr class="section-header">
+                        <td colspan="4">FOOD</td>
+                    </tr>
+                    <tr>
+                        <td>Groceries</td>
+                        <td class="amount">$550.00</td>
+                        <td class="amount negative warning">$623.00</td>
+                        <td class="amount negative">-$73.00</td>
+                    </tr>
+                    <tr>
+                        <td>Dining Out/Takeaway</td>
+                        <td class="amount">$250.00</td>
+                        <td class="amount negative warning">$340.00</td>
+                        <td class="amount negative">-$90.00</td>
+                    </tr>
+
+                    <!-- Utilities Section -->
+                    <tr class="section-header">
+                        <td colspan="4">UTILITIES</td>
+                    </tr>
+                    <tr>
+                        <td>Sky Network</td>
+                        <td class="amount">$163.00</td>
+                        <td class="amount negative">$163.00</td>
+                        <td class="amount">$0.00</td>
+                    </tr>
+                    <tr>
+                        <td>Mobile Phone</td>
+                        <td class="amount">$40.00</td>
+                        <td class="amount negative">$40.00</td>
+                        <td class="amount">$0.00</td>
+                    </tr>
+                    <tr>
+                        <td>Internet/Streaming</td>
+                        <td class="amount">$10.00</td>
+                        <td class="amount negative">$10.00</td>
+                        <td class="amount">$0.00</td>
+                    </tr>
+
+                    <!-- Insurance Section -->
+                    <tr class="section-header">
+                        <td colspan="4">INSURANCE</td>
+                    </tr>
+                    <tr>
+                        <td>Vero Insurance</td>
+                        <td class="amount">$350.00</td>
+                        <td class="amount negative">$350.00</td>
+                        <td class="amount">$0.00</td>
+                    </tr>
+                    <tr>
+                        <td>Partners Life</td>
+                        <td class="amount">$140.00</td>
+                        <td class="amount negative">$140.00</td>
+                        <td class="amount">$0.00</td>
+                    </tr>
+
+                    <!-- Other Categories -->
+                    <tr class="section-header">
+                        <td colspan="4">OTHER EXPENSES</td>
+                    </tr>
+                    <tr>
+                        <td>Grow Active Daycare</td>
+                        <td class="amount">$508.00</td>
+                        <td class="amount negative">$508.00</td>
+                        <td class="amount">$0.00</td>
+                    </tr>
+                    <tr>
+                        <td>Fuel</td>
+                        <td class="amount">$125.00</td>
+                        <td class="amount negative warning">$156.00</td>
+                        <td class="amount negative">-$31.00</td>
+                    </tr>
+                    <tr>
+                        <td>Sharesies</td>
+                        <td class="amount">$271.00</td>
+                        <td class="amount positive">$271.00</td>
+                        <td class="amount">$0.00</td>
+                    </tr>
+                    <tr>
+                        <td>Emergency Fund (CRITICAL!)</td>
+                        <td class="amount">$300.00</td>
+                        <td class="amount negative">$0.00</td>
+                        <td class="amount positive">$300.00</td>
+                    </tr>
+                    <tr>
+                        <td>Private School Fund</td>
+                        <td class="amount">$300.00</td>
+                        <td class="amount positive">$300.00</td>
+                        <td class="amount">$0.00</td>
+                    </tr>
+                    <tr>
+                        <td>Shopping/Retail</td>
+                        <td class="amount">$150.00</td>
+                        <td class="amount negative warning">$223.00</td>
+                        <td class="amount negative">-$73.00</td>
+                    </tr>
+                    <tr>
+                        <td>Entertainment</td>
+                        <td class="amount">$50.00</td>
+                        <td class="amount negative warning">$100.00</td>
+                        <td class="amount negative">-$50.00</td>
+                    </tr>
+                    <tr>
+                        <td>Travel Fund</td>
+                        <td class="amount">$100.00</td>
+                        <td class="amount positive">$100.00</td>
+                        <td class="amount">$0.00</td>
+                    </tr>
+
+                    <!-- Total Expenses -->
+                    <tr class="total-row">
+                        <td><strong>TOTAL EXPENSES</strong></td>
+                        <td class="amount negative"><strong>$5,734.00</strong></td>
+                        <td class="amount negative"><strong>$5,911.00</strong></td>
+                        <td class="amount negative"><strong>-$177.00</strong></td>
+                    </tr>
+
+                    <!-- Net Income -->
+                    <tr class="net-income-row">
+                        <td><strong>NET INCOME (Income - Expenses)</strong></td>
+                        <td class="amount positive"><strong>$570.00</strong></td>
+                        <td class="amount positive"><strong>$393.00</strong></td>
+                        <td class="amount negative"><strong>-$177.00</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Visual Analysis Section -->
+        <div class="charts-section">
+            <div class="glass-premium" style="padding: 24px; border-radius: 20px;">
+                <div class="charts-header">
+                    <div>
+                        <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 4px;">📊 Visual Budget Analysis</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">Interactive charts and insights</p>
+                    </div>
+                    <button id="chartsToggle" class="charts-toggle-btn">
+                        <span>📈</span>
+                        <span>Show Charts</span>
+                    </button>
+                </div>
+
+                <div id="chartsContainer" class="charts-container">
+                    <div class="charts-grid">
+                        <!-- Budget Variance Chart -->
+                        <div class="chart-card glass-premium">
+                            <h3>📊 Budget Variance ($ & %)</h3>
+                            <div class="chart-container">
+                                <canvas id="varianceChart"></canvas>
+                            </div>
+                            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 12px;">
+                                <strong>Alert:</strong> Food 20% over budget (-$163), Shopping 49% over (-$73)
+                            </p>
+                        </div>
+
+                        <!-- Expense Breakdown -->
+                        <div class="chart-card glass-premium">
+                            <h3>🏠 Expense Breakdown</h3>
+                            <div class="chart-container">
+                                <canvas id="expenseChart"></canvas>
+                            </div>
+                            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 12px;">
+                                <strong>Housing dominates:</strong> 38% of income goes to housing costs
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Critical Alert -->
+                    <div style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.2)); border: 2px solid rgba(239, 68, 68, 0.3); padding: 20px; border-radius: 16px; margin-top: 20px;">
+                        <h3 style="color: var(--error-red); margin-bottom: 12px;">🚨 Emergency Fund Crisis</h3>
+                        <p>You have only $0.17 in emergency savings. Target: $17,733 (3 months expenses).</p>
+                        <p style="margin-top: 8px;"><strong>Quick fix:</strong> Redirect the unused $300 emergency fund budget to actually build savings!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Initialize Chart.js defaults for dark theme
-        Chart.defaults.color = 'rgba(255, 255, 255, 0.8)';
-        Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+        console.log('Page loaded');
+
+        // Check if Chart.js loaded
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js failed to load');
+            document.getElementById('chartsToggle').style.display = 'none';
+        } else {
+            console.log('Chart.js loaded successfully');
+        }
 
         // Budget data
         const budgetData = {
-            categories: ['Food', 'Discretionary', 'Transportation', 'Utilities', 'Housing', 'Insurance', 'Childcare', 'Savings'],
-            budgeted: [800, 300, 125, 213, 2427, 490, 508, 571],
-            actual: [963, 423, 156, 213, 2427, 490, 508, 271],
-            variance: [-163, -123, -31, 0, 0, 0, 0, 300]
+            categories: ['Food', 'Shopping', 'Transportation', 'Utilities', 'Housing', 'Insurance', 'Childcare', 'Savings'],
+            budgeted: [800, 150, 125, 213, 2427, 490, 508, 571],
+            actual: [963, 223, 156, 213, 2427, 490, 508, 271],
+            variance: [-163, -73, -31, 0, 0, 0, 0, 300]
         };
 
         let chartsInitialized = false;
 
         // Toggle charts functionality
-        document.getElementById('chartsToggle').addEventListener('click', function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.getElementById('chartsToggle');
             const container = document.getElementById('chartsContainer');
-            const button = this;
-            
-            if (container.classList.contains('visible')) {
-                container.classList.remove('visible');
-                button.classList.remove('active');
-                button.innerHTML = '<span>📈</span><span>Show Visual Analysis</span>';
-            } else {
-                container.classList.add('visible');
-                button.classList.add('active');
-                button.innerHTML = '<span>📊</span><span>Hide Visual Analysis</span>';
-                
-                if (!chartsInitialized) {
-                    initializeCharts();
-                    chartsInitialized = true;
-                }
+
+            if (toggleBtn && container) {
+                toggleBtn.addEventListener('click', function() {
+                    console.log('Toggle button clicked');
+                    
+                    if (container.classList.contains('visible')) {
+                        container.classList.remove('visible');
+                        toggleBtn.classList.remove('active');
+                        toggleBtn.innerHTML = '<span>📈</span><span>Show Charts</span>';
+                    } else {
+                        container.classList.add('visible');
+                        toggleBtn.classList.add('active');
+                        toggleBtn.innerHTML = '<span>📊</span><span>Hide Charts</span>';
+                        
+                        if (!chartsInitialized && typeof Chart !== 'undefined') {
+                            initializeCharts();
+                            chartsInitialized = true;
+                        }
+                    }
+                });
             }
         });
 
         function initializeCharts() {
-            const variancePercentages = budgetData.variance.map((variance, index) => {
-                const budgeted = budgetData.budgeted[index];
-                return budgeted > 0 ? ((variance / budgeted) * 100) : 0;
-            });
+            console.log('Initializing charts');
 
-            // Variance Chart
-            const varianceCtx = document.getElementById('varianceChart').getContext('2d');
-            new Chart(varianceCtx, {
-                type: 'bar',
-                data: {
-                    labels: budgetData.categories,
-                    datasets: [{
-                        data: budgetData.variance,
-                        backgroundColor: budgetData.variance.map(v => v < 0 ? '#ef4444' : v > 0 ? '#10b981' : '#6b7280')
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    indexAxis: 'y',
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const dollarAmount = context.raw;
-                                    const percentage = variancePercentages[context.dataIndex];
-                                    return [`Amount: $${Math.abs(dollarAmount)}`, `Percentage: ${percentage.toFixed(1)}%`];
+            try {
+                // Set Chart.js defaults
+                Chart.defaults.color = 'rgba(255, 255, 255, 0.8)';
+                Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+
+                // Variance Chart
+                const varianceCtx = document.getElementById('varianceChart');
+                if (varianceCtx) {
+                    new Chart(varianceCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: budgetData.categories,
+                            datasets: [{
+                                data: budgetData.variance,
+                                backgroundColor: budgetData.variance.map(v => 
+                                    v < 0 ? '#ef4444' : v > 0 ? '#10b981' : '#6b7280'
+                                ),
+                                borderColor: budgetData.variance.map(v => 
+                                    v < 0 ? '#dc2626' : v > 0 ? '#059669' : '#4b5563'
+                                ),
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            indexAxis: 'y',
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                    titleColor: 'white',
+                                    bodyColor: 'white',
+                                    callbacks: {
+                                        label: function(context) {
+                                            const amount = Math.abs(context.raw);
+                                            const budgeted = budgetData.budgeted[context.dataIndex];
+                                            const percentage = budgeted > 0 ? ((context.raw / budgeted) * 100).toFixed(1) : 0;
+                                            return [`$${amount}`, `${percentage}%`];
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                    ticks: { color: 'rgba(255, 255, 255, 0.8)' }
+                                },
+                                y: {
+                                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                    ticks: { color: 'rgba(255, 255, 255, 0.8)' }
                                 }
                             }
                         }
-                    }
+                    });
                 }
-            });
 
-            // Expense Breakdown Chart
-            const expenseCtx = document.getElementById('expenseBreakdown').getContext('2d');
-            new Chart(expenseCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: budgetData.categories,
-                    datasets: [{
-                        data: budgetData.actual,
-                        backgroundColor: ['#ef4444', '#f97316', '#f59e0b', '#8b5cf6', '#3b82f6', '#06d6a0', '#10b981', '#84cc16']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
+                // Expense Chart
+                const expenseCtx = document.getElementById('expenseChart');
+                if (expenseCtx) {
+                    new Chart(expenseCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: budgetData.categories,
+                            datasets: [{
+                                data: budgetData.actual,
+                                backgroundColor: [
+                                    '#ef4444', '#f97316', '#f59e0b', '#8b5cf6', 
+                                    '#3b82f6', '#06d6a0', '#10b981', '#84cc16'
+                                ],
+                                borderWidth: 2,
+                                borderColor: 'rgba(255, 255, 255, 0.2)'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        color: 'rgba(255, 255, 255, 0.8)',
+                                        padding: 15,
+                                        usePointStyle: true,
+                                        font: { size: 11 }
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                    titleColor: 'white',
+                                    bodyColor: 'white'
+                                }
+                            }
+                        }
+                    });
                 }
-            });
+
+                console.log('Charts initialized successfully');
+            } catch (error) {
+                console.error('Error initializing charts:', error);
+            }
         }
     </script>
 </body>
