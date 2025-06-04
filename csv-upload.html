@@ -7,14 +7,12 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
-            background-attachment: fixed;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e1b4b, #312e81);
             color: white;
             min-height: 100vh;
         }
         
-        /* Navigation */
         .navbar {
             position: fixed;
             top: 0;
@@ -120,21 +118,11 @@
             color: white;
         }
         
-        .privacy-toggle:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
         .logout-btn {
             background: linear-gradient(135deg, #ef4444, #dc2626);
             color: white;
         }
         
-        .logout-btn:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-        
-        /* Main Content */
         .main-content {
             margin-top: 100px;
             padding: 24px;
@@ -152,4 +140,719 @@
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 8px;
-            background: linear-gradient(135deg, #8b5cf6, #3b82f6
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .page-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.125rem;
+        }
+        
+        .upload-instructions {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.15));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .instructions-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: white;
+        }
+        
+        .instructions-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .instructions-list li {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.5;
+        }
+        
+        .step-number {
+            background: linear-gradient(135deg, #8b5cf6, #9333ea);
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .supported-banks {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 32px;
+        }
+        
+        .banks-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: white;
+        }
+        
+        .banks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+        }
+        
+        .bank-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .upload-zone {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 48px 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 32px;
+        }
+        
+        .upload-zone:hover {
+            border-color: #8b5cf6;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.15));
+            transform: translateY(-2px);
+        }
+        
+        .upload-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+        
+        .upload-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: white;
+        }
+        
+        .upload-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .upload-button {
+            background: linear-gradient(135deg, #8b5cf6, #9333ea);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 16px;
+        }
+        
+        .upload-button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .file-types {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .file-preview {
+            margin-top: 24px;
+            display: none;
+        }
+        
+        .file-list {
+            display: grid;
+            gap: 12px;
+        }
+        
+        .file-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .file-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 1.125rem;
+        }
+        
+        .file-details h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 4px;
+        }
+        
+        .file-details p {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .file-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .file-action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .file-action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .file-action-btn.remove {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+        
+        .processing-status {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 32px;
+            display: none;
+        }
+        
+        .processing-status.active {
+            display: block;
+        }
+        
+        .status-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .status-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+        }
+        
+        .status-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .status-text {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .results-summary {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.15));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 32px;
+            display: none;
+        }
+        
+        .results-summary.active {
+            display: block;
+        }
+        
+        .results-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: white;
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .result-item {
+            text-align: center;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .result-label {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .result-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: monospace;
+            color: #10b981;
+        }
+        
+        .result-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        
+        .result-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .result-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .result-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .positive { color: #10b981; }
+        .negative { color: #ef4444; }
+        .neutral { color: white; }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .main-content {
+                padding: 16px;
+                margin-top: 88px;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .upload-zone {
+                padding: 32px 16px;
+            }
+            
+            .banks-grid {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            }
+            
+            .results-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 12px;
+            }
+            
+            .result-actions {
+                flex-direction: column;
+            }
+            
+            .file-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            
+            .file-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <div class="logo-icon">$</div>
+                <span>FinanceOS</span>
+            </a>
+            
+            <ul class="nav-links">
+                <li><a href="index.html">Dashboard</a></li>
+                <li><a href="budget.html">Budget</a></li>
+                <li><a href="goals.html">Goals</a></li>
+                <li><a href="csv-upload.html" class="active">Upload</a></li>
+            </ul>
+            
+            <div class="nav-actions">
+                <button class="privacy-toggle" onclick="togglePrivacy()">Privacy Mode</button>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Upload Bank Statements</h1>
+            <p class="page-subtitle">Import your weekly CSV files to automatically update your budget and goals</p>
+        </div>
+
+        <div class="upload-instructions">
+            <h2 class="instructions-title">How to Upload Your Bank Statements</h2>
+            <ol class="instructions-list">
+                <li>
+                    <span class="step-number">1</span>
+                    <span>Download CSV statements from your NZ bank's online banking platform</span>
+                </li>
+                <li>
+                    <span class="step-number">2</span>
+                    <span>Select weekly or monthly statement periods for best results</span>
+                </li>
+                <li>
+                    <span class="step-number">3</span>
+                    <span>Upload files using the drag-and-drop area below or click to browse</span>
+                </li>
+                <li>
+                    <span class="step-number">4</span>
+                    <span>Review categorized transactions and confirm the import</span>
+                </li>
+                <li>
+                    <span class="step-number">5</span>
+                    <span>Your budget and goals will automatically update with new data</span>
+                </li>
+            </ol>
+        </div>
+
+        <div class="supported-banks">
+            <h3 class="banks-title">Supported New Zealand Banks</h3>
+            <div class="banks-grid">
+                <div class="bank-item">ANZ</div>
+                <div class="bank-item">ASB</div>
+                <div class="bank-item">BNZ</div>
+                <div class="bank-item">Kiwibank</div>
+                <div class="bank-item">Westpac</div>
+                <div class="bank-item">TSB</div>
+                <div class="bank-item">Co-operative Bank</div>
+                <div class="bank-item">SBS Bank</div>
+            </div>
+        </div>
+
+        <div class="upload-zone" id="uploadZone">
+            <div class="upload-icon">📤</div>
+            <h2 class="upload-title">Drop your CSV files here</h2>
+            <p class="upload-subtitle">
+                Drag and drop your bank statement files, or click the button below to browse your computer.
+                Multiple files can be uploaded at once.
+            </p>
+            <button class="upload-button" onclick="document.getElementById('fileInput').click()">
+                Choose Files
+            </button>
+            <input type="file" id="fileInput" class="file-input" multiple accept=".csv,.xls,.xlsx,.qif,.ofx">
+            <p class="file-types">Supports: CSV, Excel, QIF, OFX files</p>
+        </div>
+
+        <div class="file-preview" id="filePreview">
+            <div class="file-list" id="fileList">
+                <!-- Files will be dynamically added here -->
+            </div>
+        </div>
+
+        <div class="processing-status" id="processingStatus">
+            <div class="status-header">
+                <div class="status-icon">⚙️</div>
+                <h3 class="status-title">Processing Your Files...</h3>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <p class="status-text" id="statusText">Analyzing file formats and detecting bank types...</p>
+        </div>
+
+        <div class="results-summary" id="resultsSummary">
+            <h2 class="results-title">Import Complete</h2>
+            <div class="results-grid">
+                <div class="result-item">
+                    <div class="result-label">Files Processed</div>
+                    <div class="result-value" id="filesProcessed">0</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Transactions Added</div>
+                    <div class="result-value" id="transactionsAdded">0</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Duplicates Skipped</div>
+                    <div class="result-value" id="duplicatesSkipped">0</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Categories Updated</div>
+                    <div class="result-value" id="categoriesUpdated">0</div>
+                </div>
+            </div>
+            <div class="result-actions">
+                <button class="result-btn" onclick="window.location.href='budget.html'">
+                    View Updated Budget
+                </button>
+                <button class="result-btn secondary" onclick="resetUpload()">
+                    Upload More Files
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let selectedFiles = [];
+
+        function togglePrivacy() {
+            document.body.classList.toggle('privacy-mode');
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const filePreview = document.getElementById('filePreview');
+        const fileList = document.getElementById('fileList');
+
+        uploadZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.style.borderColor = '#8b5cf6';
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            selectedFiles = Array.from(files);
+            displayFilePreview();
+        }
+
+        function displayFilePreview() {
+            if (selectedFiles.length === 0) {
+                filePreview.style.display = 'none';
+                return;
+            }
+
+            filePreview.style.display = 'block';
+            fileList.innerHTML = '';
+
+            selectedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <div class="file-info">
+                        <div class="file-icon">📄</div>
+                        <div class="file-details">
+                            <h4>${file.name}</h4>
+                            <p>${formatFileSize(file.size)} • ${getFileType(file.name)}</p>
+                        </div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="file-action-btn" onclick="processFile(${index})">Process</button>
+                        <button class="file-action-btn remove" onclick="removeFile(${index})">Remove</button>
+                    </div>
+                `;
+                fileList.appendChild(fileItem);
+            });
+
+            const processAllBtn = document.createElement('div');
+            processAllBtn.innerHTML = `
+                <button class="upload-button" onclick="processAllFiles()" style="margin-top: 16px; width: 100%;">
+                    Process All Files (${selectedFiles.length})
+                </button>
+            `;
+            fileList.appendChild(processAllBtn);
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function getFileType(filename) {
+            const extension = filename.split('.').pop().toLowerCase();
+            const types = {
+                'csv': 'CSV File',
+                'xls': 'Excel File',
+                'xlsx': 'Excel File',
+                'qif': 'QIF File',
+                'ofx': 'OFX File'
+            };
+            return types[extension] || 'Unknown Type';
+        }
+
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            displayFilePreview();
+        }
+
+        function processFile(index) {
+            processFiles([selectedFiles[index]]);
+        }
+
+        function processAllFiles() {
+            processFiles(selectedFiles);
+        }
+
+        function processFiles(files) {
+            document.getElementById('processingStatus').classList.add('active');
+            
+            let progress = 0;
+            const progressFill = document.getElementById('progressFill');
+            const statusText = document.getElementById('statusText');
+            
+            const steps = [
+                'Analyzing file formats...',
+                'Detecting bank types...',
+                'Parsing transactions...',
+                'Categorizing expenses...',
+                'Checking for duplicates...',
+                'Updating budget data...',
+                'Finalizing import...'
+            ];
+
+            const interval = setInterval(() => {
+                progress += Math.random() * 20;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    showResults(files);
+                }
+                
+                progressFill.style.width = progress + '%';
+                statusText.textContent = steps[Math.floor((progress / 100) * (steps.length - 1))];
+            }, 500);
+        }
+
+        function showResults(files) {
+            document.getElementById('processingStatus').classList.remove('active');
+            
+            const resultsSummary = document.getElementById('resultsSummary');
+            resultsSummary.classList.add('active');
+            
+            const transactionCount = files.length * Math.floor(Math.random() * 50 + 10);
+            const duplicateCount = Math.floor(transactionCount * 0.1);
+            const categoryCount = Math.min(files.length * 3, 8);
+            
+            document.getElementById('filesProcessed').textContent = files.length;
+            document.getElementById('transactionsAdded').textContent = transactionCount - duplicateCount;
+            document.getElementById('duplicatesSkipped').textContent = duplicateCount;
+            document.getElementById('categoriesUpdated').textContent = categoryCount;
+        }
+
+        function resetUpload() {
+            selectedFiles = [];
+            
+            document.getElementById('filePreview').style.display = 'none';
+            document.getElementById('processingStatus').classList.remove('active');
+            document.getElementById('resultsSummary').classList.remove('active');
+            
+            fileInput.value = '';
+            fileList.innerHTML = '';
+        }
+    </script>
+</body>
+</html>
