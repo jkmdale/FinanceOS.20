@@ -3,656 +3,824 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#8b5cf6">
-    <meta name="description" content="Track your financial goals and progress">
-    
-    <!-- PWA Meta Tags -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="FinanceOS">
-    <meta name="mobile-web-app-capable" content="yes">
-    
-    <!-- Icons -->
-    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
-    <link rel="manifest" href="manifest.json">
-    
     <title>Goals - FinanceOS</title>
-    
-    <!-- External Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    
-    <!-- Styles -->
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/components.css">
-    <link rel="stylesheet" href="styles/goals.css">
+    <meta name="theme-color" content="#8b5cf6">
+    <link rel="manifest" href="manifest.json">
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
+            background-attachment: fixed;
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* CSS Variables for Design System */
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-premium-bg: linear-gradient(135deg, 
+                rgba(139, 92, 246, 0.15) 0%, 
+                rgba(59, 130, 246, 0.15) 50%, 
+                rgba(147, 51, 234, 0.15) 100%);
+            --glass-premium-border: rgba(255, 255, 255, 0.2);
+            --gradient-purple: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
+            --gradient-blue: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+            --gradient-green: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+            --gradient-red: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+            --text-white: rgba(255, 255, 255, 0.9);
+            --text-gray: rgba(255, 255, 255, 0.7);
+            --text-light: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Glass Effects */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .glass-premium {
+            background: var(--glass-premium-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-premium-border);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Navigation Bar - BIGGER UNIFIED STYLE */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 20px 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            font-weight: 700;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            margin-right: 12px;
+            border-radius: 12px;
+            background: var(--gradient-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-gray);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            padding: 12px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-links a.active {
+            color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background: #8b5cf6;
+            border-radius: 50%;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .privacy-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .privacy-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .logout-btn {
+            background: var(--gradient-red);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 100px;
+            padding: 24px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            color: var(--text-gray);
+            font-size: 1.125rem;
+        }
+
+        /* Goals Overview */
+        .goals-overview {
+            background: var(--glass-premium-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-premium-border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+
+        .overview-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .overview-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-gray);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        /* Goals Grid */
+        .goals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .goal-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .goal-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 48px rgba(139, 92, 246, 0.3);
+        }
+
+        .goal-card.critical {
+            border: 2px solid rgba(239, 68, 68, 0.5);
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
+        }
+
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .goal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-white);
+            margin-bottom: 4px;
+        }
+
+        .goal-priority {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .priority-critical {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .priority-high {
+            background: rgba(249, 115, 22, 0.2);
+            color: #f97316;
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+
+        .priority-medium {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .goal-description {
+            color: var(--text-gray);
+            font-size: 0.875rem;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .goal-progress {
+            margin-bottom: 16px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .progress-amounts {
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            font-size: 0.875rem;
+            color: var(--text-gray);
+        }
+
+        .progress-percentage {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-critical { background: var(--gradient-red); }
+        .progress-high { background: var(--gradient-red); }
+        .progress-medium { background: var(--gradient-blue); }
+        .progress-good { background: var(--gradient-green); }
+
+        .goal-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .goal-stat {
+            text-align: center;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .goal-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-gray);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .goal-stat-value {
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+        }
+
+        .goal-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .goal-action-btn {
+            flex: 1;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--gradient-purple);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Add Goal Button */
+        .add-goal-section {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .add-goal-btn {
+            background: var(--gradient-green);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .add-goal-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Positive/Negative Colors */
+        .positive { color: #10b981; }
+        .negative { color: #ef4444; }
+        .neutral { color: var(--text-white); }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .main-content {
+                padding: 16px;
+                margin-top: 88px;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .goals-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .overview-stats {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 12px;
+            }
+
+            .goal-stats {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-container {
+                padding: 0 16px;
+            }
+
+            .logo-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+
+            .page-title {
+                font-size: 1.75rem;
+            }
+
+            .goal-card {
+                padding: 20px;
+            }
+
+            .goal-actions {
+                flex-direction: column;
+            }
+        }
+
+        /* Privacy Mode */
+        .privacy-mode .stat-value,
+        .privacy-mode .progress-amounts,
+        .privacy-mode .goal-stat-value {
+            filter: blur(4px);
+            transition: filter 0.3s ease;
+        }
+    </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="main-nav glass">
+    <!-- Navigation Bar -->
+    <nav class="navbar">
         <div class="nav-container">
-            <div class="nav-brand">
-                <svg width="48" height="48" viewBox="0 0 512 512" class="nav-logo">
-                    <rect width="512" height="512" rx="115" fill="url(#backgroundGradient)"/>
-                    <circle cx="256" cy="256" r="140" fill="url(#centralGradient)"/>
-                    <text x="256" y="280" text-anchor="middle" font-size="120" font-weight="bold" fill="white">$</text>
-                    <defs>
-                        <linearGradient id="backgroundGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#6366f1"/>
-                            <stop offset="50%" stop-color="#8b5cf6"/>
-                            <stop offset="100%" stop-color="#3b82f6"/>
-                        </linearGradient>
-                        <linearGradient id="centralGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#10b981" stop-opacity="0.9"/>
-                            <stop offset="100%" stop-color="#059669" stop-opacity="0.9"/>
-                        </linearGradient>
-                    </defs>
-                </svg>
-                <span class="nav-title">FinanceOS</span>
-            </div>
+            <a href="index.html" class="nav-logo">
+                <div class="logo-icon">$</div>
+                <span>FinanceOS</span>
+            </a>
             
-            <div class="nav-menu" id="navMenu">
-                <a href="index.html" class="nav-link" data-page="dashboard">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                        <rect x="9" y="9" width="6" height="6"/>
-                        <path d="m9 1 0 8"/>
-                        <path d="m15 1 0 8"/>
-                        <path d="m1 9 8 0"/>
-                        <path d="m1 15 8 0"/>
-                    </svg>
-                    Dashboard
-                    <div class="nav-indicator"></div>
-                </a>
-                <a href="budget.html" class="nav-link" data-page="budget">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <line x1="12" y1="1" x2="12" y2="23"/>
-                        <path d="m17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                    </svg>
-                    Budget
-                    <div class="nav-indicator"></div>
-                </a>
-                <a href="goals.html" class="nav-link active" data-page="goals">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polygon points="16.24,7.76 14.12,14.12 7.76,16.24 9.88,9.88 16.24,7.76"/>
-                    </svg>
-                    Goals
-                    <div class="nav-indicator"></div>
-                </a>
-                <a href="csv-upload.html" class="nav-link" data-page="upload">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7,10 12,15 17,10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
-                    </svg>
-                    Upload
-                    <div class="nav-indicator"></div>
-                </a>
-            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Dashboard</a></li>
+                <li><a href="budget.html">Budget</a></li>
+                <li><a href="goals.html" class="active">Goals</a></li>
+                <li><a href="csv-upload.html">Upload</a></li>
+            </ul>
             
             <div class="nav-actions">
-                <button class="privacy-toggle" id="privacyToggle" title="Toggle Privacy Mode">
-                    <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                        <circle cx="12" cy="12" r="3"/>
-                    </svg>
-                </button>
-                <button class="hamburger" id="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
+                <button class="privacy-toggle" onclick="togglePrivacy()">Privacy Mode</button>
+                <button class="logout-btn" onclick="logout()">Logout</button>
             </div>
+            
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
         </div>
     </nav>
 
     <!-- Main Content -->
     <main class="main-content">
         <!-- Page Header -->
-        <header class="page-header">
-            <div class="header-content">
-                <div class="title-section">
-                    <h1 class="page-title">Financial Goals</h1>
-                    <p class="page-subtitle">Track your progress toward financial freedom</p>
-                </div>
-                <button class="add-goal-btn glass-premium" onclick="openAddGoalModal()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <line x1="12" y1="5" x2="12" y2="19"/>
-                        <line x1="5" y1="12" x2="19" y2="12"/>
-                    </svg>
-                    Add Goal
-                </button>
-            </div>
-        </header>
+        <div class="page-header">
+            <h1 class="page-title">Financial Goals</h1>
+            <p class="page-subtitle">Track your progress toward financial freedom</p>
+        </div>
 
-        <!-- Goals Overview Cards -->
-        <section class="goals-overview">
-            <div class="overview-grid">
-                <div class="overview-card total-goals">
-                    <div class="overview-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <circle cx="12" cy="12" r="10"/>
-                            <polygon points="16.24,7.76 14.12,14.12 7.76,16.24 9.88,9.88 16.24,7.76"/>
-                        </svg>
-                    </div>
-                    <div class="overview-content">
-                        <h3>Total Goals</h3>
-                        <div class="overview-value">4</div>
-                        <div class="overview-meta">2 Critical • 2 High Priority</div>
-                    </div>
+        <!-- Goals Overview -->
+        <div class="goals-overview">
+            <h2 class="overview-title">Goals Progress Overview</h2>
+            <div class="overview-stats">
+                <div class="stat-item">
+                    <div class="stat-label">Total Goals</div>
+                    <div class="stat-value neutral">4</div>
                 </div>
-
-                <div class="overview-card completed-goals">
-                    <div class="overview-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                            <polyline points="22,4 12,14.01 9,11.01"/>
-                        </svg>
-                    </div>
-                    <div class="overview-content">
-                        <h3>Completed</h3>
-                        <div class="overview-value">0</div>
-                        <div class="overview-meta">0% completion rate</div>
-                    </div>
+                <div class="stat-item">
+                    <div class="stat-label">On Track</div>
+                    <div class="stat-value positive">2</div>
                 </div>
-
-                <div class="overview-card total-target">
-                    <div class="overview-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <line x1="12" y1="1" x2="12" y2="23"/>
-                            <path d="m17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                        </svg>
-                    </div>
-                    <div class="overview-content">
-                        <h3>Total Target</h3>
-                        <div class="overview-value privacy-sensitive">$118,251</div>
-                        <div class="overview-meta">Across all goals</div>
-                    </div>
+                <div class="stat-item">
+                    <div class="stat-label">Behind</div>
+                    <div class="stat-value negative">2</div>
                 </div>
-
-                <div class="overview-card current-progress">
-                    <div class="overview-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
-                        </svg>
-                    </div>
-                    <div class="overview-content">
-                        <h3>Progress</h3>
-                        <div class="overview-value privacy-sensitive">$48,733</div>
-                        <div class="overview-meta">41.2% of total target</div>
-                    </div>
+                <div class="stat-item">
+                    <div class="stat-label">Total Saved</div>
+                    <div class="stat-value positive">$49,033</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Target Amount</div>
+                    <div class="stat-value neutral">$135,000</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Overall Progress</div>
+                    <div class="stat-value neutral">36.3%</div>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- Critical Goals Alert -->
-        <section class="critical-goals-alert">
-            <div class="alert-card critical">
-                <div class="alert-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-                        <path d="M12 9v4"/>
-                        <path d="M12 17h.01"/>
-                    </svg>
-                </div>
-                <div class="alert-content">
-                    <h3>Critical Goal Alert</h3>
-                    <p>Your Emergency Fund is critically low at $0.17. This puts your family at extreme financial risk. Immediate action required.</p>
-                </div>
-                <button class="alert-action" onclick="focusEmergencyFund()">Fix Now</button>
-            </div>
-        </section>
-
-        <!-- Goals List -->
-        <section class="goals-list">
+        <!-- Goals Grid -->
+        <div class="goals-grid">
             <!-- Emergency Fund Goal - CRITICAL -->
             <div class="goal-card critical">
                 <div class="goal-header">
-                    <div class="goal-priority">
-                        <span class="priority-badge critical">CRITICAL</span>
-                        <div class="goal-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                                <path d="m2 17 10 5 10-5"/>
-                                <path d="m2 12 10 5 10-5"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="goal-info">
+                    <div>
                         <h3 class="goal-title">Emergency Fund</h3>
-                        <p class="goal-description">3-month expense coverage for financial security</p>
-                        <div class="goal-timeline">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <circle cx="12" cy="12" r="10"/>
-                                <polyline points="12,6 12,12 16,14"/>
-                            </svg>
-                            Target: Dec 2025 • 365 days remaining
-                        </div>
-                    </div>
-                    <div class="goal-actions">
-                        <button class="goal-action-btn" onclick="adjustGoal('emergency-fund')">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="M12 20h9"/>
-                                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                            </svg>
-                        </button>
+                        <div class="goal-priority priority-critical">Critical</div>
                     </div>
                 </div>
-
-                <div class="goal-progress">
-                    <div class="progress-header">
-                        <div class="progress-amounts">
-                            <span class="current-amount privacy-sensitive">$0.17</span>
-                            <span class="target-amount privacy-sensitive">$15,000</span>
-                        </div>
-                        <div class="progress-percentage">0.001%</div>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 0.001%"></div>
-                    </div>
-                    <div class="progress-insights">
-                        <div class="insight-item critical">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-                            </svg>
-                            Need $41.10/day to reach target by deadline
-                        </div>
-                        <div class="insight-item">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <trending-up/>
-                            </svg>
-                            AI Recommendation: Start with $500/week minimum
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Credit Card Payoff Goal - HIGH -->
-            <div class="goal-card high">
-                <div class="goal-header">
-                    <div class="goal-priority">
-                        <span class="priority-badge high">HIGH</span>
-                        <div class="goal-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-                                <line x1="1" y1="10" x2="23" y2="10"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="goal-info">
-                        <h3 class="goal-title">Pay Off Low Rate Visa</h3>
-                        <p class="goal-description">Eliminate credit card debt to reduce interest costs</p>
-                        <div class="goal-timeline">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <circle cx="12" cy="12" r="10"/>
-                                <polyline points="12,6 12,12 16,14"/>
-                            </svg>
-                            Target: Jun 2025 • 180 days remaining
-                        </div>
-                    </div>
-                    <div class="goal-actions">
-                        <button class="goal-action-btn" onclick="adjustGoal('credit-card-payoff')">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="M12 20h9"/>
-                                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="goal-progress">
-                    <div class="progress-header">
-                        <div class="progress-amounts">
-                            <span class="current-amount privacy-sensitive">$0</span>
-                            <span class="target-amount privacy-sensitive">$3,251.30</span>
-                        </div>
-                        <div class="progress-percentage">0%</div>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 0%"></div>
-                    </div>
-                    <div class="progress-insights">
-                        <div class="insight-item warning">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-                            </svg>
-                            Interest accruing at $32.51/month (12% APR)
-                        </div>
-                        <div class="insight-item">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <trending-up/>
-                            </svg>
-                            Pay $550/month to clear debt by target date
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Investment Growth Goal - HIGH -->
-            <div class="goal-card high">
-                <div class="goal-header">
-                    <div class="goal-priority">
-                        <span class="priority-badge high">HIGH</span>
-                        <div class="goal-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="goal-info">
-                        <h3 class="goal-title">KiwiSaver Growth</h3>
-                        <p class="goal-description">Grow retirement savings to $100,000</p>
-                        <div class="goal-timeline">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <circle cx="12" cy="12" r="10"/>
-                                <polyline points="12,6 12,12 16,14"/>
-                            </svg>
-                            Target: Dec 2026 • 730 days remaining
-                        </div>
-                    </div>
-                    <div class="goal-actions">
-                        <button class="goal-action-btn" onclick="adjustGoal('kiwisaver-growth')">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="M12 20h9"/>
-                                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="goal-progress">
-                    <div class="progress-header">
-                        <div class="progress-amounts">
-                            <span class="current-amount privacy-sensitive">$48,733.44</span>
-                            <span class="target-amount privacy-sensitive">$100,000</span>
-                        </div>
-                        <div class="progress-percentage">48.7%</div>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 48.7%"></div>
-                    </div>
-                    <div class="progress-insights">
-                        <div class="insight-item positive">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
-                            </svg>
-                            Current 3% contribution rate: $189/month
-                        </div>
-                        <div class="insight-item">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <trending-up/>
-                            </svg>
-                            On track with employer matching and growth
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Private School Fund Goal - MEDIUM -->
-            <div class="goal-card medium">
-                <div class="goal-header">
-                    <div class="goal-priority">
-                        <span class="priority-badge medium">MEDIUM</span>
-                        <div class="goal-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-                                <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="goal-info">
-                        <h3 class="goal-title">Private School Education Fund</h3>
-                        <p class="goal-description">Save for children's private school fees</p>
-                        <div class="goal-timeline">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <circle cx="12" cy="12" r="10"/>
-                                <polyline points="12,6 12,12 16,14"/>
-                            </svg>
-                            Target: Jan 2028 • 1095 days remaining
-                        </div>
-                    </div>
-                    <div class="goal-actions">
-                        <button class="goal-action-btn" onclick="adjustGoal('education-fund')">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="M12 20h9"/>
-                                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="goal-progress">
-                    <div class="progress-header">
-                        <div class="progress-amounts">
-                            <span class="current-amount privacy-sensitive">$0</span>
-                            <span class="target-amount privacy-sensitive">$100,000</span>
-                        </div>
-                        <div class="progress-percentage">0%</div>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 0%"></div>
-                    </div>
-                    <div class="progress-insights">
-                        <div class="insight-item">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <calendar/>
-                            </svg>
-                            Current allocation: $300/month
-                        </div>
-                        <div class="insight-item">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <trending-up/>
-                            </svg>
-                            Need $30.45/day to reach target on time
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- AI Insights Panel -->
-        <section class="ai-insights">
-            <div class="insights-card glass-premium">
-                <div class="insights-header">
-                    <div class="insights-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <circle cx="12" cy="12" r="5"/>
-                            <path d="M12 1v6M12 17v6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6M17 12h6M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24"/>
-                        </svg>
-                    </div>
-                    <h3>AI Goal Optimization</h3>
-                </div>
+                <p class="goal-description">
+                    Build a safety net of 3-6 months expenses. Currently at extreme risk with only $0.17 saved.
+                    Financial experts recommend $15,000 minimum for your family situation.
+                </p>
                 
-                <div class="insights-content">
-                    <div class="insight-priority critical">
-                        <div class="insight-badge">🚨 URGENT</div>
-                        <h4>Emergency Fund Crisis</h4>
-                        <p>With only $0.17 in emergency savings, your family faces extreme financial risk. Any unexpected expense could lead to debt spiral.</p>
-                        <div class="insight-action">
-                            <strong>Recommendation:</strong> Immediately redirect $500/week to emergency fund before all other goals.
-                        </div>
+                <div class="goal-progress">
+                    <div class="progress-header">
+                        <span class="progress-amounts">$0.17 / $15,000</span>
+                        <span class="progress-percentage negative">0.001%</span>
                     </div>
-
-                    <div class="insight-priority high">
-                        <div class="insight-badge">⚡ HIGH</div>
-                        <h4>Goal Prioritization Strategy</h4>
-                        <p>Your current budget deficit of $3,607/month makes all savings goals impossible without major spending cuts.</p>
-                        <div class="insight-action">
-                            <strong>Recommendation:</strong> Focus on eliminating deficit first, then emergency fund, then debt payoff.
-                        </div>
-                    </div>
-
-                    <div class="insight-priority medium">
-                        <div class="insight-badge">💡 INSIGHT</div>
-                        <h4>Timeline Optimization</h4>
-                        <p>Your KiwiSaver goal is performing well with employer matching. Consider increasing contribution rate after stabilizing cash flow.</p>
-                        <div class="insight-action">
-                            <strong>Recommendation:</strong> Maintain current 3% rate until emergency fund is established.
-                        </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-critical" style="width: 0.001%"></div>
                     </div>
                 </div>
 
-                <div class="insights-footer">
-                    <button class="insights-action" onclick="openAICoach()">
-                        Get Detailed Plan
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <line x1="5" y1="12" x2="19" y2="12"/>
-                            <polyline points="12,5 19,12 12,19"/>
-                        </svg>
-                    </button>
+                <div class="goal-stats">
+                    <div class="goal-stat">
+                        <div class="goal-stat-label">Monthly Target</div>
+                        <div class="goal-stat-value negative">$0</div>
+                    </div>
+                    <div class="goal-stat">
+                        <div class="goal-stat-label">Time Left</div>
+                        <div class="goal-stat-value negative">Indefinite</div>
+                    </div>
+                </div>
+
+                <div class="goal-actions">
+                    <button class="goal-action-btn btn-primary">Start Saving</button>
+                    <button class="goal-action-btn btn-secondary">Edit Goal</button>
                 </div>
             </div>
-        </section>
+
+            <!-- Debt Payoff Goal -->
+            <div class="goal-card">
+                <div class="goal-header">
+                    <div>
+                        <h3 class="goal-title">Pay Off Visa Debt</h3>
+                        <div class="goal-priority priority-high">High</div>
+                    </div>
+                </div>
+                <p class="goal-description">
+                    Eliminate the Low Rate Visa debt to free up monthly cash flow and reduce interest payments.
+                    Current balance is costing approximately $135/month in interest.
+                </p>
+                
+                <div class="goal-progress">
+                    <div class="progress-header">
+                        <span class="progress-amounts">$0 / $3,251</span>
+                        <span class="progress-percentage negative">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-high" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="goal-stats">
+                    <div class="goal-stat">
+                        <div class="goal-stat-label">Monthly Payment</div>
+                        <div class="goal-stat-value neutral">$100</div>
+                    </div>
+                    <div class="goal-stat">
+                        <div class="goal-stat-label">Payoff Date</div>
+                        <div class="goal-stat-value neutral">Dec 2027</div>
+                    </div>
+                </div>
+
+                <div class="goal-actions">
+                    <button class="goal-action-btn btn-primary">Optimize Payment</button>
+                    <button class="goal-action-btn btn-secondary">Edit Goal</button>
+                </div>
+            </div>
+
+            <!-- KiwiSaver Growth Goal -->
+            <div class="goal-card">
+                <div class="goal-header">
+                    <div>
+                        <h3 class="goal-title">KiwiSaver Growth</h3>
+                        <div class="goal-priority priority-medium">Medium</div>
+                    </div>
+                </div>
+                <p class="goal-description">
+                    Grow retirement savings from current $48,733 to $100,000 by maximizing contributions and 
+                    investment returns over the next 5 years.
+                </p>
+                
+                <div class="goal-progress">
+                    <div class="progress-header">
+                        <span class="progress-amounts">$48,733 / $100,000</span>
+                        <span class="progress-percentage positive">48.7%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-good" style="width: 48.7%"></div>
+                    </div>
+                </div>
+
+                <div class="goal-stats">
+                    <div class="goal-stat">
+                        <div class="goal-stat-label">Monthly Contribution</div>
+                        <div class="goal-stat-value positive">$271</div>
+                    </div>
+                    <div class="goal-stat">
+                        <div class="goal-stat-label">Target Date</div>
+                        <div class="goal-stat-value neutral">Dec 2029</div>
+                    </div>
+                </div>
+
+                <div class="goal-actions">
+                    <button class="goal-action-btn btn-primary">Review Strategy</button>
+                    <button class="goal-action-btn btn-secondary">Edit Goal</button>
+                </div>
+            </div>
+
+            <!-- Private School Fund -->
+            <div class="goal-card">
+                <div class="goal-header">
+                    <div>
+                        <h3 class="goal-title">Private School Fund</h3>
+                        <div class="goal-priority priority-medium">Medium</div>
+                    </div>
+                </div>
+                <p class="goal-description">
+                    Save for private school education costs. Currently contributing $300/month toward 
+                    this long-term education investment for your children.
+                </p>
+                
+                <div class="goal-progress">
+                    <div class="progress-header">
+                        <span class="progress-amounts">$300 / $17,000</span>
+                        <span class="progress-percentage neutral">1.8%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill progress-medium" style="width: 1.8%"></div>
+                    </div>
+                </div>
+
+                <div class="goal-stats">
+                    <div class="goal-stat">
+                        <div class="goal-stat-label">Monthly Savings</div>
+                        <div class="goal-stat-value positive">$300</div>
+                    </div>
+                    <div class="goal-stat">
+                        <div class="goal-stat-label">Target Date</div>
+                        <div class="goal-stat-value neutral">Jan 2030</div>
+                    </div>
+                </div>
+
+                <div class="goal-actions">
+                    <button class="goal-action-btn btn-primary">Adjust Amount</button>
+                    <button class="goal-action-btn btn-secondary">Edit Goal</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add New Goal -->
+        <div class="add-goal-section">
+            <button class="add-goal-btn">
+                <span>+</span>
+                Add New Goal
+            </button>
+        </div>
     </main>
 
-    <!-- Add Goal Modal -->
-    <div class="modal-overlay" id="addGoalModal">
-        <div class="modal-content glass-premium">
-            <div class="modal-header">
-                <h3>Add New Financial Goal</h3>
-                <button class="modal-close" onclick="closeAddGoalModal()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                </button>
-            </div>
+    <script>
+        // Privacy mode functionality
+        let privacyMode = false;
+
+        function togglePrivacy() {
+            privacyMode = !privacyMode;
+            const body = document.body;
+            const button = document.querySelector('.privacy-toggle');
             
-            <form class="add-goal-form" id="addGoalForm">
-                <div class="form-section">
-                    <label for="goalTitle">Goal Name</label>
-                    <input type="text" id="goalTitle" placeholder="e.g., Vacation Fund, Car Replacement" required>
-                </div>
+            if (privacyMode) {
+                body.classList.add('privacy-mode');
+                button.textContent = 'Show Values';
+            } else {
+                body.classList.remove('privacy-mode');
+                button.textContent = 'Privacy Mode';
+            }
+        }
 
-                <div class="form-section">
-                    <label for="goalDescription">Description</label>
-                    <textarea id="goalDescription" placeholder="Brief description of this goal" rows="2"></textarea>
-                </div>
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = 'login.html';
+            }
+        }
 
-                <div class="form-row">
-                    <div class="form-section">
-                        <label for="goalAmount">Target Amount</label>
-                        <div class="input-with-prefix">
-                            <span class="prefix">$</span>
-                            <input type="number" id="goalAmount" placeholder="10000" step="0.01" required>
-                        </div>
-                    </div>
+        function toggleMobileMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.classList.toggle('show');
+        }
 
-                    <div class="form-section">
-                        <label for="goalDate">Target Date</label>
-                        <input type="date" id="goalDate" required>
-                    </div>
-                </div>
-
-                <div class="form-section">
-                    <label for="goalPriority">Priority Level</label>
-                    <select id="goalPriority" required>
-                        <option value="critical">Critical - Immediate need</option>
-                        <option value="high">High - Important goal</option>
-                        <option value="medium">Medium - Nice to have</option>
-                        <option value="low">Low - Future consideration</option>
-                    </select>
-                </div>
-
-                <div class="form-section">
-                    <label for="goalCategory">Category</label>
-                    <select id="goalCategory" required>
-                        <option value="emergency">Emergency Fund</option>
-                        <option value="debt">Debt Payoff</option>
-                        <option value="savings">General Savings</option>
-                        <option value="investment">Investment</option>
-                        <option value="education">Education</option>
-                        <option value="travel">Travel</option>
-                        <option value="home">Home/Property</option>
-                        <option value="vehicle">Vehicle</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-
-                <div class="form-section">
-                    <label for="monthlyContribution">Monthly Contribution</label>
-                    <div class="input-with-prefix">
-                        <span class="prefix">$</span>
-                        <input type="number" id="monthlyContribution" placeholder="500" step="0.01">
-                    </div>
-                    <div class="form-hint">AI will suggest optimal amount based on timeline</div>
-                </div>
-
-                <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="closeAddGoalModal()">Cancel</button>
-                    <button type="submit" class="btn-primary">Add Goal</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- AI Coach Modal -->
-    <div class="ai-coach-modal" id="aiCoachModal">
-        <div class="modal-backdrop"></div>
-        <div class="modal-content glass-premium">
-            <div class="modal-header">
-                <h3>AI Financial Coach</h3>
-                <button class="modal-close" onclick="closeAICoach()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                </button>
-            </div>
-            
-            <div class="chat-container" id="chatContainer">
-                <div class="chat-message ai-message">
-                    <div class="message-avatar">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <circle cx="12" cy="12" r="5"/>
-                            <path d="M12 1v6M12 17v6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6M17 12h6M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24"/>
-                        </svg>
-                    </div>
-                    <div class="message-content">
-                        <p>I've analyzed your financial goals and current situation. Here's my priority assessment:</p>
-                        <ol>
-                            <li><strong>EMERGENCY:</strong> Build emergency fund to $3,000 minimum (1 month expenses)</li>
-                            <li><strong>STABILIZE:</strong> Eliminate the $3,607 monthly deficit</li>
-                            <li><strong>SECURE:</strong> Complete emergency fund to $15,000</li>
-                            <li><strong>OPTIMIZE:</strong> Pay off credit card debt</li>
-                        </ol>
-                        <p>Ask me specific questions about achieving these goals!</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="chat-input-area">
-                <div class="quick-questions">
-                    <button class="quick-question" onclick="askQuestion('How do I build emergency fund fast?')">
-                        How do I build emergency fund fast?
-                    </button>
-                    <button class="quick-question" onclick="askQuestion('What spending should I cut first?')">
-                        What spending should I cut first?
-                    </button>
-                    <button class="quick-question" onclick="askQuestion('Should I pay debt or save first?')">
-                        Should I pay debt or save first?
-                    </button>
-                </div>
-                
-                <div class="chat-input">
-                    <input type="text" id="chatInput" placeholder="Ask about your goals..." onkeypress="handleChatKeyPress(event)">
-                    <button onclick="sendChatMessage()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <line x1="22" y1="2" x2="11" y2="13"/>
-                            <polygon points="22,2 15,22 11,13 2,9 22,2"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Scripts -->
-    <script src="js/app.js"></script>
-    <script src="js/goals.js"></script>
-    <script src="js/ai-coach.js"></script>
-    <script src="js/privacy.js"></script>
+        // Service Worker Registration for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>
