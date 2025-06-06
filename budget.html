@@ -506,4 +506,129 @@
                     if (remainingDeficit > 0) {
                         alertMessage += ` Immediate action required to reduce expenses and build emergency savings.`;
                     } else {
-    
+                        alertMessage += ` Your emergency fund can cover this deficit.`;
+                    }
+                } else {
+                    alertMessage += ` You have no emergency fund. Immediate action required to reduce expenses and build emergency savings.`;
+                }
+                budgetDeficitAlert.innerHTML = `<strong>Budget Deficit Alert</strong><br>${alertMessage}`;
+            } else {
+                budgetDeficitAlert.style.display = 'none';
+            }
+
+            // Update chart
+            updateExpenseChart(budgetActuals, budgetData);
+        };
+
+        let expenseChart;
+
+        const updateExpenseChart = (actuals, budgetData) => {
+            const ctx = document.getElementById('expense-chart').getContext('2d');
+            const expenseCategories = budgetData.filter(row => row.category !== 'Income');
+            const labels = expenseCategories.map(row => row.category);
+            const actualExpenses = labels.map(label => actuals[label] || 0);
+            const budgetedExpenses = labels.map(label => parseFloat(budgetData.find(d => d.category === label)?.budgeted) || 0);
+
+            if (expenseChart) {
+                expenseChart.destroy();
+            }
+
+            expenseChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Actual Expenses',
+                            data: actualExpenses,
+                            backgroundColor: 'rgba(244, 67, 54, 0.7)', // Red
+                            borderColor: 'rgba(244, 67, 54, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Budgeted Expenses',
+                            data: budgetedExpenses,
+                            backgroundColor: 'rgba(33, 150, 243, 0.7)', // Blue
+                            borderColor: 'rgba(33, 150, 243, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: 'white'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: 'white'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'white'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('en-NZ', { style: 'currency', currency: 'NZD' }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        };
+
+
+        // Function to update the sync status indicator
+        const addSyncStatusIndicator = () => {
+            const transactions = JSON.parse(localStorage.getItem('financeos_transactions') || '[]');
+            const lastUpdate = localStorage.getItem('financeos_last_update');
+            const statusContainer = document.getElementById('sync-status-container');
+            statusContainer.style.display = 'block'; // Ensure it's visible
+
+            if (transactions.length > 0 && lastUpdate) {
+                const updateTime = new Date(lastUpdate).toLocaleTimeString('en-NZ', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const isRecent = (Date.now() - new Date(lastUpdate).getTime()) < (24 * 60 * 60 * 1000); // 24 hours
+                statusContainer.innerHTML = `Budget synced with ${transactions.length} transactions. (UpdateTime ${updateTime})`;
+                statusContainer.classList.remove('error');
+                statusContainer.classList.add('success'); // Assuming a 'success' class for green styling
+            } else {
+                statusContainer.innerHTML = 'No transaction data found. <small>Upload statements <a href="/upload.html" style="color: inherit; text-decoration: underline;">here</a>.</small>';
+                statusContainer.classList.remove('success');
+                statusContainer.classList.add('error'); // Assuming an 'error' class for red styling
+            }
+        };
+
+        // Initialize display on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateBudgetTable();
+            addSyncStatusIndicator();
+        });
+
+    </script>
+
+</body>
+</html>
