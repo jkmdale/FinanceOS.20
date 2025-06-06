@@ -5,13 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
-<button onclick="alert('Storage has: ' + localStorage.length + ' items')" style="position: fixed; top: 10px; right: 10px; z-index: 9999; background: red; color: white; padding: 10px; border: none; border-radius: 5px;">TEST</button>
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #0f172a, #1e1b4b, #312e81);
             color: white;
             min-height: 100vh;
+        }
+        
+        /* VERY VISIBLE TEST BUTTON */
+        .giant-test-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: red;
+            color: white;
+            border: 3px solid yellow;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            z-index: 10000;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
         }
         
         .navbar {
@@ -149,6 +165,29 @@
         .page-subtitle {
             color: rgba(255, 255, 255, 0.7);
             font-size: 1.125rem;
+        }
+        
+        /* Storage Status Display */
+        .storage-status {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2));
+            border: 2px solid rgba(16, 185, 129, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .storage-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #10b981;
+        }
+        
+        .storage-info {
+            font-family: monospace;
+            font-size: 1rem;
+            line-height: 1.5;
         }
         
         .upload-instructions {
@@ -297,134 +336,6 @@
             color: rgba(255, 255, 255, 0.5);
         }
         
-        .file-preview {
-            margin-top: 24px;
-            display: none;
-        }
-        
-        .file-list {
-            display: grid;
-            gap: 12px;
-        }
-        
-        .file-item {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .file-info {
-            display: flex;
-            align-items: center;
-        }
-        
-        .file-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #10b981, #059669);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 12px;
-            font-size: 1.125rem;
-        }
-        
-        .file-details h4 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: white;
-            margin-bottom: 4px;
-        }
-        
-        .file-details p {
-            font-size: 0.875rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
-        
-        .file-actions {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .file-action-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            border-radius: 6px;
-            padding: 6px 12px;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .file-action-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .file-action-btn.remove {
-            background: rgba(239, 68, 68, 0.2);
-            border-color: rgba(239, 68, 68, 0.3);
-            color: #ef4444;
-        }
-        
-        .processing-status {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 32px;
-            display: none;
-        }
-        
-        .processing-status.active {
-            display: block;
-        }
-        
-        .status-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        
-        .status-icon {
-            width: 24px;
-            height: 24px;
-            margin-right: 12px;
-        }
-        
-        .status-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: white;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 12px;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-        
-        .status-text {
-            font-size: 0.875rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
-        
         .results-summary {
             background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.15));
             backdrop-filter: blur(20px);
@@ -446,52 +357,16 @@
             color: white;
         }
         
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-        
-        .result-item {
-            text-align: center;
-            padding: 16px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .result-label {
-            font-size: 0.875rem;
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .result-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            font-family: monospace;
-            color: #10b981;
-        }
-        
-        .result-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        
         .result-btn {
             background: linear-gradient(135deg, #10b981, #059669);
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 8px;
-            font-size: 0.875rem;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
+            margin: 10px;
             transition: all 0.3s ease;
         }
         
@@ -499,60 +374,6 @@
             opacity: 0.9;
             transform: translateY(-1px);
         }
-        
-        .result-btn.secondary {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        /* Debug Section */
-        .debug-section {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 20px;
-        }
-        
-        .debug-title {
-            margin-bottom: 10px;
-            font-size: 1rem;
-            color: #10b981;
-        }
-        
-        .debug-info {
-            font-family: monospace;
-            font-size: 0.8rem;
-            line-height: 1.4;
-            color: rgba(255, 255, 255, 0.8);
-            white-space: pre-line;
-        }
-        
-        /* Quick Check Button */
-        .quick-check-section {
-            text-align: center;
-            margin: 20px 0;
-        }
-        
-        .quick-check-btn {
-            background: #10b981;
-            color: white;
-            padding: 15px 25px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .quick-check-btn:hover {
-            background: #059669;
-            transform: translateY(-1px);
-        }
-        
-        .positive { color: #10b981; }
-        .negative { color: #ef4444; }
-        .neutral { color: white; }
         
         @media (max-width: 768px) {
             .nav-links {
@@ -568,180 +389,21 @@
                 font-size: 2rem;
             }
             
-            .upload-zone {
-                padding: 32px 16px;
-            }
-            
-            .upload-title {
-                font-size: 1.25rem;
-            }
-            
-            .upload-subtitle {
-                font-size: 0.9rem;
-                line-height: 1.4;
-                word-wrap: break-word;
-                overflow-wrap: break-word;
-            }
-            
-            .banks-grid {
-                grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-                gap: 8px;
-            }
-            
-            .bank-item {
-                padding: 8px;
-                font-size: 0.75rem;
-            }
-            
-            .instructions-list li {
-                margin-bottom: 10px;
-                font-size: 0.85rem;
-                line-height: 1.4;
-            }
-            
-            .step-number {
-                margin-top: 1px;
-                width: 20px;
-                height: 20px;
-                font-size: 0.75rem;
-                margin-right: 10px;
-            }
-            
-            .results-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-            }
-            
-            .result-item {
-                padding: 12px 8px;
-            }
-            
-            .result-label {
-                font-size: 0.75rem;
-                word-wrap: break-word;
-                overflow-wrap: break-word;
-            }
-            
-            .result-value {
-                font-size: 1.25rem;
-            }
-            
-            .result-actions {
-                flex-direction: column;
-                gap: 8px;
-            }
-            
-            .file-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-                padding: 12px;
-            }
-            
-            .file-actions {
-                width: 100%;
-                justify-content: space-between;
-            }
-            
-            .file-details h4 {
-                font-size: 0.9rem;
-                word-wrap: break-word;
-                overflow-wrap: break-word;
-            }
-            
-            .file-details p {
-                font-size: 0.8rem;
-                word-wrap: break-word;
-                overflow-wrap: break-word;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .nav-container {
-                padding: 0 12px;
-            }
-            
-            .logo-icon {
-                width: 40px;
-                height: 40px;
-                font-size: 20px;
-            }
-            
-            .page-title {
-                font-size: 1.75rem;
-            }
-            
-            .upload-zone {
-                padding: 24px 12px;
-            }
-            
-            .upload-icon {
-                width: 48px;
-                height: 48px;
-                font-size: 1.5rem;
-                margin-bottom: 16px;
-            }
-            
-            .upload-title {
-                font-size: 1.1rem;
-                margin-bottom: 6px;
-            }
-            
-            .upload-subtitle {
-                font-size: 0.8rem;
-                margin-bottom: 16px;
-            }
-            
-            .upload-button {
-                font-size: 0.9rem;
-                padding: 10px 20px;
-            }
-            
-            .instructions-title {
-                font-size: 1.1rem;
-            }
-            
-            .instructions-list li {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 6px;
-                font-size: 0.8rem;
-            }
-            
-            .step-number {
-                align-self: flex-start;
-                width: 18px;
-                height: 18px;
-                font-size: 0.7rem;
-            }
-            
-            .banks-title {
-                font-size: 0.9rem;
-            }
-            
-            .banks-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 6px;
-            }
-            
-            .bank-item {
-                padding: 6px;
-                font-size: 0.7rem;
-            }
-            
-            .results-title {
-                font-size: 1.1rem;
-            }
-            
-            .file-icon {
-                width: 32px;
-                height: 32px;
-                font-size: 1rem;
+            .giant-test-button {
+                top: 10px;
+                right: 10px;
+                padding: 15px;
+                font-size: 14px;
             }
         }
     </style>
 </head>
 <body>
+    <!-- GIANT TEST BUTTON - SHOULD BE VERY VISIBLE -->
+    <button class="giant-test-button" onclick="testLocalStorage()">
+        TEST STORAGE
+    </button>
+    
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="nav-logo">
@@ -768,6 +430,14 @@
         <div class="page-header">
             <h1 class="page-title">Upload Bank Statements</h1>
             <p class="page-subtitle">Import your weekly CSV files to automatically update your budget and goals</p>
+        </div>
+
+        <!-- Storage Status Display -->
+        <div class="storage-status">
+            <h3 class="storage-title">localStorage Status</h3>
+            <div class="storage-info" id="storageInfo">
+                Checking localStorage...
+            </div>
         </div>
 
         <div class="upload-instructions">
@@ -810,13 +480,6 @@
             </div>
         </div>
 
-        <!-- Quick Check Button for Mobile Testing -->
-        <div class="quick-check-section">
-            <button class="quick-check-btn" onclick="checkLocalStorage()">
-                🔍 Quick Check localStorage
-            </button>
-        </div>
-
         <div class="upload-zone" id="uploadZone">
             <div class="upload-icon">📤</div>
             <h2 class="upload-title">Drop your CSV files here</h2>
@@ -824,81 +487,108 @@
                 Drag and drop your bank statement files, or click the button below to browse your computer.
                 Multiple files can be uploaded at once.
             </p>
-            <button class="upload-button" onclick="event.stopPropagation(); document.getElementById('fileInput').click();">
+            <button class="upload-button" onclick="document.getElementById('fileInput').click()">
                 Choose Files
             </button>
             <input type="file" id="fileInput" class="file-input" multiple accept=".csv,.xls,.xlsx,.qif,.ofx">
             <p class="file-types">Supports: CSV, Excel, QIF, OFX files</p>
         </div>
 
-        <div class="file-preview" id="filePreview">
-            <div class="file-list" id="fileList">
-                <!-- Files will be dynamically added here -->
-            </div>
-        </div>
-
-        <div class="processing-status" id="processingStatus">
-            <div class="status-header">
-                <div class="status-icon">⚙️</div>
-                <h3 class="status-title">Processing Your Files...</h3>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-            </div>
-            <p class="status-text" id="statusText">Analyzing file formats and detecting bank types...</p>
-        </div>
-
         <div class="results-summary" id="resultsSummary">
-            <h2 class="results-title">Import Complete</h2>
-            <div class="results-grid">
-                <div class="result-item">
-                    <div class="result-label">Files Processed</div>
-                    <div class="result-value" id="filesProcessed">0</div>
-                </div>
-                <div class="result-item">
-                    <div class="result-label">Transactions Added</div>
-                    <div class="result-value" id="transactionsAdded">0</div>
-                </div>
-                <div class="result-item">
-                    <div class="result-label">Duplicates Skipped</div>
-                    <div class="result-value" id="duplicatesSkipped">0</div>
-                </div>
-                <div class="result-item">
-                    <div class="result-label">Categories Updated</div>
-                    <div class="result-value" id="categoriesUpdated">0</div>
-                </div>
-            </div>
-            <!-- Quick Check Button -->
-        <div style="text-align: center; margin: 20px 0;">
-            <button onclick="alert('Transactions: ' + (localStorage.getItem('financeOS_transactions') ? JSON.parse(localStorage.getItem('financeOS_transactions')).length + ' found' : 'No transactions found'))" 
-                    style="background: #10b981; color: white; padding: 15px 25px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">
-                🔍 Quick Check localStorage
+            <h2 class="results-title">Test Results</h2>
+            <button class="result-btn" onclick="simulateUpload()">
+                Simulate File Upload (Test)
             </button>
-        </div>
-            <!-- Debug Info for Mobile -->
-            <div class="debug-section">
-                <h3 class="debug-title">📊 Debug Info (localStorage Status):</h3>
-                <div id="debugInfo" class="debug-info">
-                    No data loaded yet...
-                </div>
-            </div>
-            
-            <div class="result-actions">
-                <button class="result-btn" onclick="window.location.href='transactions.html'">
-                    View Transaction History
-                </button>
-                <button class="result-btn" onclick="window.location.href='budget.html'">
-                    View Updated Budget
-                </button>
-                <button class="result-btn secondary" onclick="resetUpload()">
-                    Upload More Files
-                </button>
-            </div>
+            <button class="result-btn" onclick="clearStorage()">
+                Clear All Data
+            </button>
+            <button class="result-btn" onclick="window.location.href='transactions.html'">
+                View Transaction History
+            </button>
         </div>
     </main>
 
     <script>
-        let selectedFiles = [];
+        // Show localStorage status immediately when page loads
+        function updateStorageDisplay() {
+            const storageInfo = document.getElementById('storageInfo');
+            const transactions = localStorage.getItem('financeOS_transactions');
+            const summary = localStorage.getItem('financeOS_importSummary');
+            
+            let info = '';
+            
+            if (transactions) {
+                const txnArray = JSON.parse(transactions);
+                info += `✅ WORKING! ${txnArray.length} transactions stored\n`;
+                info += `📅 Sample date: ${txnArray[0]?.date || 'None'}\n`;
+                info += `💰 Sample amount: $${Math.abs(txnArray[0]?.amount || 0).toFixed(2)}\n`;
+                info += `🏪 Sample merchant: ${txnArray[0]?.description || 'None'}`;
+            } else {
+                info += `❌ No transaction data found\n`;
+                info += `📊 localStorage items: ${localStorage.length}\n`;
+                info += `🔧 Status: Ready for upload`;
+            }
+            
+            storageInfo.textContent = info;
+        }
+
+        // Test function for the giant button
+        function testLocalStorage() {
+            const transactions = localStorage.getItem('financeOS_transactions');
+            let message = '';
+            
+            if (transactions) {
+                const count = JSON.parse(transactions).length;
+                message = `✅ localStorage WORKING!\n📊 Found ${count} transactions\n🎉 Data is being saved correctly!`;
+            } else {
+                message = `📭 No transactions yet\n🔧 localStorage is working but empty\n📤 Try uploading files to test`;
+            }
+            
+            alert(message);
+            updateStorageDisplay();
+        }
+
+        // Simulate upload for testing
+        function simulateUpload() {
+            const sampleTransactions = [
+                {
+                    id: 'test_' + Date.now(),
+                    date: new Date().toISOString().split('T')[0],
+                    description: 'COUNTDOWN CHRISTCHURCH',
+                    category: 'groceries',
+                    amount: -67.45,
+                    account: 'My Spending',
+                    source: 'test'
+                },
+                {
+                    id: 'test_' + (Date.now() + 1),
+                    date: new Date().toISOString().split('T')[0],
+                    description: 'BP PETROL STATION',
+                    category: 'transport',
+                    amount: -85.20,
+                    account: 'My Spending',
+                    source: 'test'
+                }
+            ];
+            
+            localStorage.setItem('financeOS_transactions', JSON.stringify(sampleTransactions));
+            localStorage.setItem('financeOS_importSummary', JSON.stringify({
+                lastImport: new Date().toISOString(),
+                totalTransactions: 2,
+                categorySummary: { groceries: 67.45, transport: 85.20 }
+            }));
+            
+            alert('✅ Test data saved to localStorage!');
+            updateStorageDisplay();
+        }
+
+        // Clear storage for testing
+        function clearStorage() {
+            localStorage.removeItem('financeOS_transactions');
+            localStorage.removeItem('financeOS_importSummary');
+            alert('🗑️ All data cleared from localStorage');
+            updateStorageDisplay();
+        }
 
         function togglePrivacy() {
             document.body.classList.toggle('privacy-mode');
@@ -910,38 +600,21 @@
             }
         }
 
-        // Quick Check Function for Mobile
-        function checkLocalStorage() {
-            const transactions = localStorage.getItem('financeOS_transactions');
-            const summary = localStorage.getItem('financeOS_importSummary');
-            
-            let message = '';
-            
-            if (transactions) {
-                const txnArray = JSON.parse(transactions);
-                message += `✅ localStorage WORKING!\n`;
-                message += `📊 ${txnArray.length} transactions found\n`;
-                message += `💰 Sample: $${Math.abs(txnArray[0]?.amount || 0).toFixed(2)}\n`;
-                message += `🏪 Merchant: ${txnArray[0]?.description || 'None'}\n`;
-            } else {
-                message += `❌ No transactions found\n`;
-                message += `Try uploading files first!`;
+        // File upload functionality
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                alert(`Selected ${e.target.files.length} files. This is a test version - use "Simulate Upload" button to test localStorage.`);
             }
-            
-            if (summary) {
-                const summaryData = JSON.parse(summary);
-                message += `📈 ${Object.keys(summaryData.categorySummary || {}).length} categories`;
-            }
-            
-            alert(message);
-        }
-
-        // Prevent default drag behaviors
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            uploadZone.addEventListener(eventName, preventDefaults, false);
-            document.body.addEventListener(eventName, preventDefaults, false);
         });
 
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
+        // Show results section and update storage display when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('resultsSummary').classList.add('active');
+            updateStorageDisplay();
+        });
+
+        // Update storage display every 5 seconds
+        setInterval(updateStorageDisplay, 5000);
+    </script>
+</body>
+</html>
