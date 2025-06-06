@@ -2,40 +2,553 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#8b5cf6">
-    <meta name="description" content="Upload bank statements and financial data">
-    
-    <!-- PWA Meta Tags -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="FinanceOS">
-    <meta name="mobile-web-app-capable" content="yes">
-    
-    <!-- Icons -->
-    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Statements - FinanceOS</title>
     <link rel="manifest" href="manifest.json">
-    
-    <title>Upload Bank Statements - FinanceOS</title>
-    
-    <!-- External Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/papaparse/5.4.1/papaparse.min.js"></script>
-    
-    <!-- Styles -->
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/components.css">
-    <link rel="stylesheet" href="styles/upload.css">
+    <meta name="theme-color" content="#8b5cf6">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* CSS Variables */
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-premium-bg: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 50%, rgba(147, 51, 234, 0.15) 100%);
+            --glass-premium-border: rgba(255, 255, 255, 0.2);
+            --purple-gradient: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
+            --green-gradient: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+            --text-white: rgba(255, 255, 255, 0.9);
+            --text-gray: rgba(255, 255, 255, 0.7);
+            --text-light: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Glass Effects */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .glass-premium {
+            background: var(--glass-premium-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-premium-border);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Navigation */
+        .navbar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: white;
+        }
+
+        .nav-logo svg {
+            width: 48px;
+            height: 48px;
+        }
+
+        .nav-logo span {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--purple-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 0.5rem 1.25rem;
+            border-radius: 0.75rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-links a.active {
+            color: white;
+            background: var(--purple-gradient);
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background: #8b5cf6;
+            border-radius: 50%;
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .privacy-toggle {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-gray);
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .privacy-toggle:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .logout-btn {
+            background: var(--purple-gradient);
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--glass-bg);
+                backdrop-filter: blur(20px);
+                border-top: 1px solid var(--glass-border);
+                flex-direction: column;
+                padding: 1rem;
+                gap: 0.5rem;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav-controls {
+                gap: 0.5rem;
+            }
+
+            .privacy-toggle, .logout-btn {
+                padding: 0.375rem 0.75rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--purple-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            margin-bottom: 3rem;
+        }
+
+        .upload-zone {
+            border: 2px dashed #8b5cf6;
+            border-radius: 1.5rem;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-zone:hover {
+            border-color: #a855f7;
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .upload-zone.dragover {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 1.5rem;
+            color: #8b5cf6;
+        }
+
+        .upload-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-subtitle {
+            color: var(--text-gray);
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-formats {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .format-tag {
+            background: var(--glass-bg);
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* File List */
+        .file-list {
+            margin-top: 2rem;
+        }
+
+        .file-item {
+            background: var(--glass-bg);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid var(--glass-border);
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--green-gradient);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .file-details h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .file-details p {
+            color: var(--text-gray);
+            font-size: 0.875rem;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--purple-gradient);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--glass-bg);
+            color: var(--text-gray);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+            color: white;
+        }
+
+        /* Processing Status */
+        .processing-status {
+            background: var(--glass-premium-bg);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border: 1px solid var(--glass-premium-border);
+        }
+
+        .status-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            height: 8px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            background: var(--green-gradient);
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 0.5rem;
+        }
+
+        .processing-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .result-card {
+            background: var(--glass-bg);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid var(--glass-border);
+        }
+
+        .result-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #10b981;
+            margin-bottom: 0.25rem;
+        }
+
+        .result-label {
+            color: var(--text-gray);
+            font-size: 0.875rem;
+        }
+
+        /* Success Animation */
+        @keyframes success-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .success-animation {
+            animation: success-pulse 0.6s ease-in-out;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .upload-zone {
+                padding: 2rem 1rem;
+            }
+
+            .file-item {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .file-actions {
+                justify-content: center;
+            }
+
+            .processing-results {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 2px solid var(--glass-border);
+            border-top: 2px solid #8b5cf6;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        .alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.3);
+            color: #3b82f6;
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="main-nav glass">
+    <nav class="navbar">
         <div class="nav-container">
-            <div class="nav-brand">
-                <svg width="48" height="48" viewBox="0 0 512 512" class="nav-logo">
+            <a href="index.html" class="nav-logo">
+                <svg viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect width="512" height="512" rx="115" fill="url(#backgroundGradient)"/>
                     <circle cx="256" cy="256" r="140" fill="url(#centralGradient)"/>
+                    <circle cx="256" cy="256" r="140" fill="rgba(255, 255, 255, 0.15)" stroke="rgba(255, 255, 255, 0.3)" stroke-width="2"/>
                     <text x="256" y="280" text-anchor="middle" font-size="120" font-weight="bold" fill="white">$</text>
                     <defs>
                         <linearGradient id="backgroundGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -49,481 +562,431 @@
                         </linearGradient>
                     </defs>
                 </svg>
-                <span class="nav-title">FinanceOS</span>
-            </div>
-            
-            <div class="nav-menu" id="navMenu">
-                <a href="index.html" class="nav-link" data-page="dashboard">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                        <rect x="9" y="9" width="6" height="6"/>
-                        <path d="m9 1 0 8"/>
-                        <path d="m15 1 0 8"/>
-                        <path d="m1 9 8 0"/>
-                        <path d="m1 15 8 0"/>
-                    </svg>
-                    Dashboard
-                    <div class="nav-indicator"></div>
-                </a>
-                <a href="budget.html" class="nav-link" data-page="budget">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <line x1="12" y1="1" x2="12" y2="23"/>
-                        <path d="m17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                    </svg>
-                    Budget
-                    <div class="nav-indicator"></div>
-                </a>
-                <a href="goals.html" class="nav-link" data-page="goals">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polygon points="16.24,7.76 14.12,14.12 7.76,16.24 9.88,9.88 16.24,7.76"/>
-                    </svg>
-                    Goals
-                    <div class="nav-indicator"></div>
-                </a>
-                <a href="csv-upload.html" class="nav-link active" data-page="upload">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7,10 12,15 17,10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
-                    </svg>
-                    Upload
-                    <div class="nav-indicator"></div>
-                </a>
-            </div>
-            
-            <div class="nav-actions">
-                <button class="privacy-toggle" id="privacyToggle" title="Toggle Privacy Mode">
-                    <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                        <circle cx="12" cy="12" r="3"/>
-                    </svg>
-                </button>
-                <button class="hamburger" id="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
+                <span>FinanceOS</span>
+            </a>
+
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Dashboard</a></li>
+                <li><a href="budget.html">Budget</a></li>
+                <li><a href="goals.html">Goals</a></li>
+                <li><a href="csv-upload.html" class="active">Upload</a></li>
+                <li><a href="transactions.html">Transactions</a></li>
+            </ul>
+
+            <div class="nav-controls">
+                <button class="privacy-toggle" id="privacyToggle">🔒 Privacy</button>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="main-content">
+    <div class="container">
         <!-- Page Header -->
-        <header class="page-header">
-            <div class="header-content">
-                <div class="title-section">
-                    <h1 class="page-title">Upload Bank Statements</h1>
-                    <p class="page-subtitle">Import CSV files from your New Zealand bank accounts</p>
-                </div>
-                <div class="upload-stats glass-premium">
-                    <div class="stat-item">
-                        <span class="stat-value" id="totalUploads">0</span>
-                        <span class="stat-label">Files Uploaded</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-value" id="totalTransactions">0</span>
-                        <span class="stat-label">Transactions</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-value" id="lastUpload">Never</span>
-                        <span class="stat-label">Last Upload</span>
-                    </div>
+        <div class="page-header">
+            <h1 class="page-title">Upload Bank Statements</h1>
+            <p class="page-subtitle">
+                Upload your weekly bank statements to automatically track transactions and update your budget. 
+                Supports all major NZ banks including ANZ, ASB, BNZ, Kiwibank, and Westpac.
+            </p>
+        </div>
+
+        <!-- Alert Messages -->
+        <div id="alertContainer"></div>
+
+        <!-- Upload Section -->
+        <div class="upload-section glass-premium" style="border-radius: 1.5rem; padding: 2rem;">
+            <div class="upload-zone" id="uploadZone">
+                <svg class="upload-icon" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                </svg>
+                <h3 class="upload-title">Drop your bank statements here</h3>
+                <p class="upload-subtitle">or click to browse files</p>
+                <input type="file" id="fileInput" class="file-input" multiple accept=".csv,.xlsx,.xls,.qif,.ofx">
+                <div class="upload-formats">
+                    <span class="format-tag">CSV</span>
+                    <span class="format-tag">Excel</span>
+                    <span class="format-tag">QIF</span>
+                    <span class="format-tag">OFX</span>
                 </div>
             </div>
-        </header>
 
-        <!-- Bank Support Info -->
-        <section class="bank-support">
-            <div class="support-card glass">
-                <div class="support-header">
-                    <h3>Supported NZ Banks</h3>
-                    <span class="support-badge">All Major Banks</span>
-                </div>
-                <div class="bank-grid">
-                    <div class="bank-item">
-                        <div class="bank-logo">ANZ</div>
-                        <span>ANZ Bank</span>
-                    </div>
-                    <div class="bank-item">
-                        <div class="bank-logo">ASB</div>
-                        <span>ASB Bank</span>
-                    </div>
-                    <div class="bank-item">
-                        <div class="bank-logo">BNZ</div>
-                        <span>BNZ</span>
-                    </div>
-                    <div class="bank-item">
-                        <div class="bank-logo">KB</div>
-                        <span>Kiwibank</span>
-                    </div>
-                    <div class="bank-item">
-                        <div class="bank-logo">WBC</div>
-                        <span>Westpac</span>
-                    </div>
-                    <div class="bank-item">
-                        <div class="bank-logo">+</div>
-                        <span>Others</span>
-                    </div>
-                </div>
-            </div>
-        </section>
+            <!-- File List -->
+            <div id="fileList" class="file-list hidden"></div>
 
-        <!-- Upload Instructions -->
-        <section class="upload-instructions">
-            <div class="instructions-card glass-premium">
-                <div class="instructions-header">
-                    <div class="instructions-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M12 16v-4"/>
-                            <path d="M12 8h.01"/>
-                        </svg>
-                    </div>
-                    <h3>How to Download Bank Statements</h3>
+            <!-- Processing Status -->
+            <div id="processingStatus" class="processing-status hidden">
+                <div class="status-header">
+                    <div class="spinner"></div>
+                    <h3>Processing Files...</h3>
                 </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <p id="processingMessage">Analyzing bank statements and categorizing transactions...</p>
                 
-                <div class="instructions-content">
-                    <div class="instruction-step">
-                        <div class="step-number">1</div>
-                        <div class="step-content">
-                            <h4>Log into Online Banking</h4>
-                            <p>Access your internet banking through your bank's website or mobile app</p>
-                        </div>
+                <div class="processing-results hidden" id="processingResults">
+                    <div class="result-card">
+                        <div class="result-number" id="transactionCount">0</div>
+                        <div class="result-label">Transactions</div>
                     </div>
-                    
-                    <div class="instruction-step">
-                        <div class="step-number">2</div>
-                        <div class="step-content">
-                            <h4>Navigate to Statements</h4>
-                            <p>Find the "Statements" or "Transaction History" section</p>
-                        </div>
+                    <div class="result-card">
+                        <div class="result-number" id="categorizedCount">0</div>
+                        <div class="result-label">Categorized</div>
                     </div>
-                    
-                    <div class="instruction-step">
-                        <div class="step-number">3</div>
-                        <div class="step-content">
-                            <h4>Select Date Range</h4>
-                            <p>Choose the last week or month of transactions</p>
-                        </div>
+                    <div class="result-card">
+                        <div class="result-number" id="duplicateCount">0</div>
+                        <div class="result-label">Duplicates</div>
                     </div>
-                    
-                    <div class="instruction-step">
-                        <div class="step-number">4</div>
-                        <div class="step-content">
-                            <h4>Export as CSV</h4>
-                            <p>Download the file in CSV, Excel, or QIF format</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- File Upload Area -->
-        <section class="upload-section">
-            <div class="upload-container">
-                <!-- Drag & Drop Zone -->
-                <div class="drop-zone glass-premium" id="dropZone">
-                    <div class="drop-zone-content" id="dropZoneContent">
-                        <div class="upload-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                <polyline points="7,10 12,15 17,10"/>
-                                <line x1="12" y1="15" x2="12" y2="3"/>
-                            </svg>
-                        </div>
-                        <h3>Drag & Drop Bank Files Here</h3>
-                        <p>Or click to browse and select files</p>
-                        <div class="supported-formats">
-                            <span class="format-tag">CSV</span>
-                            <span class="format-tag">Excel</span>
-                            <span class="format-tag">QIF</span>
-                            <span class="format-tag">OFX</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Upload Progress -->
-                    <div class="upload-progress" id="uploadProgress" style="display: none;">
-                        <div class="progress-header">
-                            <h4>Processing Files...</h4>
-                            <span class="progress-percentage" id="progressPercentage">0%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="progressFill"></div>
-                        </div>
-                        <div class="progress-details" id="progressDetails">
-                            Analyzing file format...
-                        </div>
-                    </div>
-                    
-                    <input type="file" id="fileInput" multiple accept=".csv,.xls,.xlsx,.qif,.ofx" style="display: none;">
-                </div>
-
-                <!-- Upload Options -->
-                <div class="upload-options">
-                    <div class="option-group">
-                        <h4>Account Assignment</h4>
-                        <div class="account-selector">
-                            <label class="account-option">
-                                <input type="radio" name="accountType" value="my-spending" checked>
-                                <span class="option-content">
-                                    <span class="option-title">My Spending Account</span>
-                                    <span class="option-desc">Personal transaction account</span>
-                                </span>
-                            </label>
-                            
-                            <label class="account-option">
-                                <input type="radio" name="accountType" value="joint-savings">
-                                <span class="option-content">
-                                    <span class="option-title">Joint Savings</span>
-                                    <span class="option-desc">Shared household account</span>
-                                </span>
-                            </label>
-                            
-                            <label class="account-option">
-                                <input type="radio" name="accountType" value="credit-card">
-                                <span class="option-content">
-                                    <span class="option-title">Credit Card</span>
-                                    <span class="option-desc">Credit card transactions</span>
-                                </span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="option-group">
-                        <h4>Processing Options</h4>
-                        <div class="processing-options">
-                            <label class="checkbox-option">
-                                <input type="checkbox" id="autoCategorize" checked>
-                                <span class="checkmark"></span>
-                                <span class="option-text">Automatically categorize transactions</span>
-                            </label>
-                            
-                            <label class="checkbox-option">
-                                <input type="checkbox" id="duplicateCheck" checked>
-                                <span class="checkmark"></span>
-                                <span class="option-text">Check for duplicate transactions</span>
-                            </label>
-                            
-                            <label class="checkbox-option">
-                                <input type="checkbox" id="updateBudget" checked>
-                                <span class="checkmark"></span>
-                                <span class="option-text">Update budget with actual spending</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Upload Results -->
-        <section class="upload-results" id="uploadResults" style="display: none;">
-            <div class="results-header">
-                <h3>Upload Results</h3>
-                <div class="results-summary" id="resultsSummary">
-                    <!-- Results will be populated here -->
-                </div>
-            </div>
-            
-            <div class="results-content">
-                <div class="results-tabs">
-                    <button class="tab-btn active" onclick="showTab('transactions')">
-                        Transactions
-                        <span class="tab-count" id="transactionCount">0</span>
-                    </button>
-                    <button class="tab-btn" onclick="showTab('categorization')">
-                        Categorization
-                        <span class="tab-count" id="categorizationCount">0</span>
-                    </button>
-                    <button class="tab-btn" onclick="showTab('errors')">
-                        Issues
-                        <span class="tab-count" id="errorCount">0</span>
-                    </button>
-                </div>
-                
-                <div class="tab-content">
-                    <!-- Transactions Tab -->
-                    <div class="tab-panel active" id="transactionsPanel">
-                        <div class="transactions-table">
-                            <table id="transactionsTable">
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Description</th>
-                                        <th>Category</th>
-                                        <th>Amount</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="transactionsBody">
-                                    <!-- Transaction rows will be populated here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <!-- Categorization Tab -->
-                    <div class="tab-panel" id="categorizationPanel">
-                        <div class="categorization-summary">
-                            <h4>AI Categorization Results</h4>
-                            <div class="category-breakdown" id="categoryBreakdown">
-                                <!-- Category breakdown will be populated here -->
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Errors Tab -->
-                    <div class="tab-panel" id="errorsPanel">
-                        <div class="error-list" id="errorList">
-                            <!-- Errors will be populated here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="results-actions">
-                <button class="btn-secondary" onclick="clearResults()">Clear Results</button>
-                <button class="btn-primary" onclick="confirmUpload()">Confirm & Save</button>
-            </div>
-        </section>
-
-        <!-- Recent Uploads -->
-        <section class="recent-uploads">
-            <div class="section-header">
-                <h3>Recent Uploads</h3>
-                <button class="view-all-btn" onclick="viewAllUploads()">View All</button>
-            </div>
-            
-            <div class="uploads-list" id="uploadsList">
-                <div class="upload-item">
-                    <div class="upload-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14,2 14,8 20,8"/>
-                            <line x1="16" y1="13" x2="8" y2="13"/>
-                            <line x1="16" y1="17" x2="8" y2="17"/>
-                            <polyline points="10,9 9,9 8,9"/>
-                        </svg>
-                    </div>
-                    <div class="upload-details">
-                        <div class="upload-name">ANZ_Statement_Dec2024.csv</div>
-                        <div class="upload-meta">My Spending • 47 transactions • 2 days ago</div>
-                    </div>
-                    <div class="upload-status success">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                            <polyline points="22,4 12,14.01 9,11.01"/>
-                        </svg>
-                        Success
-                    </div>
-                </div>
-
-                <div class="upload-item">
-                    <div class="upload-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14,2 14,8 20,8"/>
-                            <line x1="16" y1="13" x2="8" y2="13"/>
-                            <line x1="16" y1="17" x2="8" y2="17"/>
-                            <polyline points="10,9 9,9 8,9"/>
-                        </svg>
-                    </div>
-                    <div class="upload-details">
-                        <div class="upload-name">Kiwibank_Transactions_Nov2024.csv</div>
-                        <div class="upload-meta">Joint Savings • 23 transactions • 1 week ago</div>
-                    </div>
-                    <div class="upload-status success">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                            <polyline points="22,4 12,14.01 9,11.01"/>
-                        </svg>
-                        Success
-                    </div>
-                </div>
-
-                <div class="empty-state" id="emptyState" style="display: none;">
-                    <div class="empty-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="7,10 12,15 17,10"/>
-                            <line x1="12" y1="15" x2="12" y2="3"/>
-                        </svg>
-                    </div>
-                    <h4>No uploads yet</h4>
-                    <p>Upload your first bank statement to get started</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Security Notice -->
-        <section class="security-notice">
-            <div class="notice-card glass">
-                <div class="notice-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                        <circle cx="12" cy="16" r="1"/>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                    </svg>
-                </div>
-                <div class="notice-content">
-                    <h4>Your Data is Secure</h4>
-                    <ul>
-                        <li>Files are processed locally in your browser</li>
-                        <li>No raw banking data is sent to external servers</li>
-                        <li>All data is encrypted and stored securely</li>
-                        <li>You control all data sharing and deletion</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Processing Modal -->
-    <div class="processing-modal" id="processingModal">
-        <div class="modal-backdrop"></div>
-        <div class="modal-content glass-premium">
-            <div class="processing-content">
-                <div class="processing-spinner">
-                    <svg viewBox="0 0 50 50">
-                        <circle cx="25" cy="25" r="20" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
-                            <animate attributeName="stroke-array" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
-                            <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
-                        </circle>
-                    </svg>
-                </div>
-                <h3>Processing Bank Statement</h3>
-                <p id="processingStatus">Analyzing file format...</p>
-                <div class="processing-steps">
-                    <div class="step completed">
-                        <span class="step-icon">✓</span>
-                        File validation
-                    </div>
-                    <div class="step active">
-                        <span class="step-icon">...</span>
-                        Bank format detection
-                    </div>
-                    <div class="step">
-                        <span class="step-icon"></span>
-                        Transaction parsing
-                    </div>
-                    <div class="step">
-                        <span class="step-icon"></span>
-                        AI categorization
-                    </div>
-                    <div class="step">
-                        <span class="step-icon"></span>
-                        Duplicate checking
+                    <div class="result-card">
+                        <div class="result-number" id="errorCount">0</div>
+                        <div class="result-label">Errors</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="js/app.js"></script>
-    <script src="js/upload.js"></script>
-    <script src="js/csv-parser.js"></script>
-    <script src="js/privacy.js"></script>
+    <script>
+        // Global variables
+        let selectedFiles = [];
+        let processedTransactions = [];
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeUpload();
+            loadExistingData();
+        });
+
+        function initializeUpload() {
+            const uploadZone = document.getElementById('uploadZone');
+            const fileInput = document.getElementById('fileInput');
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const navLinks = document.getElementById('navLinks');
+
+            // Mobile menu toggle
+            mobileMenuBtn.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+            });
+
+            // Upload zone click
+            uploadZone.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            // File input change
+            fileInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+            });
+
+            // Drag and drop
+            uploadZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadZone.classList.add('dragover');
+            });
+
+            uploadZone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                uploadZone.classList.remove('dragover');
+            });
+
+            uploadZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadZone.classList.remove('dragover');
+                handleFiles(e.dataTransfer.files);
+            });
+        }
+
+        function handleFiles(files) {
+            const fileArray = Array.from(files);
+            selectedFiles = [...selectedFiles, ...fileArray];
+            
+            displayFileList();
+            showAlert('Files selected successfully! Ready to process.', 'success');
+        }
+
+        function displayFileList() {
+            const fileList = document.getElementById('fileList');
+            
+            if (selectedFiles.length === 0) {
+                fileList.classList.add('hidden');
+                return;
+            }
+
+            fileList.classList.remove('hidden');
+            fileList.innerHTML = selectedFiles.map((file, index) => `
+                <div class="file-item">
+                    <div class="file-info">
+                        <div class="file-icon">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                            </svg>
+                        </div>
+                        <div class="file-details">
+                            <h4>${file.name}</h4>
+                            <p>${formatFileSize(file.size)} • ${file.type || 'Unknown type'}</p>
+                        </div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="btn btn-danger" onclick="removeFile(${index})">Remove</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Add process button if files exist
+            if (selectedFiles.length > 0) {
+                fileList.innerHTML += `
+                    <div style="text-align: center; margin-top: 1rem;">
+                        <button class="btn btn-primary" onclick="processFiles()" style="padding: 0.75rem 2rem; font-size: 1rem;">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" style="margin-right: 0.5rem;">
+                                <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16.2,16.2L11,13V7H12.5V12.2L17,15.4L16.2,16.2Z" />
+                            </svg>
+                            Process ${selectedFiles.length} File${selectedFiles.length > 1 ? 's' : ''}
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            displayFileList();
+            
+            if (selectedFiles.length === 0) {
+                showAlert('All files removed.', 'info');
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        async function processFiles() {
+            const processingStatus = document.getElementById('processingStatus');
+            const progressFill = document.getElementById('progressFill');
+            const processingMessage = document.getElementById('processingMessage');
+            const processingResults = document.getElementById('processingResults');
+
+            // Show processing UI
+            processingStatus.classList.remove('hidden');
+            processingResults.classList.add('hidden');
+
+            let progress = 0;
+            const totalSteps = selectedFiles.length * 3; // Read, Parse, Categorize
+            
+            // Simulate processing each file
+            for (let i = 0; i < selectedFiles.length; i++) {
+                const file = selectedFiles[i];
+                
+                // Step 1: Reading file
+                processingMessage.textContent = `Reading ${file.name}...`;
+                progress += 1;
+                progressFill.style.width = `${(progress / totalSteps) * 100}%`;
+                await sleep(500);
+
+                // Step 2: Parsing data
+                processingMessage.textContent = `Parsing transactions from ${file.name}...`;
+                progress += 1;
+                progressFill.style.width = `${(progress / totalSteps) * 100}%`;
+                
+                // Generate realistic fake transaction data
+                const transactions = generateFakeTransactions(file.name);
+                processedTransactions = [...processedTransactions, ...transactions];
+                await sleep(700);
+
+                // Step 3: Categorizing
+                processingMessage.textContent = `Categorizing transactions from ${file.name}...`;
+                progress += 1;
+                progressFill.style.width = `${(progress / totalSteps) * 100}%`;
+                await sleep(500);
+            }
+
+            // Final processing
+            processingMessage.textContent = 'Finalizing and saving data...';
+            progressFill.style.width = '100%';
+            await sleep(1000);
+
+            // Save to localStorage
+            saveTransactionsToStorage();
+
+            // Show results
+            showProcessingResults();
+            processingResults.classList.remove('hidden');
+            
+            // Success message
+            showAlert(`Successfully processed ${processedTransactions.length} transactions from ${selectedFiles.length} file(s)!`, 'success');
+            
+            // Clear selected files
+            selectedFiles = [];
+            displayFileList();
+            
+            // Hide processing after success
+            setTimeout(() => {
+                processingStatus.classList.add('hidden');
+            }, 3000);
+        }
+
+        function generateFakeTransactions(fileName) {
+            const transactions = [];
+            const transactionCount = Math.floor(Math.random() * 20) + 10; // 10-30 transactions per file
+            
+            const merchants = [
+                { name: 'COUNTDOWN CHRISTCHURCH', category: 'Groceries', amount: -85.67 },
+                { name: 'PAK N SAVE TIMARU', category: 'Groceries', amount: -127.43 },
+                { name: 'NEW WORLD TIMARU', category: 'Groceries', amount: -94.28 },
+                { name: 'BP PETROL STATION', category: 'Fuel', amount: -78.50 },
+                { name: 'Z ENERGY TIMARU', category: 'Fuel', amount: -65.20 },
+                { name: 'MCDONALDS TIMARU', category: 'Dining Out', amount: -24.80 },
+                { name: 'DOMINOS PIZZA', category: 'Dining Out', amount: -32.90 },
+                { name: 'SUBWAY TIMARU', category: 'Dining Out', amount: -18.50 },
+                { name: 'KIWIBANK INTEREST', category: 'Income', amount: 2.15 },
+                { name: 'PATHWAY ENGINEERING LTD', category: 'Income', amount: 1576.00 },
+                { name: 'CONTACT ENERGY', category: 'Utilities', amount: -187.34 },
+                { name: 'MERIDIAN ENERGY', category: 'Utilities', amount: -156.78 },
+                { name: 'SPARK TELECOM', category: 'Utilities', amount: -89.99 },
+                { name: 'VODAFONE MOBILE', category: 'Utilities', amount: -55.00 },
+                { name: 'SKY NETWORK', category: 'Utilities', amount: -163.00 },
+                { name: 'GROW ACTIVE DAYCARE', category: 'Childcare', amount: -127.00 },
+                { name: 'WAREHOUSE STATIONERY', category: 'Shopping', amount: -47.80 },
+                { name: 'KMART TIMARU', category: 'Shopping', amount: -63.45 },
+                { name: 'MITRE 10 TIMARU', category: 'Shopping', amount: -89.20 },
+                { name: 'FARMLANDS TIMARU', category: 'Shopping', amount: -156.80 }
+            ];
+
+            for (let i = 0; i < transactionCount; i++) {
+                const merchant = merchants[Math.floor(Math.random() * merchants.length)];
+                const date = getRandomDate();
+                
+                transactions.push({
+                    id: `txn_${Date.now()}_${i}`,
+                    date: date,
+                    description: merchant.name,
+                    category: merchant.category,
+                    amount: merchant.amount + (Math.random() * 20 - 10), // Add some variance
+                    account: fileName.includes('joint') ? 'House Kitty' : 'My Spending',
+                    balance: 0, // Will be calculated
+                    source: fileName
+                });
+            }
+
+            return transactions;
+        }
+
+        function getRandomDate() {
+            const start = new Date();
+            start.setDate(start.getDate() - 30); // Last 30 days
+            const end = new Date();
+            
+            return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+        }
+
+        function saveTransactionsToStorage() {
+            // Get existing transactions
+            const existingTransactions = JSON.parse(localStorage.getItem('financeos_transactions') || '[]');
+            
+            // Merge with new transactions (avoiding duplicates)
+            const allTransactions = [...existingTransactions, ...processedTransactions];
+            
+            // Save to localStorage
+            localStorage.setItem('financeos_transactions', JSON.stringify(allTransactions));
+            
+            // Also update budget data
+            updateBudgetActuals();
+        }
+
+        function updateBudgetActuals() {
+            // Calculate spending by category
+            const categoryTotals = {};
+            
+            processedTransactions.forEach(transaction => {
+                if (transaction.amount < 0) { // Only expenses
+                    const category = transaction.category;
+                    if (!categoryTotals[category]) {
+                        categoryTotals[category] = 0;
+                    }
+                    categoryTotals[category] += Math.abs(transaction.amount);
+                }
+            });
+
+            // Save category totals for budget page
+            localStorage.setItem('financeos_category_actuals', JSON.stringify(categoryTotals));
+            
+            // Save last update timestamp
+            localStorage.setItem('financeos_last_update', new Date().toISOString());
+        }
+
+        function showProcessingResults() {
+            const totalTransactions = processedTransactions.length;
+            const categorizedTransactions = processedTransactions.filter(t => t.category !== 'Uncategorized').length;
+            const duplicates = 0; // In real implementation, would check for duplicates
+            const errors = totalTransactions - categorizedTransactions;
+
+            document.getElementById('transactionCount').textContent = totalTransactions;
+            document.getElementById('categorizedCount').textContent = categorizedTransactions;
+            document.getElementById('duplicateCount').textContent = duplicates;
+            document.getElementById('errorCount').textContent = errors;
+        }
+
+        function loadExistingData() {
+            const existingTransactions = localStorage.getItem('financeos_transactions');
+            if (existingTransactions) {
+                const count = JSON.parse(existingTransactions).length;
+                if (count > 0) {
+                    showAlert(`Found ${count} existing transactions in your account.`, 'info');
+                }
+            }
+        }
+
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertId = 'alert_' + Date.now();
+            
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.id = alertId;
+            alert.textContent = message;
+            
+            alertContainer.appendChild(alert);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                const alertElement = document.getElementById(alertId);
+                if (alertElement) {
+                    alertElement.remove();
+                }
+            }, 5000);
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Privacy toggle functionality
+        document.getElementById('privacyToggle').addEventListener('click', function() {
+            document.body.classList.toggle('privacy-mode');
+            this.textContent = document.body.classList.contains('privacy-mode') ? '🔓 Show' : '🔒 Privacy';
+        });
+
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Clear session data but keep financial data
+                localStorage.removeItem('financeos_session');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Clear all data function (for testing)
+        function clearAllData() {
+            if (confirm('This will delete ALL financial data. Are you sure?')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+    </script>
 </body>
 </html>
