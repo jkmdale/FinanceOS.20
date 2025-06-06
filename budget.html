@@ -743,6 +743,285 @@
     </style>
 </head>
 <body>
+// Budget Integration with CSV Upload Data
+// Add this JavaScript to your budget.html file
+
+function loadBudgetActuals() {
+    // Get uploaded transaction data
+    const transactions = JSON.parse(localStorage.getItem('financeos_transactions') || '[]');
+    const categoryActuals = {};
+    
+    // Calculate actual spending by category from uploaded transactions
+    transactions.forEach(transaction => {
+        if (transaction.amount < 0) { // Only expenses
+            const category = transaction.category;
+            const amount = Math.abs(transaction.amount);
+            
+            // Map transaction categories to budget categories
+            const budgetCategory = mapToBudgetCategory(category);
+            
+            if (budgetCategory) {
+                if (!categoryActuals[budgetCategory]) {
+                    categoryActuals[budgetCategory] = 0;
+                }
+                categoryActuals[budgetCategory] += amount;
+            }
+        }
+    });
+    
+    return categoryActuals;
+}
+
+function mapToBudgetCategory(transactionCategory) {
+    // Map transaction categories to your budget categories
+    const categoryMapping = {
+        'Groceries': 'Groceries',
+        'Dining Out': 'Dining Out/Takeaway',
+        'Fuel': 'Fuel',
+        'Utilities': 'Sky Network', // You might want to split this
+        'Shopping': 'Shopping/Retail',
+        'Childcare': 'Grow Active Daycare',
+        'Entertainment': 'Entertainment',
+        'Travel': 'Travel Fund',
+        // Add more mappings as needed
+    };
+    
+    return categoryMapping[transactionCategory] || null;
+}
+
+function updateBudgetTable() {
+    const actuals = loadBudgetActuals();
+    const lastUpdate = localStorage.getItem('financeos_last_update');
+    
+    // Update the budget table with actual values
+    const budgetRows = document.querySelectorAll('tbody tr');
+    
+    budgetRows.forEach(row => {
+        const categoryCell = row.cells[0]; // Assuming category is first cell
+        const budgetedCell = row.cells[2]; // Budgeted amount
+        const actualCell = row.cells[3]; // Actual amount (update this)
+        const differenceCell = row.cells[4]; // Difference
+        
+        if (categoryCell && actualCell) {
+            const category = categoryCell.textContent.trim();
+            const budgeted = parseFloat(budgetedCell.textContent.replace(/[^0-9.-]+/g, "")) || 0;
+            const actual = actuals[category] || 0;
+            const difference = budgeted - actual;
+            
+            // Update actual cell
+            actualCell.textContent = `$${actual.toFixed(2)}`;
+            actualCell.style.color = actual > budgeted ? '#ef4444' : '#10b981';
+            
+            // Update difference cell
+            differenceCell.textContent = `$${difference.toFixed(2)}`;
+            differenceCell.style.color = difference >= 0 ? '#10b981' : '#ef4444';
+            
+            // Add visual indicators
+            if (actual > budgeted * 1.1) { // Over budget by 10%
+                row.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                row.style.borderLeft = '4px solid #ef4444';
+            } else if (actual < budgeted * 0.8) { // Under budget
+                row.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+                row.style.borderLeft = '4px solid #10b981';
+            }
+        }
+    });
+    
+    // Show last update time
+    if (lastUpdate) {
+        const updateTime = new Date(lastUpdate).toLocaleString();
+        const updateElement = document.getElementById('lastUpdate') || createUpdateElement();
+        updateElement.textContent = `Last updated: ${updateTime}`;
+    }
+}
+
+function createUpdateElement() {
+    const element = document.createElement('p');
+    element.id = 'lastUpdate';
+    element.style.cssText = `
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.875rem;
+        text-align: center;
+        margin-top: 1rem;
+    `;
+    
+    // Add to page
+    const container = document.querySelector('.container');
+    if (container) {
+        container.appendChild(element);
+    }
+    
+    return element;
+}
+
+function addBudgetAlerts() {
+    const actuals = loadBudgetActuals();
+    const alerts = [];
+    
+    // Your current budget data (replace with your actual budget)
+    const budget = {
+        'Groceries': 550,
+        'Dining Out/Takeaway': 250,
+        'Shopping/Retail': 150,
+        'Entertainment': 50,
+        'Fuel': 125
+    };
+    
+    // Check for budget overruns
+    Object.keys(budget).forEach(category => {
+        const budgeted = budget[category];
+        const actual = actuals[category] || 0;
+        const percentage = (actual / budgeted) * 100;
+        
+        if (percentage > 100) {
+            alerts.push({
+                type: 'warning',
+                category: category,
+                message: `${category} is ${percentage.toFixed(0)}% over budget ($${(actual - budgeted).toFixed(2)} over)`
+            });
+        } else if (percentage > 85) {
+            alerts.push({
+                type: 'info',
+                category: category,
+                message: `${category} is at ${percentage.toFixed(0)}% of budget`
+            });
+        }
+    });
+    
+    return alerts;
+}
+
+function displayBudgetAlerts() {
+    const alerts = addBudgetAlerts();
+    
+    if (alerts.length > 0) {
+        const alertContainer = document.getElementById('budgetAlerts') || createAlertContainer();
+        
+        alertContainer.innerHTML = alerts.map(alert => `
+            <div class="alert alert-${alert.type}">
+                <strong>${alert.category}:</strong> ${alert.message}
+            </div>
+        `).join('');
+    }
+}
+
+function createAlertContainer() {
+    const container = document.createElement('div');
+    container.id = 'budgetAlerts';
+    container.style.cssText = `
+        margin-bottom: 2rem;
+    `;
+    
+    // Insert at top of main content
+    const mainContent = document.querySelector('.container');
+    const header = document.querySelector('.page-header');
+    if (mainContent && header) {
+        mainContent.insertBefore(container, header.nextSibling);
+    }
+    
+    return container;
+}
+
+// Add these CSS styles to your budget.html
+const budgetStyles = `
+<style>
+.alert {
+    padding: 1rem;
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid;
+}
+
+.alert-warning {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+.alert-info {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.3);
+    color: #3b82f6;
+}
+
+.budget-sync-status {
+    background: var(--glass-bg);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--glass-border);
+    text-align: center;
+}
+
+.sync-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #10b981;
+    font-weight: 500;
+}
+
+.sync-indicator.outdated {
+    color: #f59e0b;
+}
+</style>
+`;
+
+// Initialize budget integration when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Add styles
+    document.head.insertAdjacentHTML('beforeend', budgetStyles);
+    
+    // Load actual data from CSV uploads
+    updateBudgetTable();
+    displayBudgetAlerts();
+    
+    // Add sync status indicator
+    addSyncStatusIndicator();
+});
+
+function addSyncStatusIndicator() {
+    const transactions = JSON.parse(localStorage.getItem('financeos_transactions') || '[]');
+    const lastUpdate = localStorage.getItem('financeos_last_update');
+    
+    const statusContainer = document.createElement('div');
+    statusContainer.className = 'budget-sync-status';
+    
+    if (transactions.length > 0 && lastUpdate) {
+        const updateTime = new Date(lastUpdate);
+        const isRecent = (Date.now() - updateTime.getTime()) < 24 * 60 * 60 * 1000; // 24 hours
+        
+        statusContainer.innerHTML = `
+            <div class="sync-indicator ${isRecent ? '' : 'outdated'}">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z" />
+                </svg>
+                Budget synced with ${transactions.length} transactions
+                <span style="opacity: 0.7; font-size: 0.875rem;">
+                    (${updateTime.toLocaleDateString()})
+                </span>
+            </div>
+        `;
+    } else {
+        statusContainer.innerHTML = `
+            <div class="sync-indicator outdated">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
+                </svg>
+                No transaction data found
+                <a href="csv-upload.html" style="color: #8b5cf6; text-decoration: none; margin-left: 0.5rem;">
+                    Upload statements →
+                </a>
+            </div>
+        `;
+    }
+    
+    // Insert after page header
+    const header = document.querySelector('.page-header');
+    if (header) {
+        header.insertAdjacentElement('afterend', statusContainer);
+    }
+}
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
