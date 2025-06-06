@@ -1,3 +1,5 @@
+Got it! Here's the complete, updated HTML file with all the previous suggestions and the new CSS fixes for the overflowing numbers.
+You can simply replace your entire existing index.html file with the content below.
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -256,7 +258,7 @@
             backdrop-filter: blur(20px);
             border: 1px solid var(--glass-premium-border);
             border-radius: 20px;
-            padding: 24px;
+            padding: 24px; /* Ensure good padding */
             margin-bottom: 32px;
         }
 
@@ -279,6 +281,11 @@
             background: rgba(255, 255, 255, 0.05);
             border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            /* Added for better content handling */
+            overflow: hidden; 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         .summary-label {
@@ -290,9 +297,13 @@
         }
 
         .summary-value {
-            font-size: 1.5rem;
+            /* Using clamp for responsive font sizing */
+            font-size: clamp(1.2rem, 4vw, 1.75rem); /* Min 1.2rem, Preferred 4vw, Max 1.75rem */
             font-weight: 700;
             font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            /* Added min-width and word-wrap to prevent overflow */
+            min-width: 0; /* Allows content to shrink within flex/grid */
+            word-break: break-word; /* Breaks long words if necessary */
         }
 
         .positive { color: #10b981; }
@@ -324,6 +335,11 @@
             border-radius: 16px;
             padding: 20px;
             transition: all 0.3s ease;
+            /* Added for better content handling */
+            overflow: hidden; 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         .account-card:hover {
@@ -355,10 +371,14 @@
         }
 
         .account-balance {
-            font-size: 1.75rem;
+            /* Using clamp for responsive font sizing */
+            font-size: clamp(1.4rem, 5vw, 2rem); /* Min 1.4rem, Preferred 5vw, Max 2rem */
             font-weight: 700;
             margin-bottom: 8px;
             font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            /* Added min-width and word-wrap to prevent overflow */
+            min-width: 0; /* Allows content to shrink within flex/grid */
+            word-break: break-word; /* Breaks long words if necessary */
         }
 
         .account-available {
@@ -391,6 +411,11 @@
             text-decoration: none;
             color: white;
             transition: all 0.3s ease;
+            /* Added for better content handling */
+            overflow: hidden; 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         .action-card:hover {
@@ -487,13 +512,17 @@
             .welcome-title {
                 font-size: 1.75rem;
             }
-
-            .account-balance {
-                font-size: 1.5rem;
-            }
-
+            
+            /* Specific font size overrides for very small screens */
             .summary-value {
-                font-size: 1.25rem;
+                font-size: 1.25rem; /* Revert to a fixed smaller size on very small screens */
+            }
+            .account-balance {
+                font-size: 1.5rem; /* Revert to a fixed smaller size on very small screens */
+            }
+            /* Add more padding for cards on very small screens */
+            .account-card, .summary-item, .action-card {
+                padding: 16px;
             }
         }
 
@@ -712,4 +741,4 @@
     </script>
 </body>
 </html>
- 
+
