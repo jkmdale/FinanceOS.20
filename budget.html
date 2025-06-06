@@ -219,6 +219,28 @@
             font-size: 1.125rem;
         }
 
+        /* Budget Sync Status */
+        .budget-sync-status {
+            background: var(--glass-bg);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--glass-border);
+            text-align: center;
+        }
+
+        .sync-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #10b981;
+            font-weight: 500;
+        }
+
+        .sync-indicator.outdated {
+            color: #f59e0b;
+        }
+
         /* Budget Summary Cards */
         .budget-summary {
             display: grid;
@@ -554,6 +576,10 @@
             animation: messageSlideIn 0.3s ease-out;
         }
 
+        .ai-message-user {
+            flex-direction: row-reverse;
+        }
+
         @keyframes messageSlideIn {
             from {
                 opacity: 0;
@@ -573,8 +599,16 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+        }
+
+        .ai-message-assistant .ai-message-avatar {
             background: linear-gradient(135deg, #8b5cf6, #9333ea);
             color: white;
+        }
+
+        .ai-message-user .ai-message-avatar {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
         }
 
         .ai-message-content {
@@ -588,12 +622,45 @@
             line-height: 1.4;
         }
 
+        .ai-message-user .ai-message-content {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(147, 51, 234, 0.2));
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+
         .ai-message-content p {
             margin: 0 0 0.5rem 0;
         }
 
         .ai-message-content p:last-child {
             margin-bottom: 0;
+        }
+
+        .ai-financial-data {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 0.375rem;
+            padding: 0.25rem 0.5rem;
+            color: #10b981;
+            font-weight: 600;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+        }
+
+        .ai-warning-data {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 0.375rem;
+            padding: 0.25rem 0.5rem;
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .ai-insight-highlight {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid #3b82f6;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border-radius: 0 0.375rem 0.375rem 0;
+            font-style: italic;
         }
 
         .ai-chat-input {
@@ -644,10 +711,58 @@
             transform: translateY(-1px);
         }
 
+        .ai-chat-send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Privacy Mode */
+        .privacy-mode .amount,
+        .privacy-mode .budget-table td:nth-child(3),
+        .privacy-mode .budget-table td:nth-child(4),
+        .privacy-mode .budget-table td:nth-child(5) {
+            filter: blur(4px);
+            transition: filter 0.3s ease;
+        }
+
+        /* Budget Alert Styles */
+        .alert.alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+
+        .alert.alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+            color: #f59e0b;
+        }
+
+        .alert.alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.3);
+            color: #3b82f6;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .nav-links {
                 display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--glass-bg);
+                backdrop-filter: blur(20px);
+                border-top: 1px solid var(--glass-border);
+                flex-direction: column;
+                padding: 1rem;
+                gap: 0.5rem;
+            }
+
+            .nav-links.active {
+                display: flex;
             }
 
             .mobile-menu-btn {
@@ -731,15 +846,6 @@
         .text-right { text-align: right; }
         .font-mono { font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace; }
         .hidden { display: none; }
-
-        /* Privacy Mode */
-        .privacy-mode .amount,
-        .privacy-mode .budget-table td:nth-child(3),
-        .privacy-mode .budget-table td:nth-child(4),
-        .privacy-mode .budget-table td:nth-child(5) {
-            filter: blur(4px);
-            transition: filter 0.3s ease;
-        }
     </style>
 </head>
 <body>
@@ -751,7 +857,7 @@
                 <span>FinanceOS</span>
             </a>
             
-            <ul class="nav-links">
+            <ul class="nav-links" id="navLinks">
                 <li><a href="index.html">Dashboard</a></li>
                 <li><a href="budget.html" class="active">Budget</a></li>
                 <li><a href="goals.html">Goals</a></li>
@@ -762,18 +868,31 @@
             <div class="nav-actions">
                 <button class="privacy-toggle" id="privacyToggle">🔒 Privacy</button>
                 <button class="logout-btn" onclick="logout()">Logout</button>
-                <button class="mobile-menu-btn">☰</button>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
             </div>
         </div>
     </nav>
 
     <!-- Main Content -->
     <main class="main-content">
+        <!-- Budget Sync Status -->
+        <div class="budget-sync-status" id="budgetSyncStatus">
+            <div class="sync-indicator">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z" />
+                </svg>
+                Budget synced with transaction data
+                <span style="opacity: 0.7; font-size: 0.875rem;" id="lastUpdateTime">
+                    (Updated: Never)
+                </span>
+            </div>
+        </div>
+
         <!-- Critical Alert -->
         <div class="alert">
-            <div class="alert-title">🚨 Budget Deficit Alert</div>
+            <div class="alert-title">🚨 Critical Budget Deficit Alert</div>
             <div class="alert-message">
-                You're spending $3,607 more than you earn monthly. Your emergency fund of $0.17 cannot cover this deficit. 
+                You're spending <strong>$3,607 more than you earn monthly</strong>. Your emergency fund of $0.17 cannot cover this deficit. 
                 <strong>Immediate action required</strong> to reduce expenses and build emergency savings.
             </div>
         </div>
@@ -813,7 +932,7 @@
 
         <!-- Budget Table -->
         <div class="budget-table-container">
-            <table class="budget-table">
+            <table class="budget-table" id="budgetTable">
                 <thead>
                     <tr>
                         <th>Category</th>
@@ -1158,7 +1277,7 @@
                             </svg>
                         </div>
                         <div class="ai-message-content">
-                            <p>🚨 I can see your budget has a critical $3,607 deficit! This needs immediate attention.</p>
+                            <p>🚨 I can see your budget has a critical <span class="ai-warning-data">$3,607 deficit</span>! This needs immediate attention.</p>
                             <p>I can help you identify overspending areas and create an action plan to balance your budget. What would you like to tackle first?</p>
                         </div>
                     </div>
@@ -1183,6 +1302,71 @@
     </div>
 
     <script>
+        // Budget Integration with CSV Upload Data
+        function loadBudgetActuals() {
+            const transactions = JSON.parse(localStorage.getItem('financeos_transactions') || '[]');
+            const categoryActuals = {};
+            
+            transactions.forEach(transaction => {
+                if (transaction.amount < 0) {
+                    const category = transaction.category;
+                    const amount = Math.abs(transaction.amount);
+                    const budgetCategory = mapToBudgetCategory(category);
+                    
+                    if (budgetCategory) {
+                        if (!categoryActuals[budgetCategory]) {
+                            categoryActuals[budgetCategory] = 0;
+                        }
+                        categoryActuals[budgetCategory] += amount;
+                    }
+                }
+            });
+            
+            return categoryActuals;
+        }
+
+        function mapToBudgetCategory(transactionCategory) {
+            const categoryMapping = {
+                'Groceries': 'Groceries',
+                'Dining Out': 'Dining Out/Takeaway',
+                'Fuel': 'Fuel',
+                'Shopping': 'Shopping/Retail',
+                'Entertainment': 'Entertainment',
+                'Utilities': 'Sky Network'
+            };
+            
+            return categoryMapping[transactionCategory] || null;
+        }
+
+        function updateBudgetTable() {
+            const actuals = loadBudgetActuals();
+            const lastUpdate = localStorage.getItem('financeos_last_update');
+            
+            // Update sync status
+            const syncStatus = document.getElementById('budgetSyncStatus');
+            const lastUpdateTime = document.getElementById('lastUpdateTime');
+            
+            if (Object.keys(actuals).length > 0) {
+                syncStatus.querySelector('.sync-indicator').classList.remove('outdated');
+                lastUpdateTime.textContent = lastUpdate ? 
+                    `(Updated: ${new Date(lastUpdate).toLocaleDateString()})` : 
+                    '(Updated: Today)';
+            } else {
+                syncStatus.querySelector('.sync-indicator').classList.add('outdated');
+                syncStatus.innerHTML = `
+                    <div class="sync-indicator outdated">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
+                        </svg>
+                        No transaction data found
+                        <a href="csv-upload.html" style="color: #8b5cf6; text-decoration: none; margin-left: 0.5rem;">
+                            Upload statements →
+                        </a>
+                    </div>
+                `;
+            }
+        }
+
         // Chart Configuration
         Chart.defaults.color = 'rgba(255, 255, 255, 0.8)';
         Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
@@ -1269,98 +1453,250 @@
         });
 
         // AI Coach Functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const toggle = document.getElementById('aiCoachToggle');
-            const panel = document.getElementById('aiCoachPanel');
-            const close = document.getElementById('aiCoachClose');
-            const input = document.getElementById('aiChatInput');
-            const send = document.getElementById('aiChatSend');
-
-            toggle.addEventListener('click', () => {
-                panel.classList.toggle('hidden');
-            });
-
-            close.addEventListener('click', () => {
-                panel.classList.add('hidden');
-            });
-
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    sendMessage();
-                }
-            });
-
-            send.addEventListener('click', sendMessage);
-
-            function sendMessage() {
-                const message = input.value.trim();
-                if (!message) return;
-
-                addMessage('user', message);
-                input.value = '';
-
-                // Simulate AI response
-                setTimeout(() => {
-                    const response = generateAIResponse(message);
-                    addMessage('assistant', response);
-                }, 1000);
+        class AIFinancialCoach {
+            constructor() {
+                this.isOpen = false;
+                this.initialize();
             }
 
-            function addMessage(type, content) {
-                const messagesContainer = document.getElementById('aiChatMessages');
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `ai-message ai-message-${type}`;
+            initialize() {
+                this.bindEvents();
+                this.loadFinancialContext();
+            }
+
+            bindEvents() {
+                const toggle = document.getElementById('aiCoachToggle');
+                const close = document.getElementById('aiCoachClose');
+                const input = document.getElementById('aiChatInput');
+                const send = document.getElementById('aiChatSend');
+
+                if (toggle) {
+                    toggle.addEventListener('click', () => this.togglePanel());
+                }
+
+                if (close) {
+                    close.addEventListener('click', () => this.closePanel());
+                }
+
+                if (input) {
+                    input.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            this.sendMessage();
+                        }
+                    });
+                }
+
+                if (send) {
+                    send.addEventListener('click', () => this.sendMessage());
+                }
+            }
+
+            loadFinancialContext() {
+                const transactions = JSON.parse(localStorage.getItem('financeos_transactions') || '[]');
+                const currentMonth = new Date().getMonth();
+                const currentYear = new Date().getFullYear();
+
+                const categorySpending = {};
+                transactions.forEach(t => {
+                    const transactionDate = new Date(t.date);
+                    if (transactionDate.getMonth() === currentMonth && 
+                        transactionDate.getFullYear() === currentYear && 
+                        t.amount < 0) {
+                        
+                        const category = t.category;
+                        if (!categorySpending[category]) {
+                            categorySpending[category] = 0;
+                        }
+                        categorySpending[category] += Math.abs(t.amount);
+                    }
+                });
+
+                this.context = {
+                    transactions,
+                    categorySpending,
+                    monthlyIncome: 6304,
+                    monthlyExpenses: 9911,
+                    monthlyDeficit: -3607,
+                    emergencyFund: 0.17
+                };
+            }
+
+            togglePanel() {
+                const panel = document.getElementById('aiCoachPanel');
+                if (this.isOpen) {
+                    this.closePanel();
+                } else {
+                    this.openPanel();
+                }
+            }
+
+            openPanel() {
+                const panel = document.getElementById('aiCoachPanel');
+                const input = document.getElementById('aiChatInput');
                 
-                messageDiv.innerHTML = `
-                    <div class="ai-message-avatar">
+                panel.classList.remove('hidden');
+                this.isOpen = true;
+                
+                setTimeout(() => {
+                    if (input) input.focus();
+                }, 100);
+            }
+
+            closePanel() {
+                const panel = document.getElementById('aiCoachPanel');
+                panel.classList.add('hidden');
+                this.isOpen = false;
+            }
+
+            async sendMessage() {
+                const input = document.getElementById('aiChatInput');
+                const message = input.value.trim();
+                
+                if (!message) return;
+
+                input.value = '';
+                this.disableSendButton(true);
+
+                this.addMessage('user', message);
+
+                try {
+                    const response = await this.generateResponse(message);
+                    this.addMessage('assistant', response);
+                } catch (error) {
+                    this.addMessage('assistant', 'Sorry, I encountered an error. Please try again.');
+                }
+
+                this.disableSendButton(false);
+            }
+
+            addMessage(type, content) {
+                const messagesContainer = document.getElementById('aiChatMessages');
+                
+                const messageElement = document.createElement('div');
+                messageElement.className = `ai-message ai-message-${type}`;
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'ai-message-avatar';
+                
+                if (type === 'assistant') {
+                    avatar.innerHTML = `
                         <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16,16.5C16,17.11 15.61,17.5 15,17.5H9C8.39,17.5 8,17.11 8,16.5V15.5C8,14.89 8.39,14.5 9,14.5H15C15.61,14.5 16,14.89 16,15.5V16.5M9,13A1,1 0 0,1 8,12A1,1 0 0,1 9,11A1,1 0 0,1 10,12A1,1 0 0,1 9,13M15,13A1,1 0 0,1 14,12A1,1 0 0,1 15,11A1,1 0 0,1 16,12A1,1 0 0,1 15,13Z" />
                         </svg>
-                    </div>
-                    <div class="ai-message-content">
-                        <p>${content}</p>
-                    </div>
-                `;
+                    `;
+                } else {
+                    avatar.innerHTML = `
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
+                        </svg>
+                    `;
+                }
 
-                messagesContainer.appendChild(messageDiv);
+                const contentElement = document.createElement('div');
+                contentElement.className = 'ai-message-content';
+                contentElement.innerHTML = content;
+
+                messageElement.appendChild(avatar);
+                messageElement.appendChild(contentElement);
+
+                messagesContainer.appendChild(messageElement);
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
             }
 
-            function generateAIResponse(query) {
-                const responses = {
-                    'deficit': 'Your $3,607 deficit is critical. Priority actions: 1) Cut dining out by 50% (-$168), 2) Reduce shopping by 30% (-$59), 3) Review and cancel unused subscriptions. This could reduce your deficit by ~$227/month.',
-                    'overspending': 'You\'re overspending most on: Dining Out (+35%, $87 over), Entertainment (+46%, $23 over), and Shopping (+32%, $48 over). These three categories are costing you an extra $158/month.',
-                    'emergency': 'Start with $50/week transfers from your House Kitty ($65K) to build emergency fund. Your goal: $15,000 (3 months expenses). At $200/month, you\'ll reach this in 6 years, but start NOW!',
-                    'expenses': 'Top expense reduction opportunities: 1) Meal prep instead of dining out, 2) Review Sky Network subscription, 3) Shop sales for groceries, 4) Set entertainment spending limit of $30/month.'
-                };
+            async generateResponse(query) {
+                await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+                return this.parseQuery(query.toLowerCase());
+            }
 
-                const lowerQuery = query.toLowerCase();
-                for (const [key, response] of Object.entries(responses)) {
-                    if (lowerQuery.includes(key)) {
-                        return response;
-                    }
+            parseQuery(query) {
+                if (query.includes('deficit') || query.includes('fix')) {
+                    return `Your <span class="ai-warning-data">$3,607 deficit</span> is critical. Priority actions:
+                    
+                    <div class="ai-insight-highlight">💡 Immediate fixes: 1) Cut dining out by 50% (-$168), 2) Reduce shopping by 30% (-$59), 3) Review subscriptions. This could reduce deficit by ~$227/month.</div>`;
+                }
+
+                if (query.includes('overspend') || query.includes('over')) {
+                    return `You're overspending most on:
+                    
+                    • **Dining Out**: <span class="ai-warning-data">+35% ($87 over)</span>
+                    • **Entertainment**: <span class="ai-warning-data">+46% ($23 over)</span>  
+                    • **Shopping**: <span class="ai-warning-data">+32% ($48 over)</span>
+                    
+                    These three categories cost you an extra <span class="ai-warning-data">$158/month</span>.`;
+                }
+
+                if (query.includes('emergency')) {
+                    return `🚨 Your emergency fund is critically low at <span class="ai-warning-data">$0.17</span>.
+                    
+                    <div class="ai-insight-highlight">🎯 Start with $50/week transfers from House Kitty ($65K) to build emergency fund. Goal: $15,000. At $200/month, you'll reach this in 6 years - but start NOW!</div>`;
+                }
+
+                if (query.includes('expenses') || query.includes('reduce')) {
+                    return `Top expense reduction opportunities:
+                    
+                    1. **Meal prep** instead of dining out (-$100/month)
+                    2. **Review Sky Network** subscription (-$50/month)  
+                    3. **Shop sales** for groceries (-$50/month)
+                    4. **Set entertainment limit** to $30/month (-$43/month)
+                    
+                    <div class="ai-insight-highlight">💰 Total potential savings: $243/month</div>`;
                 }
 
                 return 'I can help you fix your budget deficit, identify overspending, or start an emergency fund. What specific area would you like to focus on?';
+            }
+
+            disableSendButton(disabled) {
+                const sendButton = document.getElementById('aiChatSend');
+                if (sendButton) {
+                    sendButton.disabled = disabled;
+                }
+            }
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize AI Coach
+            window.aiCoach = new AIFinancialCoach();
+            
+            // Update budget with CSV data
+            updateBudgetTable();
+            
+            // Mobile menu toggle
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const navLinks = document.getElementById('navLinks');
+
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    navLinks.classList.toggle('active');
+                });
+            }
+
+            // Privacy toggle
+            const privacyToggle = document.getElementById('privacyToggle');
+            if (privacyToggle) {
+                privacyToggle.addEventListener('click', function() {
+                    document.body.classList.toggle('privacy-mode');
+                    this.textContent = document.body.classList.contains('privacy-mode') ? '🔓 Show' : '🔒 Privacy';
+                });
             }
         });
 
         // Global function for quick actions
         function askAI(question) {
             const input = document.getElementById('aiChatInput');
-            input.value = question;
-            input.focus();
+            if (input) {
+                input.value = question;
+                if (window.aiCoach) {
+                    window.aiCoach.sendMessage();
+                }
+            }
         }
-
-        // Privacy toggle
-        document.getElementById('privacyToggle').addEventListener('click', function() {
-            document.body.classList.toggle('privacy-mode');
-            this.textContent = document.body.classList.contains('privacy-mode') ? '🔓 Show' : '🔒 Privacy';
-        });
 
         // Logout function
         function logout() {
             if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('financeos_session');
                 window.location.href = 'login.html';
             }
         }
