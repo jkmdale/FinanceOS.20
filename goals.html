@@ -2,12 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Goals - FinanceOS</title>
     <meta name="theme-color" content="#8b5cf6">
     <link rel="manifest" href="manifest.json">
+    
     <style>
-        /* Reset and Base Styles */
+        :root {
+            --primary-purple: #8b5cf6;
+            --secondary-blue: #3b82f6;
+            --success-green: #10b981;
+            --error-red: #ef4444;
+            --warning-orange: #f97316;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --text-primary: rgba(255, 255, 255, 0.9);
+            --text-secondary: rgba(255, 255, 255, 0.7);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -17,31 +29,11 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
-            background-attachment: fixed;
-            color: white;
             min-height: 100vh;
+            color: var(--text-primary);
             overflow-x: hidden;
         }
 
-        /* CSS Variables for Design System */
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --glass-premium-bg: linear-gradient(135deg, 
-                rgba(139, 92, 246, 0.15) 0%, 
-                rgba(59, 130, 246, 0.15) 50%, 
-                rgba(147, 51, 234, 0.15) 100%);
-            --glass-premium-border: rgba(255, 255, 255, 0.2);
-            --gradient-purple: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
-            --gradient-blue: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
-            --gradient-green: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
-            --gradient-red: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
-            --text-white: rgba(255, 255, 255, 0.9);
-            --text-gray: rgba(255, 255, 255, 0.7);
-            --text-light: rgba(255, 255, 255, 0.5);
-        }
-
-        /* Glass Effects */
         .glass {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
@@ -50,313 +42,304 @@
         }
 
         .glass-premium {
-            background: var(--glass-premium-bg);
+            background: linear-gradient(135deg, 
+                rgba(139, 92, 246, 0.15) 0%, 
+                rgba(59, 130, 246, 0.15) 50%, 
+                rgba(147, 51, 234, 0.15) 100%);
             backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-premium-border);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
 
-        /* Navigation Bar - BIGGER UNIFIED STYLE */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            background: var(--glass-bg);
+        /* UNIFIED NAVIGATION - Same on every page */
+        .main-nav {
+            background: linear-gradient(135deg, 
+                rgba(139, 92, 246, 0.15) 0%, 
+                rgba(59, 130, 246, 0.15) 50%, 
+                rgba(147, 51, 234, 0.15) 100%);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 20px 0;
-            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 20px;
+            margin-bottom: 20px;
         }
 
         .nav-container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 24px;
+            gap: 20px;
         }
 
         .nav-logo {
             display: flex;
             align-items: center;
+            gap: 12px;
             text-decoration: none;
-            color: white;
-            font-weight: 700;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .nav-logo:hover {
+            transform: translateX(-2px);
         }
 
         .logo-icon {
-            width: 48px;
-            height: 48px;
-            margin-right: 12px;
-            border-radius: 12px;
-            background: var(--gradient-green);
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 18px;
             font-weight: bold;
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
         }
 
         .nav-links {
             display: flex;
+            gap: 8px;
             align-items: center;
-            gap: 32px;
-            list-style: none;
         }
 
-        .nav-links a {
-            color: var(--text-gray);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 1rem;
-            padding: 12px 20px;
+        .nav-link {
+            padding: 8px 16px;
             border-radius: 8px;
-            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            white-space: nowrap;
             position: relative;
         }
 
-        .nav-links a:hover {
-            color: white;
+        .nav-link:hover {
+            color: var(--text-primary);
             background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
         }
 
-        .nav-links a.active {
-            color: #8b5cf6;
-            background: rgba(139, 92, 246, 0.1);
+        .nav-link.active {
+            color: white;
+            background: rgba(139, 92, 246, 0.3);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
         }
 
-        .nav-links a.active::after {
+        .nav-link.active::after {
             content: '';
             position: absolute;
-            bottom: -8px;
+            bottom: 2px;
             left: 50%;
             transform: translateX(-50%);
-            width: 6px;
-            height: 6px;
+            width: 4px;
+            height: 4px;
             background: #8b5cf6;
             border-radius: 50%;
         }
 
         .nav-actions {
             display: flex;
+            gap: 8px;
             align-items: center;
-            gap: 16px;
+        }
+
+        .privacy-toggle, .logout-button {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
 
         .privacy-toggle {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            background: rgba(249, 115, 22, 0.2);
+            color: #f97316;
+            border: 1px solid rgba(249, 115, 22, 0.3);
         }
 
         .privacy-toggle:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .logout-btn {
-            background: var(--gradient-red);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            opacity: 0.9;
+            background: rgba(249, 115, 22, 0.3);
             transform: translateY(-1px);
         }
 
-        /* Mobile Menu */
-        .mobile-menu-btn {
+        .logout-button {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .logout-button:hover {
+            background: rgba(239, 68, 68, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .nav-mobile-toggle {
             display: none;
             background: none;
             border: none;
-            color: white;
+            color: var(--text-primary);
             font-size: 1.5rem;
             cursor: pointer;
-            padding: 8px;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
         }
 
-        /* Main Content */
-        .main-content {
-            margin-top: 100px;
-            padding: 24px;
+        .nav-mobile-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-mobile-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .nav-mobile-menu.open {
+            display: block;
+        }
+
+        .nav-mobile-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .nav-mobile-actions {
+            display: flex;
+            gap: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Goals Page Styles */
+        .container {
             max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
+            margin: 0 auto;
+            padding: 20px;
         }
 
-        /* Page Header */
-        .page-header {
+        .header {
             text-align: center;
-            margin-bottom: 32px;
+            margin-bottom: 40px;
         }
 
-        .page-title {
+        .header h1 {
             font-size: 2.5rem;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             background: linear-gradient(135deg, #8b5cf6, #3b82f6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
-        .page-subtitle {
-            color: var(--text-gray);
-            font-size: 1.125rem;
+        .header p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
         }
 
-        /* Goals Overview */
-        .goals-overview {
-            background: var(--glass-premium-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-premium-border);
-            border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 32px;
-        }
-
-        .overview-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .overview-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
-        }
-
-        .stat-item {
-            text-align: center;
-            padding: 16px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .stat-label {
-            font-size: 0.875rem;
-            color: var(--text-gray);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        /* Goals Grid */
         .goals-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 24px;
-            margin-bottom: 32px;
+            margin-bottom: 40px;
         }
 
         .goal-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
             padding: 24px;
-            transition: all 0.3s ease;
+            border-radius: 20px;
+            position: relative;
+            transition: transform 0.3s ease;
         }
 
         .goal-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 48px rgba(139, 92, 246, 0.3);
-        }
-
-        .goal-card.critical {
-            border: 2px solid rgba(239, 68, 68, 0.5);
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
+            transform: translateY(-5px);
         }
 
         .goal-header {
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: flex-start;
             margin-bottom: 16px;
         }
 
         .goal-title {
-            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .goal-icon {
+            font-size: 1.5rem;
+        }
+
+        .goal-name {
+            font-size: 1.2rem;
             font-weight: 600;
-            color: var(--text-white);
-            margin-bottom: 4px;
         }
 
         .goal-priority {
-            font-size: 0.75rem;
-            font-weight: 600;
             padding: 4px 8px;
             border-radius: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-size: 0.8rem;
+            font-weight: 500;
         }
 
         .priority-critical {
             background: rgba(239, 68, 68, 0.2);
             color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
         .priority-high {
             background: rgba(249, 115, 22, 0.2);
             color: #f97316;
-            border: 1px solid rgba(249, 115, 22, 0.3);
         }
 
         .priority-medium {
             background: rgba(59, 130, 246, 0.2);
             color: #3b82f6;
-            border: 1px solid rgba(59, 130, 246, 0.3);
         }
 
-        .goal-description {
-            color: var(--text-gray);
-            font-size: 0.875rem;
-            margin-bottom: 20px;
-            line-height: 1.4;
-        }
-
-        .goal-progress {
+        .goal-amounts {
             margin-bottom: 16px;
         }
 
-        .progress-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
+        .goal-current {
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+            margin-bottom: 4px;
         }
 
-        .progress-amounts {
-            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
-            font-size: 0.875rem;
-            color: var(--text-gray);
+        .goal-target {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
         }
 
-        .progress-percentage {
-            font-weight: 600;
-            font-size: 0.875rem;
+        .progress-section {
+            margin-bottom: 16px;
         }
 
         .progress-bar {
@@ -365,464 +348,303 @@
             background: rgba(255, 255, 255, 0.1);
             border-radius: 4px;
             overflow: hidden;
+            margin-bottom: 8px;
         }
 
         .progress-fill {
             height: 100%;
             border-radius: 4px;
-            transition: width 0.5s ease;
+            transition: width 0.3s ease;
         }
 
-        .progress-critical { background: var(--gradient-red); }
-        .progress-high { background: var(--gradient-red); }
-        .progress-medium { background: var(--gradient-blue); }
-        .progress-good { background: var(--gradient-green); }
-
-        .goal-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 16px;
+        .progress-critical {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
         }
 
-        .goal-stat {
-            text-align: center;
-            padding: 12px;
+        .progress-warning {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+        }
+
+        .progress-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .goal-timeline {
             background: rgba(255, 255, 255, 0.05);
+            padding: 12px;
             border-radius: 8px;
+            margin-top: 12px;
         }
 
-        .goal-stat-label {
-            font-size: 0.75rem;
-            color: var(--text-gray);
+        .timeline-item {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
             margin-bottom: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .goal-stat-value {
-            font-size: 1rem;
-            font-weight: 600;
-            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
         }
 
         .goal-actions {
+            margin-top: 16px;
             display: flex;
             gap: 8px;
         }
 
-        .goal-action-btn {
-            flex: 1;
+        .btn {
             padding: 8px 16px;
-            border: none;
             border-radius: 8px;
-            font-size: 0.875rem;
+            border: none;
+            font-size: 0.9rem;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
         .btn-primary {
-            background: var(--gradient-purple);
+            background: linear-gradient(135deg, #8b5cf6, #9333ea);
             color: white;
-        }
-
-        .btn-primary:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
         }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
         }
 
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
+        .btn:hover {
+            transform: translateY(-1px);
         }
 
-        /* Add Goal Button */
-        .add-goal-section {
+        .alert-critical {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.2));
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .positive { color: var(--success-green); }
+        .negative { color: var(--error-red); }
+        .warning { color: var(--warning-orange); }
+
+        .add-goal-card {
+            border: 2px dashed rgba(139, 92, 246, 0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            margin-bottom: 32px;
-        }
-
-        .add-goal-btn {
-            background: var(--gradient-green);
-            color: white;
-            border: none;
-            padding: 16px 32px;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            min-height: 300px;
         }
 
-        .add-goal-btn:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+        .add-goal-card:hover {
+            border-color: var(--primary-purple);
+            background: rgba(139, 92, 246, 0.1);
         }
 
-        /* Positive/Negative Colors */
-        .positive { color: #10b981; }
-        .negative { color: #ef4444; }
-        .neutral { color: var(--text-white); }
+        .add-icon {
+            font-size: 3rem;
+            color: var(--primary-purple);
+            margin-bottom: 16px;
+        }
 
-        /* Responsive Design */
         @media (max-width: 768px) {
-            .nav-links {
+            .nav-links, .nav-actions {
                 display: none;
             }
-
-            .mobile-menu-btn {
+            
+            .nav-mobile-toggle {
                 display: block;
-            }
-
-            .main-content {
-                padding: 16px;
-                margin-top: 88px;
-            }
-
-            .page-title {
-                font-size: 2rem;
             }
 
             .goals-grid {
                 grid-template-columns: 1fr;
-                gap: 16px;
             }
 
-            .overview-stats {
-                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-                gap: 12px;
-            }
-
-            .goal-stats {
-                grid-template-columns: 1fr;
-                gap: 8px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .nav-container {
-                padding: 0 16px;
-            }
-
-            .logo-icon {
-                width: 40px;
-                height: 40px;
-                font-size: 20px;
-            }
-
-            .page-title {
-                font-size: 1.75rem;
-            }
-
-            .goal-card {
-                padding: 20px;
+            .header h1 {
+                font-size: 2rem;
             }
 
             .goal-actions {
                 flex-direction: column;
             }
         }
-
-        /* Privacy Mode */
-        .privacy-mode .stat-value,
-        .privacy-mode .progress-amounts,
-        .privacy-mode .goal-stat-value {
-            filter: blur(4px);
-            transition: filter 0.3s ease;
-        }
     </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
+    <!-- UNIFIED NAVIGATION -->
+    <nav class="main-nav">
         <div class="nav-container">
             <a href="index.html" class="nav-logo">
                 <div class="logo-icon">$</div>
-                <span>FinanceOS</span>
+                <span class="logo-text">FinanceOS</span>
             </a>
-            
-            <ul class="nav-links">
-                <li><a href="index.html">Dashboard</a></li>
-                <li><a href="budget.html">Budget</a></li>
-                <li><a href="goals.html" class="active">Goals</a></li>
-                <li><a href="csv-upload.html">Upload</a></li>
-            </ul>
-            
-            <div class="nav-actions">
-                <button class="privacy-toggle" onclick="togglePrivacy()">Privacy Mode</button>
-                <button class="logout-btn" onclick="logout()">Logout</button>
+
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">🏠 Dashboard</a>
+                <a href="budget.html" class="nav-link">📊 Budget</a>
+                <a href="goals.html" class="nav-link active">🎯 Goals</a>
+                <a href="csv-upload.html" class="nav-link">📤 Upload</a>
             </div>
-            
-            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+
+            <div class="nav-actions">
+                <button class="privacy-toggle" id="privacyToggle">🔒 Privacy</button>
+                <button class="logout-button" onclick="logout()">📱 Logout</button>
+            </div>
+
+            <button class="nav-mobile-toggle" onclick="toggleMobileMenu()">
+                <span id="menuIcon">☰</span>
+            </button>
+        </div>
+
+        <div class="nav-mobile-menu" id="mobileMenu">
+            <div class="nav-mobile-links">
+                <a href="index.html" class="nav-link">🏠 Dashboard</a>
+                <a href="budget.html" class="nav-link">📊 Budget</a>
+                <a href="goals.html" class="nav-link active">🎯 Goals</a>
+                <a href="csv-upload.html" class="nav-link">📤 Upload</a>
+            </div>
+            <div class="nav-mobile-actions">
+                <button class="privacy-toggle" onclick="togglePrivacy()">🔒 Privacy</button>
+                <button class="logout-button" onclick="logout()">📱 Logout</button>
+            </div>
         </div>
     </nav>
 
     <!-- Main Content -->
-    <main class="main-content">
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="page-title">Financial Goals</h1>
-            <p class="page-subtitle">Track your progress toward financial freedom</p>
-        </div>
-
-        <!-- Goals Overview -->
-        <div class="goals-overview">
-            <h2 class="overview-title">Goals Progress Overview</h2>
-            <div class="overview-stats">
-                <div class="stat-item">
-                    <div class="stat-label">Total Goals</div>
-                    <div class="stat-value neutral">4</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">On Track</div>
-                    <div class="stat-value positive">2</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">Behind</div>
-                    <div class="stat-value negative">2</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">Total Saved</div>
-                    <div class="stat-value positive">$49,033</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">Target Amount</div>
-                    <div class="stat-value neutral">$135,000</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">Overall Progress</div>
-                    <div class="stat-value neutral">36.3%</div>
-                </div>
-            </div>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Financial Goals</h1>
+            <p>Track your progress towards financial milestones and build a secure future</p>
         </div>
 
         <!-- Goals Grid -->
         <div class="goals-grid">
-            <!-- Emergency Fund Goal - CRITICAL -->
-            <div class="goal-card critical">
+            <!-- Emergency Fund Goal (Critical) -->
+            <div class="goal-card glass-premium alert-critical">
                 <div class="goal-header">
-                    <div>
-                        <h3 class="goal-title">Emergency Fund</h3>
-                        <div class="goal-priority priority-critical">Critical</div>
+                    <div class="goal-title">
+                        <span class="goal-icon">🚨</span>
+                        <span class="goal-name">Emergency Fund</span>
                     </div>
+                    <span class="goal-priority priority-critical">CRITICAL</span>
                 </div>
-                <p class="goal-description">
-                    Build a safety net of 3-6 months expenses. Currently at extreme risk with only $0.17 saved.
-                    Financial experts recommend $15,000 minimum for your family situation.
-                </p>
                 
-                <div class="goal-progress">
-                    <div class="progress-header">
-                        <span class="progress-amounts">$0.17 / $15,000</span>
-                        <span class="progress-percentage negative">0.001%</span>
-                    </div>
+                <div class="goal-amounts">
+                    <div class="goal-current negative">$0.17</div>
+                    <div class="goal-target">Target: $17,733 (3 months expenses)</div>
+                </div>
+                
+                <div class="progress-section">
                     <div class="progress-bar">
-                        <div class="progress-fill progress-critical" style="width: 0.001%"></div>
+                        <div class="progress-fill progress-critical" style="width: 0.001%;"></div>
+                    </div>
+                    <div class="progress-info">
+                        <span>0.001% Complete</span>
+                        <span>$17,732.83 remaining</span>
                     </div>
                 </div>
-
-                <div class="goal-stats">
-                    <div class="goal-stat">
-                        <div class="goal-stat-label">Monthly Target</div>
-                        <div class="goal-stat-value negative">$0</div>
-                    </div>
-                    <div class="goal-stat">
-                        <div class="goal-stat-label">Time Left</div>
-                        <div class="goal-stat-value negative">Indefinite</div>
-                    </div>
+                
+                <div class="goal-timeline">
+                    <div class="timeline-item"><strong>Recommended:</strong> Save $300/month</div>
+                    <div class="timeline-item"><strong>Timeline:</strong> 59 months at current rate</div>
+                    <div class="timeline-item"><strong>Priority:</strong> Highest - start immediately</div>
                 </div>
-
+                
                 <div class="goal-actions">
-                    <button class="goal-action-btn btn-primary">Start Saving</button>
-                    <button class="goal-action-btn btn-secondary">Edit Goal</button>
+                    <button class="btn btn-primary" onclick="addToGoal('emergency', 300)">
+                        Add $300/month
+                    </button>
+                    <button class="btn btn-secondary" onclick="editGoal('emergency')">
+                        Edit Goal
+                    </button>
                 </div>
             </div>
 
             <!-- Debt Payoff Goal -->
-            <div class="goal-card">
+            <div class="goal-card glass">
                 <div class="goal-header">
-                    <div>
-                        <h3 class="goal-title">Pay Off Visa Debt</h3>
-                        <div class="goal-priority priority-high">High</div>
+                    <div class="goal-title">
+                        <span class="goal-icon">💳</span>
+                        <span class="goal-name">Pay Off Visa Debt</span>
                     </div>
+                    <span class="goal-priority priority-high">HIGH</span>
                 </div>
-                <p class="goal-description">
-                    Eliminate the Low Rate Visa debt to free up monthly cash flow and reduce interest payments.
-                    Current balance is costing approximately $135/month in interest.
-                </p>
                 
-                <div class="goal-progress">
-                    <div class="progress-header">
-                        <span class="progress-amounts">$0 / $3,251</span>
-                        <span class="progress-percentage negative">0%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill progress-high" style="width: 0%"></div>
-                    </div>
+                <div class="goal-amounts">
+                    <div class="goal-current negative">$3,251.30</div>
+                    <div class="goal-target">Target: $0.00 (Debt-free)</div>
                 </div>
-
-                <div class="goal-stats">
-                    <div class="goal-stat">
-                        <div class="goal-stat-label">Monthly Payment</div>
-                        <div class="goal-stat-value neutral">$100</div>
-                    </div>
-                    <div class="goal-stat">
-                        <div class="goal-stat-label">Payoff Date</div>
-                        <div class="goal-stat-value neutral">Dec 2027</div>
-                    </div>
-                </div>
-
-                <div class="goal-actions">
-                    <button class="goal-action-btn btn-primary">Optimize Payment</button>
-                    <button class="goal-action-btn btn-secondary">Edit Goal</button>
-                </div>
-            </div>
-
-            <!-- KiwiSaver Growth Goal -->
-            <div class="goal-card">
-                <div class="goal-header">
-                    <div>
-                        <h3 class="goal-title">KiwiSaver Growth</h3>
-                        <div class="goal-priority priority-medium">Medium</div>
-                    </div>
-                </div>
-                <p class="goal-description">
-                    Grow retirement savings from current $48,733 to $100,000 by maximizing contributions and 
-                    investment returns over the next 5 years.
-                </p>
                 
-                <div class="goal-progress">
-                    <div class="progress-header">
-                        <span class="progress-amounts">$48,733 / $100,000</span>
-                        <span class="progress-percentage positive">48.7%</span>
-                    </div>
+                <div class="progress-section">
                     <div class="progress-bar">
-                        <div class="progress-fill progress-good" style="width: 48.7%"></div>
+                        <div class="progress-fill progress-warning" style="width: 0%;"></div>
+                    </div>
+                    <div class="progress-info">
+                        <span>0% Paid Off</span>
+                        <span>$3,251.30 remaining</span>
                     </div>
                 </div>
-
-                <div class="goal-stats">
-                    <div class="goal-stat">
-                        <div class="goal-stat-label">Monthly Contribution</div>
-                        <div class="goal-stat-value positive">$271</div>
-                    </div>
-                    <div class="goal-stat">
-                        <div class="goal-stat-label">Target Date</div>
-                        <div class="goal-stat-value neutral">Dec 2029</div>
-                    </div>
+                
+                <div class="goal-timeline">
+                    <div class="timeline-item"><strong>Current Payment:</strong> Minimum only</div>
+                    <div class="timeline-item"><strong>Interest Rate:</strong> 4.99% annually</div>
+                    <div class="timeline-item"><strong>Recommended:</strong> Pay $400/month extra</div>
                 </div>
-
+                
                 <div class="goal-actions">
-                    <button class="goal-action-btn btn-primary">Review Strategy</button>
-                    <button class="goal-action-btn btn-secondary">Edit Goal</button>
+                    <button class="btn btn-primary" onclick="addToGoal('debt', 400)">
+                        Pay Extra $400
+                    </button>
+                    <button class="btn btn-secondary" onclick="editGoal('debt')">
+                        Edit Goal
+                    </button>
                 </div>
             </div>
 
             <!-- Private School Fund -->
-            <div class="goal-card">
+            <div class="goal-card glass-premium">
                 <div class="goal-header">
-                    <div>
-                        <h3 class="goal-title">Private School Fund</h3>
-                        <div class="goal-priority priority-medium">Medium</div>
+                    <div class="goal-title">
+                        <span class="goal-icon">🎓</span>
+                        <span class="goal-name">Private School Fund</span>
                     </div>
+                    <span class="goal-priority priority-medium">MEDIUM</span>
                 </div>
-                <p class="goal-description">
-                    Save for private school education costs. Currently contributing $300/month toward 
-                    this long-term education investment for your children.
-                </p>
                 
-                <div class="goal-progress">
-                    <div class="progress-header">
-                        <span class="progress-amounts">$300 / $17,000</span>
-                        <span class="progress-percentage neutral">1.8%</span>
-                    </div>
+                <div class="goal-amounts">
+                    <div class="goal-current positive">$300.00</div>
+                    <div class="goal-target">Target: $50,000 (Annual fees)</div>
+                </div>
+                
+                <div class="progress-section">
                     <div class="progress-bar">
-                        <div class="progress-fill progress-medium" style="width: 1.8%"></div>
+                        <div class="progress-fill progress-success" style="width: 0.6%;"></div>
+                    </div>
+                    <div class="progress-info">
+                        <span>0.6% Complete</span>
+                        <span>$49,700 remaining</span>
                     </div>
                 </div>
-
-                <div class="goal-stats">
-                    <div class="goal-stat">
-                        <div class="goal-stat-label">Monthly Savings</div>
-                        <div class="goal-stat-value positive">$300</div>
-                    </div>
-                    <div class="goal-stat">
-                        <div class="goal-stat-label">Target Date</div>
-                        <div class="goal-stat-value neutral">Jan 2030</div>
-                    </div>
+                
+                <div class="goal-timeline">
+                    <div class="timeline-item"><strong>Current Savings:</strong> $300/month</div>
+                    <div class="timeline-item"><strong>Timeline:</strong> 165 months</div>
+                    <div class="timeline-item"><strong>Child's Age:</strong> Currently young</div>
                 </div>
-
+                
                 <div class="goal-actions">
-                    <button class="goal-action-btn btn-primary">Adjust Amount</button>
-                    <button class="goal-action-btn btn-secondary">Edit Goal</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Add New Goal -->
-        <div class="add-goal-section">
-            <button class="add-goal-btn">
-                <span>+</span>
-                Add New Goal
-            </button>
-        </div>
-    </main>
-
-    <script>
-        // Privacy mode functionality
-        let privacyMode = false;
-
-        function togglePrivacy() {
-            privacyMode = !privacyMode;
-            const body = document.body;
-            const button = document.querySelector('.privacy-toggle');
-            
-            if (privacyMode) {
-                body.classList.add('privacy-mode');
-                button.textContent = 'Show Values';
-            } else {
-                body.classList.remove('privacy-mode');
-                button.textContent = 'Privacy Mode';
-            }
-        }
-
-        function logout() {
-            if (confirm('Are you sure you want to logout?')) {
-                localStorage.clear();
-                sessionStorage.clear();
-                window.location.href = 'login.html';
-            }
-        }
-
-        function toggleMobileMenu() {
-            const navLinks = document.querySelector('.nav-links');
-            navLinks.classList.toggle('show');
-        }
-
-        // Service Worker Registration for PWA
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then((registration) => {
-                        console.log('SW registered: ', registration);
-                    })
-                    .catch((registrationError) => {
-                        console.log('SW registration failed: ', registrationError);
-                    });
-            });
-        }
-    </script>
-<!-- AI Financial Coach Component -->
+                    <button class="btn btn-primary" onclick="addToGoal('education', 300)">
+   <!-- AI Financial Coach Component -->
 <!-- Add this HTML to any page where you want the AI coach -->
 
 <div id="aiCoachContainer" class="ai-coach-container">
@@ -1494,5 +1316,5 @@ class AIFinancialCoach {
 
     hideTypingIndicator() {
         const typingElement = document.getElementById('typingIndicat
+
 </body>
-</html>
