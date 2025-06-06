@@ -867,7 +867,13 @@
                     <div class="result-value" id="categoriesUpdated">0</div>
                 </div>
             </div>
-            
+            <!-- Quick Check Button -->
+        <div style="text-align: center; margin: 20px 0;">
+            <button onclick="alert('Transactions: ' + (localStorage.getItem('financeOS_transactions') ? JSON.parse(localStorage.getItem('financeOS_transactions')).length + ' found' : 'No transactions found'))" 
+                    style="background: #10b981; color: white; padding: 15px 25px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">
+                🔍 Quick Check localStorage
+            </button>
+        </div>
             <!-- Debug Info for Mobile -->
             <div class="debug-section">
                 <h3 class="debug-title">📊 Debug Info (localStorage Status):</h3>
