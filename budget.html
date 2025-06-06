@@ -67,7 +67,7 @@
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--glass-border);
-            padding: 20px 0; /* Increased from 16px to 20px */
+            padding: 20px 0;
             transition: all 0.3s ease;
         }
 
@@ -89,7 +89,7 @@
         }
 
         .logo-icon {
-            width: 48px; /* Bigger logo - increased from 40px */
+            width: 48px;
             height: 48px;
             margin-right: 12px;
             border-radius: 12px;
@@ -97,14 +97,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px; /* Bigger dollar sign */
+            font-size: 24px;
             font-weight: bold;
         }
 
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 32px; /* Increased spacing */
+            gap: 32px;
             list-style: none;
         }
 
@@ -112,8 +112,8 @@
             color: var(--text-gray);
             text-decoration: none;
             font-weight: 500;
-            font-size: 1rem; /* Bigger text - increased from 0.875rem */
-            padding: 12px 20px; /* Bigger padding */
+            font-size: 1rem;
+            padding: 12px 20px;
             border-radius: 8px;
             transition: all 0.3s ease;
             position: relative;
@@ -191,7 +191,7 @@
 
         /* Main Content */
         .main-content {
-            margin-top: 100px; /* Account for fixed navbar */
+            margin-top: 100px;
             padding: 24px;
             max-width: 1200px;
             margin-left: auto;
@@ -381,6 +381,269 @@
             50% { opacity: 0.8; }
         }
 
+        /* AI Coach Styles */
+        .ai-coach-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+
+        .ai-coach-toggle {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ai-coach-toggle:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 12px 40px rgba(139, 92, 246, 0.5);
+        }
+
+        .ai-coach-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #10b981;
+            color: white;
+            font-size: 0.625rem;
+            font-weight: 700;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.5rem;
+            border: 2px solid white;
+            animation: pulse-badge 2s infinite;
+        }
+
+        @keyframes pulse-badge {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .ai-coach-panel {
+            position: absolute;
+            bottom: 72px;
+            right: 0;
+            width: 380px;
+            max-width: 90vw;
+            max-height: 600px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .ai-coach-panel.hidden {
+            display: none;
+        }
+
+        .ai-coach-header {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2));
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ai-coach-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .ai-status-indicator {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse-status 2s infinite;
+        }
+
+        @keyframes pulse-status {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .ai-coach-close {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+        }
+
+        .ai-coach-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .ai-coach-content {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+        }
+
+        .ai-quick-actions {
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .quick-action-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 0.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.75rem;
+            text-align: center;
+        }
+
+        .quick-action-btn:hover {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: rgba(139, 92, 246, 0.3);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .ai-chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .ai-message {
+            display: flex;
+            gap: 0.75rem;
+            animation: messageSlideIn 0.3s ease-out;
+        }
+
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .ai-message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #8b5cf6, #9333ea);
+            color: white;
+        }
+
+        .ai-message-content {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 0.75rem 1rem;
+            max-width: 280px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+
+        .ai-message-content p {
+            margin: 0 0 0.5rem 0;
+        }
+
+        .ai-message-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .ai-chat-input {
+            padding: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .ai-chat-input input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: white;
+            font-size: 0.875rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .ai-chat-input input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .ai-chat-input input:focus {
+            border-color: rgba(139, 92, 246, 0.5);
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .ai-chat-send-btn {
+            background: linear-gradient(135deg, #8b5cf6, #9333ea);
+            border: none;
+            border-radius: 0.75rem;
+            width: 40px;
+            height: 40px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .ai-chat-send-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .nav-links {
@@ -426,6 +689,21 @@
             .budget-table td {
                 padding: 8px 12px;
             }
+
+            .ai-coach-container {
+                bottom: 1rem;
+                right: 1rem;
+            }
+
+            .ai-coach-panel {
+                width: calc(100vw - 2rem);
+                bottom: 68px;
+                right: -1rem;
+            }
+
+            .ai-quick-actions {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 480px) {
@@ -465,679 +743,7 @@
     </style>
 </head>
 <body>
-<!-- AI Financial Coach Component -->
-<!-- Add this HTML to any page where you want the AI coach -->
-
-<div id="aiCoachContainer" class="ai-coach-container">
-    <!-- AI Coach Toggle Button -->
-    <button id="aiCoachToggle" class="ai-coach-toggle" title="Ask AI Coach">
-        <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16,16.5C16,17.11 15.61,17.5 15,17.5H9C8.39,17.5 8,17.11 8,16.5V15.5C8,14.89 8.39,14.5 9,14.5H15C15.61,14.5 16,14.89 16,15.5V16.5M9,13A1,1 0 0,1 8,12A1,1 0 0,1 9,11A1,1 0 0,1 10,12A1,1 0 0,1 9,13M15,13A1,1 0 0,1 14,12A1,1 0 0,1 15,11A1,1 0 0,1 16,12A1,1 0 0,1 15,13Z" />
-        </svg>
-        <span class="ai-coach-badge" id="aiCoachBadge">AI</span>
-    </button>
-
-    <!-- AI Coach Panel -->
-    <div id="aiCoachPanel" class="ai-coach-panel hidden">
-        <div class="ai-coach-header">
-            <div class="ai-coach-title">
-                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16,16.5C16,17.11 15.61,17.5 15,17.5H9C8.39,17.5 8,17.11 8,16.5V15.5C8,14.89 8.39,14.5 9,14.5H15C15.61,14.5 16,14.89 16,15.5V16.5M9,13A1,1 0 0,1 8,12A1,1 0 0,1 9,11A1,1 0 0,1 10,12A1,1 0 0,1 9,13M15,13A1,1 0 0,1 14,12A1,1 0 0,1 15,11A1,1 0 0,1 16,12A1,1 0 0,1 15,13Z" />
-                </svg>
-                <span>AI Financial Coach</span>
-                <div class="ai-status-indicator"></div>
-            </div>
-            <button id="aiCoachClose" class="ai-coach-close">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
-                </svg>
-            </button>
-        </div>
-
-        <div class="ai-coach-content">
-            <!-- Quick Action Buttons -->
-            <div class="ai-quick-actions" id="aiQuickActions">
-                <button class="quick-action-btn" onclick="askAI('How much did I spend on groceries this month?')">
-                    🛒 Grocery Spending
-                </button>
-                <button class="quick-action-btn" onclick="askAI('Am I over budget on dining out?')">
-                    🍕 Dining Budget
-                </button>
-                <button class="quick-action-btn" onclick="askAI('What is our biggest expense category?')">
-                    📊 Top Expenses
-                </button>
-                <button class="quick-action-btn" onclick="askAI('How close are we to our emergency fund goal?')">
-                    🎯 Emergency Fund
-                </button>
-            </div>
-
-            <!-- Chat Messages -->
-            <div class="ai-chat-messages" id="aiChatMessages">
-                <div class="ai-message ai-message-assistant">
-                    <div class="ai-message-avatar">
-                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16,16.5C16,17.11 15.61,17.5 15,17.5H9C8.39,17.5 8,17.11 8,16.5V15.5C8,14.89 8.39,14.5 9,14.5H15C15.61,14.5 16,14.89 16,15.5V16.5M9,13A1,1 0 0,1 8,12A1,1 0 0,1 9,11A1,1 0 0,1 10,12A1,1 0 0,1 9,13M15,13A1,1 0 0,1 14,12A1,1 0 0,1 15,11A1,1 0 0,1 16,12A1,1 0 0,1 15,13Z" />
-                        </svg>
-                    </div>
-                    <div class="ai-message-content">
-                        <p>Hi! I'm your AI Financial Coach. I can help you understand your spending, track your goals, and optimize your budget.</p>
-                        <p>Try asking me something like "How much did I spend on groceries this month?" or click one of the quick actions above!</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Chat Input -->
-            <div class="ai-chat-input">
-                <input 
-                    type="text" 
-                    id="aiChatInput" 
-                    placeholder="Ask me about your finances..."
-                    maxlength="200"
-                >
-                <button id="aiChatSend" class="ai-chat-send-btn">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<style>
-/* AI Coach Styles */
-.ai-coach-container {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    z-index: 1000;
-}
-
-.ai-coach-toggle {
-    width: 56px;
-    height: 56px;
-    background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
-    border: none;
-    border-radius: 50%;
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.4);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.ai-coach-toggle:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 12px 40px rgba(139, 92, 246, 0.5);
-}
-
-.ai-coach-toggle:active {
-    transform: translateY(0) scale(0.98);
-}
-
-.ai-coach-badge {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    background: #10b981;
-    color: white;
-    font-size: 0.625rem;
-    font-weight: 700;
-    padding: 0.125rem 0.375rem;
-    border-radius: 0.5rem;
-    border: 2px solid white;
-    animation: pulse-badge 2s infinite;
-}
-
-@keyframes pulse-badge {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
-
-.ai-coach-panel {
-    position: absolute;
-    bottom: 72px;
-    right: 0;
-    width: 380px;
-    max-width: 90vw;
-    max-height: 600px;
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 1.5rem;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-    overflow: hidden;
-    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px) scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-.ai-coach-panel.hidden {
-    display: none;
-}
-
-.ai-coach-header {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2));
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.ai-coach-title {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 600;
-    color: white;
-    font-size: 0.9rem;
-}
-
-.ai-status-indicator {
-    width: 8px;
-    height: 8px;
-    background: #10b981;
-    border-radius: 50%;
-    animation: pulse-status 2s infinite;
-}
-
-@keyframes pulse-status {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
-}
-
-.ai-coach-close {
-    background: none;
-    border: none;
-    color: rgba(255, 255, 255, 0.7);
-    cursor: pointer;
-    padding: 0.25rem;
-    border-radius: 0.375rem;
-    transition: all 0.2s ease;
-}
-
-.ai-coach-close:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-}
-
-.ai-coach-content {
-    display: flex;
-    flex-direction: column;
-    height: 500px;
-}
-
-.ai-quick-actions {
-    padding: 1rem;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.quick-action-btn {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 0.75rem;
-    padding: 0.5rem;
-    color: rgba(255, 255, 255, 0.8);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 0.75rem;
-    text-align: center;
-}
-
-.quick-action-btn:hover {
-    background: rgba(139, 92, 246, 0.2);
-    border-color: rgba(139, 92, 246, 0.3);
-    color: white;
-    transform: translateY(-1px);
-}
-
-.ai-chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.ai-message {
-    display: flex;
-    gap: 0.75rem;
-    animation: messageSlideIn 0.3s ease-out;
-}
-
-@keyframes messageSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.ai-message-user {
-    flex-direction: row-reverse;
-}
-
-.ai-message-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.ai-message-assistant .ai-message-avatar {
-    background: linear-gradient(135deg, #8b5cf6, #9333ea);
-    color: white;
-}
-
-.ai-message-user .ai-message-avatar {
-    background: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.8);
-}
-
-.ai-message-content {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 1rem;
-    padding: 0.75rem 1rem;
-    max-width: 280px;
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 0.875rem;
-    line-height: 1.4;
-}
-
-.ai-message-user .ai-message-content {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(147, 51, 234, 0.2));
-    border-color: rgba(139, 92, 246, 0.3);
-}
-
-.ai-message-content p {
-    margin: 0 0 0.5rem 0;
-}
-
-.ai-message-content p:last-child {
-    margin-bottom: 0;
-}
-
-.ai-message-loading {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    color: rgba(255, 255, 255, 0.6);
-}
-
-.ai-typing-dots {
-    display: flex;
-    gap: 0.25rem;
-}
-
-.ai-typing-dot {
-    width: 4px;
-    height: 4px;
-    background: currentColor;
-    border-radius: 50%;
-    animation: typingDot 1.4s infinite ease-in-out;
-}
-
-.ai-typing-dot:nth-child(1) { animation-delay: -0.32s; }
-.ai-typing-dot:nth-child(2) { animation-delay: -0.16s; }
-
-@keyframes typingDot {
-    0%, 80%, 100% {
-        transform: scale(0);
-        opacity: 0.5;
-    }
-    40% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-.ai-chat-input {
-    padding: 1rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-}
-
-.ai-chat-input input {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 0.75rem;
-    padding: 0.75rem 1rem;
-    color: white;
-    font-size: 0.875rem;
-    outline: none;
-    transition: all 0.2s ease;
-}
-
-.ai-chat-input input::placeholder {
-    color: rgba(255, 255, 255, 0.5);
-}
-
-.ai-chat-input input:focus {
-    border-color: rgba(139, 92, 246, 0.5);
-    background: rgba(139, 92, 246, 0.1);
-}
-
-.ai-chat-send-btn {
-    background: linear-gradient(135deg, #8b5cf6, #9333ea);
-    border: none;
-    border-radius: 0.75rem;
-    width: 40px;
-    height: 40px;
-    color: white;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.ai-chat-send-btn:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
-}
-
-.ai-chat-send-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* Responsive adjustments */
-@media (max-width: 480px) {
-    .ai-coach-container {
-        bottom: 1rem;
-        right: 1rem;
-    }
-
-    .ai-coach-panel {
-        width: calc(100vw - 2rem);
-        bottom: 68px;
-        right: -1rem;
-    }
-
-    .ai-quick-actions {
-        grid-template-columns: 1fr;
-    }
-
-    .quick-action-btn {
-        font-size: 0.7rem;
-        padding: 0.375rem;
-    }
-}
-
-/* Financial data highlighting */
-.ai-financial-data {
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.3);
-    border-radius: 0.375rem;
-    padding: 0.25rem 0.5rem;
-    color: #10b981;
-    font-weight: 600;
-    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
-}
-
-.ai-warning-data {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    border-radius: 0.375rem;
-    padding: 0.25rem 0.5rem;
-    color: #ef4444;
-    font-weight: 600;
-}
-
-.ai-insight-highlight {
-    background: rgba(59, 130, 246, 0.1);
-    border-left: 3px solid #3b82f6;
-    padding: 0.75rem;
-    margin: 0.5rem 0;
-    border-radius: 0 0.375rem 0.375rem 0;
-    font-style: italic;
-}
-</style>
-
-<script>
-// AI Financial Coach JavaScript
-class AIFinancialCoach {
-    constructor() {
-        this.isOpen = false;
-        this.conversations = JSON.parse(localStorage.getItem('ai_coach_conversations') || '[]');
-        this.currentContext = {};
-        this.initialize();
-    }
-
-    initialize() {
-        this.bindEvents();
-        this.loadFinancialContext();
-        this.restoreConversation();
-    }
-
-    bindEvents() {
-        const toggle = document.getElementById('aiCoachToggle');
-        const close = document.getElementById('aiCoachClose');
-        const input = document.getElementById('aiChatInput');
-        const send = document.getElementById('aiChatSend');
-
-        if (toggle) {
-            toggle.addEventListener('click', () => this.togglePanel());
-        }
-
-        if (close) {
-            close.addEventListener('click', () => this.closePanel());
-        }
-
-        if (input) {
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    this.sendMessage();
-                }
-            });
-        }
-
-        if (send) {
-            send.addEventListener('click', () => this.sendMessage());
-        }
-    }
-
-    loadFinancialContext() {
-        // Load real financial data from localStorage
-        const transactions = JSON.parse(localStorage.getItem('financeos_transactions') || '[]');
-        const accounts = {
-            mySpending: 25.92,
-            mySavings: 0.17,
-            houseKitty: 65357.00,
-            mortgageBilling: 126.35,
-            holding: 240.40,
-            visaDebt: -3251.30,
-            visaAvailable: 6748.70,
-            homeLoans: 271600.02,
-            kiwiSaver: 48733.44
-        };
-
-        // Calculate spending by category
-        const categorySpending = {};
-        const currentMonth = new Date().getMonth();
-        const currentYear = new Date().getFullYear();
-
-        transactions.forEach(t => {
-            const transactionDate = new Date(t.date);
-            if (transactionDate.getMonth() === currentMonth && 
-                transactionDate.getFullYear() === currentYear && 
-                t.amount < 0) {
-                
-                const category = t.category;
-                if (!categorySpending[category]) {
-                    categorySpending[category] = 0;
-                }
-                categorySpending[category] += Math.abs(t.amount);
-            }
-        });
-
-        this.currentContext = {
-            accounts,
-            transactions,
-            categorySpending,
-            monthlyIncome: 6304,
-            monthlyExpenses: 9911,
-            monthlyDeficit: -3607,
-            emergencyFund: 0.17,
-            totalTransactions: transactions.length
-        };
-    }
-
-    togglePanel() {
-        const panel = document.getElementById('aiCoachPanel');
-        if (this.isOpen) {
-            this.closePanel();
-        } else {
-            this.openPanel();
-        }
-    }
-
-    openPanel() {
-        const panel = document.getElementById('aiCoachPanel');
-        const input = document.getElementById('aiChatInput');
-        
-        panel.classList.remove('hidden');
-        this.isOpen = true;
-        
-        // Focus input after animation
-        setTimeout(() => {
-            if (input) input.focus();
-        }, 100);
-    }
-
-    closePanel() {
-        const panel = document.getElementById('aiCoachPanel');
-        panel.classList.add('hidden');
-        this.isOpen = false;
-    }
-
-    async sendMessage() {
-        const input = document.getElementById('aiChatInput');
-        const message = input.value.trim();
-        
-        if (!message) return;
-
-        // Clear input and disable send button
-        input.value = '';
-        this.disableSendButton(true);
-
-        // Add user message
-        this.addMessage('user', message);
-
-        // Show typing indicator
-        this.showTypingIndicator();
-
-        // Generate AI response
-        try {
-            const response = await this.generateResponse(message);
-            this.hideTypingIndicator();
-            this.addMessage('assistant', response);
-        } catch (error) {
-            this.hideTypingIndicator();
-            this.addMessage('assistant', 'Sorry, I encountered an error. Please try again.');
-        }
-
-        this.disableSendButton(false);
-    }
-
-    addMessage(type, content) {
-        const messagesContainer = document.getElementById('aiChatMessages');
-        
-        const messageElement = document.createElement('div');
-        messageElement.className = `ai-message ai-message-${type}`;
-        
-        const avatar = document.createElement('div');
-        avatar.className = 'ai-message-avatar';
-        
-        if (type === 'assistant') {
-            avatar.innerHTML = `
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16,16.5C16,17.11 15.61,17.5 15,17.5H9C8.39,17.5 8,17.11 8,16.5V15.5C8,14.89 8.39,14.5 9,14.5H15C15.61,14.5 16,14.89 16,15.5V16.5M9,13A1,1 0 0,1 8,12A1,1 0 0,1 9,11A1,1 0 0,1 10,12A1,1 0 0,1 9,13M15,13A1,1 0 0,1 14,12A1,1 0 0,1 15,11A1,1 0 0,1 16,12A1,1 0 0,1 15,13Z" />
-                </svg>
-            `;
-        } else {
-            avatar.innerHTML = `
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
-                </svg>
-            `;
-        }
-
-        const contentElement = document.createElement('div');
-        contentElement.className = 'ai-message-content';
-        contentElement.innerHTML = content;
-
-        messageElement.appendChild(avatar);
-        messageElement.appendChild(contentElement);
-
-        messagesContainer.appendChild(messageElement);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-        // Save conversation
-        this.saveConversation(type, content);
-    }
-
-    showTypingIndicator() {
-        const messagesContainer = document.getElementById('aiChatMessages');
-        
-        const typingElement = document.createElement('div');
-        typingElement.className = 'ai-message ai-message-assistant';
-        typingElement.id = 'typingIndicator';
-        
-        typingElement.innerHTML = `
-            <div class="ai-message-avatar">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16,16.5C16,17.11 15.61,17.5 15,17.5H9C8.39,17.5 8,17.11 8,16.5V15.5C8,14.89 8.39,14.5 9,14.5H15C15.61,14.5 16,14.89 16,15.5V16.5M9,13A1,1 0 0,1 8,12A1,1 0 0,1 9,11A1,1 0 0,1 10,12A1,1 0 0,1 9,13M15,13A1,1 0 0,1 14,12A1,1 0 0,1 15,11A1,1 0 0,1 16,12A1,1 0 0,1 15,13Z" />
-                </svg>
-            </div>
-            <div class="ai-message-content">
-                <div class="ai-message-loading">
-                    <span>Thinking</span>
-                    <div class="ai-typing-dots">
-                        <div class="ai-typing-dot"></div>
-                        <div class="ai-typing-dot"></div>
-                        <div class="ai-typing-dot"></div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        messagesContainer.appendChild(typingElement);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-
-    hideTypingIndicator() {
-        const typingElement = document.getElementById('typingIndicat
-    <!-- Navigation Bar -->
+    <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="nav-logo">
@@ -1150,32 +756,32 @@ class AIFinancialCoach {
                 <li><a href="budget.html" class="active">Budget</a></li>
                 <li><a href="goals.html">Goals</a></li>
                 <li><a href="csv-upload.html">Upload</a></li>
+                <li><a href="transactions.html">Transactions</a></li>
             </ul>
             
             <div class="nav-actions">
-                <button class="privacy-toggle" onclick="togglePrivacy()">Privacy Mode</button>
+                <button class="privacy-toggle" id="privacyToggle">🔒 Privacy</button>
                 <button class="logout-btn" onclick="logout()">Logout</button>
+                <button class="mobile-menu-btn">☰</button>
             </div>
-            
-            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
         </div>
     </nav>
 
     <!-- Main Content -->
     <main class="main-content">
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="page-title">Budget Overview</h1>
-            <p class="page-subtitle">Track your income, expenses, and financial progress</p>
+        <!-- Critical Alert -->
+        <div class="alert">
+            <div class="alert-title">🚨 Budget Deficit Alert</div>
+            <div class="alert-message">
+                You're spending $3,607 more than you earn monthly. Your emergency fund of $0.17 cannot cover this deficit. 
+                <strong>Immediate action required</strong> to reduce expenses and build emergency savings.
+            </div>
         </div>
 
-        <!-- Critical Budget Alert -->
-        <div class="alert">
-            <div class="alert-title">CRITICAL: Budget Deficit Detected</div>
-            <div class="alert-message">
-                You're spending $3,607 more than you earn monthly. This is unsustainable and requires immediate attention. 
-                Review your expense categories below and identify areas to reduce spending.
-            </div>
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Monthly Budget</h1>
+            <p class="page-subtitle">Track your income and expenses with intelligent insights</p>
         </div>
 
         <!-- Budget Summary Cards -->
@@ -1183,22 +789,25 @@ class AIFinancialCoach {
             <div class="summary-card">
                 <h3>Monthly Income</h3>
                 <div class="amount positive">$6,304</div>
-                <div class="change neutral">After-tax salary</div>
+                <div class="change neutral">Pathway Engineering</div>
             </div>
+            
             <div class="summary-card">
-                <h3>Monthly Expenses</h3>
+                <h3>Total Expenses</h3>
                 <div class="amount negative">$9,911</div>
-                <div class="change negative">All categories</div>
+                <div class="change negative">157% of income</div>
             </div>
+            
             <div class="summary-card">
-                <h3>Net Income</h3>
+                <h3>Net Cash Flow</h3>
                 <div class="amount negative">-$3,607</div>
-                <div class="change negative">Urgent action needed</div>
+                <div class="change negative">Critical deficit</div>
             </div>
+            
             <div class="summary-card">
-                <h3>Savings Rate</h3>
-                <div class="amount negative">-57.2%</div>
-                <div class="change negative">Target: 20%</div>
+                <h3>Budget Adherence</h3>
+                <div class="amount negative">43%</div>
+                <div class="change negative">Needs improvement</div>
             </div>
         </div>
 
@@ -1216,7 +825,6 @@ class AIFinancialCoach {
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Income -->
                     <tr>
                         <td class="category-main">Income</td>
                         <td></td>
@@ -1229,12 +837,11 @@ class AIFinancialCoach {
                         <td></td>
                         <td class="category-sub">Salary</td>
                         <td class="amount">$6,304</td>
-                        <td class="amount">$6,304</td>
+                        <td class="amount positive">$6,304</td>
                         <td class="amount neutral">$0</td>
                         <td>Pathway Engineer wages (after tax)</td>
                     </tr>
-
-                    <!-- Housing -->
+                    
                     <tr>
                         <td class="category-main">Housing</td>
                         <td></td>
@@ -1247,7 +854,7 @@ class AIFinancialCoach {
                         <td></td>
                         <td class="category-sub">Mortgage 1</td>
                         <td class="amount">$1,190</td>
-                        <td class="amount">$1,190</td>
+                        <td class="amount negative">$1,190</td>
                         <td class="amount neutral">$0</td>
                         <td>4.99% interest</td>
                     </tr>
@@ -1255,7 +862,7 @@ class AIFinancialCoach {
                         <td></td>
                         <td class="category-sub">Mortgage 2</td>
                         <td class="amount">$880</td>
-                        <td class="amount">$880</td>
+                        <td class="amount negative">$880</td>
                         <td class="amount neutral">$0</td>
                         <td>4.99% interest</td>
                     </tr>
@@ -1263,12 +870,11 @@ class AIFinancialCoach {
                         <td></td>
                         <td class="category-sub">Rates</td>
                         <td class="amount">$357</td>
-                        <td class="amount">$357</td>
+                        <td class="amount negative">$357</td>
                         <td class="amount neutral">$0</td>
                         <td></td>
                     </tr>
-
-                    <!-- Food -->
+                    
                     <tr>
                         <td class="category-main">Food</td>
                         <td></td>
@@ -1281,20 +887,19 @@ class AIFinancialCoach {
                         <td></td>
                         <td class="category-sub">Groceries</td>
                         <td class="amount">$550</td>
-                        <td class="amount">$673</td>
-                        <td class="amount variance-negative">-$123</td>
-                        <td>22% over budget</td>
+                        <td class="amount negative">$627</td>
+                        <td class="amount variance-negative">-$77</td>
+                        <td>14% over budget</td>
                     </tr>
                     <tr>
                         <td></td>
                         <td class="category-sub">Dining Out/Takeaway</td>
                         <td class="amount">$250</td>
-                        <td class="amount">$385</td>
-                        <td class="amount variance-negative">-$135</td>
-                        <td>54% over budget</td>
+                        <td class="amount negative">$337</td>
+                        <td class="amount variance-negative">-$87</td>
+                        <td>35% over budget</td>
                     </tr>
-
-                    <!-- Utilities -->
+                    
                     <tr>
                         <td class="category-main">Utilities</td>
                         <td></td>
@@ -1307,7 +912,7 @@ class AIFinancialCoach {
                         <td></td>
                         <td class="category-sub">Sky Network</td>
                         <td class="amount">$163</td>
-                        <td class="amount">$163</td>
+                        <td class="amount negative">$163</td>
                         <td class="amount neutral">$0</td>
                         <td></td>
                     </tr>
@@ -1315,7 +920,7 @@ class AIFinancialCoach {
                         <td></td>
                         <td class="category-sub">Mobile Phone</td>
                         <td class="amount">$40</td>
-                        <td class="amount">$45</td>
+                        <td class="amount negative">$45</td>
                         <td class="amount variance-negative">-$5</td>
                         <td></td>
                     </tr>
@@ -1323,12 +928,11 @@ class AIFinancialCoach {
                         <td></td>
                         <td class="category-sub">Internet/Streaming</td>
                         <td class="amount">$10</td>
-                        <td class="amount">$25</td>
-                        <td class="amount variance-negative">-$15</td>
-                        <td>Multiple subscriptions</td>
+                        <td class="amount negative">$15</td>
+                        <td class="amount variance-negative">-$5</td>
+                        <td></td>
                     </tr>
-
-                    <!-- Insurance -->
+                    
                     <tr>
                         <td class="category-main">Insurance</td>
                         <td></td>
@@ -1341,7 +945,7 @@ class AIFinancialCoach {
                         <td></td>
                         <td class="category-sub">Vero Insurance</td>
                         <td class="amount">$350</td>
-                        <td class="amount">$350</td>
+                        <td class="amount negative">$350</td>
                         <td class="amount neutral">$0</td>
                         <td></td>
                     </tr>
@@ -1349,12 +953,11 @@ class AIFinancialCoach {
                         <td></td>
                         <td class="category-sub">Partners Life</td>
                         <td class="amount">$140</td>
-                        <td class="amount">$140</td>
+                        <td class="amount negative">$140</td>
                         <td class="amount neutral">$0</td>
                         <td></td>
                     </tr>
-
-                    <!-- Childcare -->
+                    
                     <tr>
                         <td class="category-main">Childcare</td>
                         <td></td>
@@ -1367,12 +970,11 @@ class AIFinancialCoach {
                         <td></td>
                         <td class="category-sub">Grow Active Daycare</td>
                         <td class="amount">$508</td>
-                        <td class="amount">$508</td>
+                        <td class="amount negative">$508</td>
                         <td class="amount neutral">$0</td>
                         <td></td>
                     </tr>
-
-                    <!-- Transportation -->
+                    
                     <tr>
                         <td class="category-main">Transportation</td>
                         <td></td>
@@ -1385,12 +987,11 @@ class AIFinancialCoach {
                         <td></td>
                         <td class="category-sub">Fuel</td>
                         <td class="amount">$125</td>
-                        <td class="amount">$167</td>
-                        <td class="amount variance-negative">-$42</td>
-                        <td>34% over budget</td>
+                        <td class="amount negative">$143</td>
+                        <td class="amount variance-negative">-$18</td>
+                        <td>14% over budget</td>
                     </tr>
-
-                    <!-- Savings & Investments -->
+                    
                     <tr>
                         <td class="category-main">Savings & Investments</td>
                         <td></td>
@@ -1403,7 +1004,7 @@ class AIFinancialCoach {
                         <td></td>
                         <td class="category-sub">Sharesies</td>
                         <td class="amount">$271</td>
-                        <td class="amount">$271</td>
+                        <td class="amount negative">$271</td>
                         <td class="amount neutral">$0</td>
                         <td></td>
                     </tr>
@@ -1411,12 +1012,11 @@ class AIFinancialCoach {
                         <td></td>
                         <td class="category-sub">Emergency Fund</td>
                         <td class="amount">$0</td>
-                        <td class="amount">$0</td>
                         <td class="amount negative">$0</td>
-                        <td>CRITICAL: Start immediately</td>
+                        <td class="amount neutral">$0</td>
+                        <td>CRITICAL: Need to start</td>
                     </tr>
-
-                    <!-- Private School Fund -->
+                    
                     <tr>
                         <td class="category-main">Private School Fund</td>
                         <td></td>
@@ -1429,12 +1029,11 @@ class AIFinancialCoach {
                         <td></td>
                         <td class="category-sub">Education Savings</td>
                         <td class="amount">$300</td>
-                        <td class="amount">$300</td>
+                        <td class="amount negative">$300</td>
                         <td class="amount neutral">$0</td>
                         <td></td>
                     </tr>
-
-                    <!-- Discretionary -->
+                    
                     <tr>
                         <td class="category-main">Discretionary</td>
                         <td></td>
@@ -1447,43 +1046,42 @@ class AIFinancialCoach {
                         <td></td>
                         <td class="category-sub">Shopping/Retail</td>
                         <td class="amount">$150</td>
-                        <td class="amount">$289</td>
-                        <td class="amount variance-negative">-$139</td>
-                        <td>93% over budget</td>
+                        <td class="amount negative">$198</td>
+                        <td class="amount variance-negative">-$48</td>
+                        <td>32% over budget</td>
                     </tr>
                     <tr>
                         <td></td>
                         <td class="category-sub">Entertainment</td>
                         <td class="amount">$50</td>
-                        <td class="amount">$78</td>
-                        <td class="amount variance-negative">-$28</td>
-                        <td>56% over budget</td>
+                        <td class="amount negative">$73</td>
+                        <td class="amount variance-negative">-$23</td>
+                        <td>46% over budget</td>
                     </tr>
                     <tr>
                         <td></td>
                         <td class="category-sub">Travel Fund</td>
                         <td class="amount">$100</td>
-                        <td class="amount">$100</td>
+                        <td class="amount negative">$100</td>
                         <td class="amount neutral">$0</td>
                         <td></td>
                     </tr>
-
-                    <!-- Totals -->
+                    
                     <tr style="border-top: 2px solid rgba(255, 255, 255, 0.2); font-weight: 600;">
-                        <td class="category-main">TOTALS</td>
+                        <td class="category-main">Totals</td>
                         <td></td>
                         <td class="amount">$9,911</td>
-                        <td class="amount">$10,488</td>
-                        <td class="amount variance-negative">-$577</td>
+                        <td class="amount negative">$9,911</td>
+                        <td class="amount variance-negative">-$263</td>
                         <td></td>
                     </tr>
-                    <tr style="font-weight: 600; background: rgba(239, 68, 68, 0.1);">
-                        <td class="category-main">NET INCOME</td>
+                    <tr style="font-weight: 600;">
+                        <td class="category-main">Net Income</td>
                         <td></td>
+                        <td class="amount">-$3,607</td>
                         <td class="amount negative">-$3,607</td>
-                        <td class="amount negative">-$4,184</td>
-                        <td class="amount variance-negative">-$577</td>
-                        <td>Deficit worse than budgeted</td>
+                        <td class="amount variance-negative">-$263</td>
+                        <td>CRITICAL DEFICIT</td>
                     </tr>
                 </tbody>
             </table>
@@ -1507,132 +1105,264 @@ class AIFinancialCoach {
         </div>
     </main>
 
+    <!-- AI Financial Coach Component -->
+    <div id="aiCoachContainer" class="ai-coach-container">
+        <!-- AI Coach Toggle Button -->
+        <button id="aiCoachToggle" class="ai-coach-toggle" title="Ask AI Coach">
+            <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16,16.5C16,17.11 15.61,17.5 15,17.5H9C8.39,17.5 8,17.11 8,16.5V15.5C8,14.89 8.39,14.5 9,14.5H15C15.61,14.5 16,14.89 16,15.5V16.5M9,13A1,1 0 0,1 8,12A1,1 0 0,1 9,11A1,1 0 0,1 10,12A1,1 0 0,1 9,13M15,13A1,1 0 0,1 14,12A1,1 0 0,1 15,11A1,1 0 0,1 16,12A1,1 0 0,1 15,13Z" />
+            </svg>
+            <span class="ai-coach-badge" id="aiCoachBadge">AI</span>
+        </button>
+
+        <!-- AI Coach Panel -->
+        <div id="aiCoachPanel" class="ai-coach-panel hidden">
+            <div class="ai-coach-header">
+                <div class="ai-coach-title">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16,16.5C16,17.11 15.61,17.5 15,17.5H9C8.39,17.5 8,17.11 8,16.5V15.5C8,14.89 8.39,14.5 9,14.5H15C15.61,14.5 16,14.89 16,15.5V16.5M9,13A1,1 0 0,1 8,12A1,1 0 0,1 9,11A1,1 0 0,1 10,12A1,1 0 0,1 9,13M15,13A1,1 0 0,1 14,12A1,1 0 0,1 15,11A1,1 0 0,1 16,12A1,1 0 0,1 15,13Z" />
+                    </svg>
+                    <span>AI Financial Coach</span>
+                    <div class="ai-status-indicator"></div>
+                </div>
+                <button id="aiCoachClose" class="ai-coach-close">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="ai-coach-content">
+                <!-- Quick Action Buttons -->
+                <div class="ai-quick-actions" id="aiQuickActions">
+                    <button class="quick-action-btn" onclick="askAI('How can I fix my budget deficit?')">
+                        🚨 Fix Deficit
+                    </button>
+                    <button class="quick-action-btn" onclick="askAI('Which categories am I overspending on?')">
+                        📊 Overspending
+                    </button>
+                    <button class="quick-action-btn" onclick="askAI('How to start an emergency fund?')">
+                        🎯 Emergency Fund
+                    </button>
+                    <button class="quick-action-btn" onclick="askAI('Suggest ways to reduce expenses')">
+                        💰 Cut Expenses
+                    </button>
+                </div>
+
+                <!-- Chat Messages -->
+                <div class="ai-chat-messages" id="aiChatMessages">
+                    <div class="ai-message ai-message-assistant">
+                        <div class="ai-message-avatar">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16,16.5C16,17.11 15.61,17.5 15,17.5H9C8.39,17.5 8,17.11 8,16.5V15.5C8,14.89 8.39,14.5 9,14.5H15C15.61,14.5 16,14.89 16,15.5V16.5M9,13A1,1 0 0,1 8,12A1,1 0 0,1 9,11A1,1 0 0,1 10,12A1,1 0 0,1 9,13M15,13A1,1 0 0,1 14,12A1,1 0 0,1 15,11A1,1 0 0,1 16,12A1,1 0 0,1 15,13Z" />
+                            </svg>
+                        </div>
+                        <div class="ai-message-content">
+                            <p>🚨 I can see your budget has a critical $3,607 deficit! This needs immediate attention.</p>
+                            <p>I can help you identify overspending areas and create an action plan to balance your budget. What would you like to tackle first?</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="ai-chat-input">
+                    <input 
+                        type="text" 
+                        id="aiChatInput" 
+                        placeholder="Ask me about your budget..."
+                        maxlength="200"
+                    >
+                    <button id="aiChatSend" class="ai-chat-send-btn">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Privacy mode functionality
-        let privacyMode = false;
+        // Chart Configuration
+        Chart.defaults.color = 'rgba(255, 255, 255, 0.8)';
+        Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+        Chart.defaults.backgroundColor = 'rgba(255, 255, 255, 0.05)';
 
-        function togglePrivacy() {
-            privacyMode = !privacyMode;
-            const body = document.body;
-            const button = document.querySelector('.privacy-toggle');
-            
-            if (privacyMode) {
-                body.classList.add('privacy-mode');
-                button.textContent = 'Show Values';
-            } else {
-                body.classList.remove('privacy-mode');
-                button.textContent = 'Privacy Mode';
-            }
-        }
-
-        function logout() {
-            if (confirm('Are you sure you want to logout?')) {
-                // Clear any stored data
-                localStorage.clear();
-                sessionStorage.clear();
-                // Redirect to login page
-                window.location.href = 'login.html';
-            }
-        }
-
-        function toggleMobileMenu() {
-            const navLinks = document.querySelector('.nav-links');
-            navLinks.classList.toggle('show');
-        }
-
-        // Initialize Charts
-        function initCharts() {
-            // Budget Variance Chart
-            const varianceCtx = document.getElementById('varianceChart').getContext('2d');
-            new Chart(varianceCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Groceries', 'Dining Out', 'Shopping', 'Entertainment', 'Fuel', 'Mobile', 'Streaming'],
-                    datasets: [{
-                        label: 'Over Budget ($)',
-                        data: [123, 135, 139, 28, 42, 5, 15],
-                        backgroundColor: 'rgba(239, 68, 68, 0.6)',
-                        borderColor: 'rgba(239, 68, 68, 1)',
-                        borderWidth: 1
-                    }]
+        // Budget Variance Chart
+        const varianceCtx = document.getElementById('varianceChart').getContext('2d');
+        new Chart(varianceCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Groceries', 'Dining Out', 'Fuel', 'Shopping', 'Entertainment', 'Mobile', 'Internet'],
+                datasets: [{
+                    label: 'Budget Variance ($)',
+                    data: [-77, -87, -18, -48, -23, -5, -5],
+                    backgroundColor: function(context) {
+                        const value = context.parsed.y;
+                        return value < 0 ? 'rgba(239, 68, 68, 0.6)' : 'rgba(16, 185, 129, 0.6)';
+                    },
+                    borderColor: function(context) {
+                        const value = context.parsed.y;
+                        return value < 0 ? '#ef4444' : '#10b981';
+                    },
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: { color: 'white' }
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
                         }
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { color: 'white' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                        },
-                        x: {
-                            ticks: { color: 'white' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                    x: {
+                        grid: {
+                            display: false
                         }
                     }
                 }
-            });
-
-            // Expense Pie Chart
-            const expenseCtx = document.getElementById('expenseChart').getContext('2d');
-            new Chart(expenseCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Housing', 'Food', 'Insurance', 'Childcare', 'Transport', 'Savings', 'Discretionary', 'Utilities'],
-                    datasets: [{
-                        data: [2427, 1058, 490, 508, 167, 571, 467, 243],
-                        backgroundColor: [
-                            'rgba(139, 92, 246, 0.8)',
-                            'rgba(59, 130, 246, 0.8)',
-                            'rgba(16, 185, 129, 0.8)',
-                            'rgba(245, 158, 11, 0.8)',
-                            'rgba(239, 68, 68, 0.8)',
-                            'rgba(168, 85, 247, 0.8)',
-                            'rgba(34, 197, 94, 0.8)',
-                            'rgba(249, 115, 22, 0.8)'
-                        ],
-                        borderColor: 'rgba(255, 255, 255, 0.2)',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: { 
-                                color: 'white',
-                                padding: 15,
-                                font: { size: 12 }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Initialize everything when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            initCharts();
+            }
         });
 
-        // Service Worker Registration for PWA
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then((registration) => {
-                        console.log('SW registered: ', registration);
-                    })
-                    .catch((registrationError) => {
-                        console.log('SW registration failed: ', registrationError);
-                    });
+        // Expense Breakdown Chart
+        const expenseCtx = document.getElementById('expenseChart').getContext('2d');
+        new Chart(expenseCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Housing', 'Food', 'Insurance', 'Childcare', 'Savings', 'Discretionary', 'Other'],
+                datasets: [{
+                    data: [2427, 964, 490, 508, 571, 323, 628],
+                    backgroundColor: [
+                        '#8b5cf6',
+                        '#3b82f6', 
+                        '#10b981',
+                        '#f59e0b',
+                        '#ef4444',
+                        '#06d6a0',
+                        '#6366f1'
+                    ],
+                    borderWidth: 2,
+                    borderColor: 'rgba(0, 0, 0, 0.1)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    }
+                }
+            }
+        });
+
+        // AI Coach Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('aiCoachToggle');
+            const panel = document.getElementById('aiCoachPanel');
+            const close = document.getElementById('aiCoachClose');
+            const input = document.getElementById('aiChatInput');
+            const send = document.getElementById('aiChatSend');
+
+            toggle.addEventListener('click', () => {
+                panel.classList.toggle('hidden');
             });
+
+            close.addEventListener('click', () => {
+                panel.classList.add('hidden');
+            });
+
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            send.addEventListener('click', sendMessage);
+
+            function sendMessage() {
+                const message = input.value.trim();
+                if (!message) return;
+
+                addMessage('user', message);
+                input.value = '';
+
+                // Simulate AI response
+                setTimeout(() => {
+                    const response = generateAIResponse(message);
+                    addMessage('assistant', response);
+                }, 1000);
+            }
+
+            function addMessage(type, content) {
+                const messagesContainer = document.getElementById('aiChatMessages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `ai-message ai-message-${type}`;
+                
+                messageDiv.innerHTML = `
+                    <div class="ai-message-avatar">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16,16.5C16,17.11 15.61,17.5 15,17.5H9C8.39,17.5 8,17.11 8,16.5V15.5C8,14.89 8.39,14.5 9,14.5H15C15.61,14.5 16,14.89 16,15.5V16.5M9,13A1,1 0 0,1 8,12A1,1 0 0,1 9,11A1,1 0 0,1 10,12A1,1 0 0,1 9,13M15,13A1,1 0 0,1 14,12A1,1 0 0,1 15,11A1,1 0 0,1 16,12A1,1 0 0,1 15,13Z" />
+                        </svg>
+                    </div>
+                    <div class="ai-message-content">
+                        <p>${content}</p>
+                    </div>
+                `;
+
+                messagesContainer.appendChild(messageDiv);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            function generateAIResponse(query) {
+                const responses = {
+                    'deficit': 'Your $3,607 deficit is critical. Priority actions: 1) Cut dining out by 50% (-$168), 2) Reduce shopping by 30% (-$59), 3) Review and cancel unused subscriptions. This could reduce your deficit by ~$227/month.',
+                    'overspending': 'You\'re overspending most on: Dining Out (+35%, $87 over), Entertainment (+46%, $23 over), and Shopping (+32%, $48 over). These three categories are costing you an extra $158/month.',
+                    'emergency': 'Start with $50/week transfers from your House Kitty ($65K) to build emergency fund. Your goal: $15,000 (3 months expenses). At $200/month, you\'ll reach this in 6 years, but start NOW!',
+                    'expenses': 'Top expense reduction opportunities: 1) Meal prep instead of dining out, 2) Review Sky Network subscription, 3) Shop sales for groceries, 4) Set entertainment spending limit of $30/month.'
+                };
+
+                const lowerQuery = query.toLowerCase();
+                for (const [key, response] of Object.entries(responses)) {
+                    if (lowerQuery.includes(key)) {
+                        return response;
+                    }
+                }
+
+                return 'I can help you fix your budget deficit, identify overspending, or start an emergency fund. What specific area would you like to focus on?';
+            }
+        });
+
+        // Global function for quick actions
+        function askAI(question) {
+            const input = document.getElementById('aiChatInput');
+            input.value = question;
+            input.focus();
+        }
+
+        // Privacy toggle
+        document.getElementById('privacyToggle').addEventListener('click', function() {
+            document.body.classList.toggle('privacy-mode');
+            this.textContent = document.body.classList.contains('privacy-mode') ? '🔓 Show' : '🔒 Privacy';
+        });
+
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = 'login.html';
+            }
         }
     </script>
 </body>
