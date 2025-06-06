@@ -7,7 +7,7 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #0f172a, #1e1b4b, #312e81);
             color: white;
             min-height: 100vh;
@@ -479,6 +479,7 @@
             display: flex;
             gap: 12px;
             justify-content: center;
+            margin-bottom: 20px;
         }
         
         .result-btn {
@@ -501,6 +502,51 @@
         .result-btn.secondary {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Debug Section */
+        .debug-section {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .debug-title {
+            margin-bottom: 10px;
+            font-size: 1rem;
+            color: #10b981;
+        }
+        
+        .debug-info {
+            font-family: monospace;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            color: rgba(255, 255, 255, 0.8);
+            white-space: pre-line;
+        }
+        
+        /* Quick Check Button */
+        .quick-check-section {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .quick-check-btn {
+            background: #10b981;
+            color: white;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-check-btn:hover {
+            background: #059669;
+            transform: translateY(-1px);
         }
         
         .positive { color: #10b981; }
@@ -692,27 +738,6 @@
                 font-size: 1rem;
             }
         }
-        
-        /* Text wrapping utilities */
-        .text-wrap {
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            hyphens: auto;
-        }
-        
-        /* Prevent text overflow */
-        * {
-            box-sizing: border-box;
-        }
-        
-        .upload-instructions *,
-        .supported-banks *,
-        .results-summary *,
-        .file-item * {
-            max-width: 100%;
-            overflow-wrap: break-word;
-            word-wrap: break-word;
-        }
     </style>
 </head>
 <body>
@@ -727,6 +752,7 @@
                 <li><a href="index.html">Dashboard</a></li>
                 <li><a href="budget.html">Budget</a></li>
                 <li><a href="goals.html">Goals</a></li>
+                <li><a href="transactions.html">Transactions</a></li>
                 <li><a href="csv-upload.html" class="active">Upload</a></li>
             </ul>
             
@@ -736,10 +762,179 @@
             </div>
         </div>
     </nav>
-<button onclick="alert('Transactions: ' + (localStorage.getItem('financeOS_transactions') ? JSON.parse(localStorage.getItem('financeOS_transactions')).length : '0'))" 
-        style="background: #10b981; color: white; padding: 10px; border: none; border-radius: 5px; margin: 10px;">
-    Quick Check
-</button>
 
     <main class="main-content">
-        <div class="pa
+        <div class="page-header">
+            <h1 class="page-title">Upload Bank Statements</h1>
+            <p class="page-subtitle">Import your weekly CSV files to automatically update your budget and goals</p>
+        </div>
+
+        <div class="upload-instructions">
+            <h2 class="instructions-title">How to Upload Your Bank Statements</h2>
+            <ol class="instructions-list">
+                <li>
+                    <span class="step-number">1</span>
+                    <span>Download CSV statements from your NZ bank's online banking platform</span>
+                </li>
+                <li>
+                    <span class="step-number">2</span>
+                    <span>Select weekly or monthly statement periods for best results</span>
+                </li>
+                <li>
+                    <span class="step-number">3</span>
+                    <span>Upload files using the drag-and-drop area below or click to browse</span>
+                </li>
+                <li>
+                    <span class="step-number">4</span>
+                    <span>Review categorized transactions and confirm the import</span>
+                </li>
+                <li>
+                    <span class="step-number">5</span>
+                    <span>Your budget and goals will automatically update with new data</span>
+                </li>
+            </ol>
+        </div>
+
+        <div class="supported-banks">
+            <h3 class="banks-title">Supported New Zealand Banks</h3>
+            <div class="banks-grid">
+                <div class="bank-item">ANZ</div>
+                <div class="bank-item">ASB</div>
+                <div class="bank-item">BNZ</div>
+                <div class="bank-item">Kiwibank</div>
+                <div class="bank-item">Westpac</div>
+                <div class="bank-item">TSB</div>
+                <div class="bank-item">Co-operative Bank</div>
+                <div class="bank-item">SBS Bank</div>
+            </div>
+        </div>
+
+        <!-- Quick Check Button for Mobile Testing -->
+        <div class="quick-check-section">
+            <button class="quick-check-btn" onclick="checkLocalStorage()">
+                🔍 Quick Check localStorage
+            </button>
+        </div>
+
+        <div class="upload-zone" id="uploadZone">
+            <div class="upload-icon">📤</div>
+            <h2 class="upload-title">Drop your CSV files here</h2>
+            <p class="upload-subtitle">
+                Drag and drop your bank statement files, or click the button below to browse your computer.
+                Multiple files can be uploaded at once.
+            </p>
+            <button class="upload-button" onclick="event.stopPropagation(); document.getElementById('fileInput').click();">
+                Choose Files
+            </button>
+            <input type="file" id="fileInput" class="file-input" multiple accept=".csv,.xls,.xlsx,.qif,.ofx">
+            <p class="file-types">Supports: CSV, Excel, QIF, OFX files</p>
+        </div>
+
+        <div class="file-preview" id="filePreview">
+            <div class="file-list" id="fileList">
+                <!-- Files will be dynamically added here -->
+            </div>
+        </div>
+
+        <div class="processing-status" id="processingStatus">
+            <div class="status-header">
+                <div class="status-icon">⚙️</div>
+                <h3 class="status-title">Processing Your Files...</h3>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <p class="status-text" id="statusText">Analyzing file formats and detecting bank types...</p>
+        </div>
+
+        <div class="results-summary" id="resultsSummary">
+            <h2 class="results-title">Import Complete</h2>
+            <div class="results-grid">
+                <div class="result-item">
+                    <div class="result-label">Files Processed</div>
+                    <div class="result-value" id="filesProcessed">0</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Transactions Added</div>
+                    <div class="result-value" id="transactionsAdded">0</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Duplicates Skipped</div>
+                    <div class="result-value" id="duplicatesSkipped">0</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Categories Updated</div>
+                    <div class="result-value" id="categoriesUpdated">0</div>
+                </div>
+            </div>
+            
+            <!-- Debug Info for Mobile -->
+            <div class="debug-section">
+                <h3 class="debug-title">📊 Debug Info (localStorage Status):</h3>
+                <div id="debugInfo" class="debug-info">
+                    No data loaded yet...
+                </div>
+            </div>
+            
+            <div class="result-actions">
+                <button class="result-btn" onclick="window.location.href='transactions.html'">
+                    View Transaction History
+                </button>
+                <button class="result-btn" onclick="window.location.href='budget.html'">
+                    View Updated Budget
+                </button>
+                <button class="result-btn secondary" onclick="resetUpload()">
+                    Upload More Files
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let selectedFiles = [];
+
+        function togglePrivacy() {
+            document.body.classList.toggle('privacy-mode');
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Quick Check Function for Mobile
+        function checkLocalStorage() {
+            const transactions = localStorage.getItem('financeOS_transactions');
+            const summary = localStorage.getItem('financeOS_importSummary');
+            
+            let message = '';
+            
+            if (transactions) {
+                const txnArray = JSON.parse(transactions);
+                message += `✅ localStorage WORKING!\n`;
+                message += `📊 ${txnArray.length} transactions found\n`;
+                message += `💰 Sample: $${Math.abs(txnArray[0]?.amount || 0).toFixed(2)}\n`;
+                message += `🏪 Merchant: ${txnArray[0]?.description || 'None'}\n`;
+            } else {
+                message += `❌ No transactions found\n`;
+                message += `Try uploading files first!`;
+            }
+            
+            if (summary) {
+                const summaryData = JSON.parse(summary);
+                message += `📈 ${Object.keys(summaryData.categorySummary || {}).length} categories`;
+            }
+            
+            alert(message);
+        }
+
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadZone.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
