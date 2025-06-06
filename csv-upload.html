@@ -736,6 +736,10 @@
             </div>
         </div>
     </nav>
+<button onclick="alert('Transactions: ' + (localStorage.getItem('financeOS_transactions') ? JSON.parse(localStorage.getItem('financeOS_transactions')).length : '0'))" 
+        style="background: #10b981; color: white; padding: 10px; border: none; border-radius: 5px; margin: 10px;">
+    Quick Check
+</button>
 
     <main class="main-content">
         <div class="pa
