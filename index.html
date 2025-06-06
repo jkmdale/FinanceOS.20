@@ -1,742 +1,705 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Dashboard - FinanceOS</title>
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanceOS - Dashboard</title>
     <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8b5cf6">
+    <link rel="stylesheet" href="styles.css">
     <style>
-        /* Reset and Base Styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        .session-info {
+            /* This section is hidden as per banking app style */
+            display: none !important; 
         }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
-            background-attachment: fixed;
-            color: white;
-            min-height: 100vh;
-            overflow-x: hidden;
+        
+        .logout-button {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 10px;
         }
-
-        /* CSS Variables for Design System */
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --glass-premium-bg: linear-gradient(135deg, 
-                rgba(139, 92, 246, 0.15) 0%, 
-                rgba(59, 130, 246, 0.15) 50%, 
-                rgba(147, 51, 234, 0.15) 100%);
-            --glass-premium-border: rgba(255, 255, 255, 0.2);
-            --gradient-purple: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
-            --gradient-blue: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
-            --gradient-green: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
-            --gradient-red: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
-            --text-white: rgba(255, 255, 255, 0.9);
-            --text-gray: rgba(255, 255, 255, 0.7);
-            --text-light: rgba(255, 255, 255, 0.5);
+        
+        .logout-button:hover {
+            background: rgba(239, 68, 68, 0.3);
+            transform: translateY(-1px);
         }
-
-        /* Glass Effects */
-        .glass {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
-        .glass-premium {
-            background: var(--glass-premium-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-premium-border);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-        }
-
-        /* Navigation Bar - BIGGER UNIFIED STYLE */
-        .navbar {
+        
+        .login-overlay {
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            z-index: 1000;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 20px 0;
-            transition: all 0.3s ease;
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
-        }
-
-        .nav-logo {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            color: white;
-            font-weight: 700;
-        }
-
-        .logo-icon {
-            width: 48px;
-            height: 48px;
-            margin-right: 12px;
-            border-radius: 12px;
-            background: var(--gradient-green);
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f172a, #1e1b4b, #312e81);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            z-index: 10000;
+        }
+        
+        .login-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 60px 50px;
+            text-align: center;
+            max-width: 600px; /* Increased max-width for larger feel */
+            width: 95%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            min-height: 700px; /* Increased min-height for larger feel */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin: 20px;
+            transform: scale(1.05); /* Slightly zoom in the whole container */
+            transform-origin: center;
+        }
+        
+        .login-logo {
+            width: 90px; /* Slightly larger logo */
+            height: 90px; /* Slightly larger logo */
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px; /* Adjusted margin */
+            font-size: 36px; /* Slightly larger font */
+            color: white;
             font-weight: bold;
         }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 32px;
-            list-style: none;
+        
+        h2 {
+            font-size: 32px !important; /* Larger heading */
+            margin-bottom: 16px !important; /* Adjusted margin */
         }
 
-        .nav-links a {
-            color: var(--text-gray);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 1rem;
-            padding: 12px 20px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            position: relative;
+        p {
+            font-size: 18px !important; /* Larger paragraph text */
+            margin-bottom: 50px !important; /* Adjusted margin */
         }
 
-        .nav-links a:hover {
-            color: white;
+        .login-input {
+            width: 100%;
+            padding: 18px 22px; /* Increased padding */
+            margin-bottom: 25px; /* Adjusted margin */
             background: rgba(255, 255, 255, 0.1);
-        }
-
-        .nav-links a.active {
-            color: #8b5cf6;
-            background: rgba(139, 92, 246, 0.1);
-        }
-
-        .nav-links a.active::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 6px;
-            height: 6px;
-            background: #8b5cf6;
-            border-radius: 50%;
-        }
-
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .privacy-toggle {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 14px; /* Slightly larger border-radius */
             color: white;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 0.875rem;
+            font-size: 20px; /* Larger font */
+            box-sizing: border-box;
+        }
+        
+        .login-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .login-input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15); /* Slightly larger shadow */
+        }
+        
+        .login-button {
+            width: 100%;
+            padding: 18px; /* Increased padding */
+            background: linear-gradient(135deg, #8b5cf6, #9333ea);
+            color: white;
+            border: none;
+            border-radius: 14px; /* Slightly larger border-radius */
+            font-size: 20px; /* Larger font */
+            font-weight: 600;
             cursor: pointer;
+            margin-bottom: 25px; /* Adjusted margin */
             transition: all 0.3s ease;
         }
-
-        .privacy-toggle:hover {
+        
+        .login-button:hover {
+            transform: translateY(-3px); /* Increased hover effect */
+            box-shadow: 0 10px 28px rgba(139, 92, 246, 0.5); /* Larger shadow */
+        }
+        
+        .login-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .biometric-button {
+            width: 100%;
+            padding: 18px; /* Increased padding */
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 14px; /* Slightly larger border-radius */
+            font-size: 20px; /* Larger font */
+            cursor: pointer;
+            margin-bottom: 25px; /* Adjusted margin */
+            transition: all 0.3s ease;
+        }
+        
+        .biometric-button:hover {
             background: rgba(255, 255, 255, 0.2);
         }
-
-        .logout-btn {
-            background: var(--gradient-red);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        
+        .forgot-password {
+            color: #8b5cf6;
+            text-decoration: none;
+            font-size: 16px; /* Slightly larger font */
+            transition: color 0.3s ease;
         }
-
-        .logout-btn:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
+        
+        .forgot-password:hover {
+            color: #a78bfa;
         }
-
-        /* Mobile Menu */
-        .mobile-menu-btn {
-            display: none;
+        
+        .password-toggle {
+            position: absolute;
+            right: 15px; /* Adjusted position */
+            top: 50%;
+            transform: translateY(-50%);
             background: none;
             border: none;
-            color: white;
-            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.6);
             cursor: pointer;
-            padding: 8px;
+            font-size: 20px; /* Larger icon */
         }
-
-        /* Main Content */
-        .main-content {
-            margin-top: 100px;
-            padding: 24px;
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
+        
+        .password-field {
+            position: relative;
         }
-
-        /* Welcome Header */
-        .welcome-header {
-            text-align: center;
-            margin-bottom: 32px;
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 24px; /* Larger spinner */
+            height: 24px; /* Larger spinner */
+            border: 3px solid rgba(255, 255, 255, 0.3); /* Thicker border */
+            border-top: 3px solid white; /* Thicker border */
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
-
-        .welcome-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-
-        .welcome-subtitle {
-            color: var(--text-gray);
-            font-size: 1.125rem;
-        }
-
-        /* Critical Alerts */
-        .alerts-section {
-            margin-bottom: 32px;
-        }
-
-        .alert {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.2) 100%);
-            backdrop-filter: blur(20px);
-            border: 2px solid rgba(239, 68, 68, 0.3);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-            animation: pulse 2s infinite;
-        }
-
-        .alert-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: #ef4444;
-            margin-bottom: 8px;
-        }
-
-        .alert-message {
-            color: var(--text-gray);
-            line-height: 1.5;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-
-        /* Financial Summary */
-        .financial-summary {
-            background: var(--glass-premium-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-premium-border);
-            border-radius: 20px;
-            padding: 24px; /* Ensure good padding */
-            margin-bottom: 32px;
-        }
-
-        .summary-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .summary-item {
-            text-align: center;
-            padding: 16px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            /* Added for better content handling */
-            overflow: hidden; 
+        
+        .pin-input {
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .summary-label {
-            font-size: 0.875rem;
-            color: var(--text-gray);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .summary-value {
-            /* Using clamp for responsive font sizing */
-            font-size: clamp(1.2rem, 4vw, 1.75rem); /* Min 1.2rem, Preferred 4vw, Max 1.75rem */
-            font-weight: 700;
-            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
-            /* Added min-width and word-wrap to prevent overflow */
-            min-width: 0; /* Allows content to shrink within flex/grid */
-            word-break: break-word; /* Breaks long words if necessary */
-        }
-
-        .positive { color: #10b981; }
-        .negative { color: #ef4444; }
-        .neutral { color: var(--text-white); }
-
-        /* Account Cards */
-        .accounts-section {
-            margin-bottom: 32px;
-        }
-
-        .section-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: var(--text-white);
-        }
-
-        .accounts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .account-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 20px;
-            transition: all 0.3s ease;
-            /* Added for better content handling */
-            overflow: hidden; 
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .account-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 48px rgba(139, 92, 246, 0.3);
-        }
-
-        .account-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .account-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
+            gap: 15px; /* Increased gap */
             justify-content: center;
-            margin-right: 12px;
-            font-size: 1.125rem;
+            margin: 30px 0; /* Adjusted margin */
         }
-
-        .account-name {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-white);
-        }
-
-        .account-balance {
-            /* Using clamp for responsive font sizing */
-            font-size: clamp(1.4rem, 5vw, 2rem); /* Min 1.4rem, Preferred 5vw, Max 2rem */
-            font-weight: 700;
-            margin-bottom: 8px;
-            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
-            /* Added min-width and word-wrap to prevent overflow */
-            min-width: 0; /* Allows content to shrink within flex/grid */
-            word-break: break-word; /* Breaks long words if necessary */
-        }
-
-        .account-available {
-            font-size: 0.875rem;
-            color: var(--text-gray);
-        }
-
-        /* Quick Actions */
-        .quick-actions-section { /* Added section for semantic grouping */
-            margin-bottom: 32px;
-        }
-
-        .quick-actions-section .section-title {
-            margin-bottom: 20px;
-        }
-
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .action-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 24px;
+        
+        .pin-digit {
+            width: 60px; /* Larger PIN digits */
+            height: 60px; /* Larger PIN digits */
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px; /* Slightly larger border-radius */
+            color: white;
+            font-size: 28px; /* Larger font */
             text-align: center;
-            text-decoration: none;
-            color: white;
-            transition: all 0.3s ease;
-            /* Added for better content handling */
-            overflow: hidden; 
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            font-weight: bold;
         }
-
-        .action-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 48px rgba(139, 92, 246, 0.3);
-            color: white;
-        }
-
-        .action-icon {
-            width: 48px;
-            height: 48px;
-            margin: 0 auto 16px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-
-        .action-title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .action-description {
-            font-size: 0.875rem;
-            color: var(--text-gray);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none; /* Keep this for default hidden state */
-                flex-direction: column; /* New: Stack links vertically */
-                width: 100%; /* New: Take full width */
-                background: rgba(15, 23, 42, 0.95); /* New: Background for the menu */
-                position: absolute; /* New: Position relative to navbar */
-                top: 100%; /* New: Place below the navbar */
-                left: 0;
-                padding: 16px 0;
-                border-top: 1px solid var(--glass-border);
-            }
-
-            .nav-links.show-mobile-menu { /* New class to show the menu */
-                display: flex;
-            }
-
-            .nav-links li {
-                width: 100%; /* Ensure list items take full width */
-                text-align: center; /* Center the text */
-            }
-
-            .nav-links a {
-                padding: 12px 0; /* Adjust padding for vertical links */
-                display: block; /* Make links block-level for full clickable area */
-            }
-
-            .mobile-menu-btn {
-                display: block;
-            }
-
-            .main-content {
-                padding: 16px;
-                margin-top: 88px;
-            }
-
-            .welcome-title {
-                font-size: 2rem;
-            }
-
-            .accounts-grid,
-            .quick-actions {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
-
-            .summary-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            }
-        }
-
-        @media (max-width: 480px) {
-            .nav-container {
-                padding: 0 16px;
-            }
-
-            .logo-icon {
-                width: 40px;
-                height: 40px;
-                font-size: 20px;
-            }
-
-            .welcome-title {
-                font-size: 1.75rem;
-            }
-            
-            /* Specific font size overrides for very small screens */
-            .summary-value {
-                font-size: 1.25rem; /* Revert to a fixed smaller size on very small screens */
-            }
-            .account-balance {
-                font-size: 1.5rem; /* Revert to a fixed smaller size on very small screens */
-            }
-            /* Add more padding for cards on very small screens */
-            .account-card, .summary-item, .action-card {
-                padding: 16px;
-            }
-        }
-
-        /* Privacy Mode */
-        .privacy-mode .account-balance,
-        .privacy-mode .summary-value,
-        .privacy-mode .account-available {
-            filter: blur(4px);
-            transition: filter 0.3s ease;
+        
+        .pin-digit:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15); /* Slightly larger shadow */
         }
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="nav-logo">
-                <div class="logo-icon">$</div>
-                <span>FinanceOS</span>
-            </a>
+    <div class="session-info" id="sessionInfo" style="display: none;">
+        <span>User: demo</span>
+        <button class="logout-button" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-container">
+            <div class="login-logo">$</div>
+            <h2 style="color: white; margin-bottom: 12px; font-size: 28px;">FinanceOS</h2>
+            <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 40px; font-size: 16px;">
+                Your Personal Finance Operating System
+            </p>
             
-            <ul class="nav-links">
-                <li><a href="index.html" class="active">Dashboard</a></li>
-                <li><a href="budget.html">Budget</a></li>
-                <li><a href="goals.html">Goals</a></li>
-                <li><a href="csv-upload.html">Upload</a></li>
-            </ul>
-            
-            <div class="nav-actions">
-                <button class="privacy-toggle" onclick="togglePrivacy()">Privacy Mode</button>
-                <button class="logout-btn" onclick="logout()">Logout</button>
-            </div>
-            
-            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
-        </div>
-    </nav>
-
-    <main class="main-content">
-        <div class="welcome-header">
-            <h1 class="welcome-title">Financial Dashboard</h1>
-            <p class="welcome-subtitle">Your complete financial overview at a glance</p>
-        </div>
-
-        <div class="alerts-section">
-            <div class="alert">
-                <div class="alert-title">CRITICAL: Emergency Fund Crisis</div>
-                <div class="alert-message">
-                    Your emergency fund has only $0.17. Financial experts recommend 3-6 months of expenses ($15,000-$30,000). 
-                    This puts your family at extreme financial risk.
+            <div id="loginForm">
+                <input type="text" id="loginUsername" class="login-input" placeholder="Username" autocomplete="username">
+                
+                <div class="password-field">
+                    <input type="password" id="loginPassword" class="login-input" placeholder="Password" autocomplete="current-password">
+                    <button type="button" class="password-toggle" onclick="togglePassword()">👁️</button>
+                </div>
+                
+                <button onclick="login()" class="login-button" id="loginButton">
+                    <span id="loginButtonText">Login</span>
+                </button>
+                
+                <button onclick="showBiometricLogin()" class="biometric-button" id="biometricButton">
+                    🔐 Use Biometric Login
+                </button>
+                
+                <button onclick="showPinLogin()" class="biometric-button">
+                    🔢 Use PIN
+                </button>
+                
+                <div style="margin-top: 20px;">
+                    <a href="#" onclick="showPasswordReset()" class="forgot-password">Forgot Password?</a>
+                </div>
+                
+                <div style="margin-top: 20px; font-size: 12px; color: rgba(255, 255, 255, 0.6);">
+                    Demo: username=<strong>demo</strong>, password=<strong>demo123</strong>
                 </div>
             </div>
             
-            <div class="alert">
-                <div class="alert-title">URGENT: Monthly Budget Deficit</div>
-                <div class="alert-message">
-                    You're spending $3,607 more than you earn each month. This unsustainable pattern will deplete your savings 
-                    and increase debt. Immediate action required.
+            <div id="pinForm" style="display: none;">
+                <h3 style="color: white; margin-bottom: 20px;">Enter PIN</h3>
+                <div class="pin-input">
+                    <input type="password" class="pin-digit" maxlength="1" id="pin1" oninput="movePinFocus(1)" onkeydown="handlePinBackspace(event, 1)">
+                    <input type="password" class="pin-digit" maxlength="1" id="pin2" oninput="movePinFocus(2)" onkeydown="handlePinBackspace(event, 2)">
+                    <input type="password" class="pin-digit" maxlength="1" id="pin3" oninput="movePinFocus(3)" onkeydown="handlePinBackspace(event, 3)">
+                    <input type="password" class="pin-digit" maxlength="1" id="pin4" oninput="movePinFocus(4)" onkeydown="handlePinBackspace(event, 4)">
                 </div>
+                <button onclick="loginWithPin()" class="login-button">Login with PIN</button>
+                <button onclick="showLoginForm()" class="biometric-button">Back to Password</button>
+                <div style="margin-top: 15px; font-size: 12px; color: rgba(255, 255, 255, 0.6);">
+                    Demo PIN: <strong>1234</strong>
+                </div>
+            </div>
+            
+            <div id="resetForm" style="display: none;">
+                <h3 style="color: white; margin-bottom: 20px;">Reset Password</h3>
+                <input type="email" class="login-input" placeholder="Email Address" id="resetEmail">
+                <button onclick="sendPasswordReset()" class="login-button">Send Reset Link</button>
+                <button onclick="showLoginForm()" class="biometric-button">Back to Login</button>
             </div>
         </div>
+    </div>
 
-        <div class="financial-summary">
-            <h2 class="summary-title">Financial Overview</h2>
-            <div class="summary-grid">
-                <div class="summary-item">
-                    <div class="summary-label">Total Assets</div>
-                    <div class="summary-value positive">$114,357</div>
+    <div id="mainApp" style="display: none;">
+        <header class="header glass">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">$</div>
+                    <span class="logo-text">FinanceOS</span>
                 </div>
-                <div class="summary-item">
-                    <div class="summary-label">Total Liabilities</div>
-                    <div class="summary-value negative">$274,851</div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-label">Net Worth</div>
-                    <div class="summary-value negative">-$160,494</div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-label">Monthly Cash Flow</div>
-                    <div class="summary-value negative">-$3,607</div>
+                
+                <nav class="nav">
+                    <a href="index.html" class="nav-button active">Dashboard</a>
+                    <a href="csv-upload.html" class="nav-button">Upload CSV</a>
+                    <a href="goals.html" class="nav-button">Goals</a>
+                    <button class="privacy-toggle" id="privacyToggle">🔒 Privacy Mode</button>
+                    <button class="nav-button" id="notificationSettings">🔔 Notifications</button>
+                    <button class="logout-button" onclick="logout()">🚪 Logout</button>
+                </nav>
+            </div>
+        </header>
+
+        <main class="main-content" id="mainContent">
+            <div class="csv-status no-data" id="csvStatus">
+                📊 No recent CSV data found. <a href="csv-upload.html" style="color: #f59e0b;">Upload bank statements</a> to see transaction analysis.
+            </div>
+
+            <div class="emergency-alert">
+                <div class="alert-title">🚨 Financial Alert: Emergency Fund Critical</div>
+                <div class="alert-text">
+                    Your emergency fund has only $0.17. With a monthly deficit of $3,607, you're at high financial risk. 
+                    <strong>Immediate action required.</strong>
                 </div>
             </div>
-        </div>
 
-        <div class="accounts-section">
-            <h2 class="section-title">Your Accounts</h2>
-            <div class="accounts-grid">
-                <div class="account-card">
-                    <div class="account-header">
-                        <div class="account-icon" style="background: var(--gradient-blue);">💰</div>
-                        <div class="account-name">My Spending</div>
+            <section class="financial-summary">
+                <h2 class="section-title">Financial Overview</h2>
+                
+                <div class="summary-grid">
+                    <div class="summary-card glass-premium">
+                        <h3>Total Assets</h3>
+                        <div class="amount" style="color: #10b981;">$65,383.44</div>
+                        <div class="change">Available across all accounts</div>
                     </div>
-                    <div class="account-balance neutral">$25.92</div>
-                    <div class="account-available">$25.92 Available</div>
+                    
+                    <div class="summary-card glass-premium">
+                        <h3>Total Debt</h3>
+                        <div class="amount" style="color: #ef4444;">$274,851.32</div>
+                        <div class="change">Including mortgage & credit</div>
+                    </div>
+                    
+                    <div class="summary-card glass-premium">
+                        <h3>Net Worth</h3>
+                        <div class="amount" style="color: #ef4444;">-$209,467.88</div>
+                        <div class="change">Mortgage impact included</div>
+                    </div>
+                    
+                    <div class="summary-card glass-premium">
+                        <h3>Monthly Cash Flow</h3>
+                        <div class="amount" style="color: #ef4444;">-$3,607</div>
+                        <div class="change">Expenses exceed income</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="accounts-section">
+                <div class="section-header">
+                    <h2 class="section-title">Your Accounts</h2>
                 </div>
 
-                <div class="account-card">
-                    <div class="account-header">
-                        <div class="account-icon" style="background: var(--gradient-green);">💚</div>
-                        <div class="account-name">My Savings</div>
+                <div class="accounts-grid">
+                    <div class="account-card glass">
+                        <div class="account-header">
+                            <div class="account-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">💳</div>
+                            <div class="account-info">
+                                <h3>My Spending</h3>
+                                <div class="account-type">Personal Checking</div>
+                            </div>
+                        </div>
+                        <div class="account-balance" style="color: #10b981;">$25.92</div>
+                        <div class="account-available">$25.92 Available</div>
                     </div>
-                    <div class="account-balance negative">$0.17</div>
-                    <div class="account-available">$0.17 Available - CRITICAL LOW</div>
-                </div>
 
-                <div class="account-card">
-                    <div class="account-header">
-                        <div class="account-icon" style="background: var(--gradient-purple);">🏠</div>
-                        <div class="account-name">House Kitty</div>
+                    <div class="account-card glass">
+                        <div class="account-header">
+                            <div class="account-icon" style="background: linear-gradient(135deg, #10b981, #059669);">💰</div>
+                            <div class="account-info">
+                                <h3>My Savings</h3>
+                                <div class="account-type">Personal Savings</div>
+                            </div>
+                        </div>
+                        <div class="account-balance" style="color: #ef4444;">$0.17</div>
+                        <div class="account-available">$0.17 Available</div>
                     </div>
-                    <div class="account-balance positive">$65,357.00</div>
-                    <div class="account-available">$65,357.00 Available</div>
-                </div>
 
-                <div class="account-card">
-                    <div class="account-header">
-                        <div class="account-icon" style="background: var(--gradient-blue);">🏦</div>
-                        <div class="account-name">Mortgage And Billing</div>
+                    <div class="account-card glass-premium">
+                        <div class="account-header">
+                            <div class="account-icon" style="background: linear-gradient(135deg, #8b5cf6, #9333ea);">🏠</div>
+                            <div class="account-info">
+                                <h3>House Kitty</h3>
+                                <div class="account-type">Joint Savings</div>
+                            </div>
+                        </div>
+                        <div class="account-balance" style="color: #10b981;">$65,357.00</div>
+                        <div class="account-available">$65,357.00 Available</div>
                     </div>
-                    <div class="account-balance neutral">$126.35</div>
-                    <div class="account-available">$126.35 Available</div>
-                </div>
 
-                <div class="account-card">
-                    <div class="account-header">
-                        <div class="account-icon" style="background: var(--gradient-green);">💼</div>
-                        <div class="account-name">Holding</div>
+                    <div class="account-card glass">
+                        <div class="account-header">
+                            <div class="account-icon" style="background: linear-gradient(135deg, #f97316, #ea580c);">🧾</div>
+                            <div class="account-info">
+                                <h3>Mortgage And Billing</h3>
+                                <div class="account-type">Bill Payment Account</div>
+                            </div>
+                        </div>
+                        <div class="account-balance" style="color: #10b981;">$126.35</div>
+                        <div class="account-available">$126.35 Available</div>
                     </div>
-                    <div class="account-balance neutral">$240.40</div>
-                    <div class="account-available">$240.40 Available</div>
-                </div>
 
-                <div class="account-card">
-                    <div class="account-header">
-                        <div class="account-icon" style="background: var(--gradient-red);">💳</div>
-                        <div class="account-name">Low Rate Visa</div>
+                    <div class="account-card glass">
+                        <div class="account-header">
+                            <div class="account-icon" style="background: linear-gradient(135deg, #eab308, #ca8a04);">⏳</div>
+                            <div class="account-info">
+                                <h3>Holding</h3>
+                                <div class="account-type">Temporary Account</div>
+                            </div>
+                        </div>
+                        <div class="account-balance" style="color: #10b981;">$240.40</div>
+                        <div class="account-available">$240.40 Available</div>
                     </div>
-                    <div class="account-balance negative">-$3,251.30</div>
-                    <div class="account-available">$6,748.70 Available Credit</div>
-                </div>
 
-                <div class="account-card">
-                    <div class="account-header">
-                        <div class="account-icon" style="background: var(--gradient-purple);">📈</div>
-                        <div class="account-name">ANZ KiwiSaver</div>
+                    <div class="account-card glass">
+                        <div class="account-header">
+                            <div class="account-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">💳</div>
+                            <div class="account-info">
+                                <h3>Low Rate Visa</h3>
+                                <div class="account-type">Credit Card</div>
+                            </div>
+                        </div>
+                        <div class="account-balance" style="color: #ef4444;">-$3,251.30</div>
+                        <div class="account-available">$6,748.70 Available Credit</div>
                     </div>
-                    <div class="account-balance positive">$48,733.44</div>
-                    <div class="account-available">Long-term Investment</div>
-                </div>
 
-                <div class="account-card">
-                    <div class="account-header">
-                        <div class="account-icon" style="background: var(--gradient-red);">🏠</div>
-                        <div class="account-name">Home Loans</div>
+                    <div class="account-card glass">
+                        <div class="account-header">
+                            <div class="account-icon" style="background: linear-gradient(135deg, #6366f1, #4f46e5);">🏠</div>
+                            <div class="account-info">
+                                <h3>Home Loan</h3>
+                                <div class="account-type">Mortgage</div>
+                            </div>
+                        </div>
+                        <div class="account-balance" style="color: #ef4444;">-$271,600.02</div>
+                        <div class="account-available">Principal Remaining</div>
                     </div>
-                    <div class="account-balance negative">-$271,600.02</div>
-                    <div class="account-available">Mortgage Balance</div>
                 </div>
-            </div>
-        </div>
+            </section>
+        </main>
+    </div>
 
-        <section class="quick-actions-section">
-            <h2 class="section-title">Quick Actions</h2>
-            <div class="quick-actions">
-                <a href="#" class="action-card">
-                    <div class="action-icon" style="background: var(--gradient-purple);">💸</div>
-                    <div class="action-title">Transfer Funds</div>
-                    <div class="action-description">Move money between accounts</div>
-                </a>
-                <a href="#" class="action-card">
-                    <div class="action-icon" style="background: var(--gradient-blue);">➕</div>
-                    <div class="action-title">Add Transaction</div>
-                    <div class="action-description">Manually log an expense or income</div>
-                </a>
-                <a href="#" class="action-card">
-                    <div class="action-icon" style="background: var(--gradient-green);">📊</div>
-                    <div class="action-title">View Reports</div>
-                    <div class="action-description">Analyze your spending habits</div>
-                </a>
-                <a href="#" class="action-card">
-                    <div class="action-icon" style="background: var(--gradient-red);">⚙️</div>
-                    <div class="action-title">Settings</div>
-                    <div class="action-description">Manage preferences and profile</div>
-                </a>
-            </div>
-        </section>
-    </main>
-
-    <script>
-        // Function to toggle privacy mode
-        function togglePrivacy() {
-            document.body.classList.toggle('privacy-mode');
-        }
-
-        // Function for logout action
-        function logout() {
-            // In a real application, you'd handle session termination,
-            // redirect to a login page, etc.
-            alert('Logging out...');
-            window.location.href = 'login.html'; // Example redirect to a login page
-        }
-
-        // Function to toggle mobile menu
-        function toggleMobileMenu() {
-            const navLinks = document.querySelector('.nav-links');
-            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-
-            if (navLinks) {
-                navLinks.classList.toggle('show-mobile-menu');
-                // Optional: Change button text/icon
-                if (navLinks.classList.contains('show-mobile-menu')) {
-                    mobileMenuBtn.innerHTML = '✕'; // 'X' icon
-                } else {
-                    mobileMenuBtn.innerHTML = '☰'; // Hamburger icon
-                }
-            }
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
 
+Updated Code for script.js
+Here's the updated script.js with the banking-style session management. I've removed the visible session timer and implemented logic to check inactivity when the app gains focus or on page load.
+document.addEventListener('DOMContentLoaded', () => {
+    // Initial check for authentication on page load
+    checkAuthentication();
+
+    // Event listeners for activity to reset session
+    document.addEventListener('mousemove', resetActivityTimer);
+    document.addEventListener('keydown', resetActivityTimer);
+    document.addEventListener('click', resetActivityTimer);
+    document.addEventListener('scroll', resetActivityTimer);
+    document.addEventListener('touchstart', resetActivityTimer);
+
+    // Listen for when the window gains focus
+    window.addEventListener('focus', handleWindowFocus);
+});
+
+// --- Session Management (Banking App Style) ---
+const INACTIVITY_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes in milliseconds
+let lastActivityTime = Date.now();
+
+function resetActivityTimer() {
+    lastActivityTime = Date.now();
+    // console.log('Activity detected, timer reset.'); // For debugging
+}
+
+function isSessionTimedOut() {
+    return (Date.now() - lastActivityTime) > INACTIVITY_TIMEOUT_MS;
+}
+
+function handleWindowFocus() {
+    // console.log('Window gained focus, checking session...'); // For debugging
+    if (isAuthenticated()) {
+        if (isSessionTimedOut()) {
+            console.warn('Session timed out due to inactivity.');
+            logout(); // Log out if timed out
+            alert('Your session has expired due to inactivity. Please log in again.');
+        } else {
+            console.log('Session still active.');
+            // Session is active, no need to do anything, user can continue
+        }
+    } else {
+        // If not authenticated (e.g., after a logout), ensure login overlay is shown
+        showLoginOverlay();
+    }
+}
+
+// --- Authentication Functions ---
+function isAuthenticated() {
+    return localStorage.getItem('isAuthenticated') === 'true';
+}
+
+function setAuthenticated(status) {
+    localStorage.setItem('isAuthenticated', status);
+    if (status) {
+        localStorage.setItem('lastActivityTime', Date.now()); // Record login time as activity
+        // If the user is authenticated, ensure the lastActivityTime is consistent
+        // with the current time upon successful authentication.
+        resetActivityTimer(); 
+    } else {
+        localStorage.removeItem('lastActivityTime');
+    }
+}
+
+function checkAuthentication() {
+    const loginOverlay = document.getElementById('loginOverlay');
+    const mainApp = document.getElementById('mainApp');
+    const sessionInfo = document.getElementById('sessionInfo'); // This will remain hidden
+
+    if (isAuthenticated()) {
+        // If already authenticated, check if session has timed out since last interaction (or last page load)
+        if (isSessionTimedOut()) {
+            console.warn('Session timed out on load due to inactivity.');
+            setAuthenticated(false); // Clear authentication
+            loginOverlay.style.display = 'flex';
+            mainApp.style.display = 'none';
+            alert('Your session has expired due to inactivity. Please log in again.');
+        } else {
+            // Session is still active
+            loginOverlay.style.display = 'none';
+            mainApp.style.display = 'block';
+            sessionInfo.style.display = 'none'; // Ensure it's hidden
+            resetActivityTimer(); // Reset on successful check
+        }
+    } else {
+        loginOverlay.style.display = 'flex';
+        mainApp.style.display = 'none';
+        sessionInfo.style.display = 'none'; // Ensure it's hidden
+    }
+}
+
+function login() {
+    const usernameInput = document.getElementById('loginUsername');
+    const passwordInput = document.getElementById('loginPassword');
+    const loginButton = document.getElementById('loginButton');
+    const loginButtonText = document.getElementById('loginButtonText');
+
+    loginButton.disabled = true;
+    loginButtonText.innerHTML = '<span class="loading-spinner"></span> Logging in...';
+
+    // Simulate API call
+    setTimeout(() => {
+        const username = usernameInput.value;
+        const password = passwordInput.value;
+
+        if (username === 'demo' && password === 'demo123') {
+            setAuthenticated(true);
+            checkAuthentication();
+            alert('Login successful!');
+        } else {
+            alert('Invalid username or password.');
+            setAuthenticated(false);
+        }
+        loginButton.disabled = false;
+        loginButtonText.textContent = 'Login';
+    }, 1500);
+}
+
+function logout() {
+    setAuthenticated(false);
+    checkAuthentication();
+    alert('You have been logged out.');
+}
+
+// --- PIN Login Functions ---
+function showPinLogin() {
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('pinForm').style.display = 'block';
+    document.getElementById('pin1').focus();
+}
+
+function movePinFocus(currentPinIndex) {
+    const currentInput = document.getElementById(`pin${currentPinIndex}`);
+    if (currentInput.value.length === currentInput.maxLength) {
+        const nextPinIndex = currentPinIndex + 1;
+        if (nextPinIndex <= 4) {
+            document.getElementById(`pin${nextPinIndex}`).focus();
+        } else {
+            // All PIN digits entered, optionally trigger login
+            loginWithPin();
+        }
+    }
+}
+
+function handlePinBackspace(event, currentPinIndex) {
+    if (event.key === 'Backspace' && event.target.value === '') {
+        const prevPinIndex = currentPinIndex - 1;
+        if (prevPinIndex >= 1) {
+            document.getElementById(`pin${prevPinIndex}`).focus();
+        }
+    }
+}
+
+function loginWithPin() {
+    const pin1 = document.getElementById('pin1').value;
+    const pin2 = document.getElementById('pin2').value;
+    const pin3 = document.getElementById('pin3').value;
+    const pin4 = document.getElementById('pin4').value;
+    const enteredPin = `${pin1}${pin2}${pin3}${pin4}`;
+
+    if (enteredPin === '1234') { // Example PIN
+        setAuthenticated(true);
+        checkAuthentication();
+        alert('PIN Login successful!');
+    } else {
+        alert('Invalid PIN.');
+        setAuthenticated(false);
+        // Clear PIN fields
+        document.getElementById('pin1').value = '';
+        document.getElementById('pin2').value = '';
+        document.getElementById('pin3').value = '';
+        document.getElementById('pin4').value = '';
+        document.getElementById('pin1').focus();
+    }
+}
+
+// --- Biometric Login Functions ---
+function showBiometricLogin() {
+    if ('credentials' in navigator && 'get' in navigator.credentials) {
+        // Check if platform authenticator is available (e.g., Face ID, Touch ID)
+        navigator.credentials.get({
+            publicKey: {
+                challenge: Uint8Array.from('random_challenge_string', c => c.charCodeAt(0)),
+                rpId: window.location.hostname, // Replace with your actual domain
+                userVerification: 'preferred',
+                timeout: 60000,
+                allowCredentials: [] // Empty to trigger registration/discovery
+            }
+        })
+        .then(credential => {
+            if (credential) {
+                // In a real app, send credential to server for verification
+                alert('Biometric login successful! (Demo)');
+                setAuthenticated(true);
+                checkAuthentication();
+            } else {
+                alert('Biometric login failed: No credential found or user cancelled.');
+            }
+        })
+        .catch(error => {
+            console.error('Biometric login error:', error);
+            if (error.name === 'NotAllowedError') {
+                alert('Biometric authentication not allowed. Please grant permission or use password/PIN.');
+            } else if (error.name === 'AbortError') {
+                alert('Biometric login cancelled by user.');
+            } else if (error.name === 'SecurityError') {
+                alert('Biometric authentication not supported in this context (e.g., HTTP vs HTTPS).');
+            } else {
+                alert('Biometric login failed: ' + error.message);
+            }
+        });
+    } else {
+        alert('Biometric login not supported on this device or browser.');
+    }
+}
+
+// --- Password Reset Functions ---
+function showPasswordReset() {
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('pinForm').style.display = 'none';
+    document.getElementById('resetForm').style.display = 'block';
+}
+
+function sendPasswordReset() {
+    const resetEmail = document.getElementById('resetEmail').value;
+    if (resetEmail) {
+        alert(`Password reset link sent to ${resetEmail}! (Demo)`);
+        showLoginForm();
+    } else {
+        alert('Please enter your email address.');
+    }
+}
+
+// --- UI Navigation Functions ---
+function showLoginForm() {
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('pinForm').style.display = 'none';
+    document.getElementById('resetForm').style.display = 'none';
+}
+
+function togglePassword() {
+    const passwordInput = document.getElementById('loginPassword');
+    const toggleButton = document.querySelector('.password-toggle');
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleButton.textContent = '🙈';
+    } else {
+        passwordInput.type = 'password';
+        toggleButton.textContent = '👁️';
+    }
+}
+
+function showLoginOverlay() {
+    document.getElementById('loginOverlay').style.display = 'flex';
+    document.getElementById('mainApp').style.display = 'none';
+    document.getElementById('sessionInfo').style.display = 'none'; // Ensure it's hidden
+    showLoginForm(); // Always show the main login form when re-displaying overlay
+}
