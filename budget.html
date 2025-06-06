@@ -1,25 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#317EFB"/>
-    <meta name="description" content="A simple personal finance tracker."/>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#8b5cf6">
+    <meta name="description" content="Track your budget and spending patterns">
+    
+    <!-- PWA Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="FinanceOS">
     <meta name="mobile-web-app-capable" content="yes">
-
-    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
-    <link rel="manifest" href="/manifest.json">
-
+    
+    <!-- Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+    <link rel="manifest" href="manifest.json">
+    
     <title>Budget - FinanceOS</title>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
-
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    
     <style>
         /* Reset and Base Styles */
         * {
@@ -29,147 +32,131 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
             background-attachment: fixed;
             color: white;
             min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* CSS Variables for Design System */
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-premium-bg: linear-gradient(135deg, 
+                rgba(139, 92, 246, 0.15) 0%, 
+                rgba(59, 130, 246, 0.15) 50%, 
+                rgba(147, 51, 234, 0.15) 100%);
+            --glass-premium-border: rgba(255, 255, 255, 0.2);
+            --gradient-purple: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
+            --gradient-blue: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+            --gradient-green: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+            --gradient-red: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+            --text-white: rgba(255, 255, 255, 0.9);
+            --text-gray: rgba(255, 255, 255, 0.7);
+            --text-light: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Glass Effects */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .glass-premium {
+            background: var(--glass-premium-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-premium-border);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Navigation Bar - BIGGER UNIFIED STYLE */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 20px 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            padding: 20px;
+            justify-content: space-between;
+            padding: 0 24px;
         }
 
-        .container {
-            width: 100%;
-            max-width: 600px;
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            margin-bottom: 20px;
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            font-weight: 700;
         }
 
-        .header {
-            font-size: 2.5em;
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            margin-right: 12px;
+            border-radius: 12px;
+            background: var(--gradient-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
             font-weight: bold;
-            color: #4CAF50; /* A vibrant green for the app title */
-            margin-bottom: 20px;
-            text-align: center;
-            text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
         }
 
-        .alert-box {
-            background-color: rgba(255, 0, 0, 0.2);
-            border: 1px solid red;
-            color: #ffcccc;
-            padding: 15px;
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-gray);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            padding: 12px 20px;
             border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
-        .alert-box strong {
-            color: red;
+        .nav-links a:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
         }
 
-        h2 {
-            font-size: 1.8em;
-            color: #add8e6; /* Light blue for section titles */
-            margin-bottom: 15px;
-            text-align: center;
+        .nav-links a.active {
+            color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.1);
         }
 
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background: #8b5cf6;
+            border-radius: 50%;
         }
 
-        .summary-item {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-        }
-
-        .summary-item .label {
-            font-size: 0.9em;
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 5px;
-        }
-
-        .summary-item .value {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #fff;
-        }
-
-        .summary-item.income .value { color: #4CAF50; } /* Green */
-        .summary-item.expenses .value { color: #f44336; } /* Red */
-        .summary-item.cash-flow .value.positive { color: #8bc34a; } /* Light Green */
-        .summary-item.cash-flow .value.negative { color: #f44336; } /* Red */
-        .summary-item.adherence .value { color: #2196F3; } /* Blue */
-
-        .status-indicator {
-            padding: 10px;
-            background-color: rgba(0, 128, 0, 0.2);
-            border: 1px solid green;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            font-size: 0.9em;
-            text-align: center;
-            color: #aaffaa;
-        }
-
-        .status-indicator.error {
-            background-color: rgba(255, 0, 0, 0.2);
-            border-color: red;
-            color: #ffaaaa;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        th {
-            background-color: rgba(255, 255, 255, 0.1);
-            font-weight: bold;
-            color: #add8e6;
-        }
-
-        tbody tr:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-
-        .actual-deficit {
-            color: #f44336; /* Red for deficits */
-            font-weight: bold;
-        }
-
-        .actual-surplus {
-            color: #4CAF50; /* Green for surplus */
-            font-weight: bold;
-        }
-
-        .category-name {
-            font-weight: bold;
-            color: #fff;
-        }
-
-        /* Navigation */
         .nav-actions {
             display: flex;
             align-items: center;
@@ -189,446 +176,921 @@
 
         .privacy-toggle:hover {
             background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.3);
         }
 
         .privacy-toggle.active {
-            background: rgba(247, 149, 51, 0.2); /* A warm orange for active/privacy */
-            border-color: rgba(247, 149, 51, 0.5);
-            color: #ff9800; /* Matching text color */
+            background: rgba(247, 147, 26, 0.2);
+            border-color: rgba(247, 147, 26, 0.3);
+            color: #f97316;
         }
 
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 20px;
-            vertical-align: middle;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
+        .logout-btn {
+            background: var(--gradient-red);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.875rem;
             cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            -webkit-transition: .4s;
-            transition: .4s;
-            border-radius: 20px;
+            transition: all 0.3s ease;
         }
 
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 2px;
-            bottom: 2px;
-            background-color: white;
-            -webkit-transition: .4s;
-            transition: .4s;
-            border-radius: 50%;
+        .logout-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
         }
 
-        input:checked + .slider {
-            background-color: #4CAF50; /* Green when checked */
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 8px;
         }
 
-        input:focus + .slider {
-            box-shadow: 0 0 1px #4CAF50;
+        /* Privacy Mode */
+        .privacy-mode .privacy-sensitive {
+            filter: blur(4px);
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
 
-        input:checked + .slider:before {
-            -webkit-transform: translateX(20px);
-            -ms-transform: translateX(20px);
-            transform: translateX(20px);
+        .privacy-mode .privacy-sensitive:hover {
+            filter: blur(0);
         }
 
-        /* Rounded sliders */
-        .slider.round {
-            border-radius: 20px;
+        /* Main Content */
+        .main-content {
+            margin-top: 100px;
+            padding: 24px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .slider.round:before {
-            border-radius: 50%;
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 32px;
         }
 
-        /* Chart styles */
-        .chart-container {
-            width: 100%;
-            max-width: 500px;
-            height: auto;
-            margin: 20px auto;
-            background-color: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            color: var(--text-gray);
+            font-size: 1.125rem;
+        }
+
+        /* Critical Alert */
+        .critical-alert {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.2) 100%);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            border-radius: 16px;
             padding: 20px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            margin-bottom: 32px;
+            animation: pulse 2s infinite;
         }
 
-        canvas {
-            background-color: transparent !important;
+        .critical-alert h3 {
+            color: #ef4444;
+            font-size: 1.125rem;
+            margin-bottom: 8px;
+        }
+
+        .critical-alert p {
+            color: var(--text-gray);
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .critical-alert .alert-action {
+            background: var(--gradient-red);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* Budget Summary Cards */
+        .budget-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .summary-card {
+            background: var(--glass-premium-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-premium-border);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 48px rgba(139, 92, 246, 0.3);
+        }
+
+        .summary-card h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-gray);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-card .amount {
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .summary-card .change {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .positive { color: #10b981; }
+        .negative { color: #ef4444; }
+        .neutral { color: var(--text-gray); }
+
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .chart-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 24px;
+        }
+
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Budget Table */
+        .budget-table-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 32px;
+            overflow-x: auto;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .table-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .budget-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        .budget-table th,
+        .budget-table td {
+            text-align: left;
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .budget-table th {
+            font-weight: 600;
+            color: var(--text-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.75rem;
+        }
+
+        .budget-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .category-header {
+            background: rgba(255, 255, 255, 0.05);
+            font-weight: 600;
+        }
+
+        .category-main {
+            font-weight: 600;
+            color: white;
+            padding-left: 8px;
+        }
+
+        .category-sub {
+            padding-left: 32px;
+            color: var(--text-gray);
+        }
+
+        .amount {
+            font-weight: 600;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+        }
+
+        .variance-positive {
+            color: #10b981;
+        }
+
+        .variance-negative {
+            color: #ef4444;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-on-track {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .status-over {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .status-under {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .status-critical {
+            background: rgba(239, 68, 68, 0.3);
+            color: #ff6b6b;
+            animation: pulse 2s infinite;
+        }
+
+        /* AI Insights */
+        .ai-insights {
+            background: var(--glass-premium-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-premium-border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+
+        .insights-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .insights-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-purple);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .insight-section {
+            margin-bottom: 20px;
+            padding: 16px;
+            border-radius: 12px;
+        }
+
+        .insight-section.critical {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444;
+        }
+
+        .insight-section.warning {
+            background: rgba(247, 147, 26, 0.1);
+            border-left: 4px solid #f97316;
+        }
+
+        .insight-section.positive {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid #10b981;
+        }
+
+        .insight-section h4 {
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .insight-section ul {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .main-content {
+                padding: 16px;
+                margin-top: 88px;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .budget-summary {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 16px;
+            }
+
+            .charts-section {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .chart-container {
+                height: 250px;
+            }
+
+            .budget-table-container {
+                padding: 16px;
+            }
+
+            .budget-table {
+                font-size: 0.75rem;
+            }
+
+            .budget-table th,
+            .budget-table td {
+                padding: 8px 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-container {
+                padding: 0 16px;
+            }
+
+            .logo-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+
+            .page-title {
+                font-size: 1.75rem;
+            }
+
+            .summary-card .amount {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Utilities */
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .font-mono { font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace; }
+        .hidden { display: none; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
         }
     </style>
 </head>
 <body>
-
-    <div class="header">
-        FinanceOS
-    </div>
-
-    <div class="container">
-        <div id="sync-status-container" class="status-indicator" style="display:none;"></div>
-        <div id="budget-deficit-alert" class="alert-box" style="display:none;"></div>
-
-        <h2>Monthly Budget</h2>
-        <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 20px;">Track your income and expenses with intelligent insights</p>
-
-        <div class="summary-grid">
-            <div class="summary-item income">
-                <div class="label">MONTHLY INCOME</div>
-                <div class="value" id="monthly-income-value">$0</div>
-                <div class="sub-label" id="monthly-income-source" style="font-size: 0.8em; color: rgba(255,255,255,0.5);"></div>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <div class="logo-icon">$</div>
+                <span>FinanceOS</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="index.html">Dashboard</a>
+                <a href="budget.html" class="active">Budget</a>
+                <a href="goals.html">Goals</a>
+                <a href="csv-upload.html">Upload</a>
             </div>
-            <div class="summary-item expenses">
-                <div class="label">TOTAL EXPENSES</div>
-                <div class="value" id="total-expenses-value">$0</div>
-                <div class="sub-label" id="total-expenses-percentage" style="font-size: 0.8em; color: rgba(255,255,255,0.5);"></div>
+            
+            <div class="nav-actions">
+                <button class="privacy-toggle" id="privacyToggle">👁️ Privacy</button>
+                <button class="mobile-menu-btn">☰</button>
             </div>
-            <div class="summary-item cash-flow">
-                <div class="label">NET CASH FLOW</div>
-                <div class="value" id="net-cash-flow-value">$0</div>
-                <div class="sub-label" id="net-cash-flow-status" style="font-size: 0.8em; color: rgba(255,255,255,0.5);"></div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Monthly Budget</h1>
+            <p class="page-subtitle">December 2024 • Track spending vs budget</p>
+        </div>
+
+        <!-- Critical Budget Alert -->
+        <div class="critical-alert">
+            <h3>🚨 Critical Budget Deficit</h3>
+            <p>You're spending $3,607 more than you earn each month. This is unsustainable and requires immediate action.</p>
+            <button class="alert-action" onclick="openBudgetOptimizer()">Fix Budget</button>
+        </div>
+
+        <!-- Budget Summary Cards -->
+        <div class="budget-summary">
+            <div class="summary-card">
+                <h3>Monthly Income</h3>
+                <div class="amount positive privacy-sensitive">$6,304</div>
+                <div class="change neutral">Salary (after tax)</div>
             </div>
-            <div class="summary-item adherence">
-                <div class="label">BUDGET ADHERENCE</div>
-                <div class="value" id="budget-adherence-value">0%</div>
-                <div class="sub-label" id="budget-adherence-status" style="font-size: 0.8em; color: rgba(255,255,255,0.5);"></div>
+            <div class="summary-card">
+                <h3>Monthly Expenses</h3>
+                <div class="amount negative privacy-sensitive">$9,911</div>
+                <div class="change negative">157% of income</div>
+            </div>
+            <div class="summary-card">
+                <h3>Net Position</h3>
+                <div class="amount negative privacy-sensitive">-$3,607</div>
+                <div class="change negative">Critical deficit</div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="chart-card">
+                <h3 class="chart-title">Budget vs Actual Spending</h3>
+                <div class="chart-container">
+                    <canvas id="budgetChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h3 class="chart-title">Spending by Category</h3>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Budget Table -->
+        <div class="budget-table-container">
+            <div class="table-header">
+                <h3 class="table-title">Detailed Budget Breakdown</h3>
+            </div>
+            
+            <table class="budget-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Subcategory</th>
+                        <th>Budgeted</th>
+                        <th>Actual</th>
+                        <th>Difference</th>
+                        <th>Status</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Income Section -->
+                    <tr class="category-header">
+                        <td colspan="7"><strong>💰 Income</strong></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Salary</td>
+                        <td class="amount privacy-sensitive">$6,304</td>
+                        <td class="amount privacy-sensitive">$6,304</td>
+                        <td class="amount neutral">$0</td>
+                        <td><span class="status-badge status-on-track">On Track</span></td>
+                        <td>Pathway Engineer wages (after tax)</td>
+                    </tr>
+
+                    <!-- Housing Section -->
+                    <tr class="category-header">
+                        <td colspan="7"><strong>🏠 Housing</strong></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Mortgage 1</td>
+                        <td class="amount privacy-sensitive">$1,190</td>
+                        <td class="amount privacy-sensitive">$1,190</td>
+                        <td class="amount neutral">$0</td>
+                        <td><span class="status-badge status-on-track">Fixed</span></td>
+                        <td>4.99% interest</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Mortgage 2</td>
+                        <td class="amount privacy-sensitive">$880</td>
+                        <td class="amount privacy-sensitive">$880</td>
+                        <td class="amount neutral">$0</td>
+                        <td><span class="status-badge status-on-track">Fixed</span></td>
+                        <td>4.99% interest</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Rates</td>
+                        <td class="amount privacy-sensitive">$357</td>
+                        <td class="amount privacy-sensitive">$357</td>
+                        <td class="amount neutral">$0</td>
+                        <td><span class="status-badge status-on-track">Fixed</span></td>
+                        <td>Council rates</td>
+                    </tr>
+
+                    <!-- Food Section -->
+                    <tr class="category-header">
+                        <td colspan="7"><strong>🍽️ Food</strong></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Groceries</td>
+                        <td class="amount privacy-sensitive">$550</td>
+                        <td class="amount privacy-sensitive">$687</td>
+                        <td class="amount variance-negative privacy-sensitive">-$137</td>
+                        <td><span class="status-badge status-over">25% Over</span></td>
+                        <td>Higher than expected</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Dining Out/Takeaway</td>
+                        <td class="amount privacy-sensitive">$250</td>
+                        <td class="amount privacy-sensitive">$423</td>
+                        <td class="amount variance-negative privacy-sensitive">-$173</td>
+                        <td><span class="status-badge status-over">69% Over</span></td>
+                        <td>Cut back needed</td>
+                    </tr>
+
+                    <!-- Utilities Section -->
+                    <tr class="category-header">
+                        <td colspan="7"><strong>⚡ Utilities</strong></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Sky Network</td>
+                        <td class="amount privacy-sensitive">$163</td>
+                        <td class="amount privacy-sensitive">$163</td>
+                        <td class="amount neutral">$0</td>
+                        <td><span class="status-badge status-on-track">Fixed</span></td>
+                        <td>TV & broadband</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Mobile Phone</td>
+                        <td class="amount privacy-sensitive">$40</td>
+                        <td class="amount privacy-sensitive">$47</td>
+                        <td class="amount variance-negative privacy-sensitive">-$7</td>
+                        <td><span class="status-badge status-over">18% Over</span></td>
+                        <td>Data overage</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Internet/Streaming</td>
+                        <td class="amount privacy-sensitive">$10</td>
+                        <td class="amount privacy-sensitive">$8</td>
+                        <td class="amount variance-positive privacy-sensitive">+$2</td>
+                        <td><span class="status-badge status-under">Under</span></td>
+                        <td>Netflix only</td>
+                    </tr>
+
+                    <!-- Insurance Section -->
+                    <tr class="category-header">
+                        <td colspan="7"><strong>🛡️ Insurance</strong></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Vero Insurance</td>
+                        <td class="amount privacy-sensitive">$350</td>
+                        <td class="amount privacy-sensitive">$350</td>
+                        <td class="amount neutral">$0</td>
+                        <td><span class="status-badge status-on-track">Fixed</span></td>
+                        <td>Home & contents</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Partners Life</td>
+                        <td class="amount privacy-sensitive">$140</td>
+                        <td class="amount privacy-sensitive">$140</td>
+                        <td class="amount neutral">$0</td>
+                        <td><span class="status-badge status-on-track">Fixed</span></td>
+                        <td>Life insurance</td>
+                    </tr>
+
+                    <!-- Childcare Section -->
+                    <tr class="category-header">
+                        <td colspan="7"><strong>👶 Childcare</strong></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Grow Active Daycare</td>
+                        <td class="amount privacy-sensitive">$508</td>
+                        <td class="amount privacy-sensitive">$508</td>
+                        <td class="amount neutral">$0</td>
+                        <td><span class="status-badge status-on-track">Fixed</span></td>
+                        <td>Weekly childcare</td>
+                    </tr>
+
+                    <!-- Transportation Section -->
+                    <tr class="category-header">
+                        <td colspan="7"><strong>🚗 Transportation</strong></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Fuel</td>
+                        <td class="amount privacy-sensitive">$125</td>
+                        <td class="amount privacy-sensitive">$178</td>
+                        <td class="amount variance-negative privacy-sensitive">-$53</td>
+                        <td><span class="status-badge status-over">42% Over</span></td>
+                        <td>Higher fuel prices</td>
+                    </tr>
+
+                    <!-- Savings & Investments Section -->
+                    <tr class="category-header">
+                        <td colspan="7"><strong>📈 Savings & Investments</strong></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Sharesies</td>
+                        <td class="amount privacy-sensitive">$271</td>
+                        <td class="amount privacy-sensitive">$0</td>
+                        <td class="amount variance-negative privacy-sensitive">-$271</td>
+                        <td><span class="status-badge status-critical">No Allocation</span></td>
+                        <td>Paused due to deficit</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Emergency Fund</td>
+                        <td class="amount privacy-sensitive">$0</td>
+                        <td class="amount privacy-sensitive">$0</td>
+                        <td class="amount neutral">$0</td>
+                        <td><span class="status-badge status-critical">Critical</span></td>
+                        <td>Needs immediate funding</td>
+                    </tr>
+
+                    <!-- Education Section -->
+                    <tr class="category-header">
+                        <td colspan="7"><strong>🎓 Private School Fund</strong></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Education Savings</td>
+                        <td class="amount privacy-sensitive">$300</td>
+                        <td class="amount privacy-sensitive">$0</td>
+                        <td class="amount variance-negative privacy-sensitive">-$300</td>
+                        <td><span class="status-badge status-critical">No Allocation</span></td>
+                        <td>Deferred due to deficit</td>
+                    </tr>
+
+                    <!-- Discretionary Section -->
+                    <tr class="category-header">
+                        <td colspan="7"><strong>🛍️ Discretionary</strong></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Shopping/Retail</td>
+                        <td class="amount privacy-sensitive">$150</td>
+                        <td class="amount privacy-sensitive">$267</td>
+                        <td class="amount variance-negative privacy-sensitive">-$117</td>
+                        <td><span class="status-badge status-over">78% Over</span></td>
+                        <td>Reduce non-essentials</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Entertainment</td>
+                        <td class="amount privacy-sensitive">$50</td>
+                        <td class="amount privacy-sensitive">$93</td>
+                        <td class="amount variance-negative privacy-sensitive">-$43</td>
+                        <td><span class="status-badge status-over">86% Over</span></td>
+                        <td>Movie nights & activities</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Travel Fund</td>
+                        <td class="amount privacy-sensitive">$100</td>
+                        <td class="amount privacy-sensitive">$0</td>
+                        <td class="amount variance-negative privacy-sensitive">-$100</td>
+                        <td><span class="status-badge status-critical">No Allocation</span></td>
+                        <td>Deferred</td>
+                    </tr>
+
+                    <!-- Totals Section -->
+                    <tr class="category-header" style="border-top: 2px solid rgba(255,255,255,0.2);">
+                        <td colspan="2"><strong>Total Income</strong></td>
+                        <td class="amount privacy-sensitive"><strong>$6,304</strong></td>
+                        <td class="amount privacy-sensitive"><strong>$6,304</strong></td>
+                        <td class="amount neutral"><strong>$0</strong></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="category-header">
+                        <td colspan="2"><strong>Total Expenses</strong></td>
+                        <td class="amount privacy-sensitive"><strong>$9,911</strong></td>
+                        <td class="amount privacy-sensitive"><strong>$10,254</strong></td>
+                        <td class="amount variance-negative privacy-sensitive"><strong>-$343</strong></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="category-header" style="background: rgba(239, 68, 68, 0.1);">
+                        <td colspan="2"><strong>Net Income</strong></td>
+                        <td class="amount privacy-sensitive"><strong>-$3,607</strong></td>
+                        <td class="amount privacy-sensitive"><strong>-$3,950</strong></td>
+                        <td class="amount variance-negative privacy-sensitive"><strong>-$343</strong></td>
+                        <td><span class="status-badge status-critical">CRITICAL</span></td>
+                        <td><strong>Unsustainable</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- AI Budget Insights -->
+        <div class="ai-insights">
+            <div class="insights-header">
+                <div class="insights-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"/>
+                        <path d="M12 1v6M12 17v6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6M17 12h6M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24"/>
+                    </svg>
+                </div>
+                <h3>AI Budget Analysis</h3>
+            </div>
+            
+            <div class="insight-section critical">
+                <h4>🚨 Critical Issues</h4>
+                <ul>
+                    <li><strong>Dining Out:</strong> 69% over budget ($173 excess) - biggest opportunity to cut</li>
+                    <li><strong>Groceries:</strong> 25% over budget ($137 excess) - meal planning needed</li>
+                    <li><strong>Fuel:</strong> 42% over budget ($53 excess) - consider carpooling or public transport</li>
+                    <li><strong>No Emergency Fund:</strong> Critical financial risk - start with $50/week minimum</li>
+                </ul>
+            </div>
+
+            <div class="insight-section warning">
+                <h4>💡 AI Recommendations</h4>
+                <ul>
+                    <li><strong>Cut Dining Out by 50%:</strong> Set weekly limit of $60 (saves $211/month)</li>
+                    <li><strong>Grocery Meal Planning:</strong> Plan meals, use shopping lists (saves $137/month)</li>
+                    <li><strong>Reduce Entertainment:</strong> Free activities, library events (saves $43/month)</li>
+                    <li><strong>Emergency Fund Start:</strong> Begin with $25/week automatic transfer</li>
+                </ul>
+            </div>
+
+            <div class="insight-section positive">
+                <h4>🎯 Budget Optimization Plan</h4>
+                <p><strong>Week 1:</strong> Implement dining out limit ($60/week) - Save $50/week</p>
+                <p><strong>Week 2:</strong> Start meal planning & shopping lists - Save $35/week</p>
+                <p><strong>Week 3:</strong> Find free/low-cost entertainment - Save $10/week</p>
+                <p><strong>Month 1:</strong> Start emergency fund with savings - $95/week to emergency fund</p>
             </div>
         </div>
     </div>
 
-    <div class="container">
-        <h2>Budget Categories</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Category</th>
-                    <th>Budgeted</th>
-                    <th>Actual</th>
-                    <th>Difference</th>
-                </tr>
-            </thead>
-            <tbody id="budget-table-body">
-                </tbody>
-        </table>
-    </div>
-
-    <div class="chart-container">
-        <h2>Expense Breakdown</h2>
-        <canvas id="expense-chart"></canvas>
-    </div>
-
     <script>
-        // Budget calculations and display
-        const loadBudgetActuals = () => { // Get uploaded transaction data
-            const transactions = JSON.parse(localStorage.getItem('financeos_transactions') || '[]');
-            const categoryActuals = {};
-
-            // Calculate actual spending by category from uploaded transactions
-            transactions.forEach(transaction => {
-                if (transaction.amount < 0) { // Only expenses
-                    const amount = Math.abs(parseFloat(transaction.amount)); // Ensure amount is positive
-                    const category = mapToBudgetCategory(transaction.category);
-                    categoryActuals[category] = (categoryActuals[category] || 0) + amount;
-                }
-            });
-            return categoryActuals;
-        };
-
-        // Function to map transaction categories to your budget categories
-        const mapToBudgetCategory = (transactionCategory) => {
-            const categoryMapping = {
-                'Groceries': 'Groceries',
-                'Dining Out': 'Dining Out/Takeaway',
-                'Fuel': 'Fuel',
-                'Utilities': 'Utilities',
-                'Sky': 'Entertainment',
-                'Entertainment': 'Entertainment',
-                'Shopping/Retail': 'Shopping/Retail',
-                'Childcare': 'Childcare',
-                'Grow Active Daycare': 'Childcare', // Specific mapping example
-                'Travel': 'Travel',
-                'Travel Fund': 'Travel',
-                'Income': 'Income', // Map income for display consistency
-                'Investment': 'Investment',
-                'Rent': 'Housing',
-                'Mortgage': 'Housing',
-                'Insurance': 'Insurance',
-                'Medical': 'Healthcare',
-                'Education': 'Education',
-                'Transportation': 'Transportation',
-                'Savings': 'Savings',
-                'Other': 'Other'
-            };
-            return categoryMapping[transactionCategory] || 'Other'; // Default to 'Other' if not mapped
-        };
-
-        const updateBudgetTable = () => {
-            const budgetActuals = loadBudgetActuals();
-            const lastUpdate = localStorage.getItem('financeos_last_update');
-            const budgetTableBody = document.getElementById('budget-table-body');
-            budgetTableBody.innerHTML = ''; // Clear existing rows
-
-            let totalBudgeted = 0;
-            let totalActual = 0;
-            let totalIncome = 0; // Initialize total income
-
-            const budgetData = JSON.parse(localStorage.getItem('financeos_budget') || '[]');
-
-            // Separate income and expense categories
-            const incomeCategories = budgetData.filter(row => row.category === 'Income');
-            const expenseCategories = budgetData.filter(row => row.category !== 'Income');
-
-            // Process Income first
-            incomeCategories.forEach(row => {
-                const categoryName = row.category;
-                const budgetedAmount = parseFloat(row.budgeted);
-                totalIncome += budgetedAmount; // Add to total income
-
-                const actualAmount = budgetActuals[categoryName] || 0; // Actual income may not be mapped by category
-                const difference = budgetedAmount - actualAmount;
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="category-name">${categoryName}</td>
-                    <td>$${budgetedAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                    <td>$${actualAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                    <td class="${difference >= 0 ? 'actual-surplus' : 'actual-deficit'}">$${difference.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                `;
-                budgetTableBody.appendChild(tr);
-            });
-
-
-            // Process Expense Categories
-            expenseCategories.forEach(row => {
-                const categoryName = row.category;
-                const budgetedAmount = parseFloat(row.budgeted);
-                const actualAmount = budgetActuals[categoryName] || 0;
-                const difference = budgetedAmount - actualAmount;
-
-                totalBudgeted += budgetedAmount; // Sum of budgeted expenses
-                totalActual += actualAmount; // Sum of actual expenses
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="category-name">${categoryName}</td>
-                    <td>$${budgetedAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                    <td>$${actualAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                    <td class="${difference >= 0 ? 'actual-surplus' : 'actual-deficit'}">$${difference.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                `;
-                budgetTableBody.appendChild(tr);
-            });
-
-            // Update summary values
-            const monthlyIncomeValue = document.getElementById('monthly-income-value');
-            const totalExpensesValue = document.getElementById('total-expenses-value');
-            const netCashFlowValue = document.getElementById('net-cash-flow-value');
-            const netCashFlowStatus = document.getElementById('net-cash-flow-status');
-            const budgetAdherenceValue = document.getElementById('budget-adherence-value');
-            const budgetAdherenceStatus = document.getElementById('budget-adherence-status');
-            const budgetDeficitAlert = document.getElementById('budget-deficit-alert');
-            const emergencyFund = parseFloat(localStorage.getItem('emergency_fund') || '0');
-
-            monthlyIncomeValue.textContent = `$${totalIncome.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            totalExpensesValue.textContent = `$${totalActual.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
-            const netCashFlow = totalIncome - totalActual;
-            netCashFlowValue.textContent = `$${netCashFlow.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            netCashFlowValue.className = `value ${netCashFlow >= 0 ? 'positive' : 'negative'}`;
-            netCashFlowStatus.textContent = netCashFlow >= 0 ? 'Healthy' : 'Critical Deficit';
-
-            // Budget Adherence calculation
-            let adherencePercentage = 0;
-            if (totalBudgeted > 0) {
-                adherencePercentage = ((totalBudgeted - (totalActual - totalBudgeted)) / totalBudgeted) * 100;
-                // Correct calculation: (totalActual / totalBudgeted) * 100
-                adherencePercentage = (totalActual <= totalBudgeted) ? ((totalActual / totalBudgeted) * 100) : (totalActual / totalBudgeted) * 100;
-                adherencePercentage = Math.round(adherencePercentage); // Round for display
-            } else if (totalActual > 0) {
-                adherencePercentage = 200; // If budgeted 0 but actual > 0, show high adherence
+        // Privacy Mode Toggle
+        document.getElementById('privacyToggle').addEventListener('click', function() {
+            document.body.classList.toggle('privacy-mode');
+            this.classList.toggle('active');
+            
+            if (this.classList.contains('active')) {
+                this.innerHTML = '🔒 Privacy ON';
             } else {
-                adherencePercentage = 0; // If both are 0
+                this.innerHTML = '👁️ Privacy OFF';
             }
-
-
-            // More accurate adherence percentage if totalBudgeted is non-zero
-            if (totalBudgeted > 0) {
-                adherencePercentage = Math.round((totalActual / totalBudgeted) * 100);
-            } else if (totalActual > 0) {
-                // If budgeted is 0 but expenses exist, adherence is very low
-                adherencePercentage = 1000; // A high number to indicate very poor adherence
-            } else {
-                adherencePercentage = 0; // No budget, no expenses
-            }
-
-
-            budgetAdherenceValue.textContent = `${adherencePercentage}%`;
-            if (adherencePercentage <= 100) {
-                budgetAdherenceStatus.textContent = 'On Track';
-                budgetAdherenceValue.style.color = '#2196F3'; // Blue
-            } else if (adherencePercentage > 100 && adherencePercentage <= 120) {
-                budgetAdherenceStatus.textContent = 'Needs Improvement';
-                budgetAdherenceValue.style.color = '#ff9800'; // Orange
-            } else {
-                budgetAdherenceStatus.textContent = 'High Overspend';
-                budgetAdherenceValue.style.color = '#f44336'; // Red
-            }
-
-            // Budget deficit alert logic
-            if (netCashFlow < 0) {
-                budgetDeficitAlert.style.display = 'block';
-                let alertMessage = `You're spending $${Math.abs(netCashFlow).toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} more than you earn monthly.`;
-                if (emergencyFund > 0) {
-                    const coveredAmount = Math.min(emergencyFund, Math.abs(netCashFlow));
-                    const remainingDeficit = Math.abs(netCashFlow) - coveredAmount;
-                    alertMessage += ` Your emergency fund of $${emergencyFund.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} can cover $${coveredAmount.toLocaleString('en-NZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} of this deficit.`;
-                    if (remainingDeficit > 0) {
-                        alertMessage += ` Immediate action required to reduce expenses and build emergency savings.`;
-                    } else {
-                        alertMessage += ` Your emergency fund can cover this deficit.`;
-                    }
-                } else {
-                    alertMessage += ` You have no emergency fund. Immediate action required to reduce expenses and build emergency savings.`;
-                }
-                budgetDeficitAlert.innerHTML = `<strong>Budget Deficit Alert</strong><br>${alertMessage}`;
-            } else {
-                budgetDeficitAlert.style.display = 'none';
-            }
-
-            // Update chart
-            updateExpenseChart(budgetActuals, budgetData);
-        };
-
-        let expenseChart;
-
-        const updateExpenseChart = (actuals, budgetData) => {
-            const ctx = document.getElementById('expense-chart').getContext('2d');
-            const expenseCategories = budgetData.filter(row => row.category !== 'Income');
-            const labels = expenseCategories.map(row => row.category);
-            const actualExpenses = labels.map(label => actuals[label] || 0);
-            const budgetedExpenses = labels.map(label => parseFloat(budgetData.find(d => d.category === label)?.budgeted) || 0);
-
-            if (expenseChart) {
-                expenseChart.destroy();
-            }
-
-            expenseChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Actual Expenses',
-                            data: actualExpenses,
-                            backgroundColor: 'rgba(244, 67, 54, 0.7)', // Red
-                            borderColor: 'rgba(244, 67, 54, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Budgeted Expenses',
-                            data: budgetedExpenses,
-                            backgroundColor: 'rgba(33, 150, 243, 0.7)', // Blue
-                            borderColor: 'rgba(33, 150, 243, 1)',
-                            borderWidth: 1
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                color: 'white'
-                            },
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                color: 'white'
-                            },
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: 'white'
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.parsed.y !== null) {
-                                        label += new Intl.NumberFormat('en-NZ', { style: 'currency', currency: 'NZD' }).format(context.parsed.y);
-                                    }
-                                    return label;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        };
-
-
-        // Function to update the sync status indicator
-        const addSyncStatusIndicator = () => {
-            const transactions = JSON.parse(localStorage.getItem('financeos_transactions') || '[]');
-            const lastUpdate = localStorage.getItem('financeos_last_update');
-            const statusContainer = document.getElementById('sync-status-container');
-            statusContainer.style.display = 'block'; // Ensure it's visible
-
-            if (transactions.length > 0 && lastUpdate) {
-                const updateTime = new Date(lastUpdate).toLocaleTimeString('en-NZ', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                const isRecent = (Date.now() - new Date(lastUpdate).getTime()) < (24 * 60 * 60 * 1000); // 24 hours
-                statusContainer.innerHTML = `Budget synced with ${transactions.length} transactions. (UpdateTime ${updateTime})`;
-                statusContainer.classList.remove('error');
-                statusContainer.classList.add('success'); // Assuming a 'success' class for green styling
-            } else {
-                statusContainer.innerHTML = 'No transaction data found. <small>Upload statements <a href="/upload.html" style="color: inherit; text-decoration: underline;">here</a>.</small>';
-                statusContainer.classList.remove('success');
-                statusContainer.classList.add('error'); // Assuming an 'error' class for red styling
-            }
-        };
-
-        // Initialize display on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            updateBudgetTable();
-            addSyncStatusIndicator();
         });
 
-    </script>
+        // Chart.js Configuration
+        Chart.defaults.color = 'rgba(255, 255, 255, 0.8)';
+        Chart.defaults.backgroundColor = 'rgba(255, 255, 255, 0.1)';
 
+        // Budget vs Actual Chart
+        const budgetCtx = document.getElementById('budgetChart').getContext('2d');
+        new Chart(budgetCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Housing', 'Food', 'Utilities', 'Insurance', 'Childcare', 'Transport', 'Discretionary'],
+                datasets: [{
+                    label: 'Budgeted',
+                    data: [2427, 800, 213, 490, 508, 125, 300],
+                    backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Actual',
+                    data: [2427, 1110, 218, 490, 508, 178, 360],
+                    backgroundColor: 'rgba(239, 68, 68, 0.6)',
+                    borderColor: 'rgba(239, 68, 68, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Category Spending Chart
+        const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+        new Chart(categoryCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Housing', 'Food', 'Childcare', 'Insurance', 'Utilities', 'Transport', 'Discretionary'],
+                datasets: [{
+                    data: [2427, 1110, 508, 490, 218, 178, 360],
+                    backgroundColor: [
+                        'rgba(139, 92, 246, 0.8)',
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(16, 185, 129, 0.8)',
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(245, 158, 11, 0.8)',
+                        'rgba(247, 147, 26, 0.8)',
+                        'rgba(236, 72, 153, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(139, 92, 246, 1)',
+                        'rgba(239, 68, 68, 1)',
+                        'rgba(16, 185, 129, 1)',
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(245, 158, 11, 1)',
+                        'rgba(247, 147, 26, 1)',
+                        'rgba(236, 72, 153, 1)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    }
+                }
+            }
+        });
+
+        function openBudgetOptimizer() {
+            alert('Budget Optimizer feature coming soon! This will help you create a personalized plan to eliminate your deficit.');
+        }
+    </script>
 </body>
 </html>
