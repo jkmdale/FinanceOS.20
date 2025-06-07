@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,9 +8,11 @@
     <meta name="theme-color" content="#8b5cf6">
     <link rel="stylesheet" href="styles.css">
     <style>
+        /* Your CSS styles go here (the ones you showed in the screenshot) */
+        /* Make sure these are up-to-date with previous suggestions */
+
         .session-info {
-            /* This section is hidden as per banking app style */
-            display: none !important; 
+            display: none !important; /* Hidden as per banking app style */
         }
         
         .logout-button {
@@ -50,40 +52,46 @@
             border-radius: 24px;
             padding: 60px 50px;
             text-align: center;
-            max-width: 800px; /* Increased max-width for larger feel */
+            max-width: 600px; /* Increased max-width for larger feel */
             width: 95%;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            min-height: 900px; /* Increased min-height for larger feel */
+            min-height: 700px; /* Increased min-height for larger feel */
             display: flex;
             flex-direction: column;
             justify-content: center;
             margin: 20px;
-            transform: scale(1.05); /* Slightly zoom in the whole container */
-            transform-origin: center;
+            /* No transform scale here for now, simplify */
         }
         
         .login-logo {
-            width: 220px; /* Slightly larger logo */
-            height: 220px; /* Slightly larger logo */
+            width: 90px; /* Slightly larger logo container */
+            height: 90px; /* Slightly larger logo container */
             background: linear-gradient(135deg, #8b5cf6, #3b82f6);
             border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 30px; /* Adjusted margin */
-            font-size: 50px; /* Slightly larger font */
-            color: white;
-            font-weight: bold;
+            /* Removed font-size and color here as it's an image container now */
+        }
+
+        .login-logo img,
+        .logo-icon img {
+            width: 70%; /* Adjust size of the image within the colored box */
+            height: 70%;
+            object-fit: contain; /* Ensures the image scales well */
         }
         
         h2 {
-            font-size: 50px !important; /* Larger heading */
+            font-size: 32px !important; /* Larger heading */
             margin-bottom: 16px !important; /* Adjusted margin */
+            color: white; /* Ensure text color is white for h2 */
         }
 
         p {
-            font-size: 50px !important; /* Larger paragraph text */
+            font-size: 18px !important; /* Larger paragraph text */
             margin-bottom: 50px !important; /* Adjusted margin */
+            color: rgba(255, 255, 255, 0.8); /* Ensure text color for p */
         }
 
         .login-input {
@@ -94,7 +102,7 @@
             border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 14px; /* Slightly larger border-radius */
             color: white;
-            font-size: 50px; /* Larger font */
+            font-size: 20px; /* Larger font */
             box-sizing: border-box;
         }
         
@@ -115,7 +123,7 @@
             color: white;
             border: none;
             border-radius: 14px; /* Slightly larger border-radius */
-            font-size: 50px; /* Larger font */
+            font-size: 20px; /* Larger font */
             font-weight: 600;
             cursor: pointer;
             margin-bottom: 25px; /* Adjusted margin */
@@ -127,7 +135,7 @@
             box-shadow: 0 10px 28px rgba(139, 92, 246, 0.5); /* Larger shadow */
         }
         
-        .login-button:enabled {
+        .login-button:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
@@ -140,7 +148,7 @@
             color: white;
             border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 14px; /* Slightly larger border-radius */
-            font-size: 50px; /* Larger font */
+            font-size: 20px; /* Larger font */
             cursor: pointer;
             margin-bottom: 25px; /* Adjusted margin */
             transition: all 0.3s ease;
@@ -153,7 +161,7 @@
         .forgot-password {
             color: #8b5cf6;
             text-decoration: none;
-            font-size: 50px; /* Slightly larger font */
+            font-size: 16px; /* Slightly larger font */
             transition: color 0.3s ease;
         }
         
@@ -170,7 +178,7 @@
             border: none;
             color: rgba(255, 255, 255, 0.6);
             cursor: pointer;
-            font-size: 50px; /* Larger icon */
+            font-size: 20px; /* Larger icon */
         }
         
         .password-field {
@@ -206,7 +214,7 @@
             border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 10px; /* Slightly larger border-radius */
             color: white;
-            font-size: 50px; /* Larger font */
+            font-size: 28px; /* Larger font */
             text-align: center;
             font-weight: bold;
         }
@@ -223,11 +231,13 @@
         <span>User: demo</span>
         <button class="logout-button" onclick="logout()">Logout</button>
     </div>
+
     <div class="login-overlay" id="loginOverlay">
-                    <div class="login-logo">
+        <div class="login-container">
+            <div class="login-logo">
                 <img src="icons/icon-192x192.png" alt="FinanceOS Logo">
             </div>
-            <h2 style="color: white; margin-bottom: 12px; font-size: 80px;">FinanceOS</h2>
+            <h2 style="color: white; margin-bottom: 12px; font-size: 28px;">FinanceOS</h2>
             <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 40px; font-size: 16px;">
                 Your Personal Finance Operating System
             </p>
@@ -256,7 +266,7 @@
                     <a href="#" onclick="showPasswordReset()" class="forgot-password">Forgot Password?</a>
                 </div>
                 
-                <div style="margin-top: 20px; font-size: 20px; color: rgba(255, 255, 255, 0.6);">
+                <div style="margin-top: 20px; font-size: 12px; color: rgba(255, 255, 255, 0.6);">
                     Demo: username=<strong>demo</strong>, password=<strong>demo123</strong>
                 </div>
             </div>
@@ -271,7 +281,7 @@
                 </div>
                 <button onclick="loginWithPin()" class="login-button">Login with PIN</button>
                 <button onclick="showLoginForm()" class="biometric-button">Back to Password</button>
-                <div style="margin-top: 15px; font-size: 50px; color: rgba(255, 255, 255, 0.6);">
+                <div style="margin-top: 15px; font-size: 12px; color: rgba(255, 255, 255, 0.6);">
                     Demo PIN: <strong>1234</strong>
                 </div>
             </div>
@@ -289,7 +299,9 @@
         <header class="header glass">
             <div class="header-content">
                 <div class="logo">
-                    <div class="logo-icon">$</div>
+                    <div class="logo-icon">
+                        <img src="icons/icon-192x192.png" alt="FinanceOS Logo">
+                    </div>
                     <span class="logo-text">FinanceOS</span>
                 </div>
                 
@@ -441,268 +453,6 @@
         </main>
     </div>
 
-    <script src="script.js"></script>
-</body>
-</html>
-
-Updated Code for script.js
-Here's the updated script.js with the banking-style session management. I've removed the visible session timer and implemented logic to check inactivity when the app gains focus or on page load.
-document.addEventListener('DOMContentLoaded', () => {
-    // Initial check for authentication on page load
-    checkAuthentication();
-
-    // Event listeners for activity to reset session
-    document.addEventListener('mousemove', resetActivityTimer);
-    document.addEventListener('keydown', resetActivityTimer);
-    document.addEventListener('click', resetActivityTimer);
-    document.addEventListener('scroll', resetActivityTimer);
-    document.addEventListener('touchstart', resetActivityTimer);
-
-    // Listen for when the window gains focus
-    window.addEventListener('focus', handleWindowFocus);
-});
-
-// --- Session Management (Banking App Style) ---
-const INACTIVITY_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes in milliseconds
-let lastActivityTime = Date.now();
-
-function resetActivityTimer() {
-    lastActivityTime = Date.now();
-    // console.log('Activity detected, timer reset.'); // For debugging
-}
-
-function isSessionTimedOut() {
-    return (Date.now() - lastActivityTime) > INACTIVITY_TIMEOUT_MS;
-}
-
-function handleWindowFocus() {
-    // console.log('Window gained focus, checking session...'); // For debugging
-    if (isAuthenticated()) {
-        if (isSessionTimedOut()) {
-            console.warn('Session timed out due to inactivity.');
-            logout(); // Log out if timed out
-            alert('Your session has expired due to inactivity. Please log in again.');
-        } else {
-            console.log('Session still active.');
-            // Session is active, no need to do anything, user can continue
-        }
-    } else {
-        // If not authenticated (e.g., after a logout), ensure login overlay is shown
-        showLoginOverlay();
-    }
-}
-
-// --- Authentication Functions ---
-function isAuthenticated() {
-    return localStorage.getItem('isAuthenticated') === 'true';
-}
-
-function setAuthenticated(status) {
-    localStorage.setItem('isAuthenticated', status);
-    if (status) {
-        localStorage.setItem('lastActivityTime', Date.now()); // Record login time as activity
-        // If the user is authenticated, ensure the lastActivityTime is consistent
-        // with the current time upon successful authentication.
-        resetActivityTimer(); 
-    } else {
-        localStorage.removeItem('lastActivityTime');
-    }
-}
-
-function checkAuthentication() {
-    const loginOverlay = document.getElementById('loginOverlay');
-    const mainApp = document.getElementById('mainApp');
-    const sessionInfo = document.getElementById('sessionInfo'); // This will remain hidden
-
-    if (isAuthenticated()) {
-        // If already authenticated, check if session has timed out since last interaction (or last page load)
-        if (isSessionTimedOut()) {
-            console.warn('Session timed out on load due to inactivity.');
-            setAuthenticated(false); // Clear authentication
-            loginOverlay.style.display = 'flex';
-            mainApp.style.display = 'none';
-            alert('Your session has expired due to inactivity. Please log in again.');
-        } else {
-            // Session is still active
-            loginOverlay.style.display = 'none';
-            mainApp.style.display = 'block';
-            sessionInfo.style.display = 'none'; // Ensure it's hidden
-            resetActivityTimer(); // Reset on successful check
-        }
-    } else {
-        loginOverlay.style.display = 'flex';
-        mainApp.style.display = 'none';
-        sessionInfo.style.display = 'none'; // Ensure it's hidden
-    }
-}
-
-function login() {
-    const usernameInput = document.getElementById('loginUsername');
-    const passwordInput = document.getElementById('loginPassword');
-    const loginButton = document.getElementById('loginButton');
-    const loginButtonText = document.getElementById('loginButtonText');
-
-    loginButton.disabled = true;
-    loginButtonText.innerHTML = '<span class="loading-spinner"></span> Logging in...';
-
-    // Simulate API call
-    setTimeout(() => {
-        const username = usernameInput.value;
-        const password = passwordInput.value;
-
-        if (username === 'demo' && password === 'demo123') {
-            setAuthenticated(true);
-            checkAuthentication();
-            alert('Login successful!');
-        } else {
-            alert('Invalid username or password.');
-            setAuthenticated(false);
-        }
-        loginButton.disabled = false;
-        loginButtonText.textContent = 'Login';
-    }, 1500);
-}
-
-function logout() {
-    setAuthenticated(false);
-    checkAuthentication();
-    alert('You have been logged out.');
-}
-
-// --- PIN Login Functions ---
-function showPinLogin() {
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('pinForm').style.display = 'block';
-    document.getElementById('pin1').focus();
-}
-
-function movePinFocus(currentPinIndex) {
-    const currentInput = document.getElementById(`pin${currentPinIndex}`);
-    if (currentInput.value.length === currentInput.maxLength) {
-        const nextPinIndex = currentPinIndex + 1;
-        if (nextPinIndex <= 4) {
-            document.getElementById(`pin${nextPinIndex}`).focus();
-        } else {
-            // All PIN digits entered, optionally trigger login
-            loginWithPin();
-        }
-    }
-}
-
-function handlePinBackspace(event, currentPinIndex) {
-    if (event.key === 'Backspace' && event.target.value === '') {
-        const prevPinIndex = currentPinIndex - 1;
-        if (prevPinIndex >= 1) {
-            document.getElementById(`pin${prevPinIndex}`).focus();
-        }
-    }
-}
-
-function loginWithPin() {
-    const pin1 = document.getElementById('pin1').value;
-    const pin2 = document.getElementById('pin2').value;
-    const pin3 = document.getElementById('pin3').value;
-    const pin4 = document.getElementById('pin4').value;
-    const enteredPin = `${pin1}${pin2}${pin3}${pin4}`;
-
-    if (enteredPin === '1234') { // Example PIN
-        setAuthenticated(true);
-        checkAuthentication();
-        alert('PIN Login successful!');
-    } else {
-        alert('Invalid PIN.');
-        setAuthenticated(false);
-        // Clear PIN fields
-        document.getElementById('pin1').value = '';
-        document.getElementById('pin2').value = '';
-        document.getElementById('pin3').value = '';
-        document.getElementById('pin4').value = '';
-        document.getElementById('pin1').focus();
-    }
-}
-
-// --- Biometric Login Functions ---
-function showBiometricLogin() {
-    if ('credentials' in navigator && 'get' in navigator.credentials) {
-        // Check if platform authenticator is available (e.g., Face ID, Touch ID)
-        navigator.credentials.get({
-            publicKey: {
-                challenge: Uint8Array.from('random_challenge_string', c => c.charCodeAt(0)),
-                rpId: window.location.hostname, // Replace with your actual domain
-                userVerification: 'preferred',
-                timeout: 60000,
-                allowCredentials: [] // Empty to trigger registration/discovery
-            }
-        })
-        .then(credential => {
-            if (credential) {
-                // In a real app, send credential to server for verification
-                alert('Biometric login successful! (Demo)');
-                setAuthenticated(true);
-                checkAuthentication();
-            } else {
-                alert('Biometric login failed: No credential found or user cancelled.');
-            }
-        })
-        .catch(error => {
-            console.error('Biometric login error:', error);
-            if (error.name === 'NotAllowedError') {
-                alert('Biometric authentication not allowed. Please grant permission or use password/PIN.');
-            } else if (error.name === 'AbortError') {
-                alert('Biometric login cancelled by user.');
-            } else if (error.name === 'SecurityError') {
-                alert('Biometric authentication not supported in this context (e.g., HTTP vs HTTPS).');
-            } else {
-                alert('Biometric login failed: ' + error.message);
-            }
-        });
-    } else {
-        alert('Biometric login not supported on this device or browser.');
-    }
-}
-
-// --- Password Reset Functions ---
-function showPasswordReset() {
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('pinForm').style.display = 'none';
-    document.getElementById('resetForm').style.display = 'block';
-}
-
-function sendPasswordReset() {
-    const resetEmail = document.getElementById('resetEmail').value;
-    if (resetEmail) {
-        alert(`Password reset link sent to ${resetEmail}! (Demo)`);
-        showLoginForm();
-    } else {
-        alert('Please enter your email address.');
-    }
-}
-
-// --- UI Navigation Functions ---
-function showLoginForm() {
-    document.getElementById('loginForm').style.display = 'block';
-    document.getElementById('pinForm').style.display = 'none';
-    document.getElementById('resetForm').style.display = 'none';
-}
-
-function togglePassword() {
-    const passwordInput = document.getElementById('loginPassword');
-    const toggleButton = document.querySelector('.password-toggle');
-    if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        toggleButton.textContent = '🙈';
-    } else {
-        passwordInput.type = 'password';
-        toggleButton.textContent = '👁️';
-    }
-}
-
-function showLoginOverlay() {
-    document.getElementById('loginOverlay').style.display = 'flex';
-    document.getElementById('mainApp').style.display = 'none';
-    document.getElementById('sessionInfo').style.display = 'none'; // Ensure it's hidden
-    showLoginForm(); // Always show the main login form when re-displaying overlay
-}
-<script src="data-manager.js"></script>
+    <script src="data-manager.js"></script>
 </body>
 </html>
