@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FinanceOS - Offline</title>
+    <meta name="theme-color" content="#8b5cf6">
+    <style>
+        /* CSS Variables for Premium Design System */
+        :root {
+            --primary-bg: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-premium: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 50%, rgba(147, 51, 234, 0.15) 100%);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-premium-border: rgba(255, 255, 255, 0.2);
+            --text-primary: rgba(255, 255, 255, 0.9);
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --gradient-purple: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
+            --gradient-blue: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+            --gradient-orange: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Glass Effects */
+        .glass-premium {
+            background: var(--glass-premium);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-premium-border);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .offline-container {
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            padding: 60px 40px;
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .offline-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        .offline-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .offline-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 24px;
+            background: var(--gradient-orange);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            animation: pulse 2s infinite;
+        }
+
+        .offline-title {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .offline-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            line-height: 1.5;
+        }
+
+        .offline-features {
+            margin-bottom: 32px;
+        }
+
+        .feature-list {
+            display: grid;
+            gap: 16px;
+            text-align: left;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-blue);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .feature-text {
+            flex: 1;
+        }
+
+        .feature-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 2px;
+        }
+
+        .feature-description {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .offline-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--gradient-purple);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.3);
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 24px;
+            padding: 8px 16px;
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 8px;
+            font-size: 12px;
+            color: #f59e0b;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #f59e0b;
+            border-radius: 50%;
+            animation: blink 2s infinite;
+        }
+
+        .connection-status {
+            margin-top: 16px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Animations */
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .offline-container {
+                padding: 40px 24px;
+                margin: 20px;
+            }
+
+            .offline-icon {
+                width: 100px;
+                height: 100px;
+                font-size: 50px;
+            }
+
+            .offline-title {
+                font-size: 28px;
+            }
+
+            .offline-subtitle {
+                font-size: 16px;
+            }
+
+            .offline-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Connection restored animation */
+        .connection-restored {
+            animation: connectionRestored 1s ease-out;
+        }
+
+        @keyframes connectionRestored {
+            0% {
+                background: rgba(16, 185, 129, 0.3);
+                transform: scale(1.02);
+            }
+            100% {
+                background: transparent;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container glass-premium">
+        <div class="offline-content">
+            <div class="offline-icon">🔌</div>
+            
+            <h1 class="offline-title">You're Offline</h1>
+            <p class="offline-subtitle">
+                No internet connection detected, but FinanceOS still works! 
+                Your financial data is available offline.
+            </p>
+
+            <div class="offline-features">
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <div class="feature-icon">📊</div>
+                        <div class="feature-text">
+                            <div class="feature-title">View Your Data</div>
+                            <div class="feature-description">Access saved accounts, goals, and transactions</div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">💾</div>
+                        <div class="feature-text">
+                            <div class="feature-title">Add Transactions</div>
+                            <div class="feature-description">New data will sync when you're back online</div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">🎯</div>
+                        <div class="feature-text">
+                            <div class="feature-title">Manage Goals</div>
+                            <div class="feature-description">Update progress and create new financial goals</div>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">📱</div>
+                        <div class="feature-text">
+                            <div class="feature-title">Full App Access</div>
+                            <div class="feature-description">All core features work without internet</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="offline-actions">
+                <button class="btn btn-primary" onclick="goToDashboard()">
+                    📱 Open FinanceOS
+                </button>
+                <button class="btn btn-secondary" onclick="checkConnection()">
+                    🔄 Retry Connection
+                </button>
+            </div>
+
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>Offline Mode Active</span>
+            </div>
+
+            <div class="connection-status" id="connectionStatus">
+                Checking connection status...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let connectionCheckInterval;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            updateConnectionStatus();
+            startConnectionMonitoring();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Listen for online/offline events
+            window.addEventListener('online', handleConnectionRestored);
+            window.addEventListener('offline', handleConnectionLost);
+            
+            // Listen for keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    goToDashboard();
+                } else if (e.key === 'r' || e.key === 'R') {
+                    checkConnection();
+                }
+            });
+        }
+
+        function goToDashboard() {
+            // Try to navigate to dashboard
+            try {
+                window.location.href = '/index.html';
+            } catch (error) {
+                console.log('Navigation failed:', error);
+                // If navigation fails, try to open cached version
+                if ('caches' in window) {
+                    caches.match('/index.html').then(response => {
+                        if (response) {
+                            window.location.href = '/index.html';
+                        }
+                    });
+                }
+            }
+        }
+
+        function checkConnection() {
+            const button = event.target;
+            const originalText = button.innerHTML;
+            
+            button.innerHTML = '<div style="width: 16px; height: 16px; border: 2px solid transparent; border-top: 2px solid currentColor; border-radius: 50%; animation: spin 1s linear infinite;"></div> Checking...';
+            button.disabled = true;
+            
+            // Simulate connection check
+            setTimeout(() => {
+                if (navigator.onLine) {
+                    handleConnectionRestored();
+                } else {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                    updateConnectionStatus();
+                }
+            }, 2000);
+        }
+
+        function updateConnectionStatus() {
+            const statusEl = document.getElementById('connectionStatus');
+            const now = new Date();
+            
+            if (navigator.onLine) {
+                statusEl.textContent = `Connected • Last checked: ${now.toLocaleTimeString()}`;
+                statusEl.style.color = 'var(--success)';
+            } else {
+                statusEl.textContent = `Offline • Last checked: ${now.toLocaleTimeString()}`;
+                statusEl.style.color = 'var(--text-muted)';
+            }
+        }
+
+        function startConnectionMonitoring() {
+            // Check connection every 30 seconds
+            connectionCheckInterval = setInterval(() => {
+                updateConnectionStatus();
+                
+                // If online, automatically redirect after showing success
+                if (navigator.onLine) {
+                    setTimeout(() => {
+                        handleConnectionRestored();
+                    }, 2000);
+                }
+            }, 30000);
+        }
+
+        function stopConnectionMonitoring() {
+            if (connectionCheckInterval) {
+                clearInterval(connectionCheckInterval);
+            }
+        }
+
+        function handleConnectionRestored() {
+            console.log('Connection restored');
+            
+            // Update UI to show connection restored
+            const container = document.querySelector('.offline-container');
+            container.classList.add('connection-restored');
+            
+            // Update status
+            const statusEl = document.getElementById('connectionStatus');
+            statusEl.textContent = 'Connection restored! Redirecting...';
+            statusEl.style.color = '#10b981';
+            
+            // Update status indicator
+            const statusIndicator = document.querySelector('.status-indicator');
+            statusIndicator.innerHTML = `
+                <div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%;"></div>
+                <span style="color: #10b981;">Back Online</span>
+            `;
+            
+            // Stop monitoring
+            stopConnectionMonitoring();
+            
+            // Redirect to dashboard after brief delay
+            setTimeout(() => {
+                goToDashboard();
+            }, 2000);
+        }
+
+        function handleConnectionLost() {
+            console.log('Connection lost');
+            updateConnectionStatus();
+            
+            // Restart monitoring if it was stopped
+            if (!connectionCheckInterval) {
+                startConnectionMonitoring();
+            }
+        }
+
+        // Add CSS animation for spinner
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Service worker communication
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'SYNC_COMPLETE') {
+                    console.log('Background sync completed');
+                    // Could show a notification here
+                }
+            });
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            stopConnectionMonitoring();
+        });
+    </script>
+</body>
+</html>
