@@ -2,269 +2,1179 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>FinanceOS - Upload CSV</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8b5cf6">
-    <link rel="stylesheet" href="styles.css">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
-        /* Specific styles for CSV Upload page */
-        .upload-container {
-            background: rgba(255, 255, 255, 0.1);
+        /* CSS Variables for Premium Design System */
+        :root {
+            --primary-bg: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-premium: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 50%, rgba(147, 51, 234, 0.15) 100%);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-premium-border: rgba(255, 255, 255, 0.2);
+            --text-primary: rgba(255, 255, 255, 0.9);
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --gradient-purple: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
+            --gradient-blue: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+            --gradient-green: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+            --gradient-red: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+            --gradient-orange: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%);
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Glass Effects */
+        .glass {
+            background: var(--glass-bg);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 24px;
-            padding: 40px;
-            margin: 80px auto; /* Adjust margin to center and give space from header */
-            max-width: 800px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            text-align: center;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
-        .upload-container h1 {
+        .glass-premium {
+            background: var(--glass-premium);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-premium-border);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Transitions */
+        .transition-all { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .hover-scale:hover { transform: scale(1.02); }
+
+        /* Header Styles (Same as index.html) */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 12px 20px;
+            border-radius: 0;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 700;
             color: white;
-            font-size: 2.5em;
-            margin-bottom: 20px;
         }
 
-        .upload-container p {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1.1em;
-            margin-bottom: 30px;
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-purple);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
         }
 
-        .upload-box {
-            border: 2px dashed rgba(255, 255, 255, 0.5);
-            border-radius: 15px;
-            padding: 50px 20px;
-            margin-bottom: 30px;
-            cursor: pointer;
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-button {
+            padding: 8px 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 16px;
             transition: all 0.3s ease;
-            position: relative; /* Needed for absolute positioning of file input */
-            overflow: hidden; /* Ensures file input doesn't visibly overflow */
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            position: relative;
         }
 
-        .upload-box:hover {
-            border-color: #8b5cf6;
-            background-color: rgba(139, 92, 246, 0.1);
+        .nav-button:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
         }
 
-        .upload-box.drag-over {
+        .nav-button.active {
+            color: white;
+            background: rgba(139, 92, 246, 0.3);
+        }
+
+        .nav-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background: #8b5cf6;
+            border-radius: 50%;
+        }
+
+        .privacy-toggle {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .logout-button {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        /* Upload Area */
+        .upload-container {
+            margin-bottom: 32px;
+        }
+
+        .upload-zone {
+            border: 2px dashed var(--glass-border);
+            border-radius: 20px;
+            padding: 60px 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-zone.dragover {
             border-color: #8b5cf6;
-            background-color: rgba(139, 92, 246, 0.2);
-            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.3);
+            background: rgba(139, 92, 246, 0.1);
+            transform: scale(1.02);
+        }
+
+        .upload-zone:hover {
+            border-color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.05);
         }
 
         .upload-icon {
-            font-size: 3em;
-            color: #8b5cf6;
-            margin-bottom: 15px;
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.8;
         }
 
-        .upload-box p {
+        .upload-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
             color: white;
-            font-size: 1.2em;
-            margin: 0;
-            line-height: 1.5;
         }
 
-        .upload-box p strong {
-            color: #a78bfa;
-        }
-
-        /* Hide the default file input but make it clickable */
-        .file-input {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0; /* Make it invisible */
-            cursor: pointer;
-            z-index: 10; /* Ensure it's above other elements in the box */
+        .upload-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
         }
 
         .upload-button {
-            background: linear-gradient(135deg, #8b5cf6, #9333ea);
+            background: var(--gradient-purple);
             color: white;
-            padding: 15px 30px;
             border: none;
+            padding: 12px 24px;
             border-radius: 12px;
-            font-size: 1.1em;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 20px;
         }
 
         .upload-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
         }
 
-        .upload-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
+        /* File List */
         .file-list {
-            list-style: none;
-            padding: 0;
-            margin-top: 20px;
-            text-align: left;
-            color: rgba(255, 255, 255, 0.9);
+            margin-top: 24px;
         }
 
-        .file-list li {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .file-item {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-green);
             border-radius: 8px;
-            padding: 10px 15px;
-            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .file-details h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .file-details p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .file-action {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-action.remove {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .file-action.process {
+            background: var(--gradient-blue);
+            color: white;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-top: 16px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-green);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Bank Format Guide */
+        .bank-guide {
+            margin-bottom: 32px;
+        }
+
+        .bank-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .bank-card {
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .bank-logo {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 12px;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #1e1b4b;
+        }
+
+        .bank-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .bank-format {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: monospace;
+            line-height: 1.4;
+        }
+
+        /* Processing Results */
+        .results-container {
+            margin-top: 32px;
+        }
+
+        .result-card {
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .result-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .result-status {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .status-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        /* Transaction Preview */
+        .transaction-preview {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+        }
+
+        .transaction-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.95em;
         }
 
-        .file-name {
-            flex-grow: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        .transaction-item:last-child {
+            border-bottom: none;
         }
 
-        .remove-file {
-            background: none;
-            border: none;
-            color: #ef4444;
-            font-size: 1.2em;
-            cursor: pointer;
-            margin-left: 10px;
-            transition: color 0.2s ease;
+        .transaction-details {
+            flex: 1;
         }
 
-        .remove-file:hover {
-            color: #f87171;
+        .transaction-description {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 2px;
         }
 
-        .processing-message {
-            color: #f59e0b;
-            margin-top: 20px;
-            font-size: 1.1em;
-            display: none; /* Hidden by default */
+        .transaction-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .transaction-amount {
+            font-size: 16px;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .amount-positive {
+            color: var(--success);
+        }
+
+        .amount-negative {
+            color: var(--error);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .nav {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .nav-button {
+                font-size: 14px;
+                padding: 6px 12px;
+            }
+
+            .upload-zone {
+                padding: 40px 20px;
+            }
+
+            .upload-icon {
+                font-size: 48px;
+            }
+
+            .upload-text {
+                font-size: 16px;
+            }
+
+            .bank-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .file-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .file-actions {
+                justify-content: center;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #8b5cf6;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <div class="login-overlay" id="loginOverlay" style="display: none;">
-        <div class="login-container">
-            <div class="login-logo">$</div>
-            <h2 style="color: white; margin-bottom: 12px; font-size: 28px;">FinanceOS</h2>
-            <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 40px; font-size: 16px;">
-                Your Personal Finance Operating System
-            </p>
-            
-            <div id="loginForm">
-                <input type="text" id="loginUsername" class="login-input" placeholder="Username" autocomplete="username">
-                
-                <div class="password-field">
-                    <input type="password" id="loginPassword" class="login-input" placeholder="Password" autocomplete="current-password">
-                    <button type="button" class="password-toggle" onclick="togglePassword()">👁️</button>
+    <header class="header glass">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <span style="font-size: 24px; color: white;">$</span>
                 </div>
-                
-                <button onclick="login()" class="login-button" id="loginButton">
-                    <span id="loginButtonText">Login</span>
-                </button>
-                
-                <button onclick="showBiometricLogin()" class="biometric-button" id="biometricButton">
-                    🔐 Use Biometric Login
-                </button>
-                
-                <button onclick="showPinLogin()" class="biometric-button">
-                    🔢 Use PIN
-                </button>
-                
-                <div style="margin-top: 20px;">
-                    <a href="#" onclick="showPasswordReset()" class="forgot-password">Forgot Password?</a>
-                </div>
-                
-                <div style="margin-top: 20px; font-size: 12px; color: rgba(255, 255, 255, 0.6);">
-                    Demo: username=<strong>demo</strong>, password=<strong>demo123</strong>
-                </div>
+                <span class="logo-text">FinanceOS</span>
             </div>
             
-            <div id="pinForm" style="display: none;">
-                <h3 style="color: white; margin-bottom: 20px;">Enter PIN</h3>
-                <div class="pin-input">
-                    <input type="password" class="pin-digit" maxlength="1" id="pin1" oninput="movePinFocus(1)" onkeydown="handlePinBackspace(event, 1)">
-                    <input type="password" class="pin-digit" maxlength="1" id="pin2" oninput="movePinFocus(2)" onkeydown="handlePinBackspace(event, 2)">
-                    <input type="password" class="pin-digit" maxlength="1" id="pin3" oninput="movePinFocus(3)" onkeydown="handlePinBackspace(event, 3)">
-                    <input type="password" class="pin-digit" maxlength="1" id="pin4" oninput="movePinFocus(4)" onkeydown="handlePinBackspace(event, 4)">
-                </div>
-                <button onclick="loginWithPin()" class="login-button">Login with PIN</button>
-                <button onclick="showLoginForm()" class="biometric-button">Back to Password</button>
-                <div style="margin-top: 15px; font-size: 12px; color: rgba(255, 255, 255, 0.6);">
-                    Demo PIN: <strong>1234</strong>
-                </div>
-            </div>
-            
-            <div id="resetForm" style="display: none;">
-                <h3 style="color: white; margin-bottom: 20px;">Reset Password</h3>
-                <input type="email" class="login-input" placeholder="Email Address" id="resetEmail">
-                <button onclick="sendPasswordReset()" class="login-button">Send Reset Link</button>
-                <button onclick="showLoginForm()" class="biometric-button">Back to Login</button>
-            </div>
+            <nav class="nav">
+                <a href="index.html" class="nav-button">Dashboard</a>
+                <a href="csv-upload.html" class="nav-button active">Upload CSV</a>
+                <a href="goals.html" class="nav-button">Goals</a>
+                <a href="budget.html" class="nav-button">Budget</a>
+                <button class="privacy-toggle nav-button" id="privacyToggle">🔒 Privacy</button>
+                <button class="logout-button nav-button" onclick="logout()">🚪 Logout</button>
+            </nav>
         </div>
-    </div>
+    </header>
 
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Upload Bank Statements</h1>
+            <p class="page-subtitle">Import your CSV files to automatically categorize transactions and update your budget</p>
+        </div>
 
-    <div id="mainApp" style="display: none;">
-        <header class="header glass">
-            <div class="header-content">
-                <div class="logo">
-                    <div class="logo-icon">$</div>
-                    <span class="logo-text">FinanceOS</span>
+        <!-- Bank Format Guide -->
+        <section class="bank-guide">
+            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 16px; color: white;">Supported New Zealand Banks</h2>
+            <div class="bank-cards">
+                <div class="bank-card glass">
+                    <div class="bank-logo">ANZ</div>
+                    <div class="bank-name">ANZ Bank</div>
+                    <div class="bank-format">Date, Amount, Description, Balance</div>
                 </div>
                 
-                <nav class="nav">
-                    <a href="index.html" class="nav-button">Dashboard</a>
-                    <a href="csv-upload.html" class="nav-button active">Upload CSV</a>
-                    <a href="goals.html" class="nav-button">Goals</a>
-                    <button class="privacy-toggle" id="privacyToggle">🔒 Privacy Mode</button>
-                    <button class="nav-button" id="notificationSettings">🔔 Notifications</button>
-                    <button class="logout-button" onclick="logout()">🚪 Logout</button>
-                </nav>
-            </div>
-        </header>
-
-        <main class="main-content">
-            <div class="upload-container glass-premium">
-                <h1>Upload Your Bank Statements</h1>
-                <p>Securely upload your CSV bank statements to analyze your spending and income.</p>
-
-                <div class="upload-box" id="uploadBox">
-                    <span class="upload-icon">⬆️</span>
-                    <p>Drag & Drop your CSV files here, or <strong>Click to Browse</strong></p>
-                    <input type="file" id="csvFileInput" class="file-input" accept=".csv" multiple>
+                <div class="bank-card glass">
+                    <div class="bank-logo">ASB</div>
+                    <div class="bank-name">ASB Bank</div>
+                    <div class="bank-format">Date, Unique Id, Tran Type, Payee, Memo, Amount</div>
                 </div>
-
-                <ul class="file-list" id="fileList">
-                    </ul>
-
-                <p class="processing-message" id="processingMessage">
-                    Processing your files... Please wait.
-                </p>
-
-                <button class="upload-button" id="processCsvButton" disabled>
-                    Process Uploaded Files
-                </button>
+                
+                <div class="bank-card glass">
+                    <div class="bank-logo">BNZ</div>
+                    <div class="bank-name">Bank of New Zealand</div>
+                    <div class="bank-format">Date, Amount, Payee, Description, Reference</div>
+                </div>
+                
+                <div class="bank-card glass">
+                    <div class="bank-logo">KIWI</div>
+                    <div class="bank-name">Kiwibank</div>
+                    <div class="bank-format">Date, Memo/Description, Amount, Balance</div>
+                </div>
+                
+                <div class="bank-card glass">
+                    <div class="bank-logo">WBC</div>
+                    <div class="bank-name">Westpac</div>
+                    <div class="bank-format">Date, Amount, Other Party, Description, Balance</div>
+                </div>
+                
+                <div class="bank-card glass">
+                    <div class="bank-logo">TSB</div>
+                    <div class="bank-name">TSB Bank</div>
+                    <div class="bank-format">Date, Description, Amount, Balance</div>
+                </div>
             </div>
-        </main>
-    </div>
+        </section>
 
-    <script src="data-manager.js"></script>
-    </body>
+        <!-- Upload Area -->
+        <section class="upload-container">
+            <div class="upload-zone glass-premium" id="uploadZone">
+                <div class="upload-icon">📤</div>
+                <div class="upload-text">Drop your CSV files here</div>
+                <div class="upload-subtitle">or click to browse files</div>
+                <button class="upload-button" onclick="document.getElementById('fileInput').click()">
+                    Choose Files
+                </button>
+                <input type="file" id="fileInput" multiple accept=".csv,.xlsx,.xls,.qif,.ofx" style="display: none;">
+            </div>
+
+            <!-- File List -->
+            <div class="file-list" id="fileList"></div>
+        </section>
+
+        <!-- Processing Results -->
+        <section class="results-container" id="resultsContainer" style="display: none;">
+            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 16px; color: white;">Processing Results</h2>
+            <div id="resultsContent"></div>
+        </section>
+    </main>
+
+    <script>
+        // Application State
+        let uploadedFiles = [];
+        let processedData = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupUploadHandlers();
+            checkAuthState();
+        });
+
+        function checkAuthState() {
+            const authToken = localStorage.getItem('financeos_auth');
+            if (!authToken) {
+                window.location.href = 'index.html';
+                return;
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('financeos_auth');
+            window.location.href = 'index.html';
+        }
+
+        function setupUploadHandlers() {
+            const uploadZone = document.getElementById('uploadZone');
+            const fileInput = document.getElementById('fileInput');
+
+            // Drag and drop handlers
+            uploadZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadZone.classList.add('dragover');
+            });
+
+            uploadZone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                uploadZone.classList.remove('dragover');
+            });
+
+            uploadZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadZone.classList.remove('dragover');
+                const files = Array.from(e.dataTransfer.files);
+                handleFiles(files);
+            });
+
+            // File input handler
+            fileInput.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files);
+                handleFiles(files);
+            });
+
+            // Click handler for upload zone
+            uploadZone.addEventListener('click', () => {
+                fileInput.click();
+            });
+        }
+
+        function handleFiles(files) {
+            const validTypes = ['.csv', '.xlsx', '.xls', '.qif', '.ofx'];
+            const maxSize = 10 * 1024 * 1024; // 10MB
+
+            files.forEach(file => {
+                const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+                
+                if (!validTypes.includes(fileExtension)) {
+                    alert(`File type ${fileExtension} not supported. Please use CSV, Excel, QIF, or OFX files.`);
+                    return;
+                }
+
+                if (file.size > maxSize) {
+                    alert(`File ${file.name} is too large. Maximum size is 10MB.`);
+                    return;
+                }
+
+                // Check for duplicates
+                const isDuplicate = uploadedFiles.some(f => 
+                    f.name === file.name && f.size === file.size
+                );
+
+                if (isDuplicate) {
+                    alert(`File ${file.name} has already been uploaded.`);
+                    return;
+                }
+
+                uploadedFiles.push({
+                    file: file,
+                    id: Date.now() + Math.random(),
+                    name: file.name,
+                    size: file.size,
+                    type: fileExtension,
+                    status: 'pending',
+                    progress: 0
+                });
+            });
+
+            updateFileList();
+        }
+
+        function updateFileList() {
+            const fileList = document.getElementById('fileList');
+            
+            if (uploadedFiles.length === 0) {
+                fileList.innerHTML = '';
+                return;
+            }
+
+            fileList.innerHTML = uploadedFiles.map(fileData => `
+                <div class="file-item" id="file-${fileData.id}">
+                    <div class="file-info">
+                        <div class="file-icon">📄</div>
+                        <div class="file-details">
+                            <h4>${fileData.name}</h4>
+                            <p>${formatFileSize(fileData.size)} • ${fileData.type.toUpperCase()} • ${fileData.status}</p>
+                        </div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="file-action process" onclick="processFile('${fileData.id}')" 
+                                ${fileData.status !== 'pending' ? 'disabled' : ''}>
+                            ${fileData.status === 'processing' ? '<div class="spinner"></div>' : ''}
+                            Process
+                        </button>
+                        <button class="file-action remove" onclick="removeFile('${fileData.id}')"
+                                ${fileData.status === 'processing' ? 'disabled' : ''}>
+                            Remove
+                        </button>
+                    </div>
+                    ${fileData.status === 'processing' ? `
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${fileData.progress}%"></div>
+                            </div>
+                            <div class="progress-text">Processing... ${fileData.progress}%</div>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function removeFile(fileId) {
+            uploadedFiles = uploadedFiles.filter(f => f.id !== fileId);
+            updateFileList();
+        }
+
+        function processFile(fileId) {
+            const fileData = uploadedFiles.find(f => f.id === fileId);
+            if (!fileData) return;
+
+            fileData.status = 'processing';
+            fileData.progress = 0;
+            updateFileList();
+
+            // Simulate file processing
+            const progressInterval = setInterval(() => {
+                fileData.progress += Math.random() * 20;
+                if (fileData.progress >= 100) {
+                    fileData.progress = 100;
+                    fileData.status = 'completed';
+                    clearInterval(progressInterval);
+                    
+                    // Process the actual file
+                    processCSVFile(fileData);
+                }
+                updateFileList();
+            }, 300);
+        }
+
+        function processCSVFile(fileData) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const content = e.target.result;
+                
+                try {
+                    // Parse CSV content
+                    const transactions = parseCSVContent(content, fileData.type);
+                    
+                    // Categorize transactions
+                    const categorizedTransactions = categorizeTransactions(transactions);
+                    
+                    // Store processed data
+                    processedData.push({
+                        fileName: fileData.name,
+                        transactions: categorizedTransactions,
+                        summary: generateSummary(categorizedTransactions)
+                    });
+                    
+                    // Update localStorage for dashboard
+                    updateStoredData(categorizedTransactions);
+                    
+                    // Show results
+                    displayResults();
+                    
+                } catch (error) {
+                    console.error('Error processing file:', error);
+                    fileData.status = 'error';
+                    updateFileList();
+                }
+            };
+            
+            reader.readAsText(fileData.file);
+        }
+
+        function parseCSVContent(content, fileType) {
+            const lines = content.split('\n').filter(line => line.trim());
+            const transactions = [];
+            
+            // Skip header row
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i];
+                const columns = parseCSVLine(line);
+                
+                if (columns.length < 3) continue; // Skip invalid rows
+                
+                try {
+                    const transaction = parseTransactionByBankFormat(columns);
+                    if (transaction && transaction.amount !== 0) {
+                        transactions.push(transaction);
+                    }
+                } catch (error) {
+                    console.warn('Skipping invalid transaction row:', line);
+                }
+            }
+            
+            return transactions;
+        }
+
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            
+            result.push(current.trim());
+            return result;
+        }
+
+        function parseTransactionByBankFormat(columns) {
+            // Auto-detect bank format based on column patterns
+            let transaction = null;
+            
+            // Try ANZ format: Date, Amount, Description, Balance
+            if (columns.length >= 4 && isValidDate(columns[0]) && isValidAmount(columns[1])) {
+                transaction = {
+                    date: parseDate(columns[0]),
+                    description: columns[2] || 'Unknown',
+                    amount: parseFloat(columns[1].replace(/[,$]/g, '')),
+                    balance: parseFloat(columns[3].replace(/[,$]/g, '') || 0),
+                    bank: 'ANZ'
+                };
+            }
+            // Try ASB format: Date, Unique Id, Tran Type, Cheque Number, Payee, Memo, Amount
+            else if (columns.length >= 7 && isValidDate(columns[0]) && isValidAmount(columns[6])) {
+                transaction = {
+                    date: parseDate(columns[0]),
+                    description: `${columns[4]} - ${columns[5]}`.trim(),
+                    amount: parseFloat(columns[6].replace(/[,$]/g, '')),
+                    balance: 0,
+                    bank: 'ASB'
+                };
+            }
+            // Try BNZ format: Date, Amount, Payee, Description, Reference
+            else if (columns.length >= 5 && isValidDate(columns[0]) && isValidAmount(columns[1])) {
+                transaction = {
+                    date: parseDate(columns[0]),
+                    description: `${columns[2]} - ${columns[3]}`.trim(),
+                    amount: parseFloat(columns[1].replace(/[,$]/g, '')),
+                    balance: 0,
+                    bank: 'BNZ'
+                };
+            }
+            // Try Kiwibank format: Date, Memo/Description, Amount, Balance
+            else if (columns.length >= 4 && isValidDate(columns[0]) && isValidAmount(columns[2])) {
+                transaction = {
+                    date: parseDate(columns[0]),
+                    description: columns[1] || 'Unknown',
+                    amount: parseFloat(columns[2].replace(/[,$]/g, '')),
+                    balance: parseFloat(columns[3].replace(/[,$]/g, '') || 0),
+                    bank: 'Kiwibank'
+                };
+            }
+            
+            return transaction;
+        }
+
+        function isValidDate(dateStr) {
+            return !isNaN(Date.parse(dateStr));
+        }
+
+        function isValidAmount(amountStr) {
+            const cleaned = amountStr.replace(/[,$\s]/g, '');
+            return !isNaN(parseFloat(cleaned));
+        }
+
+        function parseDate(dateStr) {
+            return new Date(dateStr).toISOString().split('T')[0];
+        }
+
+        function categorizeTransactions(transactions) {
+            return transactions.map(transaction => {
+                const category = determineCategory(transaction.description);
+                return {
+                    ...transaction,
+                    category: category,
+                    id: Date.now() + Math.random()
+                };
+            });
+        }
+
+        function determineCategory(description) {
+            const desc = description.toLowerCase();
+            
+            // NZ-specific merchant patterns
+            const categories = {
+                'Groceries': ['countdown', 'new world', 'pak n save', 'four square', 'fresh choice', 'supervalue'],
+                'Fuel': ['bp', 'z energy', 'mobil', 'gull', 'caltex', 'shell'],
+                'Dining Out': ['mcdonald', 'kfc', 'burger king', 'subway', 'domino', 'pizza', 'cafe', 'restaurant'],
+                'Shopping': ['warehouse', 'kmart', 'farmers', 'briscoes', 'harvey norman', 'noel leeming'],
+                'Utilities': ['contact energy', 'genesis energy', 'mercury energy', 'trustpower', 'spark', 'vodafone'],
+                'Transport': ['uber', 'taxi', 'bus', 'train', 'at hop', 'parking'],
+                'Banking': ['fee', 'interest', 'ird', 'tax'],
+                'Entertainment': ['cinema', 'sky', 'netflix', 'spotify', 'gym', 'fitness'],
+                'Medical': ['pharmacy', 'doctor', 'dental', 'medical', 'health'],
+                'Insurance': ['insurance', 'aa insurance', 'state insurance']
+            };
+            
+            for (const [category, keywords] of Object.entries(categories)) {
+                if (keywords.some(keyword => desc.includes(keyword))) {
+                    return category;
+                }
+            }
+            
+            // Default categorization by amount and type
+            if (description.includes('AUTOMATIC PAYMENT') || description.includes('AP ')) {
+                return 'Bills';
+            } else if (description.includes('SALARY') || description.includes('WAGE')) {
+                return 'Income';
+            } else if (description.includes('EFTPOS') || description.includes('PURCHASE')) {
+                return 'Shopping';
+            }
+            
+            return 'Other';
+        }
+
+        function generateSummary(transactions) {
+            const totalIncome = transactions
+                .filter(t => t.amount > 0)
+                .reduce((sum, t) => sum + t.amount, 0);
+                
+            const totalExpenses = transactions
+                .filter(t => t.amount < 0)
+                .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+                
+            const categoryBreakdown = {};
+            transactions.forEach(t => {
+                if (!categoryBreakdown[t.category]) {
+                    categoryBreakdown[t.category] = 0;
+                }
+                categoryBreakdown[t.category] += Math.abs(t.amount);
+            });
+            
+            return {
+                totalTransactions: transactions.length,
+                totalIncome: totalIncome,
+                totalExpenses: totalExpenses,
+                netCashFlow: totalIncome - totalExpenses,
+                categoryBreakdown: categoryBreakdown,
+                dateRange: {
+                    start: Math.min(...transactions.map(t => new Date(t.date))),
+                    end: Math.max(...transactions.map(t => new Date(t.date)))
+                }
+            };
+        }
+
+        function updateStoredData(transactions) {
+            // Store for dashboard access
+            const existingData = JSON.parse(localStorage.getItem('financeos_transactions') || '[]');
+            const combinedData = [...existingData, ...transactions];
+            
+            // Remove duplicates based on date, description, and amount
+            const uniqueData = combinedData.filter((transaction, index, self) =>
+                index === self.findIndex(t =>
+                    t.date === transaction.date &&
+                    t.description === transaction.description &&
+                    t.amount === transaction.amount
+                )
+            );
+            
+            localStorage.setItem('financeos_transactions', JSON.stringify(uniqueData));
+            localStorage.setItem('financeos_last_csv_upload', new Date().toISOString());
+        }
+
+        function displayResults() {
+            const resultsContainer = document.getElementById('resultsContainer');
+            const resultsContent = document.getElementById('resultsContent');
+            
+            resultsContainer.style.display = 'block';
+            
+            resultsContent.innerHTML = processedData.map((data, index) => `
+                <div class="result-card glass-premium">
+                    <div class="result-header">
+                        <div class="result-title">${data.fileName}</div>
+                        <div class="result-status status-success">PROCESSED</div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px;">
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">TRANSACTIONS</div>
+                            <div style="font-size: 20px; font-weight: 600;">${data.summary.totalTransactions}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">INCOME</div>
+                            <div style="font-size: 20px; font-weight: 600; color: var(--success);">$${data.summary.totalIncome.toFixed(2)}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">EXPENSES</div>
+                            <div style="font-size: 20px; font-weight: 600; color: var(--error);">$${data.summary.totalExpenses.toFixed(2)}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">NET FLOW</div>
+                            <div style="font-size: 20px; font-weight: 600; color: ${data.summary.netCashFlow >= 0 ? 'var(--success)' : 'var(--error)'};">
+                                $${data.summary.netCashFlow.toFixed(2)}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <details style="margin-top: 16px;">
+                        <summary style="cursor: pointer; font-weight: 600; margin-bottom: 12px;">View Transactions (${data.transactions.length})</summary>
+                        <div class="transaction-preview">
+                            ${data.transactions.slice(0, 10).map(t => `
+                                <div class="transaction-item">
+                                    <div class="transaction-details">
+                                        <div class="transaction-description">${t.description}</div>
+                                        <div class="transaction-meta">${t.date} • ${t.category}</div>
+                                    </div>
+                                    <div class="transaction-amount ${t.amount >= 0 ? 'amount-positive' : 'amount-negative'}">
+                                        ${t.amount >= 0 ? '+' : ''}$${Math.abs(t.amount).toFixed(2)}
+                                    </div>
+                                </div>
+                            `).join('')}
+                            ${data.transactions.length > 10 ? `
+                                <div style="padding: 12px 16px; text-align: center; color: var(--text-muted); font-size: 12px;">
+                                    ... and ${data.transactions.length - 10} more transactions
+                                </div>
+                            ` : ''}
+                        </div>
+                    </details>
+                </div>
+            `).join('');
+            
+            // Scroll to results
+            resultsContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Process all files button
+        function processAllFiles() {
+            const pendingFiles = uploadedFiles.filter(f => f.status === 'pending');
+            pendingFiles.forEach(fileData => {
+                processFile(fileData.id);
+            });
+        }
+
+        // Add process all button if there are multiple files
+        function updateFileList() {
+            const fileList = document.getElementById('fileList');
+            
+            if (uploadedFiles.length === 0) {
+                fileList.innerHTML = '';
+                return;
+            }
+
+            const pendingCount = uploadedFiles.filter(f => f.status === 'pending').length;
+            
+            let html = '';
+            
+            if (pendingCount > 1) {
+                html += `
+                    <div style="text-align: center; margin-bottom: 16px;">
+                        <button onclick="processAllFiles()" class="upload-button">
+                            Process All Files (${pendingCount})
+                        </button>
+                    </div>
+                `;
+            }
+            
+            html += uploadedFiles.map(fileData => `
+                <div class="file-item" id="file-${fileData.id}">
+                    <div class="file-info">
+                        <div class="file-icon">📄</div>
+                        <div class="file-details">
+                            <h4>${fileData.name}</h4>
+                            <p>${formatFileSize(fileData.size)} • ${fileData.type.toUpperCase()} • ${fileData.status}</p>
+                        </div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="file-action process" onclick="processFile('${fileData.id}')" 
+                                ${fileData.status !== 'pending' ? 'disabled' : ''}>
+                            ${fileData.status === 'processing' ? '<div class="spinner"></div>' : ''}
+                            Process
+                        </button>
+                        <button class="file-action remove" onclick="removeFile('${fileData.id}')"
+                                ${fileData.status === 'processing' ? 'disabled' : ''}>
+                            Remove
+                        </button>
+                    </div>
+                    ${fileData.status === 'processing' ? `
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${fileData.progress}%"></div>
+                            </div>
+                            <div class="progress-text">Processing... ${fileData.progress}%</div>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+            
+            fileList.innerHTML = html;
+        }
+    </script>
+</body>
 </html>
