@@ -1,91 +1,170 @@
 {
   "name": "FinanceOS - Personal Finance Operating System",
   "short_name": "FinanceOS",
-  "description": "Complete personal finance management with AI coaching",
-  "start_url": "./",
-  "scope": "./",
+  "description": "Complete personal finance management with AI coaching for New Zealand families",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#8b5cf6",
   "orientation": "portrait-primary",
-  "categories": ["finance", "productivity", "lifestyle"],
-  "lang": "en",
+  "scope": "/",
+  "lang": "en-NZ",
   "dir": "ltr",
+  "categories": ["finance", "productivity", "lifestyle"],
+  "screenshots": [
+    {
+      "src": "/images/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "FinanceOS Dashboard"
+    },
+    {
+      "src": "/images/screenshot-narrow.png", 
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "FinanceOS Mobile"
+    }
+  ],
   "icons": [
     {
-      "src": "./icons/icon-72x72.png",
+      "src": "/icons/icon-72x72.png",
       "sizes": "72x72",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "maskable any"
     },
     {
-      "src": "./icons/icon-96x96.png",
-      "sizes": "96x96",
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96", 
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "maskable any"
     },
     {
-      "src": "./icons/icon-128x128.png",
+      "src": "/icons/icon-128x128.png",
       "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "any"
+      "type": "image/png", 
+      "purpose": "maskable any"
     },
     {
-      "src": "./icons/icon-144x144.png",
+      "src": "/icons/icon-144x144.png",
       "sizes": "144x144",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "maskable any"
     },
     {
-      "src": "./icons/icon-152x152.png",
+      "src": "/icons/icon-152x152.png",
       "sizes": "152x152",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "maskable any"
     },
     {
-      "src": "./icons/icon-192x192.png",
+      "src": "/icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable any"
     },
     {
-      "src": "./icons/icon-384x384.png",
+      "src": "/icons/icon-384x384.png", 
       "sizes": "384x384",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "maskable any"
     },
     {
-      "src": "./icons/icon-512x512.png",
-      "sizes": "512x512",
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512", 
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
   "shortcuts": [
     {
       "name": "Upload CSV",
       "short_name": "Upload",
-      "description": "Upload bank statements",
-      "url": "./csv-upload.html",
+      "description": "Import bank statements",
+      "url": "/csv-upload.html",
       "icons": [
         {
-          "src": "./icons/icon-96x96.png",
-          "sizes": "96x96"
+          "src": "/icons/shortcut-upload.png",
+          "sizes": "96x96",
+          "type": "image/png"
         }
       ]
     },
     {
       "name": "View Goals",
-      "short_name": "Goals",
-      "description": "Financial goals tracking",
-      "url": "./goals.html",
+      "short_name": "Goals", 
+      "description": "Track financial goals",
+      "url": "/goals.html",
       "icons": [
         {
-          "src": "./icons/icon-96x96.png",
-          "sizes": "96x96"
+          "src": "/icons/shortcut-goals.png",
+          "sizes": "96x96", 
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Budget Overview", 
+      "short_name": "Budget",
+      "description": "View budget and spending",
+      "url": "/budget.html",
+      "icons": [
+        {
+          "src": "/icons/shortcut-budget.png",
+          "sizes": "96x96",
+          "type": "image/png" 
+        }
+      ]
+    },
+    {
+      "name": "AI Coach",
+      "short_name": "AI Coach",
+      "description": "Get financial advice", 
+      "url": "/#ai-coach",
+      "icons": [
+        {
+          "src": "/icons/shortcut-ai.png",
+          "sizes": "96x96",
+          "type": "image/png"
         }
       ]
     }
   ],
-  "prefer_related_applications": false
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "protocol_handlers": [
+    {
+      "protocol": "web+financeos",
+      "url": "/?action=%s"
+    }
+  ],
+  "share_target": {
+    "action": "/csv-upload.html",
+    "method": "POST", 
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "csvFiles",
+          "accept": [".csv", ".xlsx", ".xls"]
+        }
+      ]
+    }
+  }
 }
