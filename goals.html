@@ -2,22 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Goals - FinanceOS</title>
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FinanceOS - Financial Goals</title>
     <link rel="manifest" href="manifest.json">
-    
+    <meta name="theme-color" content="#8b5cf6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
+        /* CSS Variables for Premium Design System */
         :root {
-            --primary-purple: #8b5cf6;
-            --secondary-blue: #3b82f6;
-            --success-green: #10b981;
-            --error-red: #ef4444;
-            --warning-orange: #f97316;
+            --primary-bg: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
             --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-premium: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 50%, rgba(147, 51, 234, 0.15) 100%);
             --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-premium-border: rgba(255, 255, 255, 0.2);
             --text-primary: rgba(255, 255, 255, 0.9);
             --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --gradient-purple: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
+            --gradient-blue: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+            --gradient-green: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+            --gradient-red: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+            --gradient-orange: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%);
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
         }
 
         * {
@@ -28,12 +38,13 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
-            min-height: 100vh;
+            background: var(--primary-bg);
             color: var(--text-primary);
+            min-height: 100vh;
             overflow-x: hidden;
         }
 
+        /* Glass Effects */
         .glass {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
@@ -42,135 +53,99 @@
         }
 
         .glass-premium {
-            background: linear-gradient(135deg, 
-                rgba(139, 92, 246, 0.15) 0%, 
-                rgba(59, 130, 246, 0.15) 50%, 
-                rgba(147, 51, 234, 0.15) 100%);
+            background: var(--glass-premium);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--glass-premium-border);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
 
-        /* UNIFIED NAVIGATION - Same on every page */
-        .main-nav {
-            background: linear-gradient(135deg, 
-                rgba(139, 92, 246, 0.15) 0%, 
-                rgba(59, 130, 246, 0.15) 50%, 
-                rgba(147, 51, 234, 0.15) 100%);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        /* Transitions */
+        .transition-all { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .hover-scale:hover { transform: scale(1.02) translateY(-2px); }
+
+        /* Header Styles (Same as other pages) */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
             padding: 12px 20px;
-            margin-bottom: 20px;
+            border-radius: 0;
         }
 
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
+        .header-content {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        .nav-logo {
+        .logo {
             display: flex;
             align-items: center;
             gap: 12px;
-            text-decoration: none;
-            color: var(--text-primary);
-            transition: all 0.2s ease;
-        }
-
-        .nav-logo:hover {
-            transform: translateX(-2px);
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
         }
 
         .logo-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, #10b981, #059669);
-            border-radius: 8px;
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-purple);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            font-weight: bold;
-            color: white;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
         }
 
-        .logo-text {
-            font-size: 1.25rem;
-            font-weight: 700;
-        }
-
-        .nav-links {
+        .nav {
             display: flex;
-            gap: 8px;
             align-items: center;
+            gap: 8px;
         }
 
-        .nav-link {
-            padding: 8px 16px;
-            border-radius: 8px;
+        .nav-button {
+            padding: 8px 20px;
+            border-radius: 12px;
             text-decoration: none;
             color: var(--text-secondary);
-            font-size: 0.9rem;
             font-weight: 500;
-            transition: all 0.2s ease;
-            white-space: nowrap;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            border: none;
+            background: transparent;
+            cursor: pointer;
             position: relative;
         }
 
-        .nav-link:hover {
-            color: var(--text-primary);
+        .nav-button:hover {
+            color: white;
             background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-1px);
         }
 
-        .nav-link.active {
+        .nav-button.active {
             color: white;
             background: rgba(139, 92, 246, 0.3);
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
         }
 
-        .nav-link.active::after {
+        .nav-button.active::after {
             content: '';
             position: absolute;
-            bottom: 2px;
+            bottom: -4px;
             left: 50%;
             transform: translateX(-50%);
-            width: 4px;
-            height: 4px;
+            width: 6px;
+            height: 6px;
             background: #8b5cf6;
             border-radius: 50%;
         }
 
-        .nav-actions {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .privacy-toggle, .logout-button {
-            padding: 6px 12px;
-            border-radius: 6px;
-            border: none;
-            font-size: 0.8rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
         .privacy-toggle {
-            background: rgba(249, 115, 22, 0.2);
-            color: #f97316;
-            border: 1px solid rgba(249, 115, 22, 0.3);
-        }
-
-        .privacy-toggle:hover {
-            background: rgba(249, 115, 22, 0.3);
-            transform: translateY(-1px);
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
         }
 
         .logout-button {
@@ -179,132 +154,172 @@
             border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
-        .logout-button:hover {
-            background: rgba(239, 68, 68, 0.3);
-            transform: translateY(-1px);
-        }
-
-        .nav-mobile-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: var(--text-primary);
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 4px;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-        }
-
-        .nav-mobile-toggle:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .nav-mobile-menu {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        /* Main Content */
+        .main-content {
             padding: 20px;
-            z-index: 1000;
-        }
-
-        .nav-mobile-menu.open {
-            display: block;
-        }
-
-        .nav-mobile-links {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .nav-mobile-actions {
-            display: flex;
-            gap: 12px;
-            padding-top: 12px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Goals Page Styles */
-        .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
         }
 
-        .header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 12px;
+        .page-title {
+            font-size: 32px;
+            font-weight: 800;
             background: linear-gradient(135deg, #8b5cf6, #3b82f6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
-        .header p {
-            font-size: 1.1rem;
+        .add-goal-btn {
+            background: var(--gradient-purple);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .add-goal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+        }
+
+        /* Goal Overview Cards */
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .overview-card {
+            padding: 24px;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .overview-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .overview-title {
+            font-size: 14px;
+            font-weight: 600;
             color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .overview-value {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .overview-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Goals Grid */
+        .goals-container {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: white;
         }
 
         .goals-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 24px;
-            margin-bottom: 40px;
+            gap: 20px;
         }
 
         .goal-card {
             padding: 24px;
             border-radius: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
             position: relative;
-            transition: transform 0.3s ease;
+            overflow: hidden;
         }
 
-        .goal-card:hover {
-            transform: translateY(-5px);
+        .goal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-purple);
+        }
+
+        .goal-card.priority-critical::before {
+            background: var(--gradient-red);
+        }
+
+        .goal-card.priority-high::before {
+            background: var(--gradient-orange);
+        }
+
+        .goal-card.priority-medium::before {
+            background: var(--gradient-blue);
+        }
+
+        .goal-card.priority-low::before {
+            background: var(--gradient-green);
         }
 
         .goal-header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: flex-start;
             margin-bottom: 16px;
         }
 
+        .goal-info {
+            flex: 1;
+        }
+
         .goal-title {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 4px;
         }
 
-        .goal-icon {
-            font-size: 1.5rem;
-        }
-
-        .goal-name {
-            font-size: 1.2rem;
-            font-weight: 600;
+        .goal-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
         }
 
         .goal-priority {
             padding: 4px 8px;
             border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 500;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .priority-critical {
@@ -313,8 +328,8 @@
         }
 
         .priority-high {
-            background: rgba(249, 115, 22, 0.2);
-            color: #f97316;
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
         }
 
         .priority-medium {
@@ -322,20 +337,27 @@
             color: #3b82f6;
         }
 
+        .priority-low {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
         .goal-amounts {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 16px;
         }
 
-        .goal-current {
-            font-size: 1.8rem;
-            font-weight: 700;
-            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
-            margin-bottom: 4px;
+        .current-amount {
+            font-size: 24px;
+            font-weight: 800;
+            color: white;
         }
 
-        .goal-target {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
+        .target-amount {
+            font-size: 16px;
+            color: var(--text-muted);
         }
 
         .progress-section {
@@ -344,977 +366,919 @@
 
         .progress-bar {
             width: 100%;
-            height: 8px;
+            height: 12px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
+            border-radius: 6px;
             overflow: hidden;
             margin-bottom: 8px;
         }
 
         .progress-fill {
             height: 100%;
-            border-radius: 4px;
-            transition: width 0.3s ease;
+            border-radius: 6px;
+            transition: width 0.5s ease;
+            position: relative;
         }
 
-        .progress-critical {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                rgba(255, 255, 255, 0.2) 0%, 
+                rgba(255, 255, 255, 0.1) 50%, 
+                rgba(255, 255, 255, 0.2) 100%);
+            animation: shimmer 2s infinite;
         }
 
-        .progress-warning {
-            background: linear-gradient(135deg, #f97316, #ea580c);
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
-        .progress-success {
-            background: linear-gradient(135deg, #10b981, #059669);
-        }
-
-        .progress-info {
+        .progress-stats {
             display: flex;
             justify-content: space-between;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .progress-percentage {
+            font-weight: 600;
+            color: white;
+        }
+
+        .progress-remaining {
+            color: var(--text-muted);
         }
 
         .goal-timeline {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 12px;
-            border-radius: 8px;
-            margin-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .timeline-item {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
+            text-align: center;
+            flex: 1;
+        }
+
+        .timeline-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             margin-bottom: 4px;
         }
 
-        .goal-actions {
-            margin-top: 16px;
-            display: flex;
-            gap: 8px;
+        .timeline-value {
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
         }
 
-        .btn {
+        .goal-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .action-btn {
+            flex: 1;
             padding: 8px 16px;
-            border-radius: 8px;
             border: none;
-            font-size: 0.9rem;
-            font-weight: 500;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+        }
+
+        .action-primary {
+            background: var(--gradient-purple);
+            color: white;
+        }
+
+        .action-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal {
+            background: var(--glass-premium);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-premium-border);
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .modal-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #8b5cf6, #9333ea);
+            background: var(--gradient-purple);
             color: white;
         }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
+            color: var(--text-secondary);
         }
 
-        .btn:hover {
-            transform: translateY(-1px);
+        .modal-btn:hover {
+            transform: translateY(-2px);
         }
 
-        .alert-critical {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.2));
-            border: 2px solid rgba(239, 68, 68, 0.3);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-
-        .positive { color: var(--success-green); }
-        .negative { color: var(--error-red); }
-        .warning { color: var(--warning-orange); }
-
-        .add-goal-card {
-            border: 2px dashed rgba(139, 92, 246, 0.4);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+        /* Empty State */
+        .empty-state {
             text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-height: 300px;
+            padding: 60px 20px;
+            color: var(--text-muted);
         }
 
-        .add-goal-card:hover {
-            border-color: var(--primary-purple);
-            background: rgba(139, 92, 246, 0.1);
-        }
-
-        .add-icon {
-            font-size: 3rem;
-            color: var(--primary-purple);
+        .empty-icon {
+            font-size: 64px;
             margin-bottom: 16px;
         }
 
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        .empty-description {
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        /* Mobile Responsive */
         @media (max-width: 768px) {
-            .nav-links, .nav-actions {
-                display: none;
+            .header-content {
+                flex-direction: column;
+                gap: 12px;
             }
-            
-            .nav-mobile-toggle {
-                display: block;
+
+            .nav {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .nav-button {
+                font-size: 14px;
+                padding: 6px 12px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 16px;
+            }
+
+            .overview-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
 
             .goals-grid {
                 grid-template-columns: 1fr;
             }
 
-            .header h1 {
-                font-size: 2rem;
+            .goal-amounts {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
             }
 
-            .goal-actions {
+            .modal {
+                padding: 24px;
+                margin: 20px;
+            }
+
+            .modal-actions {
                 flex-direction: column;
             }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Privacy Mode */
+        body.privacy-mode .current-amount,
+        body.privacy-mode .target-amount,
+        body.privacy-mode .overview-value {
+            filter: blur(8px);
+            transition: filter 0.3s ease;
+        }
+
+        body.privacy-mode .current-amount:hover,
+        body.privacy-mode .target-amount:hover,
+        body.privacy-mode .overview-value:hover {
+            filter: blur(0);
         }
     </style>
 </head>
 <body>
-    <!-- UNIFIED NAVIGATION -->
-    <nav class="main-nav">
-        <div class="nav-container">
-            <a href="index.html" class="nav-logo">
-                <div class="logo-icon">$</div>
+    <header class="header glass">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <span style="font-size: 24px; color: white;">$</span>
+                </div>
                 <span class="logo-text">FinanceOS</span>
-            </a>
-
-            <div class="nav-links">
-                <a href="index.html" class="nav-link">🏠 Dashboard</a>
-                <a href="budget.html" class="nav-link">📊 Budget</a>
-                <a href="goals.html" class="nav-link active">🎯 Goals</a>
-                <a href="csv-upload.html" class="nav-link">📤 Upload</a>
             </div>
+            
+            <nav class="nav">
+                <a href="index.html" class="nav-button">Dashboard</a>
+                <a href="csv-upload.html" class="nav-button">Upload CSV</a>
+                <a href="goals.html" class="nav-button active">Goals</a>
+                <a href="budget.html" class="nav-button">Budget</a>
+                <button class="privacy-toggle nav-button" id="privacyToggle">🔒 Privacy</button>
+                <button class="logout-button nav-button" onclick="logout()">🚪 Logout</button>
+            </nav>
+        </div>
+    </header>
 
-            <div class="nav-actions">
-                <button class="privacy-toggle" id="privacyToggle">🔒 Privacy</button>
-                <button class="logout-button" onclick="logout()">📱 Logout</button>
-            </div>
-
-            <button class="nav-mobile-toggle" onclick="toggleMobileMenu()">
-                <span id="menuIcon">☰</span>
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Financial Goals</h1>
+            <button class="add-goal-btn" onclick="openAddGoalModal()">
+                <span>➕</span>
+                Add New Goal
             </button>
         </div>
 
-        <div class="nav-mobile-menu" id="mobileMenu">
-            <div class="nav-mobile-links">
-                <a href="index.html" class="nav-link">🏠 Dashboard</a>
-                <a href="budget.html" class="nav-link">📊 Budget</a>
-                <a href="goals.html" class="nav-link active">🎯 Goals</a>
-                <a href="csv-upload.html" class="nav-link">📤 Upload</a>
+        <!-- Overview Cards -->
+        <section class="overview-grid">
+            <div class="overview-card glass-premium">
+                <div class="overview-icon">🎯</div>
+                <div class="overview-title">Total Goals</div>
+                <div class="overview-value" id="totalGoals">4</div>
+                <div class="overview-subtitle">Active financial targets</div>
             </div>
-            <div class="nav-mobile-actions">
-                <button class="privacy-toggle" onclick="togglePrivacy()">🔒 Privacy</button>
-                <button class="logout-button" onclick="logout()">📱 Logout</button>
+            
+            <div class="overview-card glass-premium">
+                <div class="overview-icon">💰</div>
+                <div class="overview-title">Total Saved</div>
+                <div class="overview-value text-success" id="totalSaved">$51,483.61</div>
+                <div class="overview-subtitle">Across all goals</div>
             </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="container">
-        <div class="header">
-            <h1>🎯 Financial Goals</h1>
-            <p>Track your progress towards financial milestones and build a secure future</p>
-        </div>
-
-        <!-- Goals Grid -->
-        <div class="goals-grid">
-            <!-- Emergency Fund Goal (Critical) -->
-            <div class="goal-card glass-premium alert-critical">
-                <div class="goal-header">
-                    <div class="goal-title">
-                        <span class="goal-icon">🚨</span>
-                        <span class="goal-name">Emergency Fund</span>
-                    </div>
-                    <span class="goal-priority priority-critical">CRITICAL</span>
-                </div>
-                
-                <div class="goal-amounts">
-                    <div class="goal-current negative">$0.17</div>
-                    <div class="goal-target">Target: $17,733 (3 months expenses)</div>
-                </div>
-                
-                <div class="progress-section">
-                    <div class="progress-bar">
-                        <div class="progress-fill progress-critical" style="width: 0.001%;"></div>
-                    </div>
-                    <div class="progress-info">
-                        <span>0.001% Complete</span>
-                        <span>$17,732.83 remaining</span>
-                    </div>
-                </div>
-                
-                <div class="goal-timeline">
-                    <div class="timeline-item"><strong>Recommended:</strong> Save $300/month</div>
-                    <div class="timeline-item"><strong>Timeline:</strong> 59 months at current rate</div>
-                    <div class="timeline-item"><strong>Priority:</strong> Highest - start immediately</div>
-                </div>
-                
-                <div class="goal-actions">
-                    <button class="btn btn-primary" onclick="addToGoal('emergency', 300)">
-                        Add $300/month
-                    </button>
-                    <button class="btn btn-secondary" onclick="editGoal('emergency')">
-                        Edit Goal
-                    </button>
-                </div>
+            
+            <div class="overview-card glass-premium">
+                <div class="overview-icon">📈</div>
+                <div class="overview-title">Overall Progress</div>
+                <div class="overview-value text-info" id="overallProgress">33.1%</div>
+                <div class="overview-subtitle">Average completion</div>
             </div>
-
-            <!-- Debt Payoff Goal -->
-            <div class="goal-card glass">
-                <div class="goal-header">
-                    <div class="goal-title">
-                        <span class="goal-icon">💳</span>
-                        <span class="goal-name">Pay Off Visa Debt</span>
-                    </div>
-                    <span class="goal-priority priority-high">HIGH</span>
-                </div>
-                
-                <div class="goal-amounts">
-                    <div class="goal-current negative">$3,251.30</div>
-                    <div class="goal-target">Target: $0.00 (Debt-free)</div>
-                </div>
-                
-                <div class="progress-section">
-                    <div class="progress-bar">
-                        <div class="progress-fill progress-warning" style="width: 0%;"></div>
-                    </div>
-                    <div class="progress-info">
-                        <span>0% Paid Off</span>
-                        <span>$3,251.30 remaining</span>
-                    </div>
-                </div>
-                
-                <div class="goal-timeline">
-                    <div class="timeline-item"><strong>Current Payment:</strong> Minimum only</div>
-                    <div class="timeline-item"><strong>Interest Rate:</strong> 4.99% annually</div>
-                    <div class="timeline-item"><strong>Recommended:</strong> Pay $400/month extra</div>
-                </div>
-                
-                <div class="goal-actions">
-                    <button class="btn btn-primary" onclick="addToGoal('debt', 400)">
-                        Pay Extra $400
-                    </button>
-                    <button class="btn btn-secondary" onclick="editGoal('debt')">
-                        Edit Goal
-                    </button>
-                </div>
+            
+            <div class="overview-card glass-premium">
+                <div class="overview-icon">⏰</div>
+                <div class="overview-title">Next Milestone</div>
+                <div class="overview-value text-warning" id="nextMilestone">$1,000</div>
+                <div class="overview-subtitle">Emergency Fund target</div>
             </div>
+        </section>
 
-            <!-- Private School Fund -->
-            <div class="goal-card glass-premium">
-                <div class="goal-header">
-                    <div class="goal-title">
-                        <span class="goal-icon">🎓</span>
-                        <span class="goal-name">Private School Fund</span>
-                    </div>
-                    <span class="goal-priority priority-medium">MEDIUM</span>
-                </div>
-                
-                <div class="goal-amounts">
-                    <div class="goal-current positive">$300.00</div>
-                    <div class="goal-target">Target: $50,000 (Annual fees)</div>
-                </div>
-                
-                <div class="progress-section">
-                    <div class="progress-bar">
-                        <div class="progress-fill progress-success" style="width: 0.6%;"></div>
-                    </div>
-                    <div class="progress-info">
-                        <span>0.6% Complete</span>
-                        <span>$49,700 remaining</span>
-                    </div>
-                </div>
-                
-                <div class="goal-timeline">
-                    <div class="timeline-item"><strong>Current Savings:</strong> $300/month</div>
-                    <div class="timeline-item"><strong>Timeline:</strong> 165 months</div>
-                    <div class="timeline-item"><strong>Child's Age:</strong> Currently young</div>
-                </div>
-                
-                <div class="goal-actions">
-                    <button class="btn btn-primary" onclick="addToGoal('education', 300)">
-   <!-- AI Financial Coach Component -->
-<!-- Add this HTML to any page where you want the AI coach -->
-
-<div id="aiCoachContainer" class="ai-coach-container">
-    <!-- AI Coach Toggle Button -->
-    <button id="aiCoachToggle" class="ai-coach-toggle" title="Ask AI Coach">
-        <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16,16.5C16,17.11 15.61,17.5 15,17.5H9C8.39,17.5 8,17.11 8,16.5V15.5C8,14.89 8.39,14.5 9,14.5H15C15.61,14.5 16,14.89 16,15.5V16.5M9,13A1,1 0 0,1 8,12A1,1 0 0,1 9,11A1,1 0 0,1 10,12A1,1 0 0,1 9,13M15,13A1,1 0 0,1 14,12A1,1 0 0,1 15,11A1,1 0 0,1 16,12A1,1 0 0,1 15,13Z" />
-        </svg>
-        <span class="ai-coach-badge" id="aiCoachBadge">AI</span>
-    </button>
-
-    <!-- AI Coach Panel -->
-    <div id="aiCoachPanel" class="ai-coach-panel hidden">
-        <div class="ai-coach-header">
-            <div class="ai-coach-title">
-                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16,16.5C16,17.11 15.61,17.5 15,17.5H9C8.39,17.5 8,17.11 8,16.5V15.5C8,14.89 8.39,14.5 9,14.5H15C15.61,14.5 16,14.89 16,15.5V16.5M9,13A1,1 0 0,1 8,12A1,1 0 0,1 9,11A1,1 0 0,1 10,12A1,1 0 0,1 9,13M15,13A1,1 0 0,1 14,12A1,1 0 0,1 15,11A1,1 0 0,1 16,12A1,1 0 0,1 15,13Z" />
-                </svg>
-                <span>AI Financial Coach</span>
-                <div class="ai-status-indicator"></div>
+        <!-- Critical Goals Section -->
+        <section class="goals-container">
+            <h2 class="section-title">🚨 Critical Priority Goals</h2>
+            <div class="goals-grid" id="criticalGoals">
+                <!-- Critical goals will be rendered here -->
             </div>
-            <button id="aiCoachClose" class="ai-coach-close">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
-                </svg>
-            </button>
-        </div>
+        </section>
 
-        <div class="ai-coach-content">
-            <!-- Quick Action Buttons -->
-            <div class="ai-quick-actions" id="aiQuickActions">
-                <button class="quick-action-btn" onclick="askAI('How much did I spend on groceries this month?')">
-                    🛒 Grocery Spending
-                </button>
-                <button class="quick-action-btn" onclick="askAI('Am I over budget on dining out?')">
-                    🍕 Dining Budget
-                </button>
-                <button class="quick-action-btn" onclick="askAI('What is our biggest expense category?')">
-                    📊 Top Expenses
-                </button>
-                <button class="quick-action-btn" onclick="askAI('How close are we to our emergency fund goal?')">
-                    🎯 Emergency Fund
-                </button>
+        <!-- High Priority Goals Section -->
+        <section class="goals-container">
+            <h2 class="section-title">🔥 High Priority Goals</h2>
+            <div class="goals-grid" id="highGoals">
+                <!-- High priority goals will be rendered here -->
             </div>
+        </section>
 
-            <!-- Chat Messages -->
-            <div class="ai-chat-messages" id="aiChatMessages">
-                <div class="ai-message ai-message-assistant">
-                    <div class="ai-message-avatar">
-                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16,16.5C16,17.11 15.61,17.5 15,17.5H9C8.39,17.5 8,17.11 8,16.5V15.5C8,14.89 8.39,14.5 9,14.5H15C15.61,14.5 16,14.89 16,15.5V16.5M9,13A1,1 0 0,1 8,12A1,1 0 0,1 9,11A1,1 0 0,1 10,12A1,1 0 0,1 9,13M15,13A1,1 0 0,1 14,12A1,1 0 0,1 15,11A1,1 0 0,1 16,12A1,1 0 0,1 15,13Z" />
-                        </svg>
-                    </div>
-                    <div class="ai-message-content">
-                        <p>Hi! I'm your AI Financial Coach. I can help you understand your spending, track your goals, and optimize your budget.</p>
-                        <p>Try asking me something like "How much did I spend on groceries this month?" or click one of the quick actions above!</p>
-                    </div>
+        <!-- Medium Priority Goals Section -->
+        <section class="goals-container">
+            <h2 class="section-title">📋 Medium Priority Goals</h2>
+            <div class="goals-grid" id="mediumGoals">
+                <!-- Medium priority goals will be rendered here -->
+            </div>
+        </section>
+
+        <!-- Low Priority Goals Section -->
+        <section class="goals-container">
+            <h2 class="section-title">🌱 Low Priority Goals</h2>
+            <div class="goals-grid" id="lowGoals">
+                <!-- Low priority goals will be rendered here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Add Goal Modal -->
+    <div class="modal-overlay hidden" id="addGoalModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Add New Financial Goal</h2>
+                <p class="modal-subtitle">Set a target and track your progress towards financial success</p>
+            </div>
+            
+            <form id="addGoalForm">
+                <div class="form-group">
+                    <label class="form-label">Goal Name</label>
+                    <input type="text" class="form-input" id="goalName" placeholder="e.g., Emergency Fund, Vacation, New Car" required>
                 </div>
-            </div>
-
-            <!-- Chat Input -->
-            <div class="ai-chat-input">
-                <input 
-                    type="text" 
-                    id="aiChatInput" 
-                    placeholder="Ask me about your finances..."
-                    maxlength="200"
-                >
-                <button id="aiChatSend" class="ai-chat-send-btn">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
-                    </svg>
-                </button>
+                
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-textarea" id="goalDescription" placeholder="Describe your goal and why it's important to you"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Target Amount</label>
+                    <input type="number" class="form-input" id="goalTarget" placeholder="10000" step="0.01" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Current Amount</label>
+                    <input type="number" class="form-input" id="goalCurrent" placeholder="0" step="0.01" value="0">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Priority Level</label>
+                    <select class="form-select" id="goalPriority" required>
+                        <option value="critical">Critical - Urgent financial security</option>
+                        <option value="high">High - Important for near-term plans</option>
+                        <option value="medium" selected>Medium - Beneficial for future</option>
+                        <option value="low">Low - Nice to have</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Target Date</label>
+                    <input type="date" class="form-input" id="goalDate">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Monthly Contribution</label>
+                    <input type="number" class="form-input" id="goalMonthly" placeholder="500" step="0.01">
+                </div>
+            </form>
+            
+            <div class="modal-actions">
+                <button class="modal-btn btn-secondary" onclick="closeAddGoalModal()">Cancel</button>
+                <button class="modal-btn btn-primary" onclick="saveGoal()">Create Goal</button>
             </div>
         </div>
     </div>
-</div>
 
-<style>
-/* AI Coach Styles */
-.ai-coach-container {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    z-index: 1000;
-}
+    <!-- Edit Goal Modal -->
+    <div class="modal-overlay hidden" id="editGoalModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Goal</h2>
+                <p class="modal-subtitle">Update your goal details and progress</p>
+            </div>
+            
+            <form id="editGoalForm">
+                <div class="form-group">
+                    <label class="form-label">Goal Name</label>
+                    <input type="text" class="form-input" id="editGoalName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-textarea" id="editGoalDescription"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Target Amount</label>
+                    <input type="number" class="form-input" id="editGoalTarget" step="0.01" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Current Amount</label>
+                    <input type="number" class="form-input" id="editGoalCurrent" step="0.01">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Priority Level</label>
+                    <select class="form-select" id="editGoalPriority" required>
+                        <option value="critical">Critical - Urgent financial security</option>
+                        <option value="high">High - Important for near-term plans</option>
+                        <option value="medium">Medium - Beneficial for future</option>
+                        <option value="low">Low - Nice to have</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Target Date</label>
+                    <input type="date" class="form-input" id="editGoalDate">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Monthly Contribution</label>
+                    <input type="number" class="form-input" id="editGoalMonthly" step="0.01">
+                </div>
+            </form>
+            
+            <div class="modal-actions">
+                <button class="modal-btn btn-secondary" onclick="closeEditGoalModal()">Cancel</button>
+                <button class="modal-btn" style="background: var(--gradient-red); color: white;" onclick="deleteGoal()">Delete Goal</button>
+                <button class="modal-btn btn-primary" onclick="updateGoal()">Update Goal</button>
+            </div>
+        </div>
+    </div>
 
-.ai-coach-toggle {
-    width: 56px;
-    height: 56px;
-    background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
-    border: none;
-    border-radius: 50%;
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.4);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+    <script>
+        // Application State
+        let goals = [];
+        let currentEditingGoal = null;
 
-.ai-coach-toggle:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 12px 40px rgba(139, 92, 246, 0.5);
-}
+        // Initialize default goals based on the user's actual situation
+        const defaultGoals = [
+            {
+                id: 1,
+                name: "Emergency Fund",
+                description: "Build emergency savings to cover 3 months of expenses. Critical for financial security.",
+                current: 0.17,
+                target: 15000,
+                priority: "critical",
+                targetDate: "2025-12-31",
+                monthlyContribution: 0,
+                createdDate: "2024-12-01"
+            },
+            {
+                id: 2,
+                name: "Visa Debt Payoff",
+                description: "Pay off remaining credit card debt to reduce monthly interest payments.",
+                current: 6748.70,
+                target: 10000,
+                priority: "high",
+                targetDate: "2025-06-30",
+                monthlyContribution: 300,
+                createdDate: "2024-12-01"
+            },
+            {
+                id: 3,
+                name: "KiwiSaver Growth",
+                description: "Build retirement savings through KiwiSaver contributions and investment growth.",
+                current: 48733.44,
+                target: 100000,
+                priority: "medium",
+                targetDate: "2027-12-31",
+                monthlyContribution: 271,
+                createdDate: "2024-12-01"
+            },
+            {
+                id: 4,
+                name: "Private School Fund",
+                description: "Save for children's private school education expenses.",
+                current: 1500,
+                target: 10000,
+                priority: "medium",
+                targetDate: "2026-02-01",
+                monthlyContribution: 300,
+                createdDate: "2024-12-01"
+            }
+        ];
 
-.ai-coach-toggle:active {
-    transform: translateY(0) scale(0.98);
-}
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthState();
+            loadGoals();
+            renderGoals();
+            updateOverview();
+            setupEventListeners();
+        });
 
-.ai-coach-badge {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    background: #10b981;
-    color: white;
-    font-size: 0.625rem;
-    font-weight: 700;
-    padding: 0.125rem 0.375rem;
-    border-radius: 0.5rem;
-    border: 2px solid white;
-    animation: pulse-badge 2s infinite;
-}
-
-@keyframes pulse-badge {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
-
-.ai-coach-panel {
-    position: absolute;
-    bottom: 72px;
-    right: 0;
-    width: 380px;
-    max-width: 90vw;
-    max-height: 600px;
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 1.5rem;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-    overflow: hidden;
-    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px) scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-.ai-coach-panel.hidden {
-    display: none;
-}
-
-.ai-coach-header {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2));
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.ai-coach-title {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 600;
-    color: white;
-    font-size: 0.9rem;
-}
-
-.ai-status-indicator {
-    width: 8px;
-    height: 8px;
-    background: #10b981;
-    border-radius: 50%;
-    animation: pulse-status 2s infinite;
-}
-
-@keyframes pulse-status {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
-}
-
-.ai-coach-close {
-    background: none;
-    border: none;
-    color: rgba(255, 255, 255, 0.7);
-    cursor: pointer;
-    padding: 0.25rem;
-    border-radius: 0.375rem;
-    transition: all 0.2s ease;
-}
-
-.ai-coach-close:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-}
-
-.ai-coach-content {
-    display: flex;
-    flex-direction: column;
-    height: 500px;
-}
-
-.ai-quick-actions {
-    padding: 1rem;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.quick-action-btn {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 0.75rem;
-    padding: 0.5rem;
-    color: rgba(255, 255, 255, 0.8);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 0.75rem;
-    text-align: center;
-}
-
-.quick-action-btn:hover {
-    background: rgba(139, 92, 246, 0.2);
-    border-color: rgba(139, 92, 246, 0.3);
-    color: white;
-    transform: translateY(-1px);
-}
-
-.ai-chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.ai-message {
-    display: flex;
-    gap: 0.75rem;
-    animation: messageSlideIn 0.3s ease-out;
-}
-
-@keyframes messageSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.ai-message-user {
-    flex-direction: row-reverse;
-}
-
-.ai-message-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.ai-message-assistant .ai-message-avatar {
-    background: linear-gradient(135deg, #8b5cf6, #9333ea);
-    color: white;
-}
-
-.ai-message-user .ai-message-avatar {
-    background: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.8);
-}
-
-.ai-message-content {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 1rem;
-    padding: 0.75rem 1rem;
-    max-width: 280px;
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 0.875rem;
-    line-height: 1.4;
-}
-
-.ai-message-user .ai-message-content {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(147, 51, 234, 0.2));
-    border-color: rgba(139, 92, 246, 0.3);
-}
-
-.ai-message-content p {
-    margin: 0 0 0.5rem 0;
-}
-
-.ai-message-content p:last-child {
-    margin-bottom: 0;
-}
-
-.ai-message-loading {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    color: rgba(255, 255, 255, 0.6);
-}
-
-.ai-typing-dots {
-    display: flex;
-    gap: 0.25rem;
-}
-
-.ai-typing-dot {
-    width: 4px;
-    height: 4px;
-    background: currentColor;
-    border-radius: 50%;
-    animation: typingDot 1.4s infinite ease-in-out;
-}
-
-.ai-typing-dot:nth-child(1) { animation-delay: -0.32s; }
-.ai-typing-dot:nth-child(2) { animation-delay: -0.16s; }
-
-@keyframes typingDot {
-    0%, 80%, 100% {
-        transform: scale(0);
-        opacity: 0.5;
-    }
-    40% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-.ai-chat-input {
-    padding: 1rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-}
-
-.ai-chat-input input {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 0.75rem;
-    padding: 0.75rem 1rem;
-    color: white;
-    font-size: 0.875rem;
-    outline: none;
-    transition: all 0.2s ease;
-}
-
-.ai-chat-input input::placeholder {
-    color: rgba(255, 255, 255, 0.5);
-}
-
-.ai-chat-input input:focus {
-    border-color: rgba(139, 92, 246, 0.5);
-    background: rgba(139, 92, 246, 0.1);
-}
-
-.ai-chat-send-btn {
-    background: linear-gradient(135deg, #8b5cf6, #9333ea);
-    border: none;
-    border-radius: 0.75rem;
-    width: 40px;
-    height: 40px;
-    color: white;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.ai-chat-send-btn:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
-}
-
-.ai-chat-send-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* Responsive adjustments */
-@media (max-width: 480px) {
-    .ai-coach-container {
-        bottom: 1rem;
-        right: 1rem;
-    }
-
-    .ai-coach-panel {
-        width: calc(100vw - 2rem);
-        bottom: 68px;
-        right: -1rem;
-    }
-
-    .ai-quick-actions {
-        grid-template-columns: 1fr;
-    }
-
-    .quick-action-btn {
-        font-size: 0.7rem;
-        padding: 0.375rem;
-    }
-}
-
-/* Financial data highlighting */
-.ai-financial-data {
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.3);
-    border-radius: 0.375rem;
-    padding: 0.25rem 0.5rem;
-    color: #10b981;
-    font-weight: 600;
-    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
-}
-
-.ai-warning-data {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    border-radius: 0.375rem;
-    padding: 0.25rem 0.5rem;
-    color: #ef4444;
-    font-weight: 600;
-}
-
-.ai-insight-highlight {
-    background: rgba(59, 130, 246, 0.1);
-    border-left: 3px solid #3b82f6;
-    padding: 0.75rem;
-    margin: 0.5rem 0;
-    border-radius: 0 0.375rem 0.375rem 0;
-    font-style: italic;
-}
-</style>
-
-<script>
-// AI Financial Coach JavaScript
-class AIFinancialCoach {
-    constructor() {
-        this.isOpen = false;
-        this.conversations = JSON.parse(localStorage.getItem('ai_coach_conversations') || '[]');
-        this.currentContext = {};
-        this.initialize();
-    }
-
-    initialize() {
-        this.bindEvents();
-        this.loadFinancialContext();
-        this.restoreConversation();
-    }
-
-    bindEvents() {
-        const toggle = document.getElementById('aiCoachToggle');
-        const close = document.getElementById('aiCoachClose');
-        const input = document.getElementById('aiChatInput');
-        const send = document.getElementById('aiChatSend');
-
-        if (toggle) {
-            toggle.addEventListener('click', () => this.togglePanel());
+        function checkAuthState() {
+            const authToken = localStorage.getItem('financeos_auth');
+            if (!authToken) {
+                window.location.href = 'index.html';
+                return;
+            }
         }
 
-        if (close) {
-            close.addEventListener('click', () => this.closePanel());
+        function logout() {
+            localStorage.removeItem('financeos_auth');
+            window.location.href = 'index.html';
         }
 
-        if (input) {
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    this.sendMessage();
+        function setupEventListeners() {
+            // Privacy toggle
+            const privacyToggle = document.getElementById('privacyToggle');
+            if (privacyToggle) {
+                privacyToggle.addEventListener('click', togglePrivacyMode);
+            }
+
+            // Modal close on overlay click
+            document.getElementById('addGoalModal').addEventListener('click', function(e) {
+                if (e.target === this) closeAddGoalModal();
+            });
+
+            document.getElementById('editGoalModal').addEventListener('click', function(e) {
+                if (e.target === this) closeEditGoalModal();
+            });
+        }
+
+        function togglePrivacyMode() {
+            const isPrivate = document.body.classList.toggle('privacy-mode');
+            const toggle = document.getElementById('privacyToggle');
+            if (toggle) {
+                toggle.textContent = isPrivate ? '🔓 Show Data' : '🔒 Privacy';
+            }
+            localStorage.setItem('financeos_privacy', isPrivate.toString());
+        }
+
+        function loadGoals() {
+            const saved = localStorage.getItem('financeos_goals');
+            if (saved) {
+                goals = JSON.parse(saved);
+            } else {
+                goals = defaultGoals;
+                saveGoals();
+            }
+        }
+
+        function saveGoals() {
+            localStorage.setItem('financeos_goals', JSON.stringify(goals));
+        }
+
+        function renderGoals() {
+            const sections = {
+                critical: document.getElementById('criticalGoals'),
+                high: document.getElementById('highGoals'),
+                medium: document.getElementById('mediumGoals'),
+                low: document.getElementById('lowGoals')
+            };
+
+            // Clear all sections
+            Object.values(sections).forEach(section => {
+                section.innerHTML = '';
+            });
+
+            // Group goals by priority
+            const goalsByPriority = {
+                critical: goals.filter(g => g.priority === 'critical'),
+                high: goals.filter(g => g.priority === 'high'),
+                medium: goals.filter(g => g.priority === 'medium'),
+                low: goals.filter(g => g.priority === 'low')
+            };
+
+            // Render each priority group
+            Object.entries(goalsByPriority).forEach(([priority, priorityGoals]) => {
+                if (priorityGoals.length === 0) {
+                    sections[priority].innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📋</div>
+                            <div class="empty-title">No ${priority} priority goals</div>
+                            <div class="empty-description">Add a new goal to get started</div>
+                        </div>
+                    `;
+                } else {
+                    sections[priority].innerHTML = priorityGoals.map(goal => renderGoalCard(goal)).join('');
                 }
             });
         }
 
-        if (send) {
-            send.addEventListener('click', () => this.sendMessage());
-        }
-    }
+        function renderGoalCard(goal) {
+            const progress = Math.min((goal.current / goal.target) * 100, 100);
+            const remaining = Math.max(goal.target - goal.current, 0);
+            
+            // Calculate timeline
+            const today = new Date();
+            const targetDate = new Date(goal.targetDate);
+            const monthsRemaining = Math.max(
+                (targetDate.getFullYear() - today.getFullYear()) * 12 + 
+                (targetDate.getMonth() - today.getMonth()), 0
+            );
+            
+            const monthlyNeeded = monthsRemaining > 0 ? remaining / monthsRemaining : 0;
 
-    loadFinancialContext() {
-        // Load real financial data from localStorage
-        const transactions = JSON.parse(localStorage.getItem('financeos_transactions') || '[]');
-        const accounts = {
-            mySpending: 25.92,
-            mySavings: 0.17,
-            houseKitty: 65357.00,
-            mortgageBilling: 126.35,
-            holding: 240.40,
-            visaDebt: -3251.30,
-            visaAvailable: 6748.70,
-            homeLoans: 271600.02,
-            kiwiSaver: 48733.44
-        };
-
-        // Calculate spending by category
-        const categorySpending = {};
-        const currentMonth = new Date().getMonth();
-        const currentYear = new Date().getFullYear();
-
-        transactions.forEach(t => {
-            const transactionDate = new Date(t.date);
-            if (transactionDate.getMonth() === currentMonth && 
-                transactionDate.getFullYear() === currentYear && 
-                t.amount < 0) {
-                
-                const category = t.category;
-                if (!categorySpending[category]) {
-                    categorySpending[category] = 0;
-                }
-                categorySpending[category] += Math.abs(t.amount);
-            }
-        });
-
-        this.currentContext = {
-            accounts,
-            transactions,
-            categorySpending,
-            monthlyIncome: 6304,
-            monthlyExpenses: 9911,
-            monthlyDeficit: -3607,
-            emergencyFund: 0.17,
-            totalTransactions: transactions.length
-        };
-    }
-
-    togglePanel() {
-        const panel = document.getElementById('aiCoachPanel');
-        if (this.isOpen) {
-            this.closePanel();
-        } else {
-            this.openPanel();
-        }
-    }
-
-    openPanel() {
-        const panel = document.getElementById('aiCoachPanel');
-        const input = document.getElementById('aiChatInput');
-        
-        panel.classList.remove('hidden');
-        this.isOpen = true;
-        
-        // Focus input after animation
-        setTimeout(() => {
-            if (input) input.focus();
-        }, 100);
-    }
-
-    closePanel() {
-        const panel = document.getElementById('aiCoachPanel');
-        panel.classList.add('hidden');
-        this.isOpen = false;
-    }
-
-    async sendMessage() {
-        const input = document.getElementById('aiChatInput');
-        const message = input.value.trim();
-        
-        if (!message) return;
-
-        // Clear input and disable send button
-        input.value = '';
-        this.disableSendButton(true);
-
-        // Add user message
-        this.addMessage('user', message);
-
-        // Show typing indicator
-        this.showTypingIndicator();
-
-        // Generate AI response
-        try {
-            const response = await this.generateResponse(message);
-            this.hideTypingIndicator();
-            this.addMessage('assistant', response);
-        } catch (error) {
-            this.hideTypingIndicator();
-            this.addMessage('assistant', 'Sorry, I encountered an error. Please try again.');
-        }
-
-        this.disableSendButton(false);
-    }
-
-    addMessage(type, content) {
-        const messagesContainer = document.getElementById('aiChatMessages');
-        
-        const messageElement = document.createElement('div');
-        messageElement.className = `ai-message ai-message-${type}`;
-        
-        const avatar = document.createElement('div');
-        avatar.className = 'ai-message-avatar';
-        
-        if (type === 'assistant') {
-            avatar.innerHTML = `
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16,16.5C16,17.11 15.61,17.5 15,17.5H9C8.39,17.5 8,17.11 8,16.5V15.5C8,14.89 8.39,14.5 9,14.5H15C15.61,14.5 16,14.89 16,15.5V16.5M9,13A1,1 0 0,1 8,12A1,1 0 0,1 9,11A1,1 0 0,1 10,12A1,1 0 0,1 9,13M15,13A1,1 0 0,1 14,12A1,1 0 0,1 15,11A1,1 0 0,1 16,12A1,1 0 0,1 15,13Z" />
-                </svg>
-            `;
-        } else {
-            avatar.innerHTML = `
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" />
-                </svg>
-            `;
-        }
-
-        const contentElement = document.createElement('div');
-        contentElement.className = 'ai-message-content';
-        contentElement.innerHTML = content;
-
-        messageElement.appendChild(avatar);
-        messageElement.appendChild(contentElement);
-
-        messagesContainer.appendChild(messageElement);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-        // Save conversation
-        this.saveConversation(type, content);
-    }
-
-    showTypingIndicator() {
-        const messagesContainer = document.getElementById('aiChatMessages');
-        
-        const typingElement = document.createElement('div');
-        typingElement.className = 'ai-message ai-message-assistant';
-        typingElement.id = 'typingIndicator';
-        
-        typingElement.innerHTML = `
-            <div class="ai-message-avatar">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16,16.5C16,17.11 15.61,17.5 15,17.5H9C8.39,17.5 8,17.11 8,16.5V15.5C8,14.89 8.39,14.5 9,14.5H15C15.61,14.5 16,14.89 16,15.5V16.5M9,13A1,1 0 0,1 8,12A1,1 0 0,1 9,11A1,1 0 0,1 10,12A1,1 0 0,1 9,13M15,13A1,1 0 0,1 14,12A1,1 0 0,1 15,11A1,1 0 0,1 16,12A1,1 0 0,1 15,13Z" />
-                </svg>
-            </div>
-            <div class="ai-message-content">
-                <div class="ai-message-loading">
-                    <span>Thinking</span>
-                    <div class="ai-typing-dots">
-                        <div class="ai-typing-dot"></div>
-                        <div class="ai-typing-dot"></div>
-                        <div class="ai-typing-dot"></div>
+            return `
+                <div class="goal-card glass-premium hover-scale transition-all priority-${goal.priority}" onclick="editGoal(${goal.id})">
+                    <div class="goal-header">
+                        <div class="goal-info">
+                            <div class="goal-title">${goal.name}</div>
+                            <div class="goal-description">${goal.description}</div>
+                        </div>
+                        <div class="goal-priority priority-${goal.priority}">${goal.priority.toUpperCase()}</div>
+                    </div>
+                    
+                    <div class="goal-amounts">
+                        <div class="current-amount">$${formatNumber(goal.current)}</div>
+                        <div class="target-amount">of $${formatNumber(goal.target)}</div>
+                    </div>
+                    
+                    <div class="progress-section">
+                        <div class="progress-bar">
+                            <div class="progress-fill ${getProgressColor(goal.priority)}" style="width: ${progress}%"></div>
+                        </div>
+                        <div class="progress-stats">
+                            <div class="progress-percentage">${progress.toFixed(1)}% Complete</div>
+                            <div class="progress-remaining">$${formatNumber(remaining)} remaining</div>
+                        </div>
+                    </div>
+                    
+                    <div class="goal-timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-label">Target Date</div>
+                            <div class="timeline-value">${formatDate(goal.targetDate)}</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-label">Monthly Need</div>
+                            <div class="timeline-value">$${formatNumber(monthlyNeeded)}</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-label">Contributing</div>
+                            <div class="timeline-value">$${formatNumber(goal.monthlyContribution)}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="goal-actions" onclick="event.stopPropagation()">
+                        <button class="action-btn action-primary" onclick="addContribution(${goal.id})">
+                            Add Money
+                        </button>
+                        <button class="action-btn action-secondary" onclick="editGoal(${goal.id})">
+                            Edit Goal
+                        </button>
                     </div>
                 </div>
-            </div>
-        `;
+            `;
+        }
 
-        messagesContainer.appendChild(typingElement);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
+        function getProgressColor(priority) {
+            const colors = {
+                critical: 'gradient-red',
+                high: 'gradient-orange',
+                medium: 'gradient-blue',
+                low: 'gradient-green'
+            };
+            return colors[priority] || 'gradient-purple';
+        }
 
-    hideTypingIndicator() {
-        const typingElement = document.getElementById('typingIndicat
+        function formatNumber(num) {
+            return new Intl.NumberFormat('en-NZ', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            }).format(num);
+        }
 
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-NZ', { 
+                month: 'short', 
+                year: 'numeric' 
+            });
+        }
+
+        function updateOverview() {
+            const totalGoals = goals.length;
+            const totalSaved = goals.reduce((sum, goal) => sum + goal.current, 0);
+            const totalTarget = goals.reduce((sum, goal) => sum + goal.target, 0);
+            const overallProgress = totalTarget > 0 ? (totalSaved / totalTarget) * 100 : 0;
+            
+            // Find next milestone (smallest remaining amount in critical/high priority goals)
+            const urgentGoals = goals.filter(g => ['critical', 'high'].includes(g.priority));
+            const nextMilestone = urgentGoals.length > 0 
+                ? Math.min(...urgentGoals.map(g => Math.max(1000 - (g.current % 1000), g.target - g.current)))
+                : 0;
+
+            document.getElementById('totalGoals').textContent = totalGoals;
+            document.getElementById('totalSaved').textContent = `$${formatNumber(totalSaved)}`;
+            document.getElementById('overallProgress').textContent = `${overallProgress.toFixed(1)}%`;
+            document.getElementById('nextMilestone').textContent = `$${formatNumber(nextMilestone)}`;
+        }
+
+        // Modal Functions
+        function openAddGoalModal() {
+            document.getElementById('addGoalModal').classList.remove('hidden');
+            
+            // Set default target date to 1 year from now
+            const nextYear = new Date();
+            nextYear.setFullYear(nextYear.getFullYear() + 1);
+            document.getElementById('goalDate').value = nextYear.toISOString().split('T')[0];
+        }
+
+        function closeAddGoalModal() {
+            document.getElementById('addGoalModal').classList.add('hidden');
+            document.getElementById('addGoalForm').reset();
+        }
+
+        function saveGoal() {
+            const form = document.getElementById('addGoalForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const newGoal = {
+                id: Date.now(),
+                name: document.getElementById('goalName').value,
+                description: document.getElementById('goalDescription').value,
+                target: parseFloat(document.getElementById('goalTarget').value),
+                current: parseFloat(document.getElementById('goalCurrent').value) || 0,
+                priority: document.getElementById('goalPriority').value,
+                targetDate: document.getElementById('goalDate').value,
+                monthlyContribution: parseFloat(document.getElementById('goalMonthly').value) || 0,
+                createdDate: new Date().toISOString().split('T')[0]
+            };
+
+            goals.push(newGoal);
+            saveGoals();
+            renderGoals();
+            updateOverview();
+            closeAddGoalModal();
+        }
+
+        function editGoal(goalId) {
+            const goal = goals.find(g => g.id === goalId);
+            if (!goal) return;
+
+            currentEditingGoal = goal;
+            
+            // Populate edit form
+            document.getElementById('editGoalName').value = goal.name;
+            document.getElementById('editGoalDescription').value = goal.description;
+            document.getElementById('editGoalTarget').value = goal.target;
+            document.getElementById('editGoalCurrent').value = goal.current;
+            document.getElementById('editGoalPriority').value = goal.priority;
+            document.getElementById('editGoalDate').value = goal.targetDate;
+            document.getElementById('editGoalMonthly').value = goal.monthlyContribution;
+            
+            document.getElementById('editGoalModal').classList.remove('hidden');
+        }
+
+        function closeEditGoalModal() {
+            document.getElementById('editGoalModal').classList.add('hidden');
+            currentEditingGoal = null;
+        }
+
+        function updateGoal() {
+            if (!currentEditingGoal) return;
+
+            const form = document.getElementById('editGoalForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Update the goal
+            currentEditingGoal.name = document.getElementById('editGoalName').value;
+            currentEditingGoal.description = document.getElementById('editGoalDescription').value;
+            currentEditingGoal.target = parseFloat(document.getElementById('editGoalTarget').value);
+            currentEditingGoal.current = parseFloat(document.getElementById('editGoalCurrent').value);
+            currentEditingGoal.priority = document.getElementById('editGoalPriority').value;
+            currentEditingGoal.targetDate = document.getElementById('editGoalDate').value;
+            currentEditingGoal.monthlyContribution = parseFloat(document.getElementById('editGoalMonthly').value) || 0;
+
+            saveGoals();
+            renderGoals();
+            updateOverview();
+            closeEditGoalModal();
+        }
+
+        function deleteGoal() {
+            if (!currentEditingGoal) return;
+
+            if (confirm(`Are you sure you want to delete "${currentEditingGoal.name}"? This action cannot be undone.`)) {
+                goals = goals.filter(g => g.id !== currentEditingGoal.id);
+                saveGoals();
+                renderGoals();
+                updateOverview();
+                closeEditGoalModal();
+            }
+        }
+
+        function addContribution(goalId) {
+            const goal = goals.find(g => g.id === goalId);
+            if (!goal) return;
+
+            const amount = prompt(`Add money to "${goal.name}":\n\nCurrent: $${formatNumber(goal.current)}\nTarget: $${formatNumber(goal.target)}\n\nEnter contribution amount:`);
+            
+            if (amount && !isNaN(amount) && parseFloat(amount) > 0) {
+                goal.current += parseFloat(amount);
+                saveGoals();
+                renderGoals();
+                updateOverview();
+            }
+        }
+
+        // Initialize privacy mode from localStorage
+        const savedPrivacy = localStorage.getItem('financeos_privacy');
+        if (savedPrivacy === 'true') {
+            togglePrivacyMode();
+        }
+    </script>
 </body>
+</html>
