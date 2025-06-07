@@ -2,29 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FinanceOS - Budget</title>
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8b5cf6">
-    <meta name="description" content="Track your budget and spending patterns">
-    
-    <!-- PWA Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="FinanceOS">
-    <meta name="mobile-web-app-capable" content="yes">
-    
-    <!-- Icons -->
-    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
-    <link rel="manifest" href="manifest.json">
-    
-    <title>Budget - FinanceOS</title>
-    
-    <!-- External Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    
     <style>
-        /* Reset and Base Styles */
+        /* CSS Variables for Premium Design System */
+        :root {
+            --primary-bg: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-premium: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 50%, rgba(147, 51, 234, 0.15) 100%);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-premium-border: rgba(255, 255, 255, 0.2);
+            --text-primary: rgba(255, 255, 255, 0.9);
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --gradient-purple: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
+            --gradient-blue: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+            --gradient-green: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+            --gradient-red: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+            --gradient-orange: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%);
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -33,29 +39,10 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
-            background-attachment: fixed;
-            color: white;
+            background: var(--primary-bg);
+            color: var(--text-primary);
             min-height: 100vh;
             overflow-x: hidden;
-        }
-
-        /* CSS Variables for Design System */
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --glass-premium-bg: linear-gradient(135deg, 
-                rgba(139, 92, 246, 0.15) 0%, 
-                rgba(59, 130, 246, 0.15) 50%, 
-                rgba(147, 51, 234, 0.15) 100%);
-            --glass-premium-border: rgba(255, 255, 255, 0.2);
-            --gradient-purple: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
-            --gradient-blue: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
-            --gradient-green: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
-            --gradient-red: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
-            --text-white: rgba(255, 255, 255, 0.9);
-            --text-gray: rgba(255, 255, 255, 0.7);
-            --text-light: rgba(255, 255, 255, 0.5);
         }
 
         /* Glass Effects */
@@ -67,88 +54,87 @@
         }
 
         .glass-premium {
-            background: var(--glass-premium-bg);
+            background: var(--glass-premium);
             backdrop-filter: blur(20px);
             border: 1px solid var(--glass-premium-border);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
 
-        /* Navigation Bar - BIGGER UNIFIED STYLE */
-        .navbar {
-            position: fixed;
+        /* Transitions */
+        .transition-all { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .hover-scale:hover { transform: scale(1.02) translateY(-2px); }
+
+        /* Header Styles */
+        .header {
+            position: sticky;
             top: 0;
-            left: 0;
-            right: 0;
             z-index: 1000;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 20px 0;
-            transition: all 0.3s ease;
+            padding: 12px 20px;
+            border-radius: 0;
         }
 
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
+        .header-content {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 24px;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        .nav-logo {
+        .logo {
             display: flex;
             align-items: center;
-            text-decoration: none;
-            color: white;
+            gap: 12px;
+            font-size: 24px;
             font-weight: 700;
+            color: white;
         }
 
         .logo-icon {
             width: 48px;
             height: 48px;
-            margin-right: 12px;
+            background: var(--gradient-purple);
             border-radius: 12px;
-            background: var(--gradient-green);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
         }
 
-        .nav-links {
+        .nav {
             display: flex;
             align-items: center;
-            gap: 32px;
-            list-style: none;
+            gap: 8px;
         }
 
-        .nav-links a {
-            color: var(--text-gray);
+        .nav-button {
+            padding: 8px 20px;
+            border-radius: 12px;
             text-decoration: none;
+            color: var(--text-secondary);
             font-weight: 500;
-            font-size: 1rem;
-            padding: 12px 20px;
-            border-radius: 8px;
+            font-size: 16px;
             transition: all 0.3s ease;
+            border: none;
+            background: transparent;
+            cursor: pointer;
             position: relative;
         }
 
-        .nav-links a:hover {
+        .nav-button:hover {
             color: white;
             background: rgba(255, 255, 255, 0.1);
         }
 
-        .nav-links a.active {
-            color: #8b5cf6;
-            background: rgba(139, 92, 246, 0.1);
+        .nav-button.active {
+            color: white;
+            background: rgba(139, 92, 246, 0.3);
         }
 
-        .nav-links a.active::after {
+        .nav-button.active::after {
             content: '';
             position: absolute;
-            bottom: -8px;
+            bottom: -4px;
             left: 50%;
             transform: translateX(-50%);
             width: 6px;
@@ -157,939 +143,1095 @@
             border-radius: 50%;
         }
 
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
         .privacy-toggle {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
         }
 
-        .privacy-toggle:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .privacy-toggle.active {
-            background: rgba(247, 147, 26, 0.2);
-            border-color: rgba(247, 147, 26, 0.3);
-            color: #f97316;
-        }
-
-        .logout-btn {
-            background: var(--gradient-red);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-
-        /* Mobile Menu */
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 8px;
-        }
-
-        /* Privacy Mode */
-        .privacy-mode .privacy-sensitive {
-            filter: blur(4px);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .privacy-mode .privacy-sensitive:hover {
-            filter: blur(0);
+        .logout-button {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
         /* Main Content */
         .main-content {
-            margin-top: 100px;
-            padding: 24px;
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        /* Page Header */
         .page-header {
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 32px;
         }
 
         .page-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 8px;
+            font-size: 32px;
+            font-weight: 800;
             background: linear-gradient(135deg, #8b5cf6, #3b82f6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
-        .page-subtitle {
-            color: var(--text-gray);
-            font-size: 1.125rem;
+        .budget-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
         }
 
-        /* Critical Alert */
-        .critical-alert {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.2) 100%);
-            backdrop-filter: blur(20px);
-            border: 2px solid rgba(239, 68, 68, 0.3);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 32px;
-            animation: pulse 2s infinite;
+        .month-selector {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
         }
 
-        .critical-alert h3 {
-            color: #ef4444;
-            font-size: 1.125rem;
-            margin-bottom: 8px;
-        }
-
-        .critical-alert p {
-            color: var(--text-gray);
-            line-height: 1.5;
-            margin-bottom: 16px;
-        }
-
-        .critical-alert .alert-action {
-            background: var(--gradient-red);
+        .edit-budget-btn {
+            background: var(--gradient-purple);
             color: white;
             border: none;
             padding: 8px 16px;
             border-radius: 8px;
-            cursor: pointer;
+            font-size: 14px;
             font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        /* Budget Summary Cards */
-        .budget-summary {
+        .edit-budget-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+        }
+
+        /* Budget Overview Cards */
+        .budget-overview {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
             margin-bottom: 32px;
         }
 
-        .summary-card {
-            background: var(--glass-premium-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-premium-border);
-            border-radius: 16px;
+        .overview-card {
             padding: 24px;
+            border-radius: 20px;
             text-align: center;
-            transition: all 0.3s ease;
         }
 
-        .summary-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 48px rgba(139, 92, 246, 0.3);
+        .overview-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
         }
 
-        .summary-card h3 {
-            font-size: 0.875rem;
+        .overview-title {
+            font-size: 12px;
             font-weight: 600;
-            color: var(--text-gray);
+            color: var(--text-secondary);
             margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        .summary-card .amount {
-            font-size: 1.875rem;
-            font-weight: 700;
+        .overview-amount {
+            font-size: 28px;
+            font-weight: 800;
             margin-bottom: 4px;
         }
 
-        .summary-card .change {
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        .positive { color: #10b981; }
-        .negative { color: #ef4444; }
-        .neutral { color: var(--text-gray); }
-
-        /* Charts Section */
-        .charts-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-
-        .chart-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 24px;
-        }
-
-        .chart-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 300px;
+        .overview-change {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
         }
 
         /* Budget Table */
-        .budget-table-container {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 24px;
+        .budget-section {
             margin-bottom: 32px;
-            overflow-x: auto;
         }
 
-        .table-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .table-title {
-            font-size: 1.25rem;
+        .section-title {
+            font-size: 20px;
             font-weight: 600;
+            margin-bottom: 16px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .budget-table-container {
+            border-radius: 16px;
+            overflow: hidden;
         }
 
         .budget-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.875rem;
-        }
-
-        .budget-table th,
-        .budget-table td {
-            text-align: left;
-            padding: 12px 16px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: transparent;
         }
 
         .budget-table th {
+            background: rgba(139, 92, 246, 0.2);
+            color: white;
+            padding: 16px;
+            text-align: left;
             font-weight: 600;
-            color: var(--text-gray);
+            font-size: 14px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            font-size: 0.75rem;
+        }
+
+        .budget-table td {
+            padding: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-variant-numeric: tabular-nums;
         }
 
         .budget-table tr:hover {
             background: rgba(255, 255, 255, 0.05);
         }
 
-        .category-header {
-            background: rgba(255, 255, 255, 0.05);
-            font-weight: 600;
-        }
-
-        .category-main {
+        .category-name {
             font-weight: 600;
             color: white;
-            padding-left: 8px;
         }
 
-        .category-sub {
-            padding-left: 32px;
-            color: var(--text-gray);
+        .subcategory-name {
+            color: var(--text-secondary);
+            padding-left: 20px;
+            font-size: 14px;
         }
 
         .amount {
+            text-align: right;
             font-weight: 600;
-            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
         }
 
-        .variance-positive {
-            color: #10b981;
+        .amount.positive {
+            color: var(--success);
         }
 
-        .variance-negative {
-            color: #ef4444;
+        .amount.negative {
+            color: var(--error);
         }
 
-        .status-badge {
-            padding: 4px 8px;
+        .amount.neutral {
+            color: var(--text-secondary);
+        }
+
+        .variance-bar {
+            width: 100px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
+            overflow: hidden;
+            position: relative;
         }
 
-        .status-on-track {
-            background: rgba(16, 185, 129, 0.2);
-            color: #10b981;
+        .variance-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
         }
 
-        .status-over {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
+        .variance-over {
+            background: var(--error);
         }
 
-        .status-under {
-            background: rgba(59, 130, 246, 0.2);
-            color: #3b82f6;
+        .variance-under {
+            background: var(--success);
         }
 
-        .status-critical {
-            background: rgba(239, 68, 68, 0.3);
-            color: #ff6b6b;
-            animation: pulse 2s infinite;
+        .variance-ontrack {
+            background: var(--info);
         }
 
-        /* AI Insights */
-        .ai-insights {
-            background: var(--glass-premium-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-premium-border);
-            border-radius: 20px;
-            padding: 24px;
+        /* Charts Section */
+        .charts-section {
             margin-bottom: 32px;
         }
 
-        .insights-header {
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        .chart-card {
+            padding: 24px;
+            border-radius: 20px;
+            height: 400px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: white;
+            text-align: center;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 320px;
+        }
+
+        /* Spending Insights */
+        .insights-section {
+            margin-bottom: 32px;
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .insight-card {
+            padding: 20px;
+            border-radius: 16px;
+        }
+
+        .insight-header {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
-        .insights-icon {
+        .insight-icon {
             width: 40px;
             height: 40px;
-            background: var(--gradient-purple);
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 18px;
         }
 
-        .insight-section {
-            margin-bottom: 20px;
-            padding: 16px;
-            border-radius: 12px;
-        }
-
-        .insight-section.critical {
-            background: rgba(239, 68, 68, 0.1);
-            border-left: 4px solid #ef4444;
-        }
-
-        .insight-section.warning {
-            background: rgba(247, 147, 26, 0.1);
-            border-left: 4px solid #f97316;
-        }
-
-        .insight-section.positive {
-            background: rgba(16, 185, 129, 0.1);
-            border-left: 4px solid #10b981;
-        }
-
-        .insight-section h4 {
-            margin-bottom: 8px;
+        .insight-title {
+            font-size: 16px;
             font-weight: 600;
+            color: white;
         }
 
-        .insight-section ul {
-            margin: 8px 0;
-            padding-left: 20px;
+        .insight-content {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
         }
 
-        /* Responsive Design */
+        .insight-action {
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: var(--gradient-purple);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .insight-action:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Mobile Responsive */
         @media (max-width: 768px) {
-            .nav-links {
-                display: none;
+            .header-content {
+                flex-direction: column;
+                gap: 12px;
             }
 
-            .mobile-menu-btn {
-                display: block;
+            .nav {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
             }
 
-            .main-content {
-                padding: 16px;
-                margin-top: 88px;
+            .nav-button {
+                font-size: 14px;
+                padding: 6px 12px;
             }
 
-            .page-title {
-                font-size: 2rem;
-            }
-
-            .budget-summary {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            .page-header {
+                flex-direction: column;
+                align-items: stretch;
                 gap: 16px;
             }
 
-            .charts-section {
+            .budget-overview {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .charts-grid {
                 grid-template-columns: 1fr;
-                gap: 16px;
+            }
+
+            .chart-card {
+                height: 300px;
             }
 
             .chart-container {
-                height: 250px;
+                height: 220px;
             }
 
             .budget-table-container {
-                padding: 16px;
+                overflow-x: auto;
             }
 
             .budget-table {
-                font-size: 0.75rem;
+                min-width: 600px;
             }
 
-            .budget-table th,
-            .budget-table td {
-                padding: 8px 12px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .nav-container {
-                padding: 0 16px;
-            }
-
-            .logo-icon {
-                width: 40px;
-                height: 40px;
-                font-size: 20px;
-            }
-
-            .page-title {
-                font-size: 1.75rem;
-            }
-
-            .summary-card .amount {
-                font-size: 1.5rem;
+            .insights-grid {
+                grid-template-columns: 1fr;
             }
         }
 
-        /* Utilities */
-        .text-center { text-align: center; }
-        .text-right { text-align: right; }
-        .font-mono { font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace; }
-        .hidden { display: none; }
+        .hidden {
+            display: none;
+        }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
+        /* Privacy Mode */
+        body.privacy-mode .amount,
+        body.privacy-mode .overview-amount {
+            filter: blur(8px);
+            transition: filter 0.3s ease;
+        }
+
+        body.privacy-mode .amount:hover,
+        body.privacy-mode .overview-amount:hover {
+            filter: blur(0);
+        }
+
+        /* Loading States */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="nav-logo">
-                <div class="logo-icon">$</div>
-                <span>FinanceOS</span>
-            </a>
-            
-            <div class="nav-links">
-                <a href="index.html">Dashboard</a>
-                <a href="budget.html" class="active">Budget</a>
-                <a href="goals.html">Goals</a>
-                <a href="csv-upload.html">Upload</a>
+    <header class="header glass">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <span style="font-size: 24px; color: white;">$</span>
+                </div>
+                <span class="logo-text">FinanceOS</span>
             </div>
             
-            <div class="nav-actions">
-                <button class="privacy-toggle" id="privacyToggle">👁️ Privacy</button>
-                <button class="mobile-menu-btn">☰</button>
-            </div>
+            <nav class="nav">
+                <a href="index.html" class="nav-button">Dashboard</a>
+                <a href="csv-upload.html" class="nav-button">Upload CSV</a>
+                <a href="goals.html" class="nav-button">Goals</a>
+                <a href="budget.html" class="nav-button active">Budget</a>
+                <button class="privacy-toggle nav-button" id="privacyToggle">🔒 Privacy</button>
+                <button class="logout-button nav-button" onclick="logout()">🚪 Logout</button>
+            </nav>
         </div>
-    </nav>
+    </header>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- Page Header -->
+    <main class="main-content">
         <div class="page-header">
-            <h1 class="page-title">Monthly Budget</h1>
-            <p class="page-subtitle">December 2024 • Track spending vs budget</p>
-        </div>
-
-        <!-- Critical Budget Alert -->
-        <div class="critical-alert">
-            <h3>🚨 Critical Budget Deficit</h3>
-            <p>You're spending $3,607 more than you earn each month. This is unsustainable and requires immediate action.</p>
-            <button class="alert-action" onclick="openBudgetOptimizer()">Fix Budget</button>
-        </div>
-
-        <!-- Budget Summary Cards -->
-        <div class="budget-summary">
-            <div class="summary-card">
-                <h3>Monthly Income</h3>
-                <div class="amount positive privacy-sensitive">$6,304</div>
-                <div class="change neutral">Salary (after tax)</div>
-            </div>
-            <div class="summary-card">
-                <h3>Monthly Expenses</h3>
-                <div class="amount negative privacy-sensitive">$9,911</div>
-                <div class="change negative">157% of income</div>
-            </div>
-            <div class="summary-card">
-                <h3>Net Position</h3>
-                <div class="amount negative privacy-sensitive">-$3,607</div>
-                <div class="change negative">Critical deficit</div>
+            <h1 class="page-title">Budget Overview</h1>
+            <div class="budget-controls">
+                <select class="month-selector" id="monthSelector">
+                    <option value="2024-12">December 2024</option>
+                    <option value="2024-11">November 2024</option>
+                    <option value="2024-10">October 2024</option>
+                </select>
+                <button class="edit-budget-btn" onclick="editBudget()">
+                    ✏️ Edit Budget
+                </button>
             </div>
         </div>
 
-        <!-- Charts Section -->
-        <div class="charts-section">
-            <div class="chart-card">
-                <h3 class="chart-title">Budget vs Actual Spending</h3>
-                <div class="chart-container">
-                    <canvas id="budgetChart"></canvas>
+        <!-- Budget Overview Cards -->
+        <section class="budget-overview">
+            <div class="overview-card glass-premium">
+                <div class="overview-icon">💰</div>
+                <div class="overview-title">Monthly Income</div>
+                <div class="overview-amount amount positive" id="monthlyIncome">$6,304</div>
+                <div class="overview-change">
+                    <span style="color: var(--success);">↗</span>
+                    <span>After tax wages</span>
                 </div>
             </div>
-            <div class="chart-card">
-                <h3 class="chart-title">Spending by Category</h3>
-                <div class="chart-container">
-                    <canvas id="categoryChart"></canvas>
+            
+            <div class="overview-card glass-premium">
+                <div class="overview-icon">💸</div>
+                <div class="overview-title">Monthly Expenses</div>
+                <div class="overview-amount amount negative" id="monthlyExpenses">$9,911</div>
+                <div class="overview-change">
+                    <span style="color: var(--error);">↗</span>
+                    <span>All categories</span>
                 </div>
             </div>
-        </div>
+            
+            <div class="overview-card glass-premium">
+                <div class="overview-icon">📊</div>
+                <div class="overview-title">Net Cash Flow</div>
+                <div class="overview-amount amount negative" id="netCashFlow">-$3,607</div>
+                <div class="overview-change">
+                    <span style="color: var(--error);">⚠️</span>
+                    <span>Deficit - Action needed</span>
+                </div>
+            </div>
+            
+            <div class="overview-card glass-premium">
+                <div class="overview-icon">🎯</div>
+                <div class="overview-title">Budget Adherence</div>
+                <div class="overview-amount amount neutral" id="budgetAdherence">78%</div>
+                <div class="overview-change">
+                    <span style="color: var(--warning);">📈</span>
+                    <span>Improving</span>
+                </div>
+            </div>
+        </section>
 
         <!-- Budget Table -->
-        <div class="budget-table-container">
-            <div class="table-header">
-                <h3 class="table-title">Detailed Budget Breakdown</h3>
-            </div>
+        <section class="budget-section">
+            <h2 class="section-title">
+                📋 Detailed Budget Breakdown
+            </h2>
             
-            <table class="budget-table">
-                <thead>
-                    <tr>
-                        <th>Category</th>
-                        <th>Subcategory</th>
-                        <th>Budgeted</th>
-                        <th>Actual</th>
-                        <th>Difference</th>
-                        <th>Status</th>
-                        <th>Notes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Income Section -->
-                    <tr class="category-header">
-                        <td colspan="7"><strong>💰 Income</strong></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>Salary</td>
-                        <td class="amount privacy-sensitive">$6,304</td>
-                        <td class="amount privacy-sensitive">$6,304</td>
-                        <td class="amount neutral">$0</td>
-                        <td><span class="status-badge status-on-track">On Track</span></td>
-                        <td>Pathway Engineer wages (after tax)</td>
-                    </tr>
+            <div class="budget-table-container glass-premium">
+                <table class="budget-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Budgeted</th>
+                            <th>Actual</th>
+                            <th>Difference</th>
+                            <th>Variance</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="budgetTableBody">
+                        <!-- Budget rows will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
-                    <!-- Housing Section -->
-                    <tr class="category-header">
-                        <td colspan="7"><strong>🏠 Housing</strong></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>Mortgage 1</td>
-                        <td class="amount privacy-sensitive">$1,190</td>
-                        <td class="amount privacy-sensitive">$1,190</td>
-                        <td class="amount neutral">$0</td>
-                        <td><span class="status-badge status-on-track">Fixed</span></td>
-                        <td>4.99% interest</td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>Mortgage 2</td>
-                        <td class="amount privacy-sensitive">$880</td>
-                        <td class="amount privacy-sensitive">$880</td>
-                        <td class="amount neutral">$0</td>
-                        <td><span class="status-badge status-on-track">Fixed</span></td>
-                        <td>4.99% interest</td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>Rates</td>
-                        <td class="amount privacy-sensitive">$357</td>
-                        <td class="amount privacy-sensitive">$357</td>
-                        <td class="amount neutral">$0</td>
-                        <td><span class="status-badge status-on-track">Fixed</span></td>
-                        <td>Council rates</td>
-                    </tr>
-
-                    <!-- Food Section -->
-                    <tr class="category-header">
-                        <td colspan="7"><strong>🍽️ Food</strong></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>Groceries</td>
-                        <td class="amount privacy-sensitive">$550</td>
-                        <td class="amount privacy-sensitive">$687</td>
-                        <td class="amount variance-negative privacy-sensitive">-$137</td>
-                        <td><span class="status-badge status-over">25% Over</span></td>
-                        <td>Higher than expected</td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>Dining Out/Takeaway</td>
-                        <td class="amount privacy-sensitive">$250</td>
-                        <td class="amount privacy-sensitive">$423</td>
-                        <td class="amount variance-negative privacy-sensitive">-$173</td>
-                        <td><span class="status-badge status-over">69% Over</span></td>
-                        <td>Cut back needed</td>
-                    </tr>
-
-                    <!-- Utilities Section -->
-                    <tr class="category-header">
-                        <td colspan="7"><strong>⚡ Utilities</strong></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>Sky Network</td>
-                        <td class="amount privacy-sensitive">$163</td>
-                        <td class="amount privacy-sensitive">$163</td>
-                        <td class="amount neutral">$0</td>
-                        <td><span class="status-badge status-on-track">Fixed</span></td>
-                        <td>TV & broadband</td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>Mobile Phone</td>
-                        <td class="amount privacy-sensitive">$40</td>
-                        <td class="amount privacy-sensitive">$47</td>
-                        <td class="amount variance-negative privacy-sensitive">-$7</td>
-                        <td><span class="status-badge status-over">18% Over</span></td>
-                        <td>Data overage</td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>Internet/Streaming</td>
-                        <td class="amount privacy-sensitive">$10</td>
-                        <td class="amount privacy-sensitive">$8</td>
-                        <td class="amount variance-positive privacy-sensitive">+$2</td>
-                        <td><span class="status-badge status-under">Under</span></td>
-                        <td>Netflix only</td>
-                    </tr>
-
-                    <!-- Insurance Section -->
-                    <tr class="category-header">
-                        <td colspan="7"><strong>🛡️ Insurance</strong></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>Vero Insurance</td>
-                        <td class="amount privacy-sensitive">$350</td>
-                        <td class="amount privacy-sensitive">$350</td>
-                        <td class="amount neutral">$0</td>
-                        <td><span class="status-badge status-on-track">Fixed</span></td>
-                        <td>Home & contents</td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>Partners Life</td>
-                        <td class="amount privacy-sensitive">$140</td>
-                        <td class="amount privacy-sensitive">$140</td>
-                        <td class="amount neutral">$0</td>
-                        <td><span class="status-badge status-on-track">Fixed</span></td>
-                        <td>Life insurance</td>
-                    </tr>
-
-                    <!-- Childcare Section -->
-                    <tr class="category-header">
-                        <td colspan="7"><strong>👶 Childcare</strong></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>Grow Active Daycare</td>
-                        <td class="amount privacy-sensitive">$508</td>
-                        <td class="amount privacy-sensitive">$508</td>
-                        <td class="amount neutral">$0</td>
-                        <td><span class="status-badge status-on-track">Fixed</span></td>
-                        <td>Weekly childcare</td>
-                    </tr>
-
-                    <!-- Transportation Section -->
-                    <tr class="category-header">
-                        <td colspan="7"><strong>🚗 Transportation</strong></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>Fuel</td>
-                        <td class="amount privacy-sensitive">$125</td>
-                        <td class="amount privacy-sensitive">$178</td>
-                        <td class="amount variance-negative privacy-sensitive">-$53</td>
-                        <td><span class="status-badge status-over">42% Over</span></td>
-                        <td>Higher fuel prices</td>
-                    </tr>
-
-                    <!-- Savings & Investments Section -->
-                    <tr class="category-header">
-                        <td colspan="7"><strong>📈 Savings & Investments</strong></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>Sharesies</td>
-                        <td class="amount privacy-sensitive">$271</td>
-                        <td class="amount privacy-sensitive">$0</td>
-                        <td class="amount variance-negative privacy-sensitive">-$271</td>
-                        <td><span class="status-badge status-critical">No Allocation</span></td>
-                        <td>Paused due to deficit</td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>Emergency Fund</td>
-                        <td class="amount privacy-sensitive">$0</td>
-                        <td class="amount privacy-sensitive">$0</td>
-                        <td class="amount neutral">$0</td>
-                        <td><span class="status-badge status-critical">Critical</span></td>
-                        <td>Needs immediate funding</td>
-                    </tr>
-
-                    <!-- Education Section -->
-                    <tr class="category-header">
-                        <td colspan="7"><strong>🎓 Private School Fund</strong></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>Education Savings</td>
-                        <td class="amount privacy-sensitive">$300</td>
-                        <td class="amount privacy-sensitive">$0</td>
-                        <td class="amount variance-negative privacy-sensitive">-$300</td>
-                        <td><span class="status-badge status-critical">No Allocation</span></td>
-                        <td>Deferred due to deficit</td>
-                    </tr>
-
-                    <!-- Discretionary Section -->
-                    <tr class="category-header">
-                        <td colspan="7"><strong>🛍️ Discretionary</strong></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>Shopping/Retail</td>
-                        <td class="amount privacy-sensitive">$150</td>
-                        <td class="amount privacy-sensitive">$267</td>
-                        <td class="amount variance-negative privacy-sensitive">-$117</td>
-                        <td><span class="status-badge status-over">78% Over</span></td>
-                        <td>Reduce non-essentials</td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>Entertainment</td>
-                        <td class="amount privacy-sensitive">$50</td>
-                        <td class="amount privacy-sensitive">$93</td>
-                        <td class="amount variance-negative privacy-sensitive">-$43</td>
-                        <td><span class="status-badge status-over">86% Over</span></td>
-                        <td>Movie nights & activities</td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>Travel Fund</td>
-                        <td class="amount privacy-sensitive">$100</td>
-                        <td class="amount privacy-sensitive">$0</td>
-                        <td class="amount variance-negative privacy-sensitive">-$100</td>
-                        <td><span class="status-badge status-critical">No Allocation</span></td>
-                        <td>Deferred</td>
-                    </tr>
-
-                    <!-- Totals Section -->
-                    <tr class="category-header" style="border-top: 2px solid rgba(255,255,255,0.2);">
-                        <td colspan="2"><strong>Total Income</strong></td>
-                        <td class="amount privacy-sensitive"><strong>$6,304</strong></td>
-                        <td class="amount privacy-sensitive"><strong>$6,304</strong></td>
-                        <td class="amount neutral"><strong>$0</strong></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr class="category-header">
-                        <td colspan="2"><strong>Total Expenses</strong></td>
-                        <td class="amount privacy-sensitive"><strong>$9,911</strong></td>
-                        <td class="amount privacy-sensitive"><strong>$10,254</strong></td>
-                        <td class="amount variance-negative privacy-sensitive"><strong>-$343</strong></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr class="category-header" style="background: rgba(239, 68, 68, 0.1);">
-                        <td colspan="2"><strong>Net Income</strong></td>
-                        <td class="amount privacy-sensitive"><strong>-$3,607</strong></td>
-                        <td class="amount privacy-sensitive"><strong>-$3,950</strong></td>
-                        <td class="amount variance-negative privacy-sensitive"><strong>-$343</strong></td>
-                        <td><span class="status-badge status-critical">CRITICAL</span></td>
-                        <td><strong>Unsustainable</strong></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- AI Budget Insights -->
-        <div class="ai-insights">
-            <div class="insights-header">
-                <div class="insights-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                        <circle cx="12" cy="12" r="5"/>
-                        <path d="M12 1v6M12 17v6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6M17 12h6M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24"/>
-                    </svg>
+        <!-- Charts Section -->
+        <section class="charts-section">
+            <h2 class="section-title">
+                📈 Spending Analysis
+            </h2>
+            
+            <div class="charts-grid">
+                <div class="chart-card glass-premium">
+                    <h3 class="chart-title">Budget vs Actual Spending</h3>
+                    <div class="chart-container">
+                        <canvas id="budgetChart"></canvas>
+                    </div>
                 </div>
-                <h3>AI Budget Analysis</h3>
+                
+                <div class="chart-card glass-premium">
+                    <h3 class="chart-title">Expense Category Breakdown</h3>
+                    <div class="chart-container">
+                        <canvas id="expenseChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card glass-premium">
+                    <h3 class="chart-title">Monthly Spending Trends</h3>
+                    <div class="chart-container">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card glass-premium">
+                    <h3 class="chart-title">Cash Flow Analysis</h3>
+                    <div class="chart-container">
+                        <canvas id="cashFlowChart"></canvas>
+                    </div>
+                </div>
             </div>
+        </section>
+
+        <!-- Spending Insights -->
+        <section class="insights-section">
+            <h2 class="section-title">
+                💡 AI Spending Insights
+            </h2>
             
-            <div class="insight-section critical">
-                <h4>🚨 Critical Issues</h4>
-                <ul>
-                    <li><strong>Dining Out:</strong> 69% over budget ($173 excess) - biggest opportunity to cut</li>
-                    <li><strong>Groceries:</strong> 25% over budget ($137 excess) - meal planning needed</li>
-                    <li><strong>Fuel:</strong> 42% over budget ($53 excess) - consider carpooling or public transport</li>
-                    <li><strong>No Emergency Fund:</strong> Critical financial risk - start with $50/week minimum</li>
-                </ul>
+            <div class="insights-grid">
+                <div class="insight-card glass-premium">
+                    <div class="insight-header">
+                        <div class="insight-icon" style="background: var(--gradient-red);">🚨</div>
+                        <div class="insight-title">Budget Deficit Alert</div>
+                    </div>
+                    <div class="insight-content">
+                        Your monthly expenses exceed income by $3,607. This is unsustainable long-term and requires immediate attention to prevent debt accumulation.
+                    </div>
+                    <button class="insight-action" onclick="showOptimizationPlan()">
+                        View Optimization Plan
+                    </button>
+                </div>
+                
+                <div class="insight-card glass-premium">
+                    <div class="insight-header">
+                        <div class="insight-icon" style="background: var(--gradient-orange);">🍕</div>
+                        <div class="insight-title">Dining Out Overspend</div>
+                    </div>
+                    <div class="insight-content">
+                        You're spending $250/month on dining out. Reducing this to $150 could save $1,200 annually toward your emergency fund.
+                    </div>
+                    <button class="insight-action" onclick="adjustCategory('dining')">
+                        Adjust Budget
+                    </button>
+                </div>
+                
+                <div class="insight-card glass-premium">
+                    <div class="insight-header">
+                        <div class="insight-icon" style="background: var(--gradient-blue);">📺</div>
+                        <div class="insight-title">Subscription Review</div>
+                    </div>
+                    <div class="insight-content">
+                        Sky Network costs $163/month. Consider streaming alternatives that could reduce this expense by 50-70%.
+                    </div>
+                    <button class="insight-action" onclick="reviewSubscriptions()">
+                        Review Options
+                    </button>
+                </div>
+                
+                <div class="insight-card glass-premium">
+                    <div class="insight-header">
+                        <div class="insight-icon" style="background: var(--gradient-green);">🏠</div>
+                        <div class="insight-title">House Kitty Strength</div>
+                    </div>
+                    <div class="insight-content">
+                        Your House Kitty with $65,357 provides excellent emergency coverage. This is a strong financial foundation.
+                    </div>
+                    <button class="insight-action" onclick="viewHouseKittyStrategy()">
+                        Optimize Usage
+                    </button>
+                </div>
             </div>
-
-            <div class="insight-section warning">
-                <h4>💡 AI Recommendations</h4>
-                <ul>
-                    <li><strong>Cut Dining Out by 50%:</strong> Set weekly limit of $60 (saves $211/month)</li>
-                    <li><strong>Grocery Meal Planning:</strong> Plan meals, use shopping lists (saves $137/month)</li>
-                    <li><strong>Reduce Entertainment:</strong> Free activities, library events (saves $43/month)</li>
-                    <li><strong>Emergency Fund Start:</strong> Begin with $25/week automatic transfer</li>
-                </ul>
-            </div>
-
-            <div class="insight-section positive">
-                <h4>🎯 Budget Optimization Plan</h4>
-                <p><strong>Week 1:</strong> Implement dining out limit ($60/week) - Save $50/week</p>
-                <p><strong>Week 2:</strong> Start meal planning & shopping lists - Save $35/week</p>
-                <p><strong>Week 3:</strong> Find free/low-cost entertainment - Save $10/week</p>
-                <p><strong>Month 1:</strong> Start emergency fund with savings - $95/week to emergency fund</p>
-            </div>
-        </div>
-    </div>
+        </section>
+    </main>
 
     <script>
-        // Privacy Mode Toggle
-        document.getElementById('privacyToggle').addEventListener('click', function() {
-            document.body.classList.toggle('privacy-mode');
-            this.classList.toggle('active');
-            
-            if (this.classList.contains('active')) {
-                this.innerHTML = '🔒 Privacy ON';
-            } else {
-                this.innerHTML = '👁️ Privacy OFF';
+        // Budget Data Structure
+        const budgetData = {
+            income: {
+                salary: { budgeted: 6304, actual: 6304, notes: 'Pathway Engineer wages (after tax)' }
+            },
+            expenses: {
+                housing: {
+                    'Mortgage 1': { budgeted: 1190, actual: 1190, notes: '4.99% interest' },
+                    'Mortgage 2': { budgeted: 880, actual: 880, notes: '4.99% interest' },
+                    'Rates': { budgeted: 357, actual: 357, notes: 'Council rates' }
+                },
+                food: {
+                    'Groceries': { budgeted: 550, actual: 620, notes: 'Over budget - bulk buying' },
+                    'Dining Out/Takeaway': { budgeted: 250, actual: 280, notes: 'Weekend splurges' }
+                },
+                utilities: {
+                    'Sky Network': { budgeted: 163, actual: 163, notes: 'Premium package' },
+                    'Mobile Phone': { budgeted: 40, actual: 42, notes: 'Data overage' },
+                    'Internet/Streaming': { budgeted: 10, actual: 15, notes: 'Netflix added' }
+                },
+                insurance: {
+                    'Vero Insurance': { budgeted: 350, actual: 350, notes: 'Home & contents' },
+                    'Partners Life': { budgeted: 140, actual: 140, notes: 'Life insurance' }
+                },
+                childcare: {
+                    'Grow Active Daycare': { budgeted: 508, actual: 508, notes: 'Fixed monthly fee' }
+                },
+                transportation: {
+                    'Fuel': { budgeted: 125, actual: 140, notes: 'Price increases' }
+                },
+                savings: {
+                    'Sharesies': { budgeted: 271, actual: 271, notes: 'Investment platform' },
+                    'Emergency Fund': { budgeted: 0, actual: 0, notes: 'Not currently funding' },
+                    'Education Savings': { budgeted: 300, actual: 300, notes: 'Private school fund' }
+                },
+                discretionary: {
+                    'Shopping/Retail': { budgeted: 150, actual: 180, notes: 'Clothing & household' },
+                    'Entertainment': { budgeted: 50, actual: 60, notes: 'Movies & activities' },
+                    'Travel Fund': { budgeted: 100, actual: 100, notes: 'Holiday savings' }
+                }
             }
+        };
+
+        // Chart instances
+        let budgetChart, expenseChart, trendChart, cashFlowChart;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthState();
+            setupEventListeners();
+            renderBudgetTable();
+            initializeCharts();
+            updateOverviewCards();
         });
 
-        // Chart.js Configuration
-        Chart.defaults.color = 'rgba(255, 255, 255, 0.8)';
-        Chart.defaults.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+        function checkAuthState() {
+            const authToken = localStorage.getItem('financeos_auth');
+            if (!authToken) {
+                window.location.href = 'index.html';
+                return;
+            }
+        }
 
-        // Budget vs Actual Chart
-        const budgetCtx = document.getElementById('budgetChart').getContext('2d');
-        new Chart(budgetCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Housing', 'Food', 'Utilities', 'Insurance', 'Childcare', 'Transport', 'Discretionary'],
-                datasets: [{
-                    label: 'Budgeted',
-                    data: [2427, 800, 213, 490, 508, 125, 300],
-                    backgroundColor: 'rgba(59, 130, 246, 0.6)',
-                    borderColor: 'rgba(59, 130, 246, 1)',
-                    borderWidth: 1
-                }, {
-                    label: 'Actual',
-                    data: [2427, 1110, 218, 490, 508, 178, 360],
-                    backgroundColor: 'rgba(239, 68, 68, 0.6)',
-                    borderColor: 'rgba(239, 68, 68, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    }
+        function logout() {
+            localStorage.removeItem('financeos_auth');
+            window.location.href = 'index.html';
+        }
+
+        function setupEventListeners() {
+            // Privacy toggle
+            const privacyToggle = document.getElementById('privacyToggle');
+            if (privacyToggle) {
+                privacyToggle.addEventListener('click', togglePrivacyMode);
+            }
+
+            // Month selector
+            const monthSelector = document.getElementById('monthSelector');
+            if (monthSelector) {
+                monthSelector.addEventListener('change', updateBudgetMonth);
+            }
+
+            // Initialize privacy mode from localStorage
+            const savedPrivacy = localStorage.getItem('financeos_privacy');
+            if (savedPrivacy === 'true') {
+                togglePrivacyMode();
+            }
+        }
+
+        function togglePrivacyMode() {
+            const isPrivate = document.body.classList.toggle('privacy-mode');
+            const toggle = document.getElementById('privacyToggle');
+            if (toggle) {
+                toggle.textContent = isPrivate ? '🔓 Show Data' : '🔒 Privacy';
+            }
+            localStorage.setItem('financeos_privacy', isPrivate.toString());
+        }
+
+        function updateBudgetMonth() {
+            const selectedMonth = document.getElementById('monthSelector').value;
+            console.log('Selected month:', selectedMonth);
+            // In a real app, this would fetch data for the selected month
+            renderBudgetTable();
+            updateCharts();
+        }
+
+        function renderBudgetTable() {
+            const tbody = document.getElementById('budgetTableBody');
+            let html = '';
+
+            // Income section
+            html += `<tr style="background: rgba(16, 185, 129, 0.1);">
+                <td class="category-name">INCOME</td>
+                <td class="amount positive">$${calculateTotal(budgetData.income, 'budgeted')}</td>
+                <td class="amount positive">$${calculateTotal(budgetData.income, 'actual')}</td>
+                <td class="amount">${formatDifference(calculateTotal(budgetData.income, 'actual') - calculateTotal(budgetData.income, 'budgeted'))}</td>
+                <td></td>
+                <td></td>
+            </tr>`;
+
+            Object.entries(budgetData.income).forEach(([category, data]) => {
+                const difference = data.actual - data.budgeted;
+                html += `<tr>
+                    <td class="subcategory-name">${category}</td>
+                    <td class="amount">${formatCurrency(data.budgeted)}</td>
+                    <td class="amount">${formatCurrency(data.actual)}</td>
+                    <td class="amount ${difference >= 0 ? 'positive' : 'negative'}">${formatDifference(difference)}</td>
+                    <td>${renderVarianceBar(difference, data.budgeted)}</td>
+                    <td class="text-muted">${data.notes}</td>
+                </tr>`;
+            });
+
+            // Expense sections
+            Object.entries(budgetData.expenses).forEach(([section, categories]) => {
+                const sectionBudgeted = calculateTotal(categories, 'budgeted');
+                const sectionActual = calculateTotal(categories, 'actual');
+                const sectionDifference = sectionActual - sectionBudgeted;
+
+                html += `<tr style="background: rgba(239, 68, 68, 0.1);">
+                    <td class="category-name">${section.toUpperCase()}</td>
+                    <td class="amount negative">$${sectionBudgeted}</td>
+                    <td class="amount negative">$${sectionActual}</td>
+                    <td class="amount ${sectionDifference <= 0 ? 'positive' : 'negative'}">${formatDifference(sectionDifference)}</td>
+                    <td></td>
+                    <td></td>
+                </tr>`;
+
+                Object.entries(categories).forEach(([category, data]) => {
+                    const difference = data.actual - data.budgeted;
+                    html += `<tr>
+                        <td class="subcategory-name">${category}</td>
+                        <td class="amount">${formatCurrency(data.budgeted)}</td>
+                        <td class="amount">${formatCurrency(data.actual)}</td>
+                        <td class="amount ${difference <= 0 ? 'positive' : 'negative'}">${formatDifference(difference)}</td>
+                        <td>${renderVarianceBar(difference, data.budgeted)}</td>
+                        <td style="color: var(--text-muted); font-size: 12px;">${data.notes}</td>
+                    </tr>`;
+                });
+            });
+
+            // Totals
+            const totalIncome = calculateTotal(budgetData.income, 'actual');
+            const totalExpenses = calculateTotalExpenses('actual');
+            const netCashFlow = totalIncome - totalExpenses;
+
+            html += `<tr style="background: rgba(139, 92, 246, 0.2); font-weight: bold;">
+                <td class="category-name">NET CASH FLOW</td>
+                <td class="amount">${formatCurrency(calculateTotal(budgetData.income, 'budgeted') - calculateTotalExpenses('budgeted'))}</td>
+                <td class="amount ${netCashFlow >= 0 ? 'positive' : 'negative'}">${formatCurrency(netCashFlow)}</td>
+                <td class="amount">${formatDifference(netCashFlow - (calculateTotal(budgetData.income, 'budgeted') - calculateTotalExpenses('budgeted')))}</td>
+                <td></td>
+                <td style="color: var(--text-muted); font-size: 12px;">${netCashFlow < 0 ? 'DEFICIT - Action Required' : 'SURPLUS'}</td>
+            </tr>`;
+
+            tbody.innerHTML = html;
+        }
+
+        function calculateTotal(section, type) {
+            return Object.values(section).reduce((sum, item) => sum + item[type], 0);
+        }
+
+        function calculateTotalExpenses(type) {
+            return Object.values(budgetData.expenses).reduce((sum, section) => {
+                return sum + calculateTotal(section, type);
+            }, 0);
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-NZ', {
+                style: 'currency',
+                currency: 'NZD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(Math.abs(amount));
+        }
+
+        function formatDifference(amount) {
+            const prefix = amount >= 0 ? '+' : '';
+            return prefix + formatCurrency(amount);
+        }
+
+        function renderVarianceBar(difference, budgeted) {
+            if (budgeted === 0) return '';
+            
+            const percentage = Math.abs(difference / budgeted) * 100;
+            const width = Math.min(percentage, 100);
+            
+            let colorClass = 'variance-ontrack';
+            if (percentage > 10) {
+                colorClass = difference > 0 ? 'variance-over' : 'variance-under';
+            }
+            
+            return `<div class="variance-bar">
+                <div class="variance-fill ${colorClass}" style="width: ${width}%"></div>
+            </div>`;
+        }
+
+        function updateOverviewCards() {
+            const totalIncome = calculateTotal(budgetData.income, 'actual');
+            const totalExpenses = calculateTotalExpenses('actual');
+            const netCashFlow = totalIncome - totalExpenses;
+            
+            // Calculate budget adherence
+            const totalBudgeted = calculateTotalExpenses('budgeted');
+            const adherence = totalBudgeted > 0 ? ((totalBudgeted - Math.abs(totalExpenses - totalBudgeted)) / totalBudgeted) * 100 : 0;
+
+            document.getElementById('monthlyIncome').textContent = formatCurrency(totalIncome);
+            document.getElementById('monthlyExpenses').textContent = formatCurrency(totalExpenses);
+            document.getElementById('netCashFlow').textContent = formatCurrency(netCashFlow);
+            document.getElementById('budgetAdherence').textContent = Math.round(adherence) + '%';
+        }
+
+        function initializeCharts() {
+            // Set Chart.js default colors for dark theme
+            Chart.defaults.color = 'rgba(255, 255, 255, 0.7)';
+            Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+            Chart.defaults.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+
+            createBudgetChart();
+            createExpenseChart();
+            createTrendChart();
+            createCashFlowChart();
+        }
+
+        function createBudgetChart() {
+            const ctx = document.getElementById('budgetChart').getContext('2d');
+            
+            const categories = [];
+            const budgeted = [];
+            const actual = [];
+            
+            Object.entries(budgetData.expenses).forEach(([section, items]) => {
+                Object.entries(items).forEach(([category, data]) => {
+                    categories.push(category);
+                    budgeted.push(data.budgeted);
+                    actual.push(data.actual);
+                });
+            });
+
+            budgetChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: categories,
+                    datasets: [
+                        {
+                            label: 'Budgeted',
+                            data: budgeted,
+                            backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Actual',
+                            data: actual,
+                            backgroundColor: 'rgba(239, 68, 68, 0.6)',
+                            borderColor: 'rgba(239, 68, 68, 1)',
+                            borderWidth: 1
+                        }
+                    ]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
                         }
                     },
-                    x: {
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value;
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45
+                            }
                         }
                     }
                 }
-            }
-        });
+            });
+        }
 
-        // Category Spending Chart
-        const categoryCtx = document.getElementById('categoryChart').getContext('2d');
-        new Chart(categoryCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Housing', 'Food', 'Childcare', 'Insurance', 'Utilities', 'Transport', 'Discretionary'],
-                datasets: [{
-                    data: [2427, 1110, 508, 490, 218, 178, 360],
-                    backgroundColor: [
-                        'rgba(139, 92, 246, 0.8)',
-                        'rgba(239, 68, 68, 0.8)',
-                        'rgba(16, 185, 129, 0.8)',
-                        'rgba(59, 130, 246, 0.8)',
-                        'rgba(245, 158, 11, 0.8)',
-                        'rgba(247, 147, 26, 0.8)',
-                        'rgba(236, 72, 153, 0.8)'
-                    ],
-                    borderColor: [
-                        'rgba(139, 92, 246, 1)',
-                        'rgba(239, 68, 68, 1)',
-                        'rgba(16, 185, 129, 1)',
-                        'rgba(59, 130, 246, 1)',
-                        'rgba(245, 158, 11, 1)',
-                        'rgba(247, 147, 26, 1)',
-                        'rgba(236, 72, 153, 1)'
-                    ],
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
+        function createExpenseChart() {
+            const ctx = document.getElementById('expenseChart').getContext('2d');
+            
+            const sectionTotals = {};
+            Object.entries(budgetData.expenses).forEach(([section, items]) => {
+                sectionTotals[section] = calculateTotal(items, 'actual');
+            });
+
+            const colors = [
+                'rgba(139, 92, 246, 0.8)',
+                'rgba(59, 130, 246, 0.8)',
+                'rgba(16, 185, 129, 0.8)',
+                'rgba(245, 158, 11, 0.8)',
+                'rgba(239, 68, 68, 0.8)',
+                'rgba(147, 51, 234, 0.8)',
+                'rgba(249, 115, 22, 0.8)'
+            ];
+
+            expenseChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(sectionTotals).map(s => s.charAt(0).toUpperCase() + s.slice(1)),
+                    datasets: [{
+                        data: Object.values(sectionTotals),
+                        backgroundColor: colors,
+                        borderWidth: 2,
+                        borderColor: 'rgba(255, 255, 255, 0.1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
 
-        function openBudgetOptimizer() {
-            alert('Budget Optimizer feature coming soon! This will help you create a personalized plan to eliminate your deficit.');
+        function createTrendChart() {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            
+            // Mock historical data for 6 months
+            const months = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const spending = [9200, 9400, 9650, 9800, 9850, 9911];
+            const budget = [9000, 9000, 9000, 9000, 9000, 9000];
+
+            trendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Actual Spending',
+                            data: spending,
+                            borderColor: 'rgba(239, 68, 68, 1)',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Budget Target',
+                            data: budget,
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderDash: [5, 5],
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createCashFlowChart() {
+            const ctx = document.getElementById('cashFlowChart').getContext('2d');
+            
+            const months = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const income = [6304, 6304, 6304, 6304, 6304, 6304];
+            const expenses = [9200, 9400, 9650, 9800, 9850, 9911];
+            const netFlow = income.map((inc, i) => inc - expenses[i]);
+
+            cashFlowChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Income',
+                            data: income,
+                            backgroundColor: 'rgba(16, 185, 129, 0.6)',
+                            borderColor: 'rgba(16, 185, 129, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Expenses',
+                            data: expenses.map(e => -e),
+                            backgroundColor: 'rgba(239, 68, 68, 0.6)',
+                            borderColor: 'rgba(239, 68, 68, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Net Flow',
+                            data: netFlow,
+                            type: 'line',
+                            borderColor: 'rgba(245, 158, 11, 1)',
+                            backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                            tension: 0.4,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + Math.abs(value);
+                                }
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: false,
+                            position: 'right',
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateCharts() {
+            if (budgetChart) budgetChart.update();
+            if (expenseChart) expenseChart.update();
+            if (trendChart) trendChart.update();
+            if (cashFlowChart) cashFlowChart.update();
+        }
+
+        // Action Functions
+        function editBudget() {
+            alert('Budget editing functionality would open here. This would allow you to modify budget amounts for each category.');
+        }
+
+        function showOptimizationPlan() {
+            alert('Budget Optimization Plan:\n\n1. Reduce dining out from $250 to $150 (-$100/month)\n2. Review Sky Network - consider cheaper alternatives (-$80/month)\n3. Optimize grocery shopping from $620 to $550 (-$70/month)\n4. Reduce discretionary shopping from $180 to $150 (-$30/month)\n\nTotal potential savings: $280/month\nRemaining deficit: $3,327/month');
+        }
+
+        function adjustCategory(category) {
+            const newAmount = prompt(`Adjust ${category} budget:\n\nCurrent: $250\nSuggested: $150\n\nEnter new monthly budget:`);
+            if (newAmount && !isNaN(newAmount)) {
+                alert(`${category} budget updated to $${newAmount}/month`);
+                // In a real app, this would update the budget data
+            }
+        }
+
+        function reviewSubscriptions() {
+            alert('Subscription Review:\n\nCurrent: Sky Network $163/month\n\nAlternatives:\n• Netflix + Disney+ + Spark Sport: $45/month\n• TVNZ OnDemand + ThreeNow: Free\n• Neon + Amazon Prime: $35/month\n\nPotential savings: $80-163/month');
+        }
+
+        function viewHouseKittyStrategy() {
+            alert('House Kitty Strategy:\n\nCurrent: $65,357\n\nRecommended allocation:\n• Emergency repairs: $30,000 (keep)\n• Home improvements: $20,000 (keep)\n• Temporary budget support: $15,357 (available)\n\nThis could help bridge your budget deficit while you implement cost reductions.');
         }
     </script>
 </body>
