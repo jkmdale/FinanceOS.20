@@ -252,7 +252,7 @@
             margin-bottom: 32px;
         }
 
-        .summary-card {h
+        .summary-card {
             padding: 24px;
             border-radius: 20px;
             transition: all 0.3s ease;
@@ -528,7 +528,11 @@
 
         /* Login Styles */
         .session-info {
-            display: none !important;
+            display: none; /* Controlled by JS */
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 500;
         }
 
         .login-overlay {
@@ -619,7 +623,25 @@
             box-shadow: 0 10px 28px rgba(139, 92, 246, 0.5);
         }
 
-        .biometric-button {
+        .biometric-button, .register-passkey-button { /* Added .register-passkey-button */
+            width: 100%;
+            padding: 18px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 14px;
+            font-size: 20px;
+            cursor: pointer;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+            display: none; /* Hide by default, show if WebAuthn is available */
+        }
+
+        .biometric-button:hover, .register-passkey-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .pin-button { /* Renamed from .biometric-button if it's separate */
             width: 100%;
             padding: 18px;
             background: rgba(255, 255, 255, 0.1);
@@ -632,7 +654,7 @@
             transition: all 0.3s ease;
         }
 
-        .biometric-button:hover {
+        .pin-button:hover {
             background: rgba(255, 255, 255, 0.2);
         }
 
@@ -743,796 +765,257 @@
     </style>
 </head>
 <body>
-    <div class="session-info" id="sessionInfo" style="display: none;">
-        <span>User: demo</span>
-        <button class="logout-button" onclick="logout()">Logout</button>
-    </div>
+    <header class="header glass transition-all" id="appHeader">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <img src="./icons/finance-logo.png" alt="FinanceOS Logo">
+                </div>
+                FinanceOS
+            </div>
+            <nav class="nav">
+                <button class="nav-button active">Dashboard</button>
+                <button class="nav-button">Transactions</button>
+                <button class="nav-button">Budget</button>
+                <button class="nav-button">Goals</button>
+                <button class="nav-button privacy-toggle" id="privacyToggle">Privacy Mode</button>
+                <div class="session-info" id="sessionInfo">
+                    <span>User: <span id="sessionUsername"></span></span>
+                    <button class="logout-button" id="logoutButton">Logout</button>
+                </div>
+            </nav>
+        </div>
+    </header>
 
     <div class="login-overlay" id="loginOverlay">
         <div class="login-container">
             <div class="login-logo">
-                <span style="font-size: 48px; color: white;">$</span>
+                <img src="./icons/finance-logo.png" alt="FinanceOS Logo">
             </div>
-            <h2 style="color: white; margin-bottom: 12px; font-size: 28px;">FinanceOS</h2>
-            <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 40px; font-size: 16px;">
-                Your Personal Finance Operating System
+            <h2 style="font-size: 32px; font-weight: 700; color: white; margin-bottom: 20px;">FinanceOS</h2>
+            <p style="font-size: 18px; color: var(--text-secondary); margin-bottom: 40px;">Your Personal Finance Operating System</p>
+
+            <input type="text" id="usernameInput" class="login-input" placeholder="Username" value="demo">
+            <div class="password-field">
+                <input type="password" id="passwordInput" class="login-input" placeholder="Password" value="demo123">
+                <button type="button" class="password-toggle" id="passwordToggle">👁️</button>
+            </div>
+            
+            <button class="login-button" id="loginButton">Login</button>
+            
+            <button class="biometric-button" id="biometricLoginButton">
+                <img src="./icons/biometric-icon.png" alt="Biometric Icon" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 8px;">
+                Use Biometric Login
+            </button>
+
+            <button class="pin-button" id="pinLoginButton">
+                <img src="./icons/pin-icon.png" alt="PIN Icon" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 8px;">
+                Use PIN
+            </button>
+
+            <button class="register-passkey-button" id="registerPasskeyButton">
+                <img src="./icons/key-icon.png" alt="Passkey Icon" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 8px;">
+                Register Passkey (Biometric)
+            </button>
+
+            <a href="#" style="color: var(--text-secondary); font-size: 16px; margin-top: 10px; display: block;">Forgot Password?</a>
+            <p style="font-size: 14px; color: var(--text-muted); margin-top: 30px;">
+                Demo: username=demo, password=demo123
             </p>
-            
-            <div id="loginForm">
-                <input type="text" id="loginUsername" class="login-input" placeholder="Username" autocomplete="username">
-                
-                <div class="password-field">
-                    <input type="password" id="loginPassword" class="login-input" placeholder="Password" autocomplete="current-password">
-                    <button type="button" class="password-toggle" onclick="togglePassword()">👁️</button>
-                </div>
-                
-                <button onclick="login()" class="login-button" id="loginButton">
-                    <span id="loginButtonText">Login</span>
-                </button>
-                
-                <button onclick="showBiometricLogin()" class="biometric-button" id="biometricButton">
-                    🔐 Use Biometric Login
-                </button>
-                
-                <button onclick="showPinLogin()" class="biometric-button">
-                    🔢 Use PIN
-                </button>
-                
-                <div style="margin-top: 20px;">
-                    <a href="#" onclick="showPasswordReset()" style="color: #8b5cf6; text-decoration: none;">Forgot Password?</a>
-                </div>
-                
-                <div style="margin-top: 20px; font-size: 12px; color: rgba(255, 255, 255, 0.6);">
-                    Demo: username=<strong>demo</strong>, password=<strong>demo123</strong>
-                </div>
-            </div>
-            
-            <div id="pinForm" style="display: none;">
-                <h3 style="color: white; margin-bottom: 20px;">Enter PIN</h3>
-                <div class="pin-input">
-                    <input type="password" class="pin-digit" maxlength="1" id="pin1" oninput="movePinFocus(1)" onkeydown="handlePinBackspace(event, 1)">
-                    <input type="password" class="pin-digit" maxlength="1" id="pin2" oninput="movePinFocus(2)" onkeydown="handlePinBackspace(event, 2)">
-                    <input type="password" class="pin-digit" maxlength="1" id="pin3" oninput="movePinFocus(3)" onkeydown="handlePinBackspace(event, 3)">
-                    <input type="password" class="pin-digit" maxlength="1" id="pin4" oninput="movePinFocus(4)" onkeydown="handlePinBackspace(event, 4)">
-                </div>
-                <button onclick="loginWithPin()" class="login-button">Login with PIN</button>
-                <button onclick="showLoginForm()" class="biometric-button">Back to Password</button>
-                <div style="margin-top: 15px; font-size: 12px; color: rgba(255, 255, 255, 0.6);">
-                    Demo PIN: <strong>1234</strong>
-                </div>
-            </div>
-            
-            <div id="resetForm" style="display: none;">
-                <h3 style="color: white; margin-bottom: 20px;">Reset Password</h3>
-                <input type="email" class="login-input" placeholder="Email Address" id="resetEmail">
-                <button onclick="sendPasswordReset()" class="login-button">Send Reset Link</button>
-                <button onclick="showLoginForm()" class="biometric-button">Back to Login</button>
-            </div>
         </div>
     </div>
 
-    <div id="mainApp" style="display: none;">
-        <header class="header glass">
-            <div class="header-content">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <span style="font-size: 24px; color: white;">$</span>
-                    </div>
-                    <span class="logo-text">FinanceOS</span>
-                </div>
-                
-                <nav class="nav">
-                    <a href="index.html" class="nav-button active">Dashboard</a>
-                    <a href="csv-upload.html" class="nav-button">Upload CSV</a>
-                    <a href="goals.html" class="nav-button">Goals</a>
-                    <a href="budget.html" class="nav-button">Budget</a>
-                    <button class="privacy-toggle nav-button" id="privacyToggle">🔒 Privacy</button>
-                    <button class="logout-button nav-button" onclick="logout()">🚪 Logout</button>
-                </nav>
-            </div>
-        </header>
+    <main class="main-content" id="dashboardContent" style="display: none;">
+        <div class="csv-status">
+            You have pending transactions to categorize from your last CSV upload. <a href="#">Review now!</a>
+        </div>
 
-        <main class="main-content" id="mainContent">
-            <div class="csv-status" id="csvStatus">
-                📊 No recent CSV data found. <a href="csv-upload.html">Upload bank statements</a> to see transaction analysis.
+        <div class="emergency-alert glass-premium">
+            <div class="alert-title">Critical Alert: Unexpected Large Expense!</div>
+            <div class="alert-text">
+                We detected a significant outgoing transaction ($1,250.00) from your checking account
+                on 2025-06-08 that deviates from your spending patterns. Please review your
+                transactions immediately or contact support if this is unexpected.
             </div>
+        </div>
 
-            <div class="emergency-alert">
-                <div class="alert-title">🚨 Financial Alert: Emergency Fund Critical</div>
-                <div class="alert-text">
-                    Your emergency fund has only $0.17. With a monthly deficit of $3,607, you're at high financial risk. 
-                    <strong>Immediate action required.</strong>
-                </div>
-            </div>
-
-            <section class="financial-summary">
+        <section class="financial-summary">
+            <div class="section-header">
                 <h2 class="section-title">Financial Overview</h2>
-                
-                <div class="summary-grid">
-                    <div class="summary-card glass-premium hover-scale transition-all">
-                        <h3>Total Assets</h3>
-                        <div class="amount text-success">$114,116.44</div>
-                        <div class="change">Available across all accounts</div>
-                    </div>
-                    
-                    <div class="summary-card glass-premium hover-scale transition-all">
-                        <h3>Total Debt</h3>
-                        <div class="amount text-error">$274,851.32</div>
-                        <div class="change">Including mortgage & credit</div>
-                    </div>
-                    
-                    <div class="summary-card glass-premium hover-scale transition-all">
-                        <h3>Net Worth</h3>
-                        <div class="amount text-error">-$160,734.88</div>
-                        <div class="change">Improving with debt payoff</div>
-                    </div>
-                    
-                    <div class="summary-card glass-premium hover-scale transition-all">
-                        <h3>Monthly Cash Flow</h3>
-                        <div class="amount text-error">-$3,607</div>
-                        <div class="change">Expenses exceed income</div>
-                    </div>
+            </div>
+            <div class="summary-grid">
+                <div class="summary-card glass-premium hover-scale">
+                    <h3>Total Balance</h3>
+                    <div class="amount text-success">$14,500.25</div>
+                    <div class="change">↑ 2.3% from last month</div>
                 </div>
-            </section>
-
-            <section class="accounts-section">
-                <div class="section-header">
-                    <h2 class="section-title">Your Accounts</h2>
+                <div class="summary-card glass-premium hover-scale">
+                    <h3>Monthly Income</h3>
+                    <div class="amount gradient-green">$5,800.00</div>
+                    <div class="change">↓ 1.0% from last month</div>
                 </div>
-
-                <div class="accounts-grid">
-                    <div class="account-card glass hover-scale transition-all">
-                        <div class="account-header">
-                            <div class="account-icon gradient-blue">💳</div>
-                            <div class="account-info">
-                                <h3>My Spending</h3>
-                                <div class="account-type">Personal Checking</div>
-                            </div>
-                        </div>
-                        <div class="account-balance text-success">$25.92</div>
-                        <div class="account-available">$25.92 Available</div>
-                    </div>
-
-                    <div class="account-card glass hover-scale transition-all">
-                        <div class="account-header">
-                            <div class="account-icon gradient-green">💰</div>
-                            <div class="account-info">
-                                <h3>My Savings</h3>
-                                <div class="account-type">Personal Savings</div>
-                            </div>
-                        </div>
-                        <div class="account-balance text-warning">$0.17</div>
-                        <div class="account-available">$0.17 Available</div>
-                    </div>
-
-                    <div class="account-card glass hover-scale transition-all">
-                        <div class="account-header">
-                            <div class="account-icon gradient-purple">🏠</div>
-                            <div class="account-info">
-                                <h3>House Kitty</h3>
-                                <div class="account-type">Joint Savings</div>
-                            </div>
-                        </div>
-                        <div class="account-balance text-success">$65,357.00</div>
-                        <div class="account-available">$65,357.00 Available</div>
-                    </div>
-
-                    <div class="account-card glass hover-scale transition-all">
-                        <div class="account-header">
-                            <div class="account-icon gradient-orange">📄</div>
-                            <div class="account-info">
-                                <h3>Mortgage & Billing</h3>
-                                <div class="account-type">Bill Payment Account</div>
-                            </div>
-                        </div>
-                        <div class="account-balance text-success">$126.35</div>
-                        <div class="account-available">$126.35 Available</div>
-                    </div>
-
-                    <div class="account-card glass hover-scale transition-all">
-                        <div class="account-header">
-                            <div class="account-icon gradient-blue">🔄</div>
-                            <div class="account-info">
-                                <h3>Holding</h3>
-                                <div class="account-type">Temporary Account</div>
-                            </div>
-                        </div>
-                        <div class="account-balance text-success">$240.40</div>
-                        <div class="account-available">$240.40 Available</div>
-                    </div>
-
-                    <div class="account-card glass hover-scale transition-all">
-                        <div class="account-header">
-                            <div class="account-icon gradient-red">💳</div>
-                            <div class="account-info">
-                                <h3>Low Rate Visa</h3>
-                                <div class="account-type">Credit Card</div>
-                            </div>
-                        </div>
-                        <div class="account-balance text-error">-$3,251.30</div>
-                        <div class="account-available">$6,748.70 Available</div>
-                    </div>
-
-                    <div class="account-card glass hover-scale transition-all">
-                        <div class="account-header">
-                            <div class="account-icon gradient-green">📈</div>
-                            <div class="account-info">
-                                <h3>ANZ KiwiSaver</h3>
-                                <div class="account-type">Retirement Savings</div>
-                            </div>
-                        </div>
-                        <div class="account-balance text-success">$48,733.44</div>
-                        <div class="account-available">Growing for retirement</div>
-                    </div>
-
-                    <div class="account-card glass hover-scale transition-all">
-                        <div class="account-header">
-                            <div class="account-icon gradient-red">🏠</div>
-                            <div class="account-info">
-                                <h3>Home Loans</h3>
-                                <div class="account-type">Mortgage Debt</div>
-                            </div>
-                        </div>
-                        <div class="account-balance text-error">$271,600.02</div>
-                        <div class="account-available">Principal remaining</div>
-                    </div>
+                <div class="summary-card glass-premium hover-scale">
+                    <h3>Monthly Expenses</h3>
+                    <div class="amount gradient-red">$3,250.70</div>
+                    <div class="change">↑ 5.5% from last month</div>
                 </div>
-            </section>
-
-            <section class="goals-section">
-                <div class="section-header">
-                    <h2 class="section-title">Financial Goals</h2>
-                    <a href="goals.html" class="nav-button">View All Goals</a>
+                <div class="summary-card glass-premium hover-scale">
+                    <h3>Savings Rate</h3>
+                    <div class="amount gradient-blue">44%</div>
+                    <div class="change">↑ 3% since last month</div>
                 </div>
+            </div>
+        </section>
 
-                <div class="goals-grid">
-                    <div class="goal-card glass-premium">
-                        <div class="goal-header">
-                            <div class="goal-title">Emergency Fund</div>
-                            <div class="goal-priority priority-critical">CRITICAL</div>
-                        </div>
-                        <div class="goal-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill gradient-red" style="width: 0.001%"></div>
-                            </div>
-                            <div class="progress-text">
-                                <span>$0.17 of $15,000</span>
-                                <span>0.001%</span>
-                            </div>
-                        </div>
-                        <div style="font-size: 12px; color: var(--text-muted);">
-                            Target: 3 months of expenses
+        <section class="accounts">
+            <div class="section-header">
+                <h2 class="section-title">Your Accounts</h2>
+                <button class="nav-button glass">Add Account</button>
+            </div>
+            <div class="accounts-grid">
+                <div class="account-card glass hover-scale">
+                    <div class="account-header">
+                        <div class="account-icon gradient-green">💳</div>
+                        <div class="account-info">
+                            <h3>Everyday Checking</h3>
+                            <span class="account-type">Main Account</span>
                         </div>
                     </div>
-
-                    <div class="goal-card glass-premium">
-                        <div class="goal-header">
-                            <div class="goal-title">Visa Debt Payoff</div>
-                            <div class="goal-priority priority-high">HIGH</div>
-                        </div>
-                        <div class="goal-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill gradient-orange" style="width: 67.5%"></div>
-                            </div>
-                            <div class="progress-text">
-                                <span>$6,748.70 paid of $10,000</span>
-                                <span>67.5%</span>
-                            </div>
-                        </div>
-                        <div style="font-size: 12px; color: var(--text-muted);">
-                            $3,251.30 remaining
+                    <div class="account-balance text-success">$8,123.45</div>
+                    <div class="account-available">Available: $8,000.00</div>
+                </div>
+                <div class="account-card glass hover-scale">
+                    <div class="account-header">
+                        <div class="account-icon gradient-blue">💰</div>
+                        <div class="account-info">
+                            <h3>Savings Fund</h3>
+                            <span class="account-type">Emergency & Goals</span>
                         </div>
                     </div>
-
-                    <div class="goal-card glass-premium">
-                        <div class="goal-header">
-                            <div class="goal-title">KiwiSaver Growth</div>
-                            <div class="goal-priority priority-medium">MEDIUM</div>
-                        </div>
-                        <div class="goal-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill gradient-green" style="width: 48.7%"></div>
-                            </div>
-                            <div class="progress-text">
-                                <span>$48,733 of $100,000</span>
-                                <span>48.7%</span>
-                            </div>
-                        </div>
-                        <div style="font-size: 12px; color: var(--text-muted);">
-                            Retirement milestone target
+                    <div class="account-balance text-info">$6,376.80</div>
+                    <div class="account-available">Available: $6,376.80</div>
+                </div>
+                <div class="account-card glass hover-scale">
+                    <div class="account-header">
+                        <div class="account-icon gradient-orange">💲</div>
+                        <div class="account-info">
+                            <h3>Travel Fund</h3>
+                            <span class="account-type">Specific Goal</span>
                         </div>
                     </div>
+                    <div class="account-balance text-warning">$1,200.00</div>
+                    <div class="account-available">Available: $1,200.00</div>
+                </div>
+                <div class="account-card glass hover-scale">
+                    <div class="account-header">
+                        <div class="account-icon gradient-red">💳</div>
+                        <div class="account-info">
+                            <h3>Credit Card (Visa)</h3>
+                            <span class="account-type">Primary Credit</span>
+                        </div>
+                    </div>
+                    <div class="account-balance text-error">-$2,199.99</div>
+                    <div class="account-available">Credit Limit: $5,000.00</div>
+                </div>
+            </div>
+        </section>
 
-                    <div class="goal-card glass-premium">
-                        <div class="goal-header">
-                            <div class="goal-title">Private School Fund</div>
-                            <div class="goal-priority priority-medium">MEDIUM</div>
+        <section class="goals">
+            <div class="section-header">
+                <h2 class="section-title">Your Financial Goals</h2>
+                <button class="nav-button glass">View All Goals</button>
+            </div>
+            <div class="goals-grid">
+                <div class="goal-card glass hover-scale">
+                    <div class="goal-header">
+                        <h4 class="goal-title">Emergency Fund</h4>
+                        <span class="goal-priority priority-critical">Critical</span>
+                    </div>
+                    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 10px;">
+                        Build 3 months of living expenses.
+                    </p>
+                    <div class="goal-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill gradient-green" style="width: 75%;"></div>
                         </div>
-                        <div class="goal-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill gradient-blue" style="width: 15%"></div>
-                            </div>
-                            <div class="progress-text">
-                                <span>$1,500 of $10,000</span>
-                                <span>15%</span>
-                            </div>
-                        </div>
-                        <div style="font-size: 12px; color: var(--text-muted);">
-                            $300/month contributions
+                        <div class="progress-text">
+                            <span>$11,250 / $15,000</span>
+                            <span>75% Achieved</span>
                         </div>
                     </div>
                 </div>
-            </section>
-
-            <section class="quick-actions">
-                <div class="section-header">
-                    <h2 class="section-title">Quick Actions</h2>
-                </div>
-
-                <div class="actions-grid">
-                    <a href="csv-upload.html" class="action-card glass-premium hover-scale transition-all gradient-purple">
-                        <div class="action-icon">📤</div>
-                        <div class="action-title">Upload CSV</div>
-                        <div class="action-subtitle">Import bank statements</div>
-                    </a>
-
-                    <a href="budget.html" class="action-card glass-premium hover-scale transition-all gradient-blue">
-                        <div class="action-icon">📊</div>
-                        <div class="action-title">View Budget</div>
-                        <div class="action-subtitle">Track spending vs budget</div>
-                    </a>
-
-                    <a href="goals.html" class="action-card glass-premium hover-scale transition-all gradient-green">
-                        <div class="action-icon">🎯</div>
-                        <div class="action-title">Manage Goals</div>
-                        <div class="action-subtitle">Update financial targets</div>
-                    </a>
-
-                    <a href="#" onclick="openTransferModal()" class="action-card glass-premium hover-scale transition-all gradient-orange">
-                        <div class="action-icon">💸</div>
-                        <div class="action-title">Transfer Money</div>
-                        <div class="action-subtitle">Move funds between accounts</div>
-                    </a>
-
-                    <a href="#" onclick="openPaymentModal()" class="action-card glass-premium hover-scale transition-all gradient-red">
-                        <div class="action-icon">💳</div>
-                        <div class="action-title">Pay Bills</div>
-                        <div class="action-subtitle">Schedule payments</div>
-                    </a>
-
-                    <a href="#" onclick="generateReport()" class="action-card glass-premium hover-scale transition-all gradient-purple">
-                        <div class="action-icon">📈</div>
-                        <div class="action-title">Generate Report</div>
-                        <div class="action-subtitle">Financial summary</div>
-                    </a>
-                </div>
-            </section>
-
-            <section class="ai-coach">
-                <div class="section-header">
-                    <h2 class="section-title">AI Financial Coach</h2>
-                </div>
-
-                <div class="chat-container glass-premium">
-                    <div class="chat-messages" id="chatMessages">
-                        <div class="message ai">
-                            <strong>💡 AI Coach:</strong> Welcome! I've analyzed your finances and noticed your emergency fund is critically low at $0.17. With your current monthly deficit of $3,607, this puts you at high financial risk. Would you like me to create an action plan to address this immediately?
+                <div class="goal-card glass hover-scale">
+                    <div class="goal-header">
+                        <h4 class="goal-title">New Car Deposit</h4>
+                        <span class="goal-priority priority-high">High</span>
+                    </div>
+                    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 10px;">
+                        Save for a down payment on a new electric vehicle.
+                    </p>
+                    <div class="goal-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill gradient-blue" style="width: 40%;"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span>$4,000 / $10,000</span>
+                            <span>40% Achieved</span>
                         </div>
                     </div>
-                    
-                    <div class="chat-input">
-                        <input type="text" id="chatInput" placeholder="Ask me about your spending, budget, or goals..." onkeypress="handleChatKeyPress(event)">
-                        <button onclick="sendChatMessage()">Send</button>
-                    </div>
                 </div>
-            </section>
-        </main>
-    </div>
-
-    <script>
-        // Application State
-        let isLoggedIn = false;
-        let privacyMode = false;
-        let currentUser = null;
-
-        // Financial Data
-        const accountData = {
-            assets: {
-                mySpending: 25.92,
-                mySavings: 0.17,
-                houseKitty: 65357.00,
-                mortgageBilling: 126.35,
-                holding: 240.40,
-                kiwiSaver: 48733.44
-            },
-            liabilities: {
-                lowRateVisa: 3251.30,
-                homeLoans: 271600.02
-            },
-            budget: {
-                income: 6304,
-                expenses: 9911,
-                deficit: -3607
-            }
-        };
-
-        // Initialize Application
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeApp();
-            setupEventListeners();
-            checkAuthState();
-        });
-
-        function initializeApp() {
-            // Check for saved auth state
-            const savedAuth = localStorage.getItem('financeos_auth');
-            if (savedAuth) {
-                const authData = JSON.parse(savedAuth);
-                if (authData.expires > Date.now()) {
-                    showMainApp();
-                }
-            }
-
-            // Initialize privacy mode
-            const savedPrivacy = localStorage.getItem('financeos_privacy');
-            if (savedPrivacy === 'true') {
-                togglePrivacyMode();
-            }
-        }
-
-        function setupEventListeners() {
-            // Privacy toggle
-            const privacyToggle = document.getElementById('privacyToggle');
-            if (privacyToggle) {
-                privacyToggle.addEventListener('click', togglePrivacyMode);
-            }
-
-            // Chat input enter key
-            const chatInput = document.getElementById('chatInput');
-            if (chatInput) {
-                chatInput.addEventListener('keypress', handleChatKeyPress);
-            }
-        }
-
-        function checkAuthState() {
-            const authToken = localStorage.getItem('financeos_auth');
-            if (authToken) {
-                try {
-                    const authData = JSON.parse(authToken);
-                    if (authData.expires > Date.now()) {
-                        showMainApp();
-                        return;
-                    }
-                } catch (e) {
-                    console.error('Invalid auth token');
-                }
-            }
-            showLogin();
-        }
-
-        // Authentication Functions
-        function login() {
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
-            const button = document.getElementById('loginButton');
-            const buttonText = document.getElementById('loginButtonText');
-
-            if (!username || !password) {
-                alert('Please enter both username and password');
-                return;
-            }
-
-            // Demo authentication
-            if (username === 'demo' && password === 'demo123') {
-                button.disabled = true;
-                buttonText.innerHTML = '<div class="loading-spinner"></div>';
-
-                setTimeout(() => {
-                    const authData = {
-                        user: 'demo',
-                        expires: Date.now() + (7 * 24 * 60 * 60 * 1000) // 7 days
-                    };
-                    localStorage.setItem('financeos_auth', JSON.stringify(authData));
-                    showMainApp();
-                }, 1500);
-            } else {
-                alert('Invalid credentials. Use demo/demo123');
-            }
-        }
-
-        function loginWithPin() {
-            const pin1 = document.getElementById('pin1').value;
-            const pin2 = document.getElementById('pin2').value;
-            const pin3 = document.getElementById('pin3').value;
-            const pin4 = document.getElementById('pin4').value;
-            const pin = pin1 + pin2 + pin3 + pin4;
-
-            if (pin === '1234') {
-                const authData = {
-                    user: 'demo',
-                    expires: Date.now() + (7 * 24 * 60 * 60 * 1000)
-                };
-                localStorage.setItem('financeos_auth', JSON.stringify(authData));
-                showMainApp();
-            } else {
-                alert('Invalid PIN. Use 1234');
-            }
-        }
-
-        function showBiometricLogin() {
-            if ('credentials' in navigator && 'create' in navigator.credentials) {
-                navigator.credentials.get({
-                    publicKey: {
-                        challenge: new Uint8Array(32),
-                        timeout: 60000,
-                        userVerification: "required"
-                    }
-                }).then(() => {
-                    const authData = {
-                        user: 'demo',
-                        expires: Date.now() + (7 * 24 * 60 * 60 * 1000)
-                    };
-                    localStorage.setItem('financeos_auth', JSON.stringify(authData));
-                    showMainApp();
-                }).catch(() => {
-                    alert('Biometric authentication not available or failed');
-                });
-            } else {
-                alert('Biometric authentication not supported on this device');
-            }
-        }
-
-        function showPinLogin() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('pinForm').style.display = 'block';
-            document.getElementById('pin1').focus();
-        }
-
-        function showLoginForm() {
-            document.getElementById('pinForm').style.display = 'none';
-            document.getElementById('resetForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
-        }
-
-        function showPasswordReset() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('resetForm').style.display = 'block';
-        }
-
-        function sendPasswordReset() {
-            const email = document.getElementById('resetEmail').value;
-            if (email) {
-                alert('Password reset link sent to ' + email);
-                showLoginForm();
-            } else {
-                alert('Please enter your email address');
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('financeos_auth');
-            localStorage.removeItem('financeos_privacy');
-            showLogin();
-        }
-
-        function showLogin() {
-            document.getElementById('loginOverlay').style.display = 'flex';
-            document.getElementById('mainApp').style.display = 'none';
-            isLoggedIn = false;
-        }
-
-        function showMainApp() {
-            document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-            isLoggedIn = true;
-            updateDashboard();
-        }
-
-        // UI Functions
-        function togglePassword() {
-            const passwordField = document.getElementById('loginPassword');
-            const toggle = document.querySelector('.password-toggle');
-            
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                toggle.textContent = '🙈';
-            } else {
-                passwordField.type = 'password';
-                toggle.textContent = '👁️';
-            }
-        }
-
-        function movePinFocus(current) {
-            if (current < 4) {
-                const nextField = document.getElementById('pin' + (current + 1));
-                if (nextField) nextField.focus();
-            }
-        }
-
-        function handlePinBackspace(event, current) {
-            if (event.key === 'Backspace' && current > 1) {
-                const currentField = document.getElementById('pin' + current);
-                if (currentField.value === '') {
-                    const prevField = document.getElementById('pin' + (current - 1));
-                    if (prevField) {
-                        prevField.focus();
-                        prevField.value = '';
-                    }
-                }
-            }
-        }
-
-        function togglePrivacyMode() {
-            privacyMode = !privacyMode;
-            document.body.classList.toggle('privacy-mode', privacyMode);
-            
-            const toggle = document.getElementById('privacyToggle');
-            if (toggle) {
-                toggle.textContent = privacyMode ? '🔓 Show Data' : '🔒 Privacy';
-            }
-            
-            localStorage.setItem('financeos_privacy', privacyMode.toString());
-        }
-
-        function updateDashboard() {
-            // Update CSV status
-            const csvStatus = document.getElementById('csvStatus');
-            const lastUpload = localStorage.getItem('financeos_last_csv_upload');
-            
-            if (lastUpload) {
-                const uploadDate = new Date(lastUpload);
-                const daysSince = Math.floor((Date.now() - uploadDate.getTime()) / (1000 * 60 * 60 * 24));
-                
-                if (daysSince <= 7) {
-                    csvStatus.className = 'csv-status recent-data';
-                    csvStatus.innerHTML = `✅ Recent CSV data from ${daysSince} day${daysSince !== 1 ? 's' : ''} ago. Transactions categorized and budget updated.`;
-                } else {
-                    csvStatus.className = 'csv-status old-data';
-                    csvStatus.innerHTML = `⚠️ CSV data is ${daysSince} days old. <a href="csv-upload.html">Upload recent statements</a> for accurate tracking.`;
-                }
-            }
-        }
-
-        // AI Coach Functions
-        function handleChatKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendChatMessage();
-            }
-        }
-
-        function sendChatMessage() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            
-            if (!message) return;
-
-            // Add user message
-            addChatMessage('user', message);
-            input.value = '';
-
-            // Simulate AI response
-            setTimeout(() => {
-                const response = generateAIResponse(message);
-                addChatMessage('ai', response);
-            }, 1000);
-        }
-
-        function addChatMessage(type, message) {
-            const messagesContainer = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${type}`;
-            
-            if (type === 'ai') {
-                messageDiv.innerHTML = `<strong>💡 AI Coach:</strong> ${message}`;
-            } else {
-                messageDiv.textContent = message;
-            }
-            
-            messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function generateAIResponse(query) {
-            const lowerQuery = query.toLowerCase();
-            
-            if (lowerQuery.includes('emergency') || lowerQuery.includes('fund')) {
-                return "Your emergency fund is critically low at $0.17. I recommend immediately redirecting $100/week from discretionary spending to build this to at least $1,000 within 10 weeks. This would provide basic protection while we work on your budget deficit.";
-            }
-            
-            if (lowerQuery.includes('budget') || lowerQuery.includes('deficit')) {
-                return "Your monthly deficit of $3,607 is unsustainable. Key areas to address: 1) Reduce dining out budget from $250 to $100 (-$150), 2) Review Sky Network subscription ($163) - consider cheaper alternatives, 3) Optimize grocery spending from $550 to $450 (-$100). These changes alone could reduce deficit by $413/month.";
-            }
-            
-            if (lowerQuery.includes('debt') || lowerQuery.includes('visa')) {
-                return "Your Visa debt of $3,251 is costing approximately $54/month in interest (assuming 20% APR). Focus on paying this off before building savings beyond emergency fund. Pay minimum + any extra you can afford to save on interest charges.";
-            }
-            
-            if (lowerQuery.includes('goal') || lowerQuery.includes('save')) {
-                return "With your current deficit, focus on these priorities: 1) Emergency fund to $1,000 (critical), 2) Eliminate budget deficit, 3) Pay off Visa debt, 4) Build emergency fund to $15,000, 5) Then focus on other goals like private school fund.";
-            }
-            
-            if (lowerQuery.includes('house') || lowerQuery.includes('kitty')) {
-                return "Your House Kitty has $65,357 - excellent! This provides good security for home repairs and maintenance. Consider if any portion could temporarily help with your budget deficit, but maintain at least $30,000 for true house emergencies.";
-            }
-            
-            return "I understand you're asking about your finances. Your top priorities should be: 1) Build emergency fund to $1,000 immediately, 2) Address the $3,607 monthly deficit through expense reduction, 3) Pay off high-interest debt. Would you like specific advice on any of these areas?";
-        }
-
-        // Quick Action Functions
-        function openTransferModal() {
-            alert('Transfer functionality would open here. This would allow moving money between your accounts.');
-        }
-
-        function openPaymentModal() {
-            alert('Bill payment functionality would open here. This would show upcoming bills and allow scheduling payments.');
-        }
-
-        function generateReport() {
-            alert('Report generation would create a comprehensive financial summary PDF. This feature will be available soon.');
-        }
-
-        // PWA Installation
-        let deferredPrompt;
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            
-            // Show install prompt after user is logged in
-            if (isLoggedIn) {
-                showInstallPrompt();
-            }
-        });
-
-        function showInstallPrompt() {
-            if (deferredPrompt) {
-                const installBanner = document.createElement('div');
-                installBanner.innerHTML = `
-                    <div style="position: fixed; bottom: 20px; right: 20px; background: var(--glass-premium); backdrop-filter: blur(20px); border: 1px solid var(--glass-premium-border); border-radius: 16px; padding: 16px; max-width: 300px; z-index: 1000;">
-                        <h4 style="margin: 0 0 8px 0; color: white;">Install FinanceOS</h4>
-                        <p style="margin: 0 0 12px 0; font-size: 12px; color: var(--text-secondary);">Add to home screen for the best experience</p>
-                        <div style="display: flex; gap: 8px;">
-                            <button onclick="installPWA()" style="background: var(--gradient-purple); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 12px; cursor: pointer;">Install</button>
-                            <button onclick="dismissInstall()" style="background: transparent; color: var(--text-secondary); border: 1px solid var(--glass-border); padding: 8px 16px; border-radius: 8px; font-size: 12px; cursor: pointer;">Later</button>
+                <div class="goal-card glass hover-scale">
+                    <div class="goal-header">
+                        <h4 class="goal-title">Retirement Savings</h4>
+                        <span class="goal-priority priority-medium">Medium</span>
+                    </div>
+                    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 10px;">
+                        Long-term investment for comfortable retirement.
+                    </p>
+                    <div class="goal-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill gradient-purple" style="width: 25%;"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span>$25,000 / $100,000</span>
+                            <span>25% Achieved</span>
                         </div>
                     </div>
-                `;
-                document.body.appendChild(installBanner);
-            }
-        }
+                </div>
+            </div>
+        </section>
 
-        function installPWA() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('PWA installed');
-                    }
-                    deferredPrompt = null;
-                    dismissInstall();
-                });
-            }
-        }
+        <section class="quick-actions">
+            <div class="section-header">
+                <h2 class="section-title">Quick Actions</h2>
+            </div>
+            <div class="actions-grid">
+                <a href="#" class="action-card glass-premium hover-glow">
+                    <div class="action-icon">💸</div>
+                    <div class="action-title">Send Money</div>
+                    <div class="action-subtitle">Transfer funds instantly</div>
+                </a>
+                <a href="#" class="action-card glass-premium hover-glow">
+                    <div class="action-icon">➕</div>
+                    <div class="action-title">Add Transaction</div>
+                    <div class="action-subtitle">Manually record spending</div>
+                </a>
+                <a href="#" class="action-card glass-premium hover-glow">
+                    <div class="action-icon">📊</div>
+                    <div class="action-title">View Reports</div>
+                    <div class="action-subtitle">Analyze your finances</div>
+                </a>
+                <a href="#" class="action-card glass-premium hover-glow">
+                    <div class="action-icon">🔔</div>
+                    <div class="action-title">Set Alerts</div>
+                    <div class="action-subtitle">Get notified on activity</div>
+                </a>
+            </div>
+        </section>
 
-        function dismissInstall() {
-            const banner = document.querySelector('[style*="position: fixed; bottom: 20px"]');
-            if (banner) {
-                banner.remove();
-            }
-        }
-
-        // Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then((registration) => {
-                        console.log('SW registered: ', registration);
-                    })
-                    .catch((registrationError) => {
-                        console.log('SW registration failed: ', registrationError);
-                    });
-            });
-        }
-    </script>
-</body>
-</html>
+        <section class="ai-coach">
+            <div class="section-header">
+                <h2 class="section-title">AI Financial Coach</h2>
+            </div>
+            <div class="chat-container glass">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message ai">
+                        Hi there! I'm your FinanceOS AI Coach. How can I help you manage your finances today?
