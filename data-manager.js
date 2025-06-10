@@ -19,7 +19,9 @@ class FinanceOSDataManager {
             BUDGET: 'financeos_budget',
             CSV_UPLOAD: 'financeos_last_csv_upload',
             USER_PREFERENCES: 'financeos_preferences',
-            CACHE_TIMESTAMP: 'financeos_cache_timestamp'
+            CACHE_TIMESTAMP: 'financeos_cache_timestamp',
+            // New key for biometric credentials
+            BIOMETRIC_CREDENTIALS: 'financeos_biometric_credentials' 
         };
         
         // Initialize database
@@ -87,7 +89,47 @@ class FinanceOSDataManager {
             cacheStore.createIndex('timestamp', 'timestamp', { unique: false });
         }
 
+        // Biometric Credentials store (New)
+        if (!db.objectStoreNames.contains('biometricCredentials')) {
+            const bioStore = db.createObjectStore('biometricCredentials', { keyPath: 'id' });
+            bioStore.createIndex('userId', 'userId', { unique: true }); // Link to user
+        }
+
         console.log('[DataManager] Object stores created');
+    }
+
+    // === UTILITY METHODS FOR INDEXEDDB ===
+    
+    putToStore(store, data) {
+        return new Promise((resolve, reject) => {
+            const request = store.put(data);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    getAllFromStore(store) {
+        return new Promise((resolve, reject) => {
+            const request = store.getAll();
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    clearStore(store) {
+        return new Promise((resolve, reject) => {
+            const request = store.clear();
+            request.onsuccess = () => resolve();
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    deleteFromStore(store, key) {
+        return new Promise((resolve, reject) => {
+            const request = store.delete(key);
+            request.onsuccess = () => resolve();
+            request.onerror = () => reject(request.error);
+        });
     }
 
     // === AUTHENTICATION MANAGEMENT ===
@@ -129,6 +171,179 @@ class FinanceOSDataManager {
     clearAuth() {
         localStorage.removeItem(this.keys.AUTH);
         localStorage.removeItem(this.keys.PRIVACY);
+        // Also clear biometric credentials associated with the user on logout
+        // This assumes a 'userId' is part of the authData.user object
+        const authData = JSON.parse(localStorage.getItem(this.keys.AUTH) || '{}');
+        if (authData.user && authData.user.id) {
+            this.removeBiometricCredential(authData.user.id);
+        }
+    }
+
+    // === BIOMETRIC AUTHENTICATION MANAGEMENT (New Methods) ===
+
+    /**
+     * Checks if WebAuthn (biometric) is available in the browser.
+     * @returns {Promise<boolean>} True if WebAuthn is supported and available.
+     */
+    async isBiometricAvailable() {
+        if (!window.PublicKeyCredential) {
+            console.warn('[DataManager] WebAuthn (PublicKeyCredential) is not supported in this browser.');
+            return false;
+        }
+        try {
+            // Check if a credential can be created (for registration)
+            // or if a credential can be retrieved (for authentication)
+            // This is a basic check; more robust checks might involve specific feature detections.
+            return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+        } catch (error) {
+            console.error('[DataManager] Error checking biometric availability:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Registers a biometric credential for the current user.
+     * This usually involves a server-side challenge.
+     * @param {object} options - Options for PublicKeyCredential creation, usually from server.
+     * @returns {Promise<Credential>} The created PublicKeyCredential object.
+     */
+    async registerBiometricCredential(options) {
+        if (!this.isBiometricAvailable()) {
+            throw new Error('Biometric authentication not available.');
+        }
+
+        try {
+            // Convert challenge and ID from Base64Url to ArrayBuffer
+            options.publicKey.challenge = this._base64urlToArrayBuffer(options.publicKey.challenge);
+            options.publicKey.user.id = this._base64urlToArrayBuffer(options.publicKey.user.id);
+            if (options.publicKey.excludeCredentials) {
+                options.publicKey.excludeCredentials.forEach(cred => {
+                    cred.id = this._base64urlToArrayBuffer(cred.id);
+                });
+            }
+
+            const credential = await navigator.credentials.create({
+                publicKey: options.publicKey
+            });
+
+            // Store the credential ID (and potentially other info) locally
+            // In a real app, the credential.response would be sent to the server for verification
+            // and the server would store the public key. Here, we're just saving the client-side reference.
+            const authData = this.getAuthToken();
+            if (authData && authData.user && this.db) {
+                const credentialData = {
+                    id: credential.id, // The credential ID
+                    userId: authData.user.id, // Link to your internal user ID
+                    type: credential.type,
+                    // rawId: credential.rawId, // The raw credential ID as ArrayBuffer
+                    // response: { // The response sent to the server
+                    //     clientDataJSON: credential.response.clientDataJSON,
+                    //     attestationObject: credential.response.attestationObject
+                    // }
+                };
+                const tx = this.db.transaction(['biometricCredentials'], 'readwrite');
+                const store = tx.objectStore('biometricCredentials');
+                await this.putToStore(store, credentialData);
+                console.log('[DataManager] Biometric credential registered and saved locally.');
+            } else {
+                console.warn('[DataManager] No active user session to associate biometric credential with.');
+            }
+            
+            return credential;
+
+        } catch (error) {
+            console.error('[DataManager] Error registering biometric credential:', error);
+            throw new Error('Biometric registration failed: ' + error.message);
+        }
+    }
+
+    /**
+     * Authenticates the user using a biometric credential.
+     * This usually involves a server-side challenge.
+     * @param {object} options - Options for PublicKeyCredential assertion, usually from server.
+     * @returns {Promise<Credential>} The asserted PublicKeyCredential object.
+     */
+    async authenticateBiometricCredential(options) {
+        if (!this.isBiometricAvailable()) {
+            throw new Error('Biometric authentication not available.');
+        }
+
+        try {
+            // Convert challenge and ID from Base64Url to ArrayBuffer
+            options.publicKey.challenge = this._base64urlToArrayBuffer(options.publicKey.challenge);
+            if (options.publicKey.allowCredentials) {
+                options.publicKey.allowCredentials.forEach(cred => {
+                    cred.id = this._base64urlToArrayBuffer(cred.id);
+                });
+            }
+
+            const assertion = await navigator.credentials.get({
+                publicKey: options.publicKey
+            });
+
+            // In a real app, the assertion.response would be sent to the server for verification.
+            // The server would then confirm the user's identity based on the biometric signature.
+            console.log('[DataManager] Biometric authentication successful locally (assertion obtained).');
+            return assertion;
+
+        } catch (error) {
+            console.error('[DataManager] Error authenticating biometric credential:', error);
+            throw new Error('Biometric authentication failed: ' + error.message);
+        }
+    }
+
+    /**
+     * Removes a stored biometric credential for a user.
+     * @param {string} userId - The ID of the user whose credential to remove.
+     */
+    async removeBiometricCredential(userId) {
+        if (!this.db) return;
+
+        try {
+            const tx = this.db.transaction(['biometricCredentials'], 'readwrite');
+            const store = tx.objectStore('biometricCredentials');
+            const request = store.index('userId').openCursor(IDBKeyRange.only(userId));
+
+            request.onsuccess = async (event) => {
+                const cursor = event.target.result;
+                if (cursor) {
+                    await this.deleteFromStore(store, cursor.primaryKey);
+                    console.log(`[DataManager] Biometric credential for user ${userId} removed.`);
+                    cursor.continue();
+                }
+            };
+            request.onerror = (event) => {
+                console.error('[DataManager] Error removing biometric credential:', event.target.error);
+            };
+        } catch (error) {
+            console.error('[DataManager] Error removing biometric credential:', error);
+        }
+    }
+
+    // Helper to convert Base64Url to ArrayBuffer
+    _base64urlToArrayBuffer(base64url) {
+        // Replace non-url compatible chars with base64 standard chars
+        const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+        // Pad out with '=' if it's not a multiple of 4
+        const pad = base64.length % 4;
+        const paddedBase64 = pad ? base64 + '===='.slice(0, 4 - pad) : base64;
+        const raw = window.atob(paddedBase64);
+        const rawLength = raw.length;
+        const array = new Uint8Array(new ArrayBuffer(rawLength));
+        for (let i = 0; i < rawLength; i++) {
+            array[i] = raw.charCodeAt(i);
+        }
+        return array.buffer;
+    }
+
+    // Helper to convert ArrayBuffer to Base64Url (useful for sending to server)
+    _arrayBufferToBase64url(buffer) {
+        const bytes = new Uint8Array(buffer);
+        let str = '';
+        for (let i = 0; i < bytes.byteLength; i++) {
+            str += String.fromCharCode(bytes[i]);
+        }
+        return window.btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
     }
 
     // === TRANSACTION MANAGEMENT ===
@@ -599,199 +814,33 @@ class FinanceOSDataManager {
             }
             
             if (data.budgets) {
-                localStorage.setItem(this.keys.BUDGET, JSON.stringify(data.budgets));
+                localStorage.setItem(this.keys.BUDGET, JSON.stringify(data.budgets)); // Corrected line
+                if (this.db) {
+                    const tx = this.db.transaction(['budget'], 'readwrite');
+                    const store = tx.objectStore('budget');
+                    for (const monthKey in data.budgets) {
+                        await this.putToStore(store, data.budgets[monthKey]);
+                    }
+                }
             }
-            
+
             if (data.preferences) {
                 localStorage.setItem(this.keys.USER_PREFERENCES, JSON.stringify(data.preferences));
             }
-            
+
             if (data.metadata && data.metadata.lastCSVUpload) {
                 this.setLastCSVUpload(data.metadata.lastCSVUpload);
             }
-            
-            console.log('[DataManager] Data imported successfully');
-            
+
+            if (data.metadata && data.metadata.cacheTimestamps) {
+                localStorage.setItem(this.keys.CACHE_TIMESTAMP, JSON.stringify(data.metadata.cacheTimestamps));
+            }
+
+            console.log('[DataManager] Data imported successfully.');
+            return true;
         } catch (error) {
             console.error('[DataManager] Error importing data:', error);
             throw error;
         }
     }
-
-    // === CLEANUP OPERATIONS ===
-
-    async clearAllData() {
-        try {
-            // Clear localStorage
-            Object.values(this.keys).forEach(key => {
-                localStorage.removeItem(key);
-            });
-            
-            // Clear IndexedDB
-            if (this.db) {
-                const storeNames = ['transactions', 'goals', 'budget', 'pendingSync', 'cache'];
-                for (const storeName of storeNames) {
-                    const tx = this.db.transaction([storeName], 'readwrite');
-                    const store = tx.objectStore(storeName);
-                    await this.clearStore(store);
-                }
-            }
-            
-            console.log('[DataManager] All data cleared');
-            
-        } catch (error) {
-            console.error('[DataManager] Error clearing data:', error);
-            throw error;
-        }
-    }
-
-    async clearExpiredCache(maxAge = 30 * 24 * 60 * 60 * 1000) { // 30 days
-        if (!this.db) return;
-
-        try {
-            const tx = this.db.transaction(['cache'], 'readwrite');
-            const store = tx.objectStore('cache');
-            const index = store.index('timestamp');
-            
-            const cutoffTime = Date.now() - maxAge;
-            const range = IDBKeyRange.upperBound(cutoffTime);
-            
-            const cursor = index.openCursor(range);
-            const deletePromises = [];
-            
-            cursor.onsuccess = (event) => {
-                const cursor = event.target.result;
-                if (cursor) {
-                    deletePromises.push(cursor.delete());
-                    cursor.continue();
-                }
-            };
-            
-            await Promise.all(deletePromises);
-            console.log('[DataManager] Expired cache cleared');
-            
-        } catch (error) {
-            console.error('[DataManager] Error clearing expired cache:', error);
-        }
-    }
-
-    // === UTILITY FUNCTIONS ===
-
-    putToStore(store, data) {
-        return new Promise((resolve, reject) => {
-            const request = store.put(data);
-            request.onerror = () => reject(request.error);
-            request.onsuccess = () => resolve(request.result);
-        });
-    }
-
-    getAllFromStore(store) {
-        return new Promise((resolve, reject) => {
-            const request = store.getAll();
-            request.onerror = () => reject(request.error);
-            request.onsuccess = () => resolve(request.result);
-        });
-    }
-
-    deleteFromStore(store, key) {
-        return new Promise((resolve, reject) => {
-            const request = store.delete(key);
-            request.onerror = () => reject(request.error);
-            request.onsuccess = () => resolve(request.result);
-        });
-    }
-
-    clearStore(store) {
-        return new Promise((resolve, reject) => {
-            const request = store.clear();
-            request.onerror = () => reject(request.error);
-            request.onsuccess = () => resolve(request.result);
-        });
-    }
-
-    // === FINANCIAL HEALTH MONITORING ===
-
-    analyzeFinancialHealth() {
-        return new Promise(async (resolve) => {
-            try {
-                const goals = await this.getGoals();
-                const transactions = await this.getTransactions();
-                const preferences = this.getUserPreferences();
-                
-                const analysis = {
-                    score: 0,
-                    alerts: [],
-                    recommendations: [],
-                    insights: []
-                };
-                
-                // Emergency fund analysis
-                const emergencyFund = goals.find(g => 
-                    g.name.toLowerCase().includes('emergency')
-                );
-                
-                if (emergencyFund) {
-                    if (emergencyFund.current < 1000) {
-                        analysis.alerts.push('Emergency fund is critically low');
-                        analysis.recommendations.push('Prioritize building emergency fund to $1,000');
-                    } else if (emergencyFund.current < 5000) {
-                        analysis.alerts.push('Emergency fund needs attention');
-                        analysis.recommendations.push('Continue building emergency fund');
-                    }
-                }
-                
-                // Spending pattern analysis
-                const recentTransactions = transactions.filter(t => {
-                    const transactionDate = new Date(t.date);
-                    const thirtyDaysAgo = new Date();
-                    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-                    return transactionDate > thirtyDaysAgo;
-                });
-                
-                const monthlySpending = this.calculateMonthlySpending(recentTransactions);
-                if (monthlySpending > 8000) {
-                    analysis.alerts.push('High monthly spending detected');
-                    analysis.recommendations.push('Review discretionary expenses');
-                }
-                
-                // Goal progress analysis
-                const goalsWithProgress = goals.filter(g => g.current > 0);
-                analysis.insights.push(`You're actively working on ${goalsWithProgress.length} financial goals`);
-                
-                // Calculate overall score
-                let score = 50; // Base score
-                
-                if (emergencyFund && emergencyFund.current >= 5000) score += 20;
-                if (monthlySpending <= 6000) score += 15;
-                if (goals.length >= 3) score += 10;
-                if (analysis.alerts.length === 0) score += 5;
-                
-                analysis.score = Math.min(score, 100);
-                
-                resolve(analysis);
-                
-            } catch (error) {
-                console.error('[DataManager] Error analyzing financial health:', error);
-                resolve({
-                    score: 0,
-                    alerts: ['Unable to analyze financial health'],
-                    recommendations: [],
-                    insights: []
-                });
-            }
-        });
-    }
 }
-
-// Create global instance
-const dataManager = new FinanceOSDataManager();
-
-// Export for use in other files
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = FinanceOSDataManager;
-} else if (typeof window !== 'undefined') {
-    window.FinanceOSDataManager = FinanceOSDataManager;
-    window.dataManager = dataManager;
-}
-
-console.log('[DataManager] FinanceOS Data Manager v1.2.0 loaded');
