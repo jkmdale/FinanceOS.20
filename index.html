@@ -252,7 +252,7 @@
             margin-bottom: 32px;
         }
 
-        .summary-card {
+        .summary-card {h
             padding: 24px;
             border-radius: 20px;
             transition: all 0.3s ease;
@@ -528,11 +528,7 @@
 
         /* Login Styles */
         .session-info {
-            display: none; /* Controlled by JS */
-            align-items: center;
-            gap: 10px;
-            font-size: 16px;
-            font-weight: 500;
+            display: none !important;
         }
 
         .login-overlay {
@@ -623,25 +619,7 @@
             box-shadow: 0 10px 28px rgba(139, 92, 246, 0.5);
         }
 
-        .biometric-button, .register-passkey-button { /* Added .register-passkey-button */
-            width: 100%;
-            padding: 18px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 14px;
-            font-size: 20px;
-            cursor: pointer;
-            margin-bottom: 25px;
-            transition: all 0.3s ease;
-            display: none; /* Hide by default, show if WebAuthn is available */
-        }
-
-        .biometric-button:hover, .register-passkey-button:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .pin-button { /* Renamed from .biometric-button if it's separate */
+        .biometric-button {
             width: 100%;
             padding: 18px;
             background: rgba(255, 255, 255, 0.1);
@@ -654,7 +632,7 @@
             transition: all 0.3s ease;
         }
 
-        .pin-button:hover {
+        .biometric-button:hover {
             background: rgba(255, 255, 255, 0.2);
         }
 
@@ -765,257 +743,761 @@
     </style>
 </head>
 <body>
-    <header class="header glass transition-all" id="appHeader">
-        <div class="header-content">
-            <div class="logo">
-                <div class="logo-icon">
-                    <img src="./icons/finance-logo.png" alt="FinanceOS Logo">
-                </div>
-                FinanceOS
-            </div>
-            <nav class="nav">
-                <button class="nav-button active">Dashboard</button>
-                <button class="nav-button">Transactions</button>
-                <button class="nav-button">Budget</button>
-                <button class="nav-button">Goals</button>
-                <button class="nav-button privacy-toggle" id="privacyToggle">Privacy Mode</button>
-                <div class="session-info" id="sessionInfo">
-                    <span>User: <span id="sessionUsername"></span></span>
-                    <button class="logout-button" id="logoutButton">Logout</button>
-                </div>
-            </nav>
-        </div>
-    </header>
-
-    <div class="login-overlay" id="loginOverlay">
-        <div class="login-container">
-            <div class="login-logo">
-                <img src="./icons/finance-logo.png" alt="FinanceOS Logo">
-            </div>
-            <h2 style="font-size: 32px; font-weight: 700; color: white; margin-bottom: 20px;">FinanceOS</h2>
-            <p style="font-size: 18px; color: var(--text-secondary); margin-bottom: 40px;">Your Personal Finance Operating System</p>
-
-            <input type="text" id="usernameInput" class="login-input" placeholder="Username" value="demo">
-            <div class="password-field">
-                <input type="password" id="passwordInput" class="login-input" placeholder="Password" value="demo123">
-                <button type="button" class="password-toggle" id="passwordToggle">👁️</button>
-            </div>
-            
-            <button class="login-button" id="loginButton">Login</button>
-            
-            <button class="biometric-button" id="biometricLoginButton">
-                <img src="./icons/biometric-icon.png" alt="Biometric Icon" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 8px;">
-                Use Biometric Login
-            </button>
-
-            <button class="pin-button" id="pinLoginButton">
-                <img src="./icons/pin-icon.png" alt="PIN Icon" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 8px;">
-                Use PIN
-            </button>
-
-            <button class="register-passkey-button" id="registerPasskeyButton">
-                <img src="./icons/key-icon.png" alt="Passkey Icon" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 8px;">
-                Register Passkey (Biometric)
-            </button>
-
-            <a href="#" style="color: var(--text-secondary); font-size: 16px; margin-top: 10px; display: block;">Forgot Password?</a>
-            <p style="font-size: 14px; color: var(--text-muted); margin-top: 30px;">
-                Demo: username=demo, password=demo123
-            </p>
-        </div>
+    <div class="session-info" id="sessionInfo" style="display: none;">
+        <span>User: demo</span>
+        <button class="logout-button" onclick="logout()">Logout</button>
     </div>
 
-    <main class="main-content" id="dashboardContent" style="display: none;">
-        <div class="csv-status">
-            You have pending transactions to categorize from your last CSV upload. <a href="#">Review now!</a>
-        </div>
+    <div class="login-overlay" id="loginOverlay">
+   <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FinanceOS - Dashboard</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8b5cf6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <style>
+        /* CSS Variables for Premium Design System */
+        :root {
+            --primary-bg: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-premium: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 50%, rgba(147, 51, 234, 0.15) 100%);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-premium-border: rgba(255, 255, 255, 0.2);
+            --text-primary: rgba(255, 255, 255, 0.9);
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --gradient-purple: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
+            --gradient-blue: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+            --gradient-green: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+            --gradient-red: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+            --gradient-orange: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%);
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+        }
 
-        <div class="emergency-alert glass-premium">
-            <div class="alert-title">Critical Alert: Unexpected Large Expense!</div>
-            <div class="alert-text">
-                We detected a significant outgoing transaction ($1,250.00) from your checking account
-                on 2025-06-08 that deviates from your spending patterns. Please review your
-                transactions immediately or contact support if this is unexpected.
-            </div>
-        </div>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-        <section class="financial-summary">
-            <div class="section-header">
-                <h2 class="section-title">Financial Overview</h2>
-            </div>
-            <div class="summary-grid">
-                <div class="summary-card glass-premium hover-scale">
-                    <h3>Total Balance</h3>
-                    <div class="amount text-success">$14,500.25</div>
-                    <div class="change">↑ 2.3% from last month</div>
-                </div>
-                <div class="summary-card glass-premium hover-scale">
-                    <h3>Monthly Income</h3>
-                    <div class="amount gradient-green">$5,800.00</div>
-                    <div class="change">↓ 1.0% from last month</div>
-                </div>
-                <div class="summary-card glass-premium hover-scale">
-                    <h3>Monthly Expenses</h3>
-                    <div class="amount gradient-red">$3,250.70</div>
-                    <div class="change">↑ 5.5% from last month</div>
-                </div>
-                <div class="summary-card glass-premium hover-scale">
-                    <h3>Savings Rate</h3>
-                    <div class="amount gradient-blue">44%</div>
-                    <div class="change">↑ 3% since last month</div>
-                </div>
-            </div>
-        </section>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-        <section class="accounts">
-            <div class="section-header">
-                <h2 class="section-title">Your Accounts</h2>
-                <button class="nav-button glass">Add Account</button>
-            </div>
-            <div class="accounts-grid">
-                <div class="account-card glass hover-scale">
-                    <div class="account-header">
-                        <div class="account-icon gradient-green">💳</div>
-                        <div class="account-info">
-                            <h3>Everyday Checking</h3>
-                            <span class="account-type">Main Account</span>
-                        </div>
-                    </div>
-                    <div class="account-balance text-success">$8,123.45</div>
-                    <div class="account-available">Available: $8,000.00</div>
-                </div>
-                <div class="account-card glass hover-scale">
-                    <div class="account-header">
-                        <div class="account-icon gradient-blue">💰</div>
-                        <div class="account-info">
-                            <h3>Savings Fund</h3>
-                            <span class="account-type">Emergency & Goals</span>
-                        </div>
-                    </div>
-                    <div class="account-balance text-info">$6,376.80</div>
-                    <div class="account-available">Available: $6,376.80</div>
-                </div>
-                <div class="account-card glass hover-scale">
-                    <div class="account-header">
-                        <div class="account-icon gradient-orange">💲</div>
-                        <div class="account-info">
-                            <h3>Travel Fund</h3>
-                            <span class="account-type">Specific Goal</span>
-                        </div>
-                    </div>
-                    <div class="account-balance text-warning">$1,200.00</div>
-                    <div class="account-available">Available: $1,200.00</div>
-                </div>
-                <div class="account-card glass hover-scale">
-                    <div class="account-header">
-                        <div class="account-icon gradient-red">💳</div>
-                        <div class="account-info">
-                            <h3>Credit Card (Visa)</h3>
-                            <span class="account-type">Primary Credit</span>
-                        </div>
-                    </div>
-                    <div class="account-balance text-error">-$2,199.99</div>
-                    <div class="account-available">Credit Limit: $5,000.00</div>
-                </div>
-            </div>
-        </section>
+        /* Glass Effects */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
 
-        <section class="goals">
-            <div class="section-header">
-                <h2 class="section-title">Your Financial Goals</h2>
-                <button class="nav-button glass">View All Goals</button>
-            </div>
-            <div class="goals-grid">
-                <div class="goal-card glass hover-scale">
-                    <div class="goal-header">
-                        <h4 class="goal-title">Emergency Fund</h4>
-                        <span class="goal-priority priority-critical">Critical</span>
-                    </div>
-                    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 10px;">
-                        Build 3 months of living expenses.
-                    </p>
-                    <div class="goal-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill gradient-green" style="width: 75%;"></div>
-                        </div>
-                        <div class="progress-text">
-                            <span>$11,250 / $15,000</span>
-                            <span>75% Achieved</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="goal-card glass hover-scale">
-                    <div class="goal-header">
-                        <h4 class="goal-title">New Car Deposit</h4>
-                        <span class="goal-priority priority-high">High</span>
-                    </div>
-                    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 10px;">
-                        Save for a down payment on a new electric vehicle.
-                    </p>
-                    <div class="goal-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill gradient-blue" style="width: 40%;"></div>
-                        </div>
-                        <div class="progress-text">
-                            <span>$4,000 / $10,000</span>
-                            <span>40% Achieved</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="goal-card glass hover-scale">
-                    <div class="goal-header">
-                        <h4 class="goal-title">Retirement Savings</h4>
-                        <span class="goal-priority priority-medium">Medium</span>
-                    </div>
-                    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 10px;">
-                        Long-term investment for comfortable retirement.
-                    </p>
-                    <div class="goal-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill gradient-purple" style="width: 25%;"></div>
-                        </div>
-                        <div class="progress-text">
-                            <span>$25,000 / $100,000</span>
-                            <span>25% Achieved</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+        .glass-premium {
+            background: var(--glass-premium);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-premium-border);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
 
-        <section class="quick-actions">
-            <div class="section-header">
-                <h2 class="section-title">Quick Actions</h2>
-            </div>
-            <div class="actions-grid">
-                <a href="#" class="action-card glass-premium hover-glow">
-                    <div class="action-icon">💸</div>
-                    <div class="action-title">Send Money</div>
-                    <div class="action-subtitle">Transfer funds instantly</div>
-                </a>
-                <a href="#" class="action-card glass-premium hover-glow">
-                    <div class="action-icon">➕</div>
-                    <div class="action-title">Add Transaction</div>
-                    <div class="action-subtitle">Manually record spending</div>
-                </a>
-                <a href="#" class="action-card glass-premium hover-glow">
-                    <div class="action-icon">📊</div>
-                    <div class="action-title">View Reports</div>
-                    <div class="action-subtitle">Analyze your finances</div>
-                </a>
-                <a href="#" class="action-card glass-premium hover-glow">
-                    <div class="action-icon">🔔</div>
-                    <div class="action-title">Set Alerts</div>
-                    <div class="action-subtitle">Get notified on activity</div>
-                </a>
-            </div>
-        </section>
+        /* Gradients */
+        .gradient-purple { background: var(--gradient-purple); }
+        .gradient-blue { background: var(--gradient-blue); }
+        .gradient-green { background: var(--gradient-green); }
+        .gradient-red { background: var(--gradient-red); }
+        .gradient-orange { background: var(--gradient-orange); }
 
-        <section class="ai-coach">
-            <div class="section-header">
-                <h2 class="section-title">AI Financial Coach</h2>
-            </div>
-            <div class="chat-container glass">
-                <div class="chat-messages" id="chatMessages">
-                    <div class="message ai">
-                        Hi there! I'm your FinanceOS AI Coach. How can I help you manage your finances today?
+        /* Transitions */
+        .transition-all { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .hover-scale:hover { transform: scale(1.05); }
+        .hover-glow:hover { box-shadow: 0 0 20px rgba(139, 92, 246, 0.5); }
+
+        /* Header Styles */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 12px 20px;
+            border-radius: 0;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-purple);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .logo-icon img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-button {
+            padding: 8px 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .nav-button:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-button.active {
+            color: white;
+            background: rgba(139, 92, 246, 0.3);
+        }
+
+        .nav-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background: #8b5cf6;
+            border-radius: 50%;
+        }
+
+        .privacy-toggle {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .privacy-toggle:hover {
+            background: rgba(245, 158, 11, 0.3);
+        }
+
+        .logout-button {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .logout-button:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* CSV Status Banner */
+        .csv-status {
+            background: var(--gradient-orange);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .csv-status a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        /* Emergency Alert */
+        .emergency-alert {
+            background: var(--gradient-red);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            animation: pulse 2s infinite;
+        }
+
+        .alert-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .alert-text {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.9; }
+        }
+
+        /* Section Styles */
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: white;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        /* Financial Summary */
+        .financial-summary {
+            margin-bottom: 32px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .summary-card {h
+            padding: 24px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 48px rgba(139, 92, 246, 0.3);
+        }
+
+        .summary-card h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .amount {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .change {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Account Cards */
+        .accounts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .account-card {
+            padding: 20px;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .account-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
+        }
+
+        .account-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .account-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .account-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 2px;
+        }
+
+        .account-type {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .account-balance {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .account-available {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Goals Section */
+        .goals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .goal-card {
+            padding: 20px;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .goal-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .goal-priority {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .priority-critical {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .priority-high {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .priority-medium {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .goal-progress {
+            margin-bottom: 12px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Quick Actions */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .action-card {
+            padding: 24px;
+            border-radius: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+        }
+
+        .action-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 48px rgba(139, 92, 246, 0.3);
+        }
+
+        .action-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .action-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .action-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* AI Coach */
+        .ai-coach {
+            margin-bottom: 32px;
+        }
+
+        .chat-container {
+            padding: 20px;
+            border-radius: 16px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .chat-messages {
+            margin-bottom: 16px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 80%;
+        }
+
+        .message.user {
+            background: var(--gradient-purple);
+            margin-left: auto;
+            color: white;
+        }
+
+        .message.ai {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .chat-input input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .chat-input button {
+            padding: 12px 16px;
+            background: var(--gradient-purple);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* Login Styles */
+        .session-info {
+            display: none !important;
+        }
+
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .login-container {
+            background: var(--glass-premium);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-premium-border);
+            border-radius: 24px;
+            padding: 60px 50px;
+            text-align: center;
+            max-width: 600px;
+            width: 95%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            min-height: 700px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin: 20px;
+        }
+
+        .login-logo {
+            width: 90px;
+            height: 90px;
+            background: var(--gradient-purple);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+        }
+
+        .login-logo img {
+            width: 70%;
+            height: 70%;
+            object-fit: contain;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 18px 22px;
+            margin-bottom: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 14px;
+            color: white;
+            font-size: 20px;
+            box-sizing: border-box;
+        }
+
+        .login-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .login-input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 18px;
+            background: var(--gradient-purple);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .login-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 28px rgba(139, 92, 246, 0.5);
+        }
+
+        .biometric-button {
+            width: 100%;
+            padding: 18px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 14px;
+            font-size: 20px;
+            cursor: pointer;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .biometric-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .password-field {
+            position: relative;
+        }
+
+        .pin-input {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .pin-digit {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            color: white;
+            font-size: 28px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .pin-digit:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .nav {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .nav-button {
+                font-size: 14px;
+                padding: 6px 12px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .accounts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .goals-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .amount {
+                font-size: 24px;
+            }
+
+            .login-container {
+                padding: 40px 30px;
+                min-height: 600px;
+            }
+        }
+
+        /* Utility Classes */
+        .hidden { display: none !important; }
+        .loading { opacity: 0.6; pointer-events: none; }
+        .text-success { color: var(--success); }
+        .text-error { color: var(--error); }
+        .text-warning { color: var(--warning); }
+        .text-info { color: var(--info); }
+
+        /* Privacy Mode */
+        body.privacy-mode .amount,
+        body.privacy-mode .account-balance {
+            filter: blur(8px);
+            transition: filter 0.3s ease;
+        }
+
+        body.privacy-mode .amount:hover,
+        body.privacy-mode .account-balance:hover {
+            filter: blur(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="session-info" id="sessionInfo" style="display: none;">
+        <span>User: demo</span>
+        <button class="logout-button" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="login-overlay" id="loginOverlay">
+   
