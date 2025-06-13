@@ -101,6 +101,8 @@
 
         // Initialize global sync manager
         window.FinanceOSSync = new FinanceOSDataSync();
+    </script>
+    
     <style>
         * {
             margin: 0;
@@ -617,170 +619,143 @@
                     header: true,
                     skipEmptyLines: true,
                     complete: function(results) {
-                        console.log('Papa Parse results:', results);
+                        if (results.errors.length > 0) {
+                            console.error('CSV parse errors:', results.errors);
+                        }
                         resolve(results.data);
                     },
-                    error: function(error) {
-                        reject(error);
-                    }
+                    error: reject
                 });
             });
         }
 
         function processRow(row) {
             try {
-                // Get the first few values to try to detect format
-                const values = Object.values(row);
-                const keys = Object.keys(row);
-                
-                console.log('Processing row:', row);
-                
-                // Try to find date, amount, and description
-                let date = '';
-                let amount = 0;
-                let description = '';
-                
-                // Look for date field
-                for (let key of keys) {
-                    if (key.toLowerCase().includes('date')) {
-                        date = parseDate(row[key]);
-                        break;
-                    }
-                }
-                
-                // Look for amount field
-                for (let key of keys) {
-                    if (key.toLowerCase().includes('amount') || key.toLowerCase().includes('value')) {
-                        amount = parseAmount(row[key]);
-                        break;
-                    }
-                }
-                
-                // Look for description field
-                for (let key of keys) {
-                    if (key.toLowerCase().includes('description') || key.toLowerCase().includes('memo') || key.toLowerCase().includes('detail')) {
-                        description = String(row[key] || '').trim();
-                        break;
-                    }
-                }
-                
-                // If we couldn't find proper fields, try first few columns
-                if (!date && values.length > 0) {
-                    date = parseDate(values[0]);
-                }
-                if (!amount && values.length > 1) {
-                    amount = parseAmount(values[1]);
-                }
-                if (!description && values.length > 2) {
-                    description = String(values[2] || '').trim();
-                }
-                
-                // Validate required fields
-                if (!date || isNaN(amount)) {
-                    console.warn('Skipping invalid row:', row);
+                // Clean the row data
+                const cleanRow = {};
+                Object.keys(row).forEach(key => {
+                    cleanRow[key.trim().toLowerCase()] = row[key];
+                });
+
+                // Try to extract date, description, and amount
+                let date = extractDate(cleanRow);
+                let description = extractDescription(cleanRow);
+                let amount = extractAmount(cleanRow);
+
+                if (!date || !description || amount === null) {
+                    console.warn('Skipping invalid row:', cleanRow);
                     return null;
                 }
-                
+
                 return {
                     id: Date.now() + Math.random(),
-                    date: date,
+                    date: formatDate(date),
+                    description: description.trim(),
                     amount: amount,
-                    description: description,
-                    category: categorizeTransaction(description)
+                    category: categorizeTransaction(description),
+                    account: 'Imported',
+                    timestamp: new Date().toISOString()
                 };
-                
             } catch (error) {
                 console.error('Error processing row:', error, row);
                 return null;
             }
         }
 
-        function parseDate(value) {
-            if (!value) return '';
+        function extractDate(row) {
+            const dateFields = ['date', 'transaction date', 'processed date', 'value date'];
             
-            try {
-                const date = new Date(value);
-                if (isNaN(date.getTime())) {
-                    // Try different formats
-                    const dateStr = String(value);
-                    if (dateStr.includes('/')) {
-                        const parts = dateStr.split('/');
-                        if (parts.length === 3) {
-                            // Assume DD/MM/YYYY
-                            const d = new Date(parts[2], parts[1] - 1, parts[0]);
-                            if (!isNaN(d.getTime())) {
-                                return d.toISOString().split('T')[0];
-                            }
-                        }
+            for (const field of dateFields) {
+                if (row[field]) {
+                    const date = new Date(row[field]);
+                    if (!isNaN(date.getTime())) {
+                        return date;
                     }
-                    return '';
                 }
-                return date.toISOString().split('T')[0];
-            } catch (error) {
-                return '';
             }
+            
+            return null;
         }
 
-        function parseAmount(value) {
-            if (value === null || value === undefined || value === '') return 0;
+        function extractDescription(row) {
+            const descFields = ['description', 'memo', 'details', 'payee', 'reference', 'particulars'];
             
-            // Convert to string and clean
-            let cleanValue = String(value).replace(/[,$\s]/g, '');
-            
-            // Handle negative amounts in parentheses
-            if (cleanValue.includes('(') && cleanValue.includes(')')) {
-                cleanValue = '-' + cleanValue.replace(/[()]/g, '');
+            for (const field of descFields) {
+                if (row[field] && row[field].trim()) {
+                    return row[field].trim();
+                }
             }
             
-            const parsed = parseFloat(cleanValue);
-            return isNaN(parsed) ? 0 : parsed;
+            return 'Unknown Transaction';
+        }
+
+        function extractAmount(row) {
+            const amountFields = ['amount', 'debit', 'credit', 'withdrawal', 'deposit'];
+            
+            for (const field of amountFields) {
+                if (row[field]) {
+                    let amount = parseFloat(row[field].toString().replace(/[,$]/g, ''));
+                    if (!isNaN(amount)) {
+                        // Handle credit/debit fields
+                        if (field === 'debit' || field === 'withdrawal') {
+                            return -Math.abs(amount);
+                        }
+                        return amount;
+                    }
+                }
+            }
+            
+            return null;
+        }
+
+        function formatDate(date) {
+            return date.toISOString().split('T')[0];
         }
 
         function categorizeTransaction(description) {
             const desc = description.toLowerCase();
             
-            if (desc.includes('supermarket') || desc.includes('countdown') || desc.includes('new world')) {
-                return 'Groceries';
-            } else if (desc.includes('fuel') || desc.includes('petrol') || desc.includes('bp') || desc.includes('z energy')) {
-                return 'Fuel';
-            } else if (desc.includes('restaurant') || desc.includes('cafe') || desc.includes('mcdonald')) {
-                return 'Dining';
-            } else if (desc.includes('salary') || desc.includes('wage') || desc.includes('pay')) {
+            if (desc.includes('salary') || desc.includes('wages') || desc.includes('income')) {
                 return 'Income';
+            } else if (desc.includes('grocery') || desc.includes('supermarket') || desc.includes('food')) {
+                return 'Groceries';
+            } else if (desc.includes('gas') || desc.includes('fuel') || desc.includes('petrol')) {
+                return 'Transportation';
+            } else if (desc.includes('restaurant') || desc.includes('cafe') || desc.includes('takeaway')) {
+                return 'Dining Out';
+            } else if (desc.includes('mortgage') || desc.includes('rent')) {
+                return 'Housing';
+            } else if (desc.includes('insurance')) {
+                return 'Insurance';
+            } else if (desc.includes('transfer')) {
+                return 'Transfer';
             } else {
                 return 'Other';
             }
         }
 
         function updateResults() {
-            const results = document.getElementById('results');
-            
-            if (allTransactions.length === 0) {
-                results.style.display = 'none';
-                return;
-            }
-            
-            results.style.display = 'block';
-            
-            // Calculate totals
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.style.display = 'block';
+
+            // Calculate statistics
             const totalCount = allTransactions.length;
-            const totalIncome = allTransactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
-            const totalExpenses = Math.abs(allTransactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0));
-            const netAmount = totalIncome - totalExpenses;
-            
+            const income = allTransactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
+            const expenses = allTransactions.filter(t => t.amount < 0).reduce((sum, t) => sum + Math.abs(t.amount), 0);
+            const netAmount = income - expenses;
+
             // Update stats
             document.getElementById('totalCount').textContent = totalCount;
-            document.getElementById('totalIncome').textContent = formatCurrency(totalIncome);
-            document.getElementById('totalExpenses').textContent = formatCurrency(totalExpenses);
-            
-            const netElement = document.getElementById('netAmount');
-            netElement.textContent = formatCurrency(Math.abs(netAmount));
-            netElement.className = netAmount >= 0 ? 'stat-value amount-positive' : 'stat-value amount-negative';
-            
+            document.getElementById('totalIncome').textContent = formatCurrency(income);
+            document.getElementById('totalExpenses').textContent = formatCurrency(expenses);
+            document.getElementById('netAmount').textContent = formatCurrency(netAmount);
+            document.getElementById('netAmount').className = `stat-value ${netAmount >= 0 ? 'amount-positive' : 'amount-negative'}`;
+
             // Show recent transactions
-            const recent = allTransactions.slice(-10);
-            const transactionsPreview = document.getElementById('transactionsPreview');
-            transactionsPreview.innerHTML = recent.map(t => `
+            const recentTransactions = allTransactions.slice(-10).reverse();
+            const previewDiv = document.getElementById('transactionsPreview');
+            
+            previewDiv.innerHTML = recentTransactions.map(t => `
                 <div class="transaction-item">
                     <div>
                         <div class="transaction-desc">${t.description}</div>
@@ -803,337 +778,78 @@
         function saveData() {
             try {
                 // Save transactions
-                localStorage.setItem('financeos_transactions', JSON.stringify(allTransactions));
-                localStorage.setItem('financeos_last_upload', new Date().toISOString());
+                const existingTransactions = JSON.parse(localStorage.getItem('financeos_transactions') || '[]');
+                const updatedTransactions = [...existingTransactions, ...allTransactions];
+                localStorage.setItem('financeos_transactions', JSON.stringify(updatedTransactions));
+
+                // Update account balances (mock data for demo)
+                const accounts = JSON.parse(localStorage.getItem('financeos_accounts') || '[]');
+                const defaultAccounts = [
+                    { id: 1, name: 'My Spending', balance: 25.92, type: 'checking' },
+                    { id: 2, name: 'My Savings', balance: 0.17, type: 'savings' },
+                    { id: 3, name: 'House Kitty', balance: 65357.00, type: 'savings' },
+                    { id: 4, name: 'Mortgage And Billing', balance: 126.35, type: 'checking' },
+                    { id: 5, name: 'Holding', balance: 240.40, type: 'checking' },
+                    { id: 6, name: 'Low Rate Visa', balance: -3251.30, type: 'credit' },
+                    { id: 7, name: 'VISA', balance: 0, type: 'credit' }
+                ];
                 
-                // Calculate comprehensive financial data for all pages
-                const totalIncome = allTransactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
-                const totalExpenses = Math.abs(allTransactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0));
-                const netCashFlow = totalIncome - totalExpenses;
-                
-                // Update main dashboard data
-                const dashboardData = {
-                    totalTransactions: allTransactions.length,
-                    lastUpdate: new Date().toISOString(),
-                    totalIncome: totalIncome,
-                    totalExpenses: totalExpenses,
-                    netCashFlow: netCashFlow,
-                    monthlySpending: calculateMonthlySpending(),
-                    accounts: updateAccountBalances(),
-                    recentTransactions: allTransactions.slice(-10)
-                };
-                
-                localStorage.setItem('financeos_dashboard_data', JSON.stringify(dashboardData));
-                
-                // Update budget data
-                updateBudgetData();
-                
-                // Update goals progress
-                updateGoalsData();
-                
+                if (accounts.length === 0) {
+                    localStorage.setItem('financeos_accounts', JSON.stringify(defaultAccounts));
+                }
+
                 // Trigger cross-page updates
-                triggerPageUpdates();
+                const updateTimestamp = Date.now();
+                localStorage.setItem('financeos_data_updated', updateTimestamp.toString());
                 
-                console.log('All page data updated successfully');
-                alert('CSV files processed successfully! All pages have been updated with new data.');
+                // BroadcastChannel
+                if (typeof BroadcastChannel !== 'undefined') {
+                    const bc = new BroadcastChannel('financeos_updates');
+                    bc.postMessage({
+                        type: 'DATA_UPDATED',
+                        source: 'csv_upload',
+                        timestamp: updateTimestamp,
+                        transactionCount: allTransactions.length
+                    });
+                }
+
+                // Custom event
+                window.dispatchEvent(new CustomEvent('financeos_data_updated', {
+                    detail: {
+                        source: 'csv_upload',
+                        timestamp: updateTimestamp,
+                        transactionCount: allTransactions.length
+                    }
+                }));
+
+                // Show notification
+                if (window.FinanceOSSync) {
+                    window.FinanceOSSync.showUpdateNotification(
+                        `Successfully imported ${allTransactions.length} transactions!`
+                    );
+                }
+
+                console.log('Data saved successfully:', {
+                    transactionCount: allTransactions.length,
+                    timestamp: updateTimestamp
+                });
+
+                // Clear processed data
+                selectedFiles = [];
+                allTransactions = [];
+                renderFileList();
+                showProcessButton();
                 
             } catch (error) {
                 console.error('Error saving data:', error);
-                alert('Data processed but there was an error saving. Please try again.');
+                alert('Error saving data. Please try again.');
             }
-        }
-
-        function calculateMonthlySpending() {
-            const now = new Date();
-            const currentMonth = now.getMonth();
-            const currentYear = now.getFullYear();
-            
-            const monthlyExpenses = allTransactions.filter(t => {
-                const transactionDate = new Date(t.date);
-                return transactionDate.getMonth() === currentMonth && 
-                       transactionDate.getFullYear() === currentYear &&
-                       t.amount < 0;
-            });
-            
-            return Math.abs(monthlyExpenses.reduce((sum, t) => sum + t.amount, 0));
-        }
-
-        function updateAccountBalances() {
-            // Get existing account data or create default
-            const existingAccounts = JSON.parse(localStorage.getItem('financeos_accounts') || '[]');
-            
-            // Calculate new balances based on transactions
-            const totalIncome = allTransactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
-            const totalExpenses = Math.abs(allTransactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0));
-            
-            // Default account structure if none exists
-            const defaultAccounts = [
-                {
-                    id: 'my-spending',
-                    name: 'My Spending',
-                    type: 'checking',
-                    balance: 25.92 + (totalIncome * 0.1), // Add some income flow
-                    available: 25.92 + (totalIncome * 0.1)
-                },
-                {
-                    id: 'my-savings',
-                    name: 'My Savings', 
-                    type: 'savings',
-                    balance: 0.17 + (totalIncome * 0.05),
-                    available: 0.17 + (totalIncome * 0.05)
-                },
-                {
-                    id: 'house-kitty',
-                    name: 'House Kitty',
-                    type: 'savings',
-                    balance: 65357.00 - (totalExpenses * 0.1), // Expenses reduce this
-                    available: 65357.00 - (totalExpenses * 0.1)
-                },
-                {
-                    id: 'mortgage-billing',
-                    name: 'Mortgage And Billing',
-                    type: 'checking',
-                    balance: 126.35 + (totalIncome * 0.15),
-                    available: 126.35 + (totalIncome * 0.15)
-                },
-                {
-                    id: 'holding',
-                    name: 'Holding',
-                    type: 'savings',
-                    balance: 240.40 + (totalIncome * 0.03),
-                    available: 240.40 + (totalIncome * 0.03)
-                },
-                {
-                    id: 'low-rate-visa',
-                    name: 'Low Rate Visa',
-                    type: 'credit',
-                    balance: -3251.30 - (totalExpenses * 0.05), // More expenses = more debt
-                    available: 6748.70 - (totalExpenses * 0.05)
-                },
-                {
-                    id: 'kiwisaver',
-                    name: 'ANZ KiwiSaver Scheme',
-                    type: 'investment',
-                    balance: 48733.44 + (totalIncome * 0.02), // Grows with income
-                    available: 48733.44 + (totalIncome * 0.02)
-                },
-                {
-                    id: 'home-loans',
-                    name: 'Your home loans',
-                    type: 'mortgage',
-                    balance: -271600.02, // Mortgages don't change from transactions
-                    available: 0
-                }
-            ];
-
-            // Use existing accounts if available, otherwise default
-            const accounts = existingAccounts.length > 0 ? existingAccounts : defaultAccounts;
-            
-            // Save updated accounts
-            localStorage.setItem('financeos_accounts', JSON.stringify(accounts));
-            
-            return accounts;
-        }
-
-        function updateBudgetData() {
-            // Get current month in YYYY-MM format
-            const currentMonth = new Date().toISOString().slice(0, 7);
-            
-            // Calculate spending by category for current month
-            const monthlyTransactions = allTransactions.filter(t => 
-                t.date.startsWith(currentMonth)
-            );
-            
-            const categorySpending = {};
-            monthlyTransactions.forEach(t => {
-                if (t.amount < 0) { // Only expenses
-                    const category = t.category || 'Other';
-                    categorySpending[category] = (categorySpending[category] || 0) + Math.abs(t.amount);
-                }
-            });
-            
-            // Update budget with actual spending
-            const budgetData = {
-                month: currentMonth,
-                lastUpdated: new Date().toISOString(),
-                income: {
-                    salary: { 
-                        budgeted: 6304, 
-                        actual: allTransactions.filter(t => t.amount > 0 && t.category === 'Income').reduce((sum, t) => sum + t.amount, 0) || 6304,
-                        notes: 'Updated from CSV import'
-                    }
-                },
-                expenses: {
-                    food: {
-                        'Groceries': { 
-                            budgeted: 550, 
-                            actual: categorySpending['Groceries'] || 0, 
-                            notes: 'From imported transactions' 
-                        },
-                        'Dining Out/Takeaway': { 
-                            budgeted: 250, 
-                            actual: categorySpending['Dining'] || 0, 
-                            notes: 'From imported transactions' 
-                        }
-                    },
-                    transportation: {
-                        'Fuel': { 
-                            budgeted: 125, 
-                            actual: categorySpending['Fuel'] || 0, 
-                            notes: 'From imported transactions' 
-                        }
-                    },
-                    discretionary: {
-                        'Shopping/Retail': { 
-                            budgeted: 150, 
-                            actual: categorySpending['Shopping'] || 0, 
-                            notes: 'From imported transactions' 
-                        },
-                        'Other': { 
-                            budgeted: 200, 
-                            actual: categorySpending['Other'] || 0, 
-                            notes: 'From imported transactions' 
-                        }
-                    }
-                },
-                totalSpent: Object.values(categorySpending).reduce((sum, amount) => sum + amount, 0),
-                categoryBreakdown: categorySpending
-            };
-            
-            // Save budget data
-            const existingBudgets = JSON.parse(localStorage.getItem('financeos_budget') || '{}');
-            existingBudgets[currentMonth] = budgetData;
-            localStorage.setItem('financeos_budget', JSON.stringify(existingBudgets));
-            
-            console.log('Budget data updated:', budgetData);
-        }
-
-        function updateGoalsData() {
-            // Get existing goals
-            const existingGoals = JSON.parse(localStorage.getItem('financeos_goals') || '[]');
-            
-            // Calculate progress updates based on new transaction data
-            const totalIncome = allTransactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
-            const totalSavings = totalIncome * 0.1; // Assume 10% savings rate
-            
-            // Default goals if none exist
-            const defaultGoals = [
-                {
-                    id: 1,
-                    name: "Emergency Fund",
-                    description: "Build emergency savings to cover 3 months of expenses",
-                    current: 0.17 + (totalSavings * 0.3), // 30% of savings goes to emergency fund
-                    target: 15000,
-                    priority: "critical",
-                    targetDate: "2025-12-31",
-                    monthlyContribution: totalSavings * 0.3 / 12,
-                    createdDate: "2024-12-01",
-                    lastUpdated: new Date().toISOString()
-                },
-                {
-                    id: 2,
-                    name: "Visa Debt Payoff",
-                    description: "Pay off remaining credit card debt",
-                    current: Math.max(0, 6748.70 - (totalIncome * 0.05)), // Pay down with income
-                    target: 10000,
-                    priority: "high",
-                    targetDate: "2025-06-30",
-                    monthlyContribution: totalIncome * 0.05 / 12,
-                    createdDate: "2024-12-01",
-                    lastUpdated: new Date().toISOString()
-                },
-                {
-                    id: 3,
-                    name: "KiwiSaver Growth",
-                    description: "Build retirement savings through KiwiSaver",
-                    current: 48733.44 + (totalIncome * 0.03), // 3% contribution
-                    target: 100000,
-                    priority: "medium",
-                    targetDate: "2027-12-31",
-                    monthlyContribution: 271,
-                    createdDate: "2024-12-01",
-                    lastUpdated: new Date().toISOString()
-                },
-                {
-                    id: 4,
-                    name: "Private School Fund",
-                    description: "Save for children's private school education",
-                    current: 1500 + (totalSavings * 0.4), // 40% of savings to education
-                    target: 10000,
-                    priority: "medium",
-                    targetDate: "2026-02-01",
-                    monthlyContribution: 300,
-                    createdDate: "2024-12-01",
-                    lastUpdated: new Date().toISOString()
-                }
-            ];
-
-            // Update existing goals or use defaults
-            const goals = existingGoals.length > 0 ? existingGoals.map(goal => {
-                // Update progress based on goal type
-                if (goal.name.toLowerCase().includes('emergency')) {
-                    goal.current = Math.max(goal.current, 0.17 + (totalSavings * 0.3));
-                } else if (goal.name.toLowerCase().includes('debt') || goal.name.toLowerCase().includes('visa')) {
-                    goal.current = Math.max(goal.current - (totalIncome * 0.05), 0);
-                } else if (goal.name.toLowerCase().includes('kiwisaver')) {
-                    goal.current = goal.current + (totalIncome * 0.03);
-                } else if (goal.name.toLowerCase().includes('school') || goal.name.toLowerCase().includes('education')) {
-                    goal.current = goal.current + (totalSavings * 0.4);
-                }
-                goal.lastUpdated = new Date().toISOString();
-                return goal;
-            }) : defaultGoals;
-            
-            // Save updated goals
-            localStorage.setItem('financeos_goals', JSON.stringify(goals));
-            
-            console.log('Goals data updated:', goals);
-        }
-
-        function triggerPageUpdates() {
-            // Set a flag that other pages can check for updates
-            localStorage.setItem('financeos_data_updated', Date.now().toString());
-            
-            // Post message to other tabs/windows
-            if (typeof BroadcastChannel !== 'undefined') {
-                const bc = new BroadcastChannel('financeos_updates');
-                bc.postMessage({
-                    type: 'DATA_UPDATED',
-                    timestamp: Date.now(),
-                    source: 'csv_upload'
-                });
-                bc.close();
-            }
-            
-            // Legacy method - storage event
-            window.dispatchEvent(new Event('storage'));
-            
-            // Custom event for same-page updates
-            window.dispatchEvent(new CustomEvent('financeos_data_updated', {
-                detail: {
-                    transactions: allTransactions.length,
-                    timestamp: Date.now()
-                }
-            }));
-            
-            console.log('Page update triggers sent');
         }
 
         function loadExistingData() {
-            try {
-                const saved = localStorage.getItem('financeos_transactions');
-                if (saved) {
-                    allTransactions = JSON.parse(saved);
-                    if (allTransactions.length > 0) {
-                        updateResults();
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading data:', error);
-            }
+            // This function can be used to load and display existing data
+            console.log('Loading existing data...');
         }
-
-        console.log('CSV Upload script loaded');
     </script>
 </body>
 </html>
