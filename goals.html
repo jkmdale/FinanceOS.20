@@ -8,6 +8,104 @@
     <meta name="theme-color" content="#8b5cf6">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Include the Data Sync Manager -->
+    <script>
+        /**
+         * FinanceOS Data Sync Manager
+         * Enables automatic updates across all pages when CSV data is uploaded
+         */
+        class FinanceOSDataSync {
+            constructor() {
+                this.updateCallbacks = [];
+                this.lastUpdateCheck = 0;
+                this.setupUpdateListeners();
+                console.log('FinanceOS Data Sync Manager initialized on Goals page');
+            }
+
+            onDataUpdate(callback) {
+                this.updateCallbacks.push(callback);
+            }
+
+            setupUpdateListeners() {
+                // BroadcastChannel for cross-tab updates
+                if (typeof BroadcastChannel !== 'undefined') {
+                    const bc = new BroadcastChannel('financeos_updates');
+                    bc.addEventListener('message', (event) => {
+                        if (event.data.type === 'DATA_UPDATED') {
+                            this.handleDataUpdate(event.data);
+                        }
+                    });
+                }
+
+                // Storage events for cross-tab updates
+                window.addEventListener('storage', (event) => {
+                    if (event.key === 'financeos_data_updated') {
+                        this.handleDataUpdate({ source: 'storage' });
+                    }
+                });
+
+                // Custom events for same-page updates
+                window.addEventListener('financeos_data_updated', (event) => {
+                    this.handleDataUpdate(event.detail);
+                });
+
+                // Polling fallback
+                setInterval(() => this.checkForUpdates(), 5000);
+                window.addEventListener('focus', () => this.checkForUpdates());
+            }
+
+            checkForUpdates() {
+                const lastUpdate = parseInt(localStorage.getItem('financeos_data_updated') || '0');
+                if (lastUpdate > this.lastUpdateCheck) {
+                    this.lastUpdateCheck = lastUpdate;
+                    this.handleDataUpdate({ source: 'polling', timestamp: lastUpdate });
+                }
+            }
+
+            handleDataUpdate(data) {
+                console.log('Goals page: Handling data update:', data);
+                this.updateCallbacks.forEach(callback => {
+                    try {
+                        callback(data);
+                    } catch (error) {
+                        console.error('Error in update callback:', error);
+                    }
+                });
+            }
+
+            showUpdateNotification(message = 'Goals data updated!') {
+                let notification = document.getElementById('data-update-notification');
+                
+                if (!notification) {
+                    notification = document.createElement('div');
+                    notification.id = 'data-update-notification';
+                    notification.style.cssText = `
+                        position: fixed; top: 20px; right: 20px; z-index: 10000;
+                        background: linear-gradient(135deg, #10b981, #059669);
+                        color: white; padding: 15px 20px; border-radius: 12px;
+                        box-shadow: 0 8px 32px rgba(16, 185, 129, 0.3);
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                        font-weight: 600; backdrop-filter: blur(20px);
+                        border: 1px solid rgba(255, 255, 255, 0.2);
+                        transform: translateX(400px); transition: transform 0.3s ease;
+                    `;
+                    document.body.appendChild(notification);
+                }
+
+                notification.textContent = message;
+                setTimeout(() => notification.style.transform = 'translateX(0)', 100);
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(400px)';
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+        }
+
+        // Initialize global sync manager
+        window.FinanceOSSync = new FinanceOSDataSync();
+    </script>
+    
     <style>
         /* CSS Variables for Premium Design System */
         :root {
@@ -63,7 +161,7 @@
         .transition-all { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .hover-scale:hover { transform: scale(1.02) translateY(-2px); }
 
-        /* Header Styles (Same as other pages) */
+        /* Header Styles */
         .header {
             position: sticky;
             top: 0;
@@ -732,247 +830,103 @@
             <div class="overview-card glass-premium">
                 <div class="overview-icon">💰</div>
                 <div class="overview-title">Total Saved</div>
-                <div class="overview-value text-success" id="totalSaved">$51,483.61</div>
+                <div class="overview-value" style="color: var(--success);" id="totalSaved">$51,483.61</div>
                 <div class="overview-subtitle">Across all goals</div>
             </div>
             
             <div class="overview-card glass-premium">
                 <div class="overview-icon">📈</div>
-                <div class="overview-title">Overall Progress</div>
-                <div class="overview-value text-info" id="overallProgress">33.1%</div>
-                <div class="overview-subtitle">Average completion</div>
+                <div class="overview-title">Average Progress</div>
+                <div class="overview-value" id="averageProgress">34%</div>
+                <div class="overview-subtitle">Completion rate</div>
             </div>
             
             <div class="overview-card glass-premium">
                 <div class="overview-icon">⏰</div>
                 <div class="overview-title">Next Milestone</div>
-                <div class="overview-value text-warning" id="nextMilestone">$1,000</div>
-                <div class="overview-subtitle">Emergency Fund target</div>
+                <div class="overview-value" id="nextMilestone">3 months</div>
+                <div class="overview-subtitle">Emergency fund</div>
             </div>
         </section>
 
-        <!-- Critical Goals Section -->
+        <!-- Goals Grid -->
         <section class="goals-container">
-            <h2 class="section-title">🚨 Critical Priority Goals</h2>
-            <div class="goals-grid" id="criticalGoals">
-                <!-- Critical goals will be rendered here -->
+            <h2 class="section-title">Your Financial Goals</h2>
+            <div class="goals-grid" id="goalsGrid">
+                <!-- Goals will be populated by JavaScript -->
             </div>
         </section>
 
-        <!-- High Priority Goals Section -->
-        <section class="goals-container">
-            <h2 class="section-title">🔥 High Priority Goals</h2>
-            <div class="goals-grid" id="highGoals">
-                <!-- High priority goals will be rendered here -->
+        <!-- Add Goal Modal -->
+        <div class="modal-overlay hidden" id="addGoalModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 class="modal-title">Add New Financial Goal</h3>
+                    <p class="modal-subtitle">Set a new target to work towards</p>
+                </div>
+                
+                <form id="addGoalForm">
+                    <div class="form-group">
+                        <label class="form-label">Goal Name</label>
+                        <input type="text" class="form-input" id="goalName" placeholder="e.g., Emergency Fund" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-textarea" id="goalDescription" placeholder="Describe your goal..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Target Amount</label>
+                        <input type="number" class="form-input" id="goalTarget" placeholder="10000" step="0.01" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Current Amount</label>
+                        <input type="number" class="form-input" id="goalCurrent" placeholder="0" step="0.01" value="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Target Date</label>
+                        <input type="date" class="form-input" id="goalDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Priority</label>
+                        <select class="form-select" id="goalPriority" required>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </div>
+                </form>
+                
+                <div class="modal-actions">
+                    <button class="modal-btn btn-secondary" onclick="closeAddGoalModal()">Cancel</button>
+                    <button class="modal-btn btn-primary" onclick="saveNewGoal()">Create Goal</button>
+                </div>
             </div>
-        </section>
-
-        <!-- Medium Priority Goals Section -->
-        <section class="goals-container">
-            <h2 class="section-title">📋 Medium Priority Goals</h2>
-            <div class="goals-grid" id="mediumGoals">
-                <!-- Medium priority goals will be rendered here -->
-            </div>
-        </section>
-
-        <!-- Low Priority Goals Section -->
-        <section class="goals-container">
-            <h2 class="section-title">🌱 Low Priority Goals</h2>
-            <div class="goals-grid" id="lowGoals">
-                <!-- Low priority goals will be rendered here -->
-            </div>
-        </section>
+        </div>
     </main>
 
-    <!-- Add Goal Modal -->
-    <div class="modal-overlay hidden" id="addGoalModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h2 class="modal-title">Add New Financial Goal</h2>
-                <p class="modal-subtitle">Set a target and track your progress towards financial success</p>
-            </div>
-            
-            <form id="addGoalForm">
-                <div class="form-group">
-                    <label class="form-label">Goal Name</label>
-                    <input type="text" class="form-input" id="goalName" placeholder="e.g., Emergency Fund, Vacation, New Car" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Description</label>
-                    <textarea class="form-textarea" id="goalDescription" placeholder="Describe your goal and why it's important to you"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Target Amount</label>
-                    <input type="number" class="form-input" id="goalTarget" placeholder="10000" step="0.01" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Current Amount</label>
-                    <input type="number" class="form-input" id="goalCurrent" placeholder="0" step="0.01" value="0">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Priority Level</label>
-                    <select class="form-select" id="goalPriority" required>
-                        <option value="critical">Critical - Urgent financial security</option>
-                        <option value="high">High - Important for near-term plans</option>
-                        <option value="medium" selected>Medium - Beneficial for future</option>
-                        <option value="low">Low - Nice to have</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Target Date</label>
-                    <input type="date" class="form-input" id="goalDate">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Monthly Contribution</label>
-                    <input type="number" class="form-input" id="goalMonthly" placeholder="500" step="0.01">
-                </div>
-            </form>
-            
-            <div class="modal-actions">
-                <button class="modal-btn btn-secondary" onclick="closeAddGoalModal()">Cancel</button>
-                <button class="modal-btn btn-primary" onclick="saveGoal()">Create Goal</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit Goal Modal -->
-    <div class="modal-overlay hidden" id="editGoalModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h2 class="modal-title">Edit Goal</h2>
-                <p class="modal-subtitle">Update your goal details and progress</p>
-            </div>
-            
-            <form id="editGoalForm">
-                <div class="form-group">
-                    <label class="form-label">Goal Name</label>
-                    <input type="text" class="form-input" id="editGoalName" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Description</label>
-                    <textarea class="form-textarea" id="editGoalDescription"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Target Amount</label>
-                    <input type="number" class="form-input" id="editGoalTarget" step="0.01" required>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Current Amount</label>
-                    <input type="number" class="form-input" id="editGoalCurrent" step="0.01">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Priority Level</label>
-                    <select class="form-select" id="editGoalPriority" required>
-                        <option value="critical">Critical - Urgent financial security</option>
-                        <option value="high">High - Important for near-term plans</option>
-                        <option value="medium">Medium - Beneficial for future</option>
-                        <option value="low">Low - Nice to have</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Target Date</label>
-                    <input type="date" class="form-input" id="editGoalDate">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Monthly Contribution</label>
-                    <input type="number" class="form-input" id="editGoalMonthly" step="0.01">
-                </div>
-            </form>
-            
-            <div class="modal-actions">
-                <button class="modal-btn btn-secondary" onclick="closeEditGoalModal()">Cancel</button>
-                <button class="modal-btn" style="background: var(--gradient-red); color: white;" onclick="deleteGoal()">Delete Goal</button>
-                <button class="modal-btn btn-primary" onclick="updateGoal()">Update Goal</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // Application State
+        // Global Variables
         let goals = [];
-        let currentEditingGoal = null;
-
-        // Initialize default goals based on the user's actual situation
-        const defaultGoals = [
-            {
-                id: 1,
-                name: "Emergency Fund",
-                description: "Build emergency savings to cover 3 months of expenses. Critical for financial security.",
-                current: 0.17,
-                target: 15000,
-                priority: "critical",
-                targetDate: "2025-12-31",
-                monthlyContribution: 0,
-                createdDate: "2024-12-01"
-            },
-            {
-                id: 2,
-                name: "Visa Debt Payoff",
-                description: "Pay off remaining credit card debt to reduce monthly interest payments.",
-                current: 6748.70,
-                target: 10000,
-                priority: "high",
-                targetDate: "2025-06-30",
-                monthlyContribution: 300,
-                createdDate: "2024-12-01"
-            },
-            {
-                id: 3,
-                name: "KiwiSaver Growth",
-                description: "Build retirement savings through KiwiSaver contributions and investment growth.",
-                current: 48733.44,
-                target: 100000,
-                priority: "medium",
-                targetDate: "2027-12-31",
-                monthlyContribution: 271,
-                createdDate: "2024-12-01"
-            },
-            {
-                id: 4,
-                name: "Private School Fund",
-                description: "Save for children's private school education expenses.",
-                current: 1500,
-                target: 10000,
-                priority: "medium",
-                targetDate: "2026-02-01",
-                monthlyContribution: 300,
-                createdDate: "2024-12-01"
-            }
-        ];
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            checkAuthState();
-            loadGoals();
-            renderGoals();
-            updateOverview();
+            console.log('Goals page initialized');
             setupEventListeners();
-        });
+            loadGoalsData();
+            renderGoals();
+            updateOverviewCards();
 
-        function checkAuthState() {
-            const authToken = localStorage.getItem('financeos_auth');
-            if (!authToken) {
-                window.location.href = 'index.html';
-                return;
+            // Register for data updates
+            if (window.FinanceOSSync) {
+                window.FinanceOSSync.onDataUpdate(handleDataUpdate);
             }
-        }
-
-        function logout() {
-            localStorage.removeItem('financeos_auth');
-            window.location.href = 'index.html';
-        }
+        });
 
         function setupEventListeners() {
             // Privacy toggle
@@ -981,304 +935,6 @@
                 privacyToggle.addEventListener('click', togglePrivacyMode);
             }
 
-            // Modal close on overlay click
-            document.getElementById('addGoalModal').addEventListener('click', function(e) {
-                if (e.target === this) closeAddGoalModal();
-            });
-
-            document.getElementById('editGoalModal').addEventListener('click', function(e) {
-                if (e.target === this) closeEditGoalModal();
-            });
-        }
-
-        function togglePrivacyMode() {
-            const isPrivate = document.body.classList.toggle('privacy-mode');
-            const toggle = document.getElementById('privacyToggle');
-            if (toggle) {
-                toggle.textContent = isPrivate ? '🔓 Show Data' : '🔒 Privacy';
-            }
-            localStorage.setItem('financeos_privacy', isPrivate.toString());
-        }
-
-        function loadGoals() {
-            const saved = localStorage.getItem('financeos_goals');
-            if (saved) {
-                goals = JSON.parse(saved);
-            } else {
-                goals = defaultGoals;
-                saveGoals();
-            }
-        }
-
-        function saveGoals() {
-            localStorage.setItem('financeos_goals', JSON.stringify(goals));
-        }
-
-        function renderGoals() {
-            const sections = {
-                critical: document.getElementById('criticalGoals'),
-                high: document.getElementById('highGoals'),
-                medium: document.getElementById('mediumGoals'),
-                low: document.getElementById('lowGoals')
-            };
-
-            // Clear all sections
-            Object.values(sections).forEach(section => {
-                section.innerHTML = '';
-            });
-
-            // Group goals by priority
-            const goalsByPriority = {
-                critical: goals.filter(g => g.priority === 'critical'),
-                high: goals.filter(g => g.priority === 'high'),
-                medium: goals.filter(g => g.priority === 'medium'),
-                low: goals.filter(g => g.priority === 'low')
-            };
-
-            // Render each priority group
-            Object.entries(goalsByPriority).forEach(([priority, priorityGoals]) => {
-                if (priorityGoals.length === 0) {
-                    sections[priority].innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-icon">📋</div>
-                            <div class="empty-title">No ${priority} priority goals</div>
-                            <div class="empty-description">Add a new goal to get started</div>
-                        </div>
-                    `;
-                } else {
-                    sections[priority].innerHTML = priorityGoals.map(goal => renderGoalCard(goal)).join('');
-                }
-            });
-        }
-
-        function renderGoalCard(goal) {
-            const progress = Math.min((goal.current / goal.target) * 100, 100);
-            const remaining = Math.max(goal.target - goal.current, 0);
-            
-            // Calculate timeline
-            const today = new Date();
-            const targetDate = new Date(goal.targetDate);
-            const monthsRemaining = Math.max(
-                (targetDate.getFullYear() - today.getFullYear()) * 12 + 
-                (targetDate.getMonth() - today.getMonth()), 0
-            );
-            
-            const monthlyNeeded = monthsRemaining > 0 ? remaining / monthsRemaining : 0;
-
-            return `
-                <div class="goal-card glass-premium hover-scale transition-all priority-${goal.priority}" onclick="editGoal(${goal.id})">
-                    <div class="goal-header">
-                        <div class="goal-info">
-                            <div class="goal-title">${goal.name}</div>
-                            <div class="goal-description">${goal.description}</div>
-                        </div>
-                        <div class="goal-priority priority-${goal.priority}">${goal.priority.toUpperCase()}</div>
-                    </div>
-                    
-                    <div class="goal-amounts">
-                        <div class="current-amount">$${formatNumber(goal.current)}</div>
-                        <div class="target-amount">of $${formatNumber(goal.target)}</div>
-                    </div>
-                    
-                    <div class="progress-section">
-                        <div class="progress-bar">
-                            <div class="progress-fill ${getProgressColor(goal.priority)}" style="width: ${progress}%"></div>
-                        </div>
-                        <div class="progress-stats">
-                            <div class="progress-percentage">${progress.toFixed(1)}% Complete</div>
-                            <div class="progress-remaining">$${formatNumber(remaining)} remaining</div>
-                        </div>
-                    </div>
-                    
-                    <div class="goal-timeline">
-                        <div class="timeline-item">
-                            <div class="timeline-label">Target Date</div>
-                            <div class="timeline-value">${formatDate(goal.targetDate)}</div>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="timeline-label">Monthly Need</div>
-                            <div class="timeline-value">$${formatNumber(monthlyNeeded)}</div>
-                        </div>
-                        <div class="timeline-item">
-                            <div class="timeline-label">Contributing</div>
-                            <div class="timeline-value">$${formatNumber(goal.monthlyContribution)}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="goal-actions" onclick="event.stopPropagation()">
-                        <button class="action-btn action-primary" onclick="addContribution(${goal.id})">
-                            Add Money
-                        </button>
-                        <button class="action-btn action-secondary" onclick="editGoal(${goal.id})">
-                            Edit Goal
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-
-        function getProgressColor(priority) {
-            const colors = {
-                critical: 'gradient-red',
-                high: 'gradient-orange',
-                medium: 'gradient-blue',
-                low: 'gradient-green'
-            };
-            return colors[priority] || 'gradient-purple';
-        }
-
-        function formatNumber(num) {
-            return new Intl.NumberFormat('en-NZ', {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 2
-            }).format(num);
-        }
-
-        function formatDate(dateStr) {
-            const date = new Date(dateStr);
-            return date.toLocaleDateString('en-NZ', { 
-                month: 'short', 
-                year: 'numeric' 
-            });
-        }
-
-        function updateOverview() {
-            const totalGoals = goals.length;
-            const totalSaved = goals.reduce((sum, goal) => sum + goal.current, 0);
-            const totalTarget = goals.reduce((sum, goal) => sum + goal.target, 0);
-            const overallProgress = totalTarget > 0 ? (totalSaved / totalTarget) * 100 : 0;
-            
-            // Find next milestone (smallest remaining amount in critical/high priority goals)
-            const urgentGoals = goals.filter(g => ['critical', 'high'].includes(g.priority));
-            const nextMilestone = urgentGoals.length > 0 
-                ? Math.min(...urgentGoals.map(g => Math.max(1000 - (g.current % 1000), g.target - g.current)))
-                : 0;
-
-            document.getElementById('totalGoals').textContent = totalGoals;
-            document.getElementById('totalSaved').textContent = `$${formatNumber(totalSaved)}`;
-            document.getElementById('overallProgress').textContent = `${overallProgress.toFixed(1)}%`;
-            document.getElementById('nextMilestone').textContent = `$${formatNumber(nextMilestone)}`;
-        }
-
-        // Modal Functions
-        function openAddGoalModal() {
-            document.getElementById('addGoalModal').classList.remove('hidden');
-            
-            // Set default target date to 1 year from now
-            const nextYear = new Date();
-            nextYear.setFullYear(nextYear.getFullYear() + 1);
-            document.getElementById('goalDate').value = nextYear.toISOString().split('T')[0];
-        }
-
-        function closeAddGoalModal() {
-            document.getElementById('addGoalModal').classList.add('hidden');
-            document.getElementById('addGoalForm').reset();
-        }
-
-        function saveGoal() {
-            const form = document.getElementById('addGoalForm');
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
-
-            const newGoal = {
-                id: Date.now(),
-                name: document.getElementById('goalName').value,
-                description: document.getElementById('goalDescription').value,
-                target: parseFloat(document.getElementById('goalTarget').value),
-                current: parseFloat(document.getElementById('goalCurrent').value) || 0,
-                priority: document.getElementById('goalPriority').value,
-                targetDate: document.getElementById('goalDate').value,
-                monthlyContribution: parseFloat(document.getElementById('goalMonthly').value) || 0,
-                createdDate: new Date().toISOString().split('T')[0]
-            };
-
-            goals.push(newGoal);
-            saveGoals();
-            renderGoals();
-            updateOverview();
-            closeAddGoalModal();
-        }
-
-        function editGoal(goalId) {
-            const goal = goals.find(g => g.id === goalId);
-            if (!goal) return;
-
-            currentEditingGoal = goal;
-            
-            // Populate edit form
-            document.getElementById('editGoalName').value = goal.name;
-            document.getElementById('editGoalDescription').value = goal.description;
-            document.getElementById('editGoalTarget').value = goal.target;
-            document.getElementById('editGoalCurrent').value = goal.current;
-            document.getElementById('editGoalPriority').value = goal.priority;
-            document.getElementById('editGoalDate').value = goal.targetDate;
-            document.getElementById('editGoalMonthly').value = goal.monthlyContribution;
-            
-            document.getElementById('editGoalModal').classList.remove('hidden');
-        }
-
-        function closeEditGoalModal() {
-            document.getElementById('editGoalModal').classList.add('hidden');
-            currentEditingGoal = null;
-        }
-
-        function updateGoal() {
-            if (!currentEditingGoal) return;
-
-            const form = document.getElementById('editGoalForm');
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
-
-            // Update the goal
-            currentEditingGoal.name = document.getElementById('editGoalName').value;
-            currentEditingGoal.description = document.getElementById('editGoalDescription').value;
-            currentEditingGoal.target = parseFloat(document.getElementById('editGoalTarget').value);
-            currentEditingGoal.current = parseFloat(document.getElementById('editGoalCurrent').value);
-            currentEditingGoal.priority = document.getElementById('editGoalPriority').value;
-            currentEditingGoal.targetDate = document.getElementById('editGoalDate').value;
-            currentEditingGoal.monthlyContribution = parseFloat(document.getElementById('editGoalMonthly').value) || 0;
-
-            saveGoals();
-            renderGoals();
-            updateOverview();
-            closeEditGoalModal();
-        }
-
-        function deleteGoal() {
-            if (!currentEditingGoal) return;
-
-            if (confirm(`Are you sure you want to delete "${currentEditingGoal.name}"? This action cannot be undone.`)) {
-                goals = goals.filter(g => g.id !== currentEditingGoal.id);
-                saveGoals();
-                renderGoals();
-                updateOverview();
-                closeEditGoalModal();
-            }
-        }
-
-        function addContribution(goalId) {
-            const goal = goals.find(g => g.id === goalId);
-            if (!goal) return;
-
-            const amount = prompt(`Add money to "${goal.name}":\n\nCurrent: $${formatNumber(goal.current)}\nTarget: $${formatNumber(goal.target)}\n\nEnter contribution amount:`);
-            
-            if (amount && !isNaN(amount) && parseFloat(amount) > 0) {
-                goal.current += parseFloat(amount);
-                saveGoals();
-                renderGoals();
-                updateOverview();
-            }
-        }
-
-        // Initialize privacy mode from localStorage
-        const savedPrivacy = localStorage.getItem('financeos_privacy');
-        if (savedPrivacy === 'true') {
-            togglePrivacyMode();
-        }
-    </script>
-</body>
-</html>
+            // Initialize privacy mode from localStorage
+            const savedPrivacy = localStorage.getItem('financeos_privacy');
+            if (savedPrivacy === '
