@@ -8,6 +8,258 @@
     <meta name="theme-color" content="#8b5cf6">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- FinanceOS Auto-Update System -->
+    <script>
+        /**
+         * FinanceOS Auto-Update System
+         * This script enables the dashboard to automatically refresh when CSV data is uploaded
+         */
+
+        // Data Sync Manager (lightweight version for dashboard)
+        class FinanceOSPageSync {
+            constructor() {
+                this.lastUpdateCheck = 0;
+                this.setupUpdateListeners();
+                console.log('FinanceOS Page Sync initialized');
+            }
+
+            setupUpdateListeners() {
+                // BroadcastChannel for cross-tab updates
+                if (typeof BroadcastChannel !== 'undefined') {
+                    const bc = new BroadcastChannel('financeos_updates');
+                    bc.addEventListener('message', (event) => {
+                        if (event.data.type === 'DATA_UPDATED') {
+                            console.log('Received update from CSV upload');
+                            this.handleDataUpdate();
+                        }
+                    });
+                }
+
+                // Storage events
+                window.addEventListener('storage', (event) => {
+                    if (event.key === 'financeos_data_updated') {
+                        console.log('Storage update detected');
+                        this.handleDataUpdate();
+                    }
+                });
+
+                // Polling fallback (check every 5 seconds)
+                setInterval(() => this.checkForUpdates(), 5000);
+                
+                // Check when page gains focus
+                window.addEventListener('focus', () => this.checkForUpdates());
+            }
+
+            checkForUpdates() {
+                const lastUpdate = parseInt(localStorage.getItem('financeos_data_updated') || '0');
+                if (lastUpdate > this.lastUpdateCheck) {
+                    this.lastUpdateCheck = lastUpdate;
+                    console.log('Polling detected update');
+                    this.handleDataUpdate();
+                }
+            }
+
+            handleDataUpdate() {
+                this.showUpdateNotification();
+                this.refreshPageData();
+            }
+
+            refreshPageData() {
+                console.log('Refreshing dashboard data...');
+                
+                // Get latest data from localStorage
+                const data = this.getLatestData();
+                
+                // Update dashboard elements
+                this.updateAccountBalances(data.accounts);
+                this.updateTransactionStats(data.dashboardData);
+                this.updateGoalsProgress(data.goals);
+                
+                // Call dashboard-specific refresh if it exists
+                if (typeof refreshDashboard === 'function') refreshDashboard();
+            }
+
+            getLatestData() {
+                try {
+                    return {
+                        transactions: JSON.parse(localStorage.getItem('financeos_transactions') || '[]'),
+                        dashboardData: JSON.parse(localStorage.getItem('financeos_dashboard_data') || '{}'),
+                        accounts: JSON.parse(localStorage.getItem('financeos_accounts') || '[]'),
+                        goals: JSON.parse(localStorage.getItem('financeos_goals') || '[]'),
+                        budget: JSON.parse(localStorage.getItem('financeos_budget') || '{}')
+                    };
+                } catch (error) {
+                    console.error('Error getting latest data:', error);
+                    return { accounts: [], dashboardData: {}, goals: [], budget: {} };
+                }
+            }
+
+            updateAccountBalances(accounts) {
+                if (!accounts || accounts.length === 0) return;
+                
+                // Update account balance elements
+                const balanceElements = {
+                    'mySpendingBalance': accounts.find(a => a.id === 'my-spending')?.balance,
+                    'mySavingsBalance': accounts.find(a => a.id === 'my-savings')?.balance,
+                    'houseKittyBalance': accounts.find(a => a.id === 'house-kitty')?.balance,
+                    'mortgageBillingBalance': accounts.find(a => a.id === 'mortgage-billing')?.balance,
+                    'holdingBalance': accounts.find(a => a.id === 'holding')?.balance,
+                    'visaBalance': accounts.find(a => a.id === 'low-rate-visa')?.balance,
+                    'kiwiSaverBalance': accounts.find(a => a.id === 'kiwisaver')?.balance
+                };
+
+                Object.entries(balanceElements).forEach(([elementId, balance]) => {
+                    const element = document.getElementById(elementId);
+                    if (element && balance !== undefined) {
+                        element.textContent = this.formatCurrency(balance);
+                        element.className = balance >= 0 ? 'amount positive' : 'amount negative';
+                    }
+                });
+
+                console.log('Account balances updated');
+            }
+
+            updateTransactionStats(dashboardData) {
+                if (!dashboardData) return;
+
+                const statElements = {
+                    'totalTransactions': dashboardData.totalTransactions,
+                    'totalIncome': dashboardData.totalIncome,
+                    'totalExpenses': dashboardData.totalExpenses,
+                    'netCashFlow': dashboardData.netCashFlow,
+                    'monthlySpending': dashboardData.monthlySpending
+                };
+
+                Object.entries(statElements).forEach(([elementId, value]) => {
+                    const element = document.getElementById(elementId);
+                    if (element && value !== undefined) {
+                        if (elementId === 'totalTransactions') {
+                            element.textContent = value;
+                        } else {
+                            element.textContent = this.formatCurrency(value);
+                            if (elementId === 'netCashFlow') {
+                                element.className = value >= 0 ? 'amount positive' : 'amount negative';
+                            }
+                        }
+                    }
+                });
+
+                console.log('Transaction stats updated');
+            }
+
+            updateGoalsProgress(goals) {
+                if (!goals || goals.length === 0) return;
+
+                goals.forEach(goal => {
+                    const progress = Math.min((goal.current / goal.target) * 100, 100);
+                    
+                    // Update progress bars
+                    const progressBar = document.getElementById(`goal-${goal.id}-progress`);
+                    if (progressBar) {
+                        progressBar.style.width = progress + '%';
+                    }
+
+                    // Update current amounts
+                    const currentElement = document.getElementById(`goal-${goal.id}-current`);
+                    if (currentElement) {
+                        currentElement.textContent = this.formatCurrency(goal.current);
+                    }
+
+                    // Update percentages
+                    const percentElement = document.getElementById(`goal-${goal.id}-percent`);
+                    if (percentElement) {
+                        percentElement.textContent = Math.round(progress) + '%';
+                    }
+                });
+
+                console.log('Goals progress updated');
+            }
+
+            formatCurrency(amount) {
+                return new Intl.NumberFormat('en-NZ', {
+                    style: 'currency',
+                    currency: 'NZD',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 2
+                }).format(Math.abs(amount || 0));
+            }
+
+            showUpdateNotification() {
+                // Remove existing notification
+                const existing = document.getElementById('update-notification');
+                if (existing) existing.remove();
+
+                // Create notification
+                const notification = document.createElement('div');
+                notification.id = 'update-notification';
+                notification.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 12px; height: 12px; background: #10b981; border-radius: 50%; animation: pulse 1.5s infinite;"></div>
+                        <span>Financial data updated from CSV upload!</span>
+                    </div>
+                `;
+                
+                notification.style.cssText = `
+                    position: fixed; top: 20px; right: 20px; z-index: 10000;
+                    background: rgba(16, 185, 129, 0.95); backdrop-filter: blur(20px);
+                    color: white; padding: 15px 20px; border-radius: 12px;
+                    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.3);
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    font-weight: 600; font-size: 14px;
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    transform: translateX(400px); transition: all 0.3s ease;
+                    cursor: pointer;
+                `;
+
+                // Add pulse animation
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes pulse {
+                        0%, 100% { opacity: 1; transform: scale(1); }
+                        50% { opacity: 0.7; transform: scale(1.1); }
+                    }
+                `;
+                document.head.appendChild(style);
+
+                document.body.appendChild(notification);
+
+                // Click to dismiss
+                notification.addEventListener('click', () => {
+                    notification.style.transform = 'translateX(400px)';
+                    setTimeout(() => notification.remove(), 300);
+                });
+
+                // Animate in
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(0)';
+                }, 100);
+
+                // Auto remove after 5 seconds
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.style.transform = 'translateX(400px)';
+                        setTimeout(() => notification.remove(), 300);
+                    }
+                }, 5000);
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            window.FinanceOSPageSync = new FinanceOSPageSync();
+            
+            // Initial data refresh
+            setTimeout(() => {
+                if (window.FinanceOSPageSync) {
+                    window.FinanceOSPageSync.refreshPageData();
+                }
+            }, 1000);
+        });
+
+        console.log('FinanceOS Page Sync script loaded for Dashboard');
+    </script>
+    
     <style>
         /* CSS Variables for Premium Design System */
         :root {
@@ -252,7 +504,7 @@
             margin-bottom: 32px;
         }
 
-        .summary-card {h
+        .summary-card {
             padding: 24px;
             border-radius: 20px;
             transition: all 0.3s ease;
@@ -678,861 +930,4 @@
         }
 
         /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 12px;
-            }
-
-            .nav {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 8px;
-            }
-
-            .nav-button {
-                font-size: 14px;
-                padding: 6px 12px;
-            }
-
-            .summary-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .accounts-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .goals-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .actions-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .amount {
-                font-size: 24px;
-            }
-
-            .login-container {
-                padding: 40px 30px;
-                min-height: 600px;
-            }
-        }
-
-        /* Utility Classes */
-        .hidden { display: none !important; }
-        .loading { opacity: 0.6; pointer-events: none; }
-        .text-success { color: var(--success); }
-        .text-error { color: var(--error); }
-        .text-warning { color: var(--warning); }
-        .text-info { color: var(--info); }
-
-        /* Privacy Mode */
-        body.privacy-mode .amount,
-        body.privacy-mode .account-balance {
-            filter: blur(8px);
-            transition: filter 0.3s ease;
-        }
-
-        body.privacy-mode .amount:hover,
-        body.privacy-mode .account-balance:hover {
-            filter: blur(0);
-        }
-    </style>
-</head>
-<body>
-    <div class="session-info" id="sessionInfo" style="display: none;">
-        <span>User: demo</span>
-        <button class="logout-button" onclick="logout()">Logout</button>
-    </div>
-
-    <div class="login-overlay" id="loginOverlay">
-        <div class="login-container">
-            <div class="login-logo">
-                <span style="font-size: 48px; color: white;">$</span>
-            </div>
-            <h2 style="color: white; margin-bottom: 12px; font-size: 28px;">FinanceOS</h2>
-            <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 40px; font-size: 16px;">
-                Your Personal Finance Operating System
-            </p>
-            
-            <div id="loginForm">
-                <input type="text" id="loginUsername" class="login-input" placeholder="Username" autocomplete="username">
-                
-                <div class="password-field">
-                    <input type="password" id="loginPassword" class="login-input" placeholder="Password" autocomplete="current-password">
-                    <button type="button" class="password-toggle" onclick="togglePassword()">👁️</button>
-                </div>
-                
-                <button onclick="login()" class="login-button" id="loginButton">
-                    <span id="loginButtonText">Login</span>
-                </button>
-                
-                <button onclick="showBiometricLogin()" class="biometric-button" id="biometricButton">
-                    🔐 Use Biometric Login
-                </button>
-                
-                <button onclick="showPinLogin()" class="biometric-button">
-                    🔢 Use PIN
-                </button>
-                
-                <div style="margin-top: 20px;">
-                    <a href="#" onclick="showPasswordReset()" style="color: #8b5cf6; text-decoration: none;">Forgot Password?</a>
-                </div>
-                
-                <div style="margin-top: 20px; font-size: 12px; color: rgba(255, 255, 255, 0.6);">
-                    Demo: username=<strong>demo</strong>, password=<strong>demo123</strong>
-                </div>
-            </div>
-            
-            <div id="pinForm" style="display: none;">
-                <h3 style="color: white; margin-bottom: 20px;">Enter PIN</h3>
-                <div class="pin-input">
-                    <input type="password" class="pin-digit" maxlength="1" id="pin1" oninput="movePinFocus(1)" onkeydown="handlePinBackspace(event, 1)">
-                    <input type="password" class="pin-digit" maxlength="1" id="pin2" oninput="movePinFocus(2)" onkeydown="handlePinBackspace(event, 2)">
-                    <input type="password" class="pin-digit" maxlength="1" id="pin3" oninput="movePinFocus(3)" onkeydown="handlePinBackspace(event, 3)">
-                    <input type="password" class="pin-digit" maxlength="1" id="pin4" oninput="movePinFocus(4)" onkeydown="handlePinBackspace(event, 4)">
-                </div>
-                <button onclick="loginWithPin()" class="login-button">Login with PIN</button>
-                <button onclick="showLoginForm()" class="biometric-button">Back to Password</button>
-                <div style="margin-top: 15px; font-size: 12px; color: rgba(255, 255, 255, 0.6);">
-                    Demo PIN: <strong>1234</strong>
-                </div>
-            </div>
-            
-            <div id="resetForm" style="display: none;">
-                <h3 style="color: white; margin-bottom: 20px;">Reset Password</h3>
-                <input type="email" class="login-input" placeholder="Email Address" id="resetEmail">
-                <button onclick="sendPasswordReset()" class="login-button">Send Reset Link</button>
-                <button onclick="showLoginForm()" class="biometric-button">Back to Login</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="mainApp" style="display: none;">
-        <header class="header glass">
-            <div class="header-content">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <span style="font-size: 24px; color: white;">$</span>
-                    </div>
-                    <span class="logo-text">FinanceOS</span>
-                </div>
-                
-                <nav class="nav">
-                    <a href="index.html" class="nav-button active">Dashboard</a>
-                    <a href="csv-upload.html" class="nav-button">Upload CSV</a>
-                    <a href="goals.html" class="nav-button">Goals</a>
-                    <a href="budget.html" class="nav-button">Budget</a>
-                    <button class="privacy-toggle nav-button" id="privacyToggle">🔒 Privacy</button>
-                    <button class="logout-button nav-button" onclick="logout()">🚪 Logout</button>
-                </nav>
-            </div>
-        </header>
-
-        <main class="main-content" id="mainContent">
-            <div class="csv-status" id="csvStatus">
-                📊 No recent CSV data found. <a href="csv-upload.html">Upload bank statements</a> to see transaction analysis.
-            </div>
-
-            <div class="emergency-alert">
-                <div class="alert-title">🚨 Financial Alert: Emergency Fund Critical</div>
-                <div class="alert-text">
-                    Your emergency fund has only $0.17. With a monthly deficit of $3,607, you're at high financial risk. 
-                    <strong>Immediate action required.</strong>
-                </div>
-            </div>
-
-            <section class="financial-summary">
-                <h2 class="section-title">Financial Overview</h2>
-                
-                <div class="summary-grid">
-                    <div class="summary-card glass-premium hover-scale transition-all">
-                        <h3>Total Assets</h3>
-                        <div class="amount text-success">$114,116.44</div>
-                        <div class="change">Available across all accounts</div>
-                    </div>
-                    
-                    <div class="summary-card glass-premium hover-scale transition-all">
-                        <h3>Total Debt</h3>
-                        <div class="amount text-error">$274,851.32</div>
-                        <div class="change">Including mortgage & credit</div>
-                    </div>
-                    
-                    <div class="summary-card glass-premium hover-scale transition-all">
-                        <h3>Net Worth</h3>
-                        <div class="amount text-error">-$160,734.88</div>
-                        <div class="change">Improving with debt payoff</div>
-                    </div>
-                    
-                    <div class="summary-card glass-premium hover-scale transition-all">
-                        <h3>Monthly Cash Flow</h3>
-                        <div class="amount text-error">-$3,607</div>
-                        <div class="change">Expenses exceed income</div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="accounts-section">
-                <div class="section-header">
-                    <h2 class="section-title">Your Accounts</h2>
-                </div>
-
-                <div class="accounts-grid">
-                    <div class="account-card glass hover-scale transition-all">
-                        <div class="account-header">
-                            <div class="account-icon gradient-blue">💳</div>
-                            <div class="account-info">
-                                <h3>My Spending</h3>
-                                <div class="account-type">Personal Checking</div>
-                            </div>
-                        </div>
-                        <div class="account-balance text-success">$25.92</div>
-                        <div class="account-available">$25.92 Available</div>
-                    </div>
-
-                    <div class="account-card glass hover-scale transition-all">
-                        <div class="account-header">
-                            <div class="account-icon gradient-green">💰</div>
-                            <div class="account-info">
-                                <h3>My Savings</h3>
-                                <div class="account-type">Personal Savings</div>
-                            </div>
-                        </div>
-                        <div class="account-balance text-warning">$0.17</div>
-                        <div class="account-available">$0.17 Available</div>
-                    </div>
-
-                    <div class="account-card glass hover-scale transition-all">
-                        <div class="account-header">
-                            <div class="account-icon gradient-purple">🏠</div>
-                            <div class="account-info">
-                                <h3>House Kitty</h3>
-                                <div class="account-type">Joint Savings</div>
-                            </div>
-                        </div>
-                        <div class="account-balance text-success">$65,357.00</div>
-                        <div class="account-available">$65,357.00 Available</div>
-                    </div>
-
-                    <div class="account-card glass hover-scale transition-all">
-                        <div class="account-header">
-                            <div class="account-icon gradient-orange">📄</div>
-                            <div class="account-info">
-                                <h3>Mortgage & Billing</h3>
-                                <div class="account-type">Bill Payment Account</div>
-                            </div>
-                        </div>
-                        <div class="account-balance text-success">$126.35</div>
-                        <div class="account-available">$126.35 Available</div>
-                    </div>
-
-                    <div class="account-card glass hover-scale transition-all">
-                        <div class="account-header">
-                            <div class="account-icon gradient-blue">🔄</div>
-                            <div class="account-info">
-                                <h3>Holding</h3>
-                                <div class="account-type">Temporary Account</div>
-                            </div>
-                        </div>
-                        <div class="account-balance text-success">$240.40</div>
-                        <div class="account-available">$240.40 Available</div>
-                    </div>
-
-                    <div class="account-card glass hover-scale transition-all">
-                        <div class="account-header">
-                            <div class="account-icon gradient-red">💳</div>
-                            <div class="account-info">
-                                <h3>Low Rate Visa</h3>
-                                <div class="account-type">Credit Card</div>
-                            </div>
-                        </div>
-                        <div class="account-balance text-error">-$3,251.30</div>
-                        <div class="account-available">$6,748.70 Available</div>
-                    </div>
-
-                    <div class="account-card glass hover-scale transition-all">
-                        <div class="account-header">
-                            <div class="account-icon gradient-green">📈</div>
-                            <div class="account-info">
-                                <h3>ANZ KiwiSaver</h3>
-                                <div class="account-type">Retirement Savings</div>
-                            </div>
-                        </div>
-                        <div class="account-balance text-success">$48,733.44</div>
-                        <div class="account-available">Growing for retirement</div>
-                    </div>
-
-                    <div class="account-card glass hover-scale transition-all">
-                        <div class="account-header">
-                            <div class="account-icon gradient-red">🏠</div>
-                            <div class="account-info">
-                                <h3>Home Loans</h3>
-                                <div class="account-type">Mortgage Debt</div>
-                            </div>
-                        </div>
-                        <div class="account-balance text-error">$271,600.02</div>
-                        <div class="account-available">Principal remaining</div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="goals-section">
-                <div class="section-header">
-                    <h2 class="section-title">Financial Goals</h2>
-                    <a href="goals.html" class="nav-button">View All Goals</a>
-                </div>
-
-                <div class="goals-grid">
-                    <div class="goal-card glass-premium">
-                        <div class="goal-header">
-                            <div class="goal-title">Emergency Fund</div>
-                            <div class="goal-priority priority-critical">CRITICAL</div>
-                        </div>
-                        <div class="goal-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill gradient-red" style="width: 0.001%"></div>
-                            </div>
-                            <div class="progress-text">
-                                <span>$0.17 of $15,000</span>
-                                <span>0.001%</span>
-                            </div>
-                        </div>
-                        <div style="font-size: 12px; color: var(--text-muted);">
-                            Target: 3 months of expenses
-                        </div>
-                    </div>
-
-                    <div class="goal-card glass-premium">
-                        <div class="goal-header">
-                            <div class="goal-title">Visa Debt Payoff</div>
-                            <div class="goal-priority priority-high">HIGH</div>
-                        </div>
-                        <div class="goal-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill gradient-orange" style="width: 67.5%"></div>
-                            </div>
-                            <div class="progress-text">
-                                <span>$6,748.70 paid of $10,000</span>
-                                <span>67.5%</span>
-                            </div>
-                        </div>
-                        <div style="font-size: 12px; color: var(--text-muted);">
-                            $3,251.30 remaining
-                        </div>
-                    </div>
-
-                    <div class="goal-card glass-premium">
-                        <div class="goal-header">
-                            <div class="goal-title">KiwiSaver Growth</div>
-                            <div class="goal-priority priority-medium">MEDIUM</div>
-                        </div>
-                        <div class="goal-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill gradient-green" style="width: 48.7%"></div>
-                            </div>
-                            <div class="progress-text">
-                                <span>$48,733 of $100,000</span>
-                                <span>48.7%</span>
-                            </div>
-                        </div>
-                        <div style="font-size: 12px; color: var(--text-muted);">
-                            Retirement milestone target
-                        </div>
-                    </div>
-
-                    <div class="goal-card glass-premium">
-                        <div class="goal-header">
-                            <div class="goal-title">Private School Fund</div>
-                            <div class="goal-priority priority-medium">MEDIUM</div>
-                        </div>
-                        <div class="goal-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill gradient-blue" style="width: 15%"></div>
-                            </div>
-                            <div class="progress-text">
-                                <span>$1,500 of $10,000</span>
-                                <span>15%</span>
-                            </div>
-                        </div>
-                        <div style="font-size: 12px; color: var(--text-muted);">
-                            $300/month contributions
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="quick-actions">
-                <div class="section-header">
-                    <h2 class="section-title">Quick Actions</h2>
-                </div>
-
-                <div class="actions-grid">
-                    <a href="csv-upload.html" class="action-card glass-premium hover-scale transition-all gradient-purple">
-                        <div class="action-icon">📤</div>
-                        <div class="action-title">Upload CSV</div>
-                        <div class="action-subtitle">Import bank statements</div>
-                    </a>
-
-                    <a href="budget.html" class="action-card glass-premium hover-scale transition-all gradient-blue">
-                        <div class="action-icon">📊</div>
-                        <div class="action-title">View Budget</div>
-                        <div class="action-subtitle">Track spending vs budget</div>
-                    </a>
-
-                    <a href="goals.html" class="action-card glass-premium hover-scale transition-all gradient-green">
-                        <div class="action-icon">🎯</div>
-                        <div class="action-title">Manage Goals</div>
-                        <div class="action-subtitle">Update financial targets</div>
-                    </a>
-
-                    <a href="#" onclick="openTransferModal()" class="action-card glass-premium hover-scale transition-all gradient-orange">
-                        <div class="action-icon">💸</div>
-                        <div class="action-title">Transfer Money</div>
-                        <div class="action-subtitle">Move funds between accounts</div>
-                    </a>
-
-                    <a href="#" onclick="openPaymentModal()" class="action-card glass-premium hover-scale transition-all gradient-red">
-                        <div class="action-icon">💳</div>
-                        <div class="action-title">Pay Bills</div>
-                        <div class="action-subtitle">Schedule payments</div>
-                    </a>
-
-                    <a href="#" onclick="generateReport()" class="action-card glass-premium hover-scale transition-all gradient-purple">
-                        <div class="action-icon">📈</div>
-                        <div class="action-title">Generate Report</div>
-                        <div class="action-subtitle">Financial summary</div>
-                    </a>
-                </div>
-            </section>
-
-            <section class="ai-coach">
-                <div class="section-header">
-                    <h2 class="section-title">AI Financial Coach</h2>
-                </div>
-
-                <div class="chat-container glass-premium">
-                    <div class="chat-messages" id="chatMessages">
-                        <div class="message ai">
-                            <strong>💡 AI Coach:</strong> Welcome! I've analyzed your finances and noticed your emergency fund is critically low at $0.17. With your current monthly deficit of $3,607, this puts you at high financial risk. Would you like me to create an action plan to address this immediately?
-                        </div>
-                    </div>
-                    
-                    <div class="chat-input">
-                        <input type="text" id="chatInput" placeholder="Ask me about your spending, budget, or goals..." onkeypress="handleChatKeyPress(event)">
-                        <button onclick="sendChatMessage()">Send</button>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <script>
-        // Application State
-        let isLoggedIn = false;
-        let privacyMode = false;
-        let currentUser = null;
-
-        // Financial Data
-        const accountData = {
-            assets: {
-                mySpending: 25.92,
-                mySavings: 0.17,
-                houseKitty: 65357.00,
-                mortgageBilling: 126.35,
-                holding: 240.40,
-                kiwiSaver: 48733.44
-            },
-            liabilities: {
-                lowRateVisa: 3251.30,
-                homeLoans: 271600.02
-            },
-            budget: {
-                income: 6304,
-                expenses: 9911,
-                deficit: -3607
-            }
-        };
-
-        // Initialize Application
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeApp();
-            setupEventListeners();
-            checkAuthState();
-        });
-
-        function initializeApp() {
-            // Check for saved auth state
-            const savedAuth = localStorage.getItem('financeos_auth');
-            if (savedAuth) {
-                const authData = JSON.parse(savedAuth);
-                if (authData.expires > Date.now()) {
-                    showMainApp();
-                }
-            }
-
-            // Initialize privacy mode
-            const savedPrivacy = localStorage.getItem('financeos_privacy');
-            if (savedPrivacy === 'true') {
-                togglePrivacyMode();
-            }
-        }
-
-        function setupEventListeners() {
-            // Privacy toggle
-            const privacyToggle = document.getElementById('privacyToggle');
-            if (privacyToggle) {
-                privacyToggle.addEventListener('click', togglePrivacyMode);
-            }
-
-            // Chat input enter key
-            const chatInput = document.getElementById('chatInput');
-            if (chatInput) {
-                chatInput.addEventListener('keypress', handleChatKeyPress);
-            }
-        }
-
-        function checkAuthState() {
-            const authToken = localStorage.getItem('financeos_auth');
-            if (authToken) {
-                try {
-                    const authData = JSON.parse(authToken);
-                    if (authData.expires > Date.now()) {
-                        showMainApp();
-                        return;
-                    }
-                } catch (e) {
-                    console.error('Invalid auth token');
-                }
-            }
-            showLogin();
-        }
-
-        // Authentication Functions
-        function login() {
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
-            const button = document.getElementById('loginButton');
-            const buttonText = document.getElementById('loginButtonText');
-
-            if (!username || !password) {
-                alert('Please enter both username and password');
-                return;
-            }
-
-            // Demo authentication
-            if (username === 'demo' && password === 'demo123') {
-                button.disabled = true;
-                buttonText.innerHTML = '<div class="loading-spinner"></div>';
-
-                setTimeout(() => {
-                    const authData = {
-                        user: 'demo',
-                        expires: Date.now() + (7 * 24 * 60 * 60 * 1000) // 7 days
-                    };
-                    localStorage.setItem('financeos_auth', JSON.stringify(authData));
-                    showMainApp();
-                }, 1500);
-            } else {
-                alert('Invalid credentials. Use demo/demo123');
-            }
-        }
-
-        function loginWithPin() {
-            const pin1 = document.getElementById('pin1').value;
-            const pin2 = document.getElementById('pin2').value;
-            const pin3 = document.getElementById('pin3').value;
-            const pin4 = document.getElementById('pin4').value;
-            const pin = pin1 + pin2 + pin3 + pin4;
-
-            if (pin === '1234') {
-                const authData = {
-                    user: 'demo',
-                    expires: Date.now() + (7 * 24 * 60 * 60 * 1000)
-                };
-                localStorage.setItem('financeos_auth', JSON.stringify(authData));
-                showMainApp();
-            } else {
-                alert('Invalid PIN. Use 1234');
-            }
-        }
-
-        function showBiometricLogin() {
-            if ('credentials' in navigator && 'create' in navigator.credentials) {
-                navigator.credentials.get({
-                    publicKey: {
-                        challenge: new Uint8Array(32),
-                        timeout: 60000,
-                        userVerification: "required"
-                    }
-                }).then(() => {
-                    const authData = {
-                        user: 'demo',
-                        expires: Date.now() + (7 * 24 * 60 * 60 * 1000)
-                    };
-                    localStorage.setItem('financeos_auth', JSON.stringify(authData));
-                    showMainApp();
-                }).catch(() => {
-                    alert('Biometric authentication not available or failed');
-                });
-            } else {
-                alert('Biometric authentication not supported on this device');
-            }
-        }
-
-        function showPinLogin() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('pinForm').style.display = 'block';
-            document.getElementById('pin1').focus();
-        }
-
-        function showLoginForm() {
-            document.getElementById('pinForm').style.display = 'none';
-            document.getElementById('resetForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
-        }
-
-        function showPasswordReset() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('resetForm').style.display = 'block';
-        }
-
-        function sendPasswordReset() {
-            const email = document.getElementById('resetEmail').value;
-            if (email) {
-                alert('Password reset link sent to ' + email);
-                showLoginForm();
-            } else {
-                alert('Please enter your email address');
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('financeos_auth');
-            localStorage.removeItem('financeos_privacy');
-            showLogin();
-        }
-
-        function showLogin() {
-            document.getElementById('loginOverlay').style.display = 'flex';
-            document.getElementById('mainApp').style.display = 'none';
-            isLoggedIn = false;
-        }
-
-        function showMainApp() {
-            document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-            isLoggedIn = true;
-            updateDashboard();
-        }
-
-        // UI Functions
-        function togglePassword() {
-            const passwordField = document.getElementById('loginPassword');
-            const toggle = document.querySelector('.password-toggle');
-            
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                toggle.textContent = '🙈';
-            } else {
-                passwordField.type = 'password';
-                toggle.textContent = '👁️';
-            }
-        }
-
-        function movePinFocus(current) {
-            if (current < 4) {
-                const nextField = document.getElementById('pin' + (current + 1));
-                if (nextField) nextField.focus();
-            }
-        }
-
-        function handlePinBackspace(event, current) {
-            if (event.key === 'Backspace' && current > 1) {
-                const currentField = document.getElementById('pin' + current);
-                if (currentField.value === '') {
-                    const prevField = document.getElementById('pin' + (current - 1));
-                    if (prevField) {
-                        prevField.focus();
-                        prevField.value = '';
-                    }
-                }
-            }
-        }
-
-        function togglePrivacyMode() {
-            privacyMode = !privacyMode;
-            document.body.classList.toggle('privacy-mode', privacyMode);
-            
-            const toggle = document.getElementById('privacyToggle');
-            if (toggle) {
-                toggle.textContent = privacyMode ? '🔓 Show Data' : '🔒 Privacy';
-            }
-            
-            localStorage.setItem('financeos_privacy', privacyMode.toString());
-        }
-
-        function updateDashboard() {
-            // Update CSV status
-            const csvStatus = document.getElementById('csvStatus');
-            const lastUpload = localStorage.getItem('financeos_last_csv_upload');
-            
-            if (lastUpload) {
-                const uploadDate = new Date(lastUpload);
-                const daysSince = Math.floor((Date.now() - uploadDate.getTime()) / (1000 * 60 * 60 * 24));
-                
-                if (daysSince <= 7) {
-                    csvStatus.className = 'csv-status recent-data';
-                    csvStatus.innerHTML = `✅ Recent CSV data from ${daysSince} day${daysSince !== 1 ? 's' : ''} ago. Transactions categorized and budget updated.`;
-                } else {
-                    csvStatus.className = 'csv-status old-data';
-                    csvStatus.innerHTML = `⚠️ CSV data is ${daysSince} days old. <a href="csv-upload.html">Upload recent statements</a> for accurate tracking.`;
-                }
-            }
-        }
-
-        // AI Coach Functions
-        function handleChatKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendChatMessage();
-            }
-        }
-
-        function sendChatMessage() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            
-            if (!message) return;
-
-            // Add user message
-            addChatMessage('user', message);
-            input.value = '';
-
-            // Simulate AI response
-            setTimeout(() => {
-                const response = generateAIResponse(message);
-                addChatMessage('ai', response);
-            }, 1000);
-        }
-
-        function addChatMessage(type, message) {
-            const messagesContainer = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${type}`;
-            
-            if (type === 'ai') {
-                messageDiv.innerHTML = `<strong>💡 AI Coach:</strong> ${message}`;
-            } else {
-                messageDiv.textContent = message;
-            }
-            
-            messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function generateAIResponse(query) {
-            const lowerQuery = query.toLowerCase();
-            
-            if (lowerQuery.includes('emergency') || lowerQuery.includes('fund')) {
-                return "Your emergency fund is critically low at $0.17. I recommend immediately redirecting $100/week from discretionary spending to build this to at least $1,000 within 10 weeks. This would provide basic protection while we work on your budget deficit.";
-            }
-            
-            if (lowerQuery.includes('budget') || lowerQuery.includes('deficit')) {
-                return "Your monthly deficit of $3,607 is unsustainable. Key areas to address: 1) Reduce dining out budget from $250 to $100 (-$150), 2) Review Sky Network subscription ($163) - consider cheaper alternatives, 3) Optimize grocery spending from $550 to $450 (-$100). These changes alone could reduce deficit by $413/month.";
-            }
-            
-            if (lowerQuery.includes('debt') || lowerQuery.includes('visa')) {
-                return "Your Visa debt of $3,251 is costing approximately $54/month in interest (assuming 20% APR). Focus on paying this off before building savings beyond emergency fund. Pay minimum + any extra you can afford to save on interest charges.";
-            }
-            
-            if (lowerQuery.includes('goal') || lowerQuery.includes('save')) {
-                return "With your current deficit, focus on these priorities: 1) Emergency fund to $1,000 (critical), 2) Eliminate budget deficit, 3) Pay off Visa debt, 4) Build emergency fund to $15,000, 5) Then focus on other goals like private school fund.";
-            }
-            
-            if (lowerQuery.includes('house') || lowerQuery.includes('kitty')) {
-                return "Your House Kitty has $65,357 - excellent! This provides good security for home repairs and maintenance. Consider if any portion could temporarily help with your budget deficit, but maintain at least $30,000 for true house emergencies.";
-            }
-            
-            return "I understand you're asking about your finances. Your top priorities should be: 1) Build emergency fund to $1,000 immediately, 2) Address the $3,607 monthly deficit through expense reduction, 3) Pay off high-interest debt. Would you like specific advice on any of these areas?";
-        }
-
-        // Quick Action Functions
-        function openTransferModal() {
-            alert('Transfer functionality would open here. This would allow moving money between your accounts.');
-        }
-
-        function openPaymentModal() {
-            alert('Bill payment functionality would open here. This would show upcoming bills and allow scheduling payments.');
-        }
-
-        function generateReport() {
-            alert('Report generation would create a comprehensive financial summary PDF. This feature will be available soon.');
-        }
-
-        // PWA Installation
-        let deferredPrompt;
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            
-            // Show install prompt after user is logged in
-            if (isLoggedIn) {
-                showInstallPrompt();
-            }
-        });
-
-        function showInstallPrompt() {
-            if (deferredPrompt) {
-                const installBanner = document.createElement('div');
-                installBanner.innerHTML = `
-                    <div style="position: fixed; bottom: 20px; right: 20px; background: var(--glass-premium); backdrop-filter: blur(20px); border: 1px solid var(--glass-premium-border); border-radius: 16px; padding: 16px; max-width: 300px; z-index: 1000;">
-                        <h4 style="margin: 0 0 8px 0; color: white;">Install FinanceOS</h4>
-                        <p style="margin: 0 0 12px 0; font-size: 12px; color: var(--text-secondary);">Add to home screen for the best experience</p>
-                        <div style="display: flex; gap: 8px;">
-                            <button onclick="installPWA()" style="background: var(--gradient-purple); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 12px; cursor: pointer;">Install</button>
-                            <button onclick="dismissInstall()" style="background: transparent; color: var(--text-secondary); border: 1px solid var(--glass-border); padding: 8px 16px; border-radius: 8px; font-size: 12px; cursor: pointer;">Later</button>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(installBanner);
-            }
-        }
-
-        function installPWA() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('PWA installed');
-                    }
-                    deferredPrompt = null;
-                    dismissInstall();
-                });
-            }
-        }
-
-        function dismissInstall() {
-            const banner = document.querySelector('[style*="position: fixed; bottom: 20px"]');
-            if (banner) {
-                banner.remove();
-            }
-        }
-
-        // Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then((registration) => {
-                        console.log('SW registered: ', registration);
-                    })
-                    .catch((registrationError) => {
-                        console.log('SW registration failed: ', registrationError);
-                    });
-            });
-        }
-    </script>
-</body>
-</html>
+        @media (max-width: 768
