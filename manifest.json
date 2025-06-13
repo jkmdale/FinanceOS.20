@@ -1,8 +1,8 @@
 {
   "name": "FinanceOS - Personal Finance Operating System",
   "short_name": "FinanceOS",
-  "description": "Complete personal finance management with AI coaching for New Zealand families",
-  "start_url": "/",
+  "description": "Complete personal finance management with AI coaching and CSV import for New Zealand families. Track budgets, goals, and spending with real-time sync across devices.",
+  "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#8b5cf6",
@@ -10,21 +10,22 @@
   "scope": "/",
   "lang": "en-NZ",
   "dir": "ltr",
-  "categories": ["finance", "productivity", "lifestyle"],
+  "categories": ["finance", "productivity", "lifestyle", "business"],
+  "iarc_rating_id": "",
   "screenshots": [
     {
       "src": "/images/screenshot-wide.png",
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "FinanceOS Dashboard"
+      "label": "FinanceOS Dashboard - Complete financial overview with real-time data sync"
     },
     {
       "src": "/images/screenshot-narrow.png", 
       "sizes": "750x1334",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "FinanceOS Mobile"
+      "label": "FinanceOS Mobile - Track finances on the go with offline support"
     }
   ],
   "icons": [
@@ -81,13 +82,19 @@
       "sizes": "180x180",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "/icons/favicon.ico",
+      "sizes": "16x16 32x32 48x48",
+      "type": "image/x-icon",
+      "purpose": "any"
     }
   ],
   "shortcuts": [
     {
       "name": "Upload CSV",
       "short_name": "Upload",
-      "description": "Import bank statements",
+      "description": "Import bank statements and transactions",
       "url": "/csv-upload.html",
       "icons": [
         {
@@ -100,7 +107,7 @@
     {
       "name": "View Goals",
       "short_name": "Goals", 
-      "description": "Track financial goals",
+      "description": "Track and manage financial goals",
       "url": "/goals.html",
       "icons": [
         {
@@ -113,7 +120,7 @@
     {
       "name": "Budget Overview", 
       "short_name": "Budget",
-      "description": "View budget and spending",
+      "description": "View budget and spending analysis",
       "url": "/budget.html",
       "icons": [
         {
@@ -124,13 +131,13 @@
       ]
     },
     {
-      "name": "AI Coach",
-      "short_name": "AI Coach",
-      "description": "Get financial advice", 
-      "url": "/#ai-coach",
+      "name": "Dashboard",
+      "short_name": "Home",
+      "description": "Main financial dashboard",
+      "url": "/index.html",
       "icons": [
         {
-          "src": "/icons/shortcut-ai.png",
+          "src": "/icons/shortcut-dashboard.png",
           "sizes": "96x96",
           "type": "image/png"
         }
@@ -162,9 +169,43 @@
       "files": [
         {
           "name": "csvFiles",
-          "accept": [".csv", ".xlsx", ".xls"]
+          "accept": [".csv", ".xlsx", ".xls", ".qif", ".ofx"]
         }
       ]
     }
-  }
+  },
+  "file_handlers": [
+    {
+      "action": "/csv-upload.html",
+      "accept": {
+        "text/csv": [".csv"],
+        "application/vnd.ms-excel": [".xls"],
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
+        "application/qif": [".qif"],
+        "application/x-ofx": [".ofx"]
+      },
+      "icons": [
+        {
+          "src": "/icons/file-handler.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "handle_links": "preferred",
+  "id": "financeos-pwa",
+  "permissions": [
+    "storage-access",
+    "persistent-storage"
+  ],
+  "permissions_policy": {
+    "camera": [],
+    "microphone": [],
+    "geolocation": []
+  },
+  "manifest_version": 3,
+  "version": "1.2.0",
+  "capture_links": "existing-client-navigate"
 }
