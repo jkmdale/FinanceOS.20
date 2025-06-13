@@ -8,6 +8,10 @@
     <meta name="theme-color" content="#8b5cf6">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Include Papa Parse for CSV processing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
     <style>
         /* CSS Variables for Premium Design System */
         :root {
@@ -59,11 +63,7 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
 
-        /* Transitions */
-        .transition-all { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .hover-scale:hover { transform: scale(1.02); }
-
-        /* Header Styles (Same as index.html) */
+        /* Header */
         .header {
             position: sticky;
             top: 0;
@@ -265,6 +265,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            flex: 1;
         }
 
         .file-icon {
@@ -317,6 +318,7 @@
         /* Progress Bar */
         .progress-container {
             margin-top: 16px;
+            display: none;
         }
 
         .progress-bar {
@@ -332,6 +334,7 @@
             background: var(--gradient-green);
             border-radius: 4px;
             transition: width 0.3s ease;
+            width: 0%;
         }
 
         .progress-text {
@@ -386,6 +389,7 @@
         /* Processing Results */
         .results-container {
             margin-top: 32px;
+            display: none;
         }
 
         .result-card {
@@ -396,7 +400,7 @@
 
         .result-header {
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: center;
             margin-bottom: 12px;
         }
@@ -478,6 +482,75 @@
             color: var(--error);
         }
 
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .summary-card {
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .summary-card h3 {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .summary-card .value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .summary-card .change {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Actions */
+        .upload-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 24px;
+        }
+
+        .action-button {
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-button.primary {
+            background: var(--gradient-purple);
+            color: white;
+        }
+
+        .action-button.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .action-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .header-content {
@@ -542,6 +615,17 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        /* Success Animation */
+        .success-animation {
+            animation: successPulse 0.6s ease-out;
+        }
+
+        @keyframes successPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
@@ -619,20 +703,65 @@
             <div class="upload-zone glass-premium" id="uploadZone">
                 <div class="upload-icon">📤</div>
                 <div class="upload-text">Drop your CSV files here</div>
-                <div class="upload-subtitle">or click to browse files</div>
+                <div class="upload-subtitle">or click to browse files (multiple files supported)</div>
                 <button class="upload-button" onclick="document.getElementById('fileInput').click()">
                     Choose Files
                 </button>
                 <input type="file" id="fileInput" multiple accept=".csv,.xlsx,.xls,.qif,.ofx" style="display: none;">
             </div>
 
+            <!-- Progress Bar -->
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">Processing files...</div>
+            </div>
+
             <!-- File List -->
             <div class="file-list" id="fileList"></div>
+
+            <!-- Upload Actions -->
+            <div class="upload-actions" id="uploadActions" style="display: none;">
+                <button class="action-button primary" id="processAllBtn" onclick="processAllFiles()">
+                    Process All Files
+                </button>
+                <button class="action-button secondary" id="clearAllBtn" onclick="clearAllFiles()">
+                    Clear All
+                </button>
+            </div>
         </section>
 
         <!-- Processing Results -->
-        <section class="results-container" id="resultsContainer" style="display: none;">
-            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 16px; color: white;">Processing Results</h2>
+        <section class="results-container" id="resultsContainer">
+            <!-- Summary Cards -->
+            <div class="summary-cards" id="summaryCards" style="display: none;">
+                <div class="summary-card glass-premium">
+                    <h3>Total Transactions</h3>
+                    <div class="value" id="totalTransactions">0</div>
+                    <div class="change">Imported successfully</div>
+                </div>
+                
+                <div class="summary-card glass-premium">
+                    <h3>Total Income</h3>
+                    <div class="value positive" id="totalIncome">$0.00</div>
+                    <div class="change">From all files</div>
+                </div>
+                
+                <div class="summary-card glass-premium">
+                    <h3>Total Expenses</h3>
+                    <div class="value negative" id="totalExpenses">$0.00</div>
+                    <div class="change">From all files</div>
+                </div>
+                
+                <div class="summary-card glass-premium">
+                    <h3>Net Change</h3>
+                    <div class="value" id="netChange">$0.00</div>
+                    <div class="change">Income - Expenses</div>
+                </div>
+            </div>
+
+            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 16px; color: white; display: none;" id="resultsTitle">Processing Results</h2>
             <div id="resultsContent"></div>
         </section>
     </main>
@@ -640,12 +769,66 @@
     <script>
         // Application State
         let uploadedFiles = [];
-        let processedData = [];
+        let processedTransactions = [];
+        let totalStats = {
+            transactions: 0,
+            income: 0,
+            expenses: 0,
+            netChange: 0
+        };
+
+        // Bank format configurations for NZ banks
+        const BANK_FORMATS = {
+            ANZ: {
+                headers: ['Date', 'Amount', 'Description', 'Balance'],
+                dateIndex: 0,
+                amountIndex: 1,
+                descriptionIndex: 2,
+                balanceIndex: 3
+            },
+            ASB: {
+                headers: ['Date', 'Unique Id', 'Tran Type', 'Cheque Number', 'Payee', 'Memo', 'Amount'],
+                dateIndex: 0,
+                amountIndex: 6,
+                descriptionIndex: 5,
+                payeeIndex: 4
+            },
+            BNZ: {
+                headers: ['Date', 'Amount', 'Payee', 'Description', 'Reference', 'Transaction Type'],
+                dateIndex: 0,
+                amountIndex: 1,
+                descriptionIndex: 3,
+                payeeIndex: 2
+            },
+            KIWIBANK: {
+                headers: ['Date', 'Memo/Description', 'Amount', 'Balance'],
+                dateIndex: 0,
+                amountIndex: 2,
+                descriptionIndex: 1,
+                balanceIndex: 3
+            },
+            WESTPAC: {
+                headers: ['Date', 'Amount', 'Other Party', 'Description', 'Reference', 'Particulars', 'Code', 'Reference', 'Balance'],
+                dateIndex: 0,
+                amountIndex: 1,
+                descriptionIndex: 3,
+                payeeIndex: 2,
+                balanceIndex: 8
+            },
+            TSB: {
+                headers: ['Date', 'Description', 'Amount', 'Balance'],
+                dateIndex: 0,
+                amountIndex: 2,
+                descriptionIndex: 1,
+                balanceIndex: 3
+            }
+        };
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             setupUploadHandlers();
             checkAuthState();
+            loadExistingData();
         });
 
         function checkAuthState() {
@@ -673,7 +856,9 @@
 
             uploadZone.addEventListener('dragleave', (e) => {
                 e.preventDefault();
-                uploadZone.classList.remove('dragover');
+                if (!uploadZone.contains(e.relatedTarget)) {
+                    uploadZone.classList.remove('dragover');
+                }
             });
 
             uploadZone.addEventListener('drop', (e) => {
@@ -683,60 +868,62 @@
                 handleFiles(files);
             });
 
-            // File input handler
+            // Click handler
+            uploadZone.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            // File input change handler
             fileInput.addEventListener('change', (e) => {
                 const files = Array.from(e.target.files);
                 handleFiles(files);
             });
 
-            // Click handler for upload zone
-            uploadZone.addEventListener('click', () => {
-                fileInput.click();
-            });
+            // Privacy toggle
+            const privacyToggle = document.getElementById('privacyToggle');
+            if (privacyToggle) {
+                privacyToggle.addEventListener('click', togglePrivacyMode);
+            }
         }
 
         function handleFiles(files) {
-            const validTypes = ['.csv', '.xlsx', '.xls', '.qif', '.ofx'];
-            const maxSize = 10 * 1024 * 1024; // 10MB
+            console.log('Files selected:', files.length);
+            
+            const validFiles = files.filter(file => {
+                const extension = file.name.toLowerCase().split('.').pop();
+                return ['csv', 'xlsx', 'xls', 'qif', 'ofx'].includes(extension);
+            });
 
-            files.forEach(file => {
-                const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
-                
-                if (!validTypes.includes(fileExtension)) {
-                    alert(`File type ${fileExtension} not supported. Please use CSV, Excel, QIF, or OFX files.`);
-                    return;
-                }
+            if (validFiles.length === 0) {
+                alert('Please select valid CSV, Excel, QIF, or OFX files.');
+                return;
+            }
 
-                if (file.size > maxSize) {
-                    alert(`File ${file.name} is too large. Maximum size is 10MB.`);
-                    return;
-                }
-
-                // Check for duplicates
-                const isDuplicate = uploadedFiles.some(f => 
-                    f.name === file.name && f.size === file.size
-                );
-
-                if (isDuplicate) {
-                    alert(`File ${file.name} has already been uploaded.`);
-                    return;
-                }
-
+            // Add files to upload queue
+            validFiles.forEach(file => {
+                const fileId = Date.now() + Math.random();
                 uploadedFiles.push({
+                    id: fileId,
                     file: file,
-                    id: Date.now() + Math.random(),
                     name: file.name,
                     size: file.size,
-                    type: fileExtension,
                     status: 'pending',
-                    progress: 0
+                    bankFormat: null,
+                    transactions: [],
+                    errors: []
                 });
             });
 
-            updateFileList();
+            renderFileList();
+            showUploadActions();
+            
+            // Auto-process if less than 3 files
+            if (validFiles.length <= 2) {
+                setTimeout(() => processAllFiles(), 500);
+            }
         }
 
-        function updateFileList() {
+        function renderFileList() {
             const fileList = document.getElementById('fileList');
             
             if (uploadedFiles.length === 0) {
@@ -744,437 +931,10 @@
                 return;
             }
 
-            fileList.innerHTML = uploadedFiles.map(fileData => `
-                <div class="file-item" id="file-${fileData.id}">
+            const html = uploadedFiles.map(fileObj => `
+                <div class="file-item" id="file-${fileObj.id}">
                     <div class="file-info">
                         <div class="file-icon">📄</div>
                         <div class="file-details">
-                            <h4>${fileData.name}</h4>
-                            <p>${formatFileSize(fileData.size)} • ${fileData.type.toUpperCase()} • ${fileData.status}</p>
-                        </div>
-                    </div>
-                    <div class="file-actions">
-                        <button class="file-action process" onclick="processFile('${fileData.id}')" 
-                                ${fileData.status !== 'pending' ? 'disabled' : ''}>
-                            ${fileData.status === 'processing' ? '<div class="spinner"></div>' : ''}
-                            Process
-                        </button>
-                        <button class="file-action remove" onclick="removeFile('${fileData.id}')"
-                                ${fileData.status === 'processing' ? 'disabled' : ''}>
-                            Remove
-                        </button>
-                    </div>
-                    ${fileData.status === 'processing' ? `
-                        <div class="progress-container">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${fileData.progress}%"></div>
-                            </div>
-                            <div class="progress-text">Processing... ${fileData.progress}%</div>
-                        </div>
-                    ` : ''}
-                </div>
-            `).join('');
-        }
-
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        function removeFile(fileId) {
-            uploadedFiles = uploadedFiles.filter(f => f.id !== fileId);
-            updateFileList();
-        }
-
-        function processFile(fileId) {
-            const fileData = uploadedFiles.find(f => f.id === fileId);
-            if (!fileData) return;
-
-            fileData.status = 'processing';
-            fileData.progress = 0;
-            updateFileList();
-
-            // Simulate file processing
-            const progressInterval = setInterval(() => {
-                fileData.progress += Math.random() * 20;
-                if (fileData.progress >= 100) {
-                    fileData.progress = 100;
-                    fileData.status = 'completed';
-                    clearInterval(progressInterval);
-                    
-                    // Process the actual file
-                    processCSVFile(fileData);
-                }
-                updateFileList();
-            }, 300);
-        }
-
-        function processCSVFile(fileData) {
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                const content = e.target.result;
-                
-                try {
-                    // Parse CSV content
-                    const transactions = parseCSVContent(content, fileData.type);
-                    
-                    // Categorize transactions
-                    const categorizedTransactions = categorizeTransactions(transactions);
-                    
-                    // Store processed data
-                    processedData.push({
-                        fileName: fileData.name,
-                        transactions: categorizedTransactions,
-                        summary: generateSummary(categorizedTransactions)
-                    });
-                    
-                    // Update localStorage for dashboard
-                    updateStoredData(categorizedTransactions);
-                    
-                    // Show results
-                    displayResults();
-                    
-                } catch (error) {
-                    console.error('Error processing file:', error);
-                    fileData.status = 'error';
-                    updateFileList();
-                }
-            };
-            
-            reader.readAsText(fileData.file);
-        }
-
-        function parseCSVContent(content, fileType) {
-            const lines = content.split('\n').filter(line => line.trim());
-            const transactions = [];
-            
-            // Skip header row
-            for (let i = 1; i < lines.length; i++) {
-                const line = lines[i];
-                const columns = parseCSVLine(line);
-                
-                if (columns.length < 3) continue; // Skip invalid rows
-                
-                try {
-                    const transaction = parseTransactionByBankFormat(columns);
-                    if (transaction && transaction.amount !== 0) {
-                        transactions.push(transaction);
-                    }
-                } catch (error) {
-                    console.warn('Skipping invalid transaction row:', line);
-                }
-            }
-            
-            return transactions;
-        }
-
-        function parseCSVLine(line) {
-            const result = [];
-            let current = '';
-            let inQuotes = false;
-            
-            for (let i = 0; i < line.length; i++) {
-                const char = line[i];
-                
-                if (char === '"') {
-                    inQuotes = !inQuotes;
-                } else if (char === ',' && !inQuotes) {
-                    result.push(current.trim());
-                    current = '';
-                } else {
-                    current += char;
-                }
-            }
-            
-            result.push(current.trim());
-            return result;
-        }
-
-        function parseTransactionByBankFormat(columns) {
-            // Auto-detect bank format based on column patterns
-            let transaction = null;
-            
-            // Try ANZ format: Date, Amount, Description, Balance
-            if (columns.length >= 4 && isValidDate(columns[0]) && isValidAmount(columns[1])) {
-                transaction = {
-                    date: parseDate(columns[0]),
-                    description: columns[2] || 'Unknown',
-                    amount: parseFloat(columns[1].replace(/[,$]/g, '')),
-                    balance: parseFloat(columns[3].replace(/[,$]/g, '') || 0),
-                    bank: 'ANZ'
-                };
-            }
-            // Try ASB format: Date, Unique Id, Tran Type, Cheque Number, Payee, Memo, Amount
-            else if (columns.length >= 7 && isValidDate(columns[0]) && isValidAmount(columns[6])) {
-                transaction = {
-                    date: parseDate(columns[0]),
-                    description: `${columns[4]} - ${columns[5]}`.trim(),
-                    amount: parseFloat(columns[6].replace(/[,$]/g, '')),
-                    balance: 0,
-                    bank: 'ASB'
-                };
-            }
-            // Try BNZ format: Date, Amount, Payee, Description, Reference
-            else if (columns.length >= 5 && isValidDate(columns[0]) && isValidAmount(columns[1])) {
-                transaction = {
-                    date: parseDate(columns[0]),
-                    description: `${columns[2]} - ${columns[3]}`.trim(),
-                    amount: parseFloat(columns[1].replace(/[,$]/g, '')),
-                    balance: 0,
-                    bank: 'BNZ'
-                };
-            }
-            // Try Kiwibank format: Date, Memo/Description, Amount, Balance
-            else if (columns.length >= 4 && isValidDate(columns[0]) && isValidAmount(columns[2])) {
-                transaction = {
-                    date: parseDate(columns[0]),
-                    description: columns[1] || 'Unknown',
-                    amount: parseFloat(columns[2].replace(/[,$]/g, '')),
-                    balance: parseFloat(columns[3].replace(/[,$]/g, '') || 0),
-                    bank: 'Kiwibank'
-                };
-            }
-            
-            return transaction;
-        }
-
-        function isValidDate(dateStr) {
-            return !isNaN(Date.parse(dateStr));
-        }
-
-        function isValidAmount(amountStr) {
-            const cleaned = amountStr.replace(/[,$\s]/g, '');
-            return !isNaN(parseFloat(cleaned));
-        }
-
-        function parseDate(dateStr) {
-            return new Date(dateStr).toISOString().split('T')[0];
-        }
-
-        function categorizeTransactions(transactions) {
-            return transactions.map(transaction => {
-                const category = determineCategory(transaction.description);
-                return {
-                    ...transaction,
-                    category: category,
-                    id: Date.now() + Math.random()
-                };
-            });
-        }
-
-        function determineCategory(description) {
-            const desc = description.toLowerCase();
-            
-            // NZ-specific merchant patterns
-            const categories = {
-                'Groceries': ['countdown', 'new world', 'pak n save', 'four square', 'fresh choice', 'supervalue'],
-                'Fuel': ['bp', 'z energy', 'mobil', 'gull', 'caltex', 'shell'],
-                'Dining Out': ['mcdonald', 'kfc', 'burger king', 'subway', 'domino', 'pizza', 'cafe', 'restaurant'],
-                'Shopping': ['warehouse', 'kmart', 'farmers', 'briscoes', 'harvey norman', 'noel leeming'],
-                'Utilities': ['contact energy', 'genesis energy', 'mercury energy', 'trustpower', 'spark', 'vodafone'],
-                'Transport': ['uber', 'taxi', 'bus', 'train', 'at hop', 'parking'],
-                'Banking': ['fee', 'interest', 'ird', 'tax'],
-                'Entertainment': ['cinema', 'sky', 'netflix', 'spotify', 'gym', 'fitness'],
-                'Medical': ['pharmacy', 'doctor', 'dental', 'medical', 'health'],
-                'Insurance': ['insurance', 'aa insurance', 'state insurance']
-            };
-            
-            for (const [category, keywords] of Object.entries(categories)) {
-                if (keywords.some(keyword => desc.includes(keyword))) {
-                    return category;
-                }
-            }
-            
-            // Default categorization by amount and type
-            if (description.includes('AUTOMATIC PAYMENT') || description.includes('AP ')) {
-                return 'Bills';
-            } else if (description.includes('SALARY') || description.includes('WAGE')) {
-                return 'Income';
-            } else if (description.includes('EFTPOS') || description.includes('PURCHASE')) {
-                return 'Shopping';
-            }
-            
-            return 'Other';
-        }
-
-        function generateSummary(transactions) {
-            const totalIncome = transactions
-                .filter(t => t.amount > 0)
-                .reduce((sum, t) => sum + t.amount, 0);
-                
-            const totalExpenses = transactions
-                .filter(t => t.amount < 0)
-                .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-                
-            const categoryBreakdown = {};
-            transactions.forEach(t => {
-                if (!categoryBreakdown[t.category]) {
-                    categoryBreakdown[t.category] = 0;
-                }
-                categoryBreakdown[t.category] += Math.abs(t.amount);
-            });
-            
-            return {
-                totalTransactions: transactions.length,
-                totalIncome: totalIncome,
-                totalExpenses: totalExpenses,
-                netCashFlow: totalIncome - totalExpenses,
-                categoryBreakdown: categoryBreakdown,
-                dateRange: {
-                    start: Math.min(...transactions.map(t => new Date(t.date))),
-                    end: Math.max(...transactions.map(t => new Date(t.date)))
-                }
-            };
-        }
-
-        function updateStoredData(transactions) {
-            // Store for dashboard access
-            const existingData = JSON.parse(localStorage.getItem('financeos_transactions') || '[]');
-            const combinedData = [...existingData, ...transactions];
-            
-            // Remove duplicates based on date, description, and amount
-            const uniqueData = combinedData.filter((transaction, index, self) =>
-                index === self.findIndex(t =>
-                    t.date === transaction.date &&
-                    t.description === transaction.description &&
-                    t.amount === transaction.amount
-                )
-            );
-            
-            localStorage.setItem('financeos_transactions', JSON.stringify(uniqueData));
-            localStorage.setItem('financeos_last_csv_upload', new Date().toISOString());
-        }
-
-        function displayResults() {
-            const resultsContainer = document.getElementById('resultsContainer');
-            const resultsContent = document.getElementById('resultsContent');
-            
-            resultsContainer.style.display = 'block';
-            
-            resultsContent.innerHTML = processedData.map((data, index) => `
-                <div class="result-card glass-premium">
-                    <div class="result-header">
-                        <div class="result-title">${data.fileName}</div>
-                        <div class="result-status status-success">PROCESSED</div>
-                    </div>
-                    
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px;">
-                        <div>
-                            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">TRANSACTIONS</div>
-                            <div style="font-size: 20px; font-weight: 600;">${data.summary.totalTransactions}</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">INCOME</div>
-                            <div style="font-size: 20px; font-weight: 600; color: var(--success);">$${data.summary.totalIncome.toFixed(2)}</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">EXPENSES</div>
-                            <div style="font-size: 20px; font-weight: 600; color: var(--error);">$${data.summary.totalExpenses.toFixed(2)}</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">NET FLOW</div>
-                            <div style="font-size: 20px; font-weight: 600; color: ${data.summary.netCashFlow >= 0 ? 'var(--success)' : 'var(--error)'};">
-                                $${data.summary.netCashFlow.toFixed(2)}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <details style="margin-top: 16px;">
-                        <summary style="cursor: pointer; font-weight: 600; margin-bottom: 12px;">View Transactions (${data.transactions.length})</summary>
-                        <div class="transaction-preview">
-                            ${data.transactions.slice(0, 10).map(t => `
-                                <div class="transaction-item">
-                                    <div class="transaction-details">
-                                        <div class="transaction-description">${t.description}</div>
-                                        <div class="transaction-meta">${t.date} • ${t.category}</div>
-                                    </div>
-                                    <div class="transaction-amount ${t.amount >= 0 ? 'amount-positive' : 'amount-negative'}">
-                                        ${t.amount >= 0 ? '+' : ''}$${Math.abs(t.amount).toFixed(2)}
-                                    </div>
-                                </div>
-                            `).join('')}
-                            ${data.transactions.length > 10 ? `
-                                <div style="padding: 12px 16px; text-align: center; color: var(--text-muted); font-size: 12px;">
-                                    ... and ${data.transactions.length - 10} more transactions
-                                </div>
-                            ` : ''}
-                        </div>
-                    </details>
-                </div>
-            `).join('');
-            
-            // Scroll to results
-            resultsContainer.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // Process all files button
-        function processAllFiles() {
-            const pendingFiles = uploadedFiles.filter(f => f.status === 'pending');
-            pendingFiles.forEach(fileData => {
-                processFile(fileData.id);
-            });
-        }
-
-        // Add process all button if there are multiple files
-        function updateFileList() {
-            const fileList = document.getElementById('fileList');
-            
-            if (uploadedFiles.length === 0) {
-                fileList.innerHTML = '';
-                return;
-            }
-
-            const pendingCount = uploadedFiles.filter(f => f.status === 'pending').length;
-            
-            let html = '';
-            
-            if (pendingCount > 1) {
-                html += `
-                    <div style="text-align: center; margin-bottom: 16px;">
-                        <button onclick="processAllFiles()" class="upload-button">
-                            Process All Files (${pendingCount})
-                        </button>
-                    </div>
-                `;
-            }
-            
-            html += uploadedFiles.map(fileData => `
-                <div class="file-item" id="file-${fileData.id}">
-                    <div class="file-info">
-                        <div class="file-icon">📄</div>
-                        <div class="file-details">
-                            <h4>${fileData.name}</h4>
-                            <p>${formatFileSize(fileData.size)} • ${fileData.type.toUpperCase()} • ${fileData.status}</p>
-                        </div>
-                    </div>
-                    <div class="file-actions">
-                        <button class="file-action process" onclick="processFile('${fileData.id}')" 
-                                ${fileData.status !== 'pending' ? 'disabled' : ''}>
-                            ${fileData.status === 'processing' ? '<div class="spinner"></div>' : ''}
-                            Process
-                        </button>
-                        <button class="file-action remove" onclick="removeFile('${fileData.id}')"
-                                ${fileData.status === 'processing' ? 'disabled' : ''}>
-                            Remove
-                        </button>
-                    </div>
-                    ${fileData.status === 'processing' ? `
-                        <div class="progress-container">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${fileData.progress}%"></div>
-                            </div>
-                            <div class="progress-text">Processing... ${fileData.progress}%</div>
-                        </div>
-                    ` : ''}
-                </div>
-            `).join('');
-            
-            fileList.innerHTML = html;
-        }
-    </script>
-</body>
-</html>
+                            <h4>${fileObj.name}</h4>
+                            <p>${formatFileSize(fileObj.size)} • ${
