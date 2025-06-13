@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FinanceOS - Login</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8b5cf6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <style>
+        /* CSS Variables */
+        :root {
+            --primary-bg: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-premium: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 50%, rgba(147, 51, 234, 0.15) 100%);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-premium-border: rgba(255, 255, 255, 0.2);
+            --text-primary: rgba(255, 255, 255, 0.9);
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --gradient-purple: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #9333ea 100%);
+            --gradient-green: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--primary-bg);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Background decorative elements */
+        .background-effects {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(139, 92, 246, 0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .bg-circle:nth-child(1) {
+            top: 10%;
+            left: 10%;
+            width: 80px;
+            height: 80px;
+            animation-delay: 0s;
+        }
+
+        .bg-circle:nth-child(2) {
+            top: 20%;
+            right: 15%;
+            width: 120px;
+            height: 120px;
+            animation-delay: 2s;
+        }
+
+        .bg-circle:nth-child(3) {
+            bottom: 15%;
+            left: 20%;
+            width: 100px;
+            height: 100px;
+            animation-delay: 4s;
+        }
+
+        .bg-circle:nth-child(4) {
+            bottom: 25%;
+            right: 10%;
+            width: 60px;
+            height: 60px;
+            animation-delay: 1s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) scale(1); opacity: 0.5; }
+            50% { transform: translateY(-20px) scale(1.1); opacity: 0.8; }
+        }
+
+        /* Main login container */
+        .login-container {
+            background: var(--glass-premium);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-premium-border);
+            border-radius: 24px;
+            padding: 48px 40px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            position: relative;
+            z-index: 10;
+            animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Logo section */
+        .logo-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-purple);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
+            animation: logoGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes logoGlow {
+            0%, 100% { box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3); }
+            50% { box-shadow: 0 12px 48px rgba(139, 92, 246, 0.5); }
+        }
+
+        .logo-icon svg {
+            width: 50px;
+            height: 50px;
+            color: white;
+        }
+
+        .logo-title {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .logo-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Form styles */
+        .login-form {
+            margin-bottom: 32px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.1);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+
+        .password-toggle:hover {
+            color: var(--text-secondary);
+        }
+
+        /* Button styles */
+        .login-button {
+            width: 100%;
+            padding: 16px;
+            background: var(--gradient-purple);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.4);
+        }
+
+        .login-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .button-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* Demo credentials */
+        .demo-section {
+            margin-bottom: 24px;
+            padding: 16px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 12px;
+        }
+
+        .demo-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--success);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .demo-credentials {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .demo-button {
+            background: var(--gradient-green);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .demo-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Error message */
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--error);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: none;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Success message */
+        .success-message {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--success);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        .login-footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .login-container {
+                padding: 32px 24px;
+                margin: 20px;
+            }
+
+            .logo-icon {
+                width: 60px;
+                height: 60px;
+            }
+
+            .logo-title {
+                font-size: 28px;
+            }
+        }
+
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Effects -->
+    <div class="background-effects">
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+    </div>
+
+    <!-- Login Container -->
+    <div class="login-container">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1L9 7V9H21M12 23C10.9 23 10 22.1 10 21C10 19.9 10.9 19 12 19C13.1 19 14 19.9 14 21C14 22.1 13.1 23 12 23ZM18 10H6V12H18V10Z"/>
+                </svg>
+            </div>
+            <h1 class="logo-title">FinanceOS</h1>
+            <p class="logo-subtitle">Your Personal Finance Operating System</p>
+        </div>
+
+        <!-- Demo Credentials -->
+        <div class="demo-section">
+            <div class="demo-title">
+                <span>🚀</span>
+                Demo Access
+            </div>
+            <div class="demo-credentials">
+                <strong>Username:</strong> demo<br>
+                <strong>Password:</strong> password
+            </div>
+            <button class="demo-button" onclick="fillDemoCredentials()">
+                Use Demo Login
+            </button>
+        </div>
+
+        <!-- Error/Success Messages -->
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+
+        <!-- Login Form -->
+        <form class="login-form" id="loginForm">
+            <div class="form-group">
+                <label class="form-label" for="username">Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    class="form-input" 
+                    placeholder="Enter your username"
+                    autocomplete="username"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <div class="password-container">
+                    <input 
+                        type="password" 
+                        id="password" 
+                        class="form-input" 
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
+                    <button type="button" class="password-toggle" onclick="togglePassword()">
+                        <span id="passwordToggleIcon">👁️</span>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="login-button" id="loginButton">
+                <div class="button-content">
+                    <span id="loginButtonText">Sign In to FinanceOS</span>
+                </div>
+            </button>
+        </form>
+
+        <!-- Footer -->
+        <div class="login-footer">
+            <p>Secure financial management for New Zealand families</p>
+        </div>
+    </div>
+
+    <script>
+        // Valid credentials (in a real app, this would be handled server-side)
+        const validCredentials = [
+            { username: 'demo', password: 'password' },
+            { username: 'admin', password: 'admin123' },
+            { username: 'user', password: 'user123' },
+            { username: 'test', password: 'test' }
+        ];
+
+        // DOM Elements
+        const loginForm = document.getElementById('loginForm');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginButton = document.getElementById('loginButton');
+        const loginButtonText = document.getElementById('loginButtonText');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Login page initialized');
+            
+            // Check if already logged in
+            checkExistingAuth();
+            
+            // Set up form submission
+            loginForm.addEventListener('submit', handleLogin);
+            
+            // Set up input event listeners
+            usernameInput.addEventListener('input', clearMessages);
+            passwordInput.addEventListener('input', clearMessages);
+            
+            // Focus on username field
+            usernameInput.focus();
+        });
+
+        function checkExistingAuth() {
+            const authToken = localStorage.getItem('financeos_auth');
+            const userData = localStorage.getItem('financeos_user');
+            
+            if (authToken && userData) {
+                showSuccessMessage('Already logged in! Redirecting...');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            }
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+            
+            if (!username || !password) {
+                showErrorMessage('Please enter both username and password');
+                return;
+            }
+
+            // Show loading state
+            setLoadingState(true);
+            clearMessages();
+
+            // Simulate network delay for realism
+            await new Promise(resolve => setTimeout(resolve, 800));
+
+            // Validate credentials
+            const isValid = validCredentials.some(cred => 
+                cred.username === username && cred.password === password
+            );
+
+            if (isValid) {
+                // Success - save auth data
+                const authToken = 'auth_' + Date.now() + '_' + Math.random().toString(36);
+                const userData = {
+                    username: username,
+                    loginTime: new Date().toISOString(),
+                    permissions: ['read', 'write', 'admin']
+                };
+
+                localStorage.setItem('financeos_auth', authToken);
+                localStorage.setItem('financeos_user', JSON.stringify(userData));
+
+                showSuccessMessage('Login successful! Redirecting to dashboard...');
+                
+                // Redirect after success message
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+
+            } else {
+                // Failed login
+                showErrorMessage('Invalid username or password. Try the demo credentials!');
+                setLoadingState(false);
+                
+                // Shake the form
+                loginForm.style.animation = 'shake 0.5s ease-in-out';
+                setTimeout(() => {
+                    loginForm.style.animation = '';
+                }, 500);
+            }
+        }
+
+        function setLoadingState(loading) {
+            loginButton.disabled = loading;
+            
+            if (loading) {
+                loginButtonText.innerHTML = `
+                    <div class="spinner"></div>
+                    <span>Signing in...</span>
+                `;
+            } else {
+                loginButtonText.textContent = 'Sign In to FinanceOS';
+            }
+        }
+
+        function showErrorMessage(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            successMessage.style.display = 'none';
+        }
+
+        function showSuccessMessage(message) {
+            successMessage.textContent = message;
+            successMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+        }
+
+        function clearMessages() {
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+        }
+
+        function togglePassword() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            const icon = document.getElementById('passwordToggleIcon');
+            icon.textContent = type === 'password' ? '👁️' : '🙈';
+        }
+
+        function fillDemoCredentials() {
+            usernameInput.value = 'demo';
+            passwordInput.value = 'password';
+            clearMessages();
+            
+            // Animate the inputs
+            usernameInput.style.background = 'rgba(16, 185, 129, 0.1)';
+            passwordInput.style.background = 'rgba(16, 185, 129, 0.1)';
+            
+            setTimeout(() => {
+                usernameInput.style.background = '';
+                passwordInput.style.background = '';
+            }, 1000);
+        }
+
