@@ -937,4 +937,632 @@
                         <div class="file-icon">📄</div>
                         <div class="file-details">
                             <h4>${fileObj.name}</h4>
-                            <p>${formatFileSize(fileObj.size)} • ${
+                            <p>${formatFileSize(fileObj.size)} • ${fileObj.status}</p>
+                        </div>
+                    </div>
+                    <div class="file-actions">
+                        ${fileObj.status === 'pending' ? `
+                            <button class="file-action process" onclick="processSingleFile('${fileObj.id}')">Process</button>
+                            <button class="file-action remove" onclick="removeFile('${fileObj.id}')">Remove</button>
+                        ` : fileObj.status === 'processing' ? `
+                            <div class="spinner"></div>
+                            <span style="color: var(--info);">Processing...</span>
+                        ` : fileObj.status === 'success' ? `
+                            <span style="color: var(--success);">✅ ${fileObj.transactions.length} transactions</span>
+                            <button class="file-action remove" onclick="removeFile('${fileObj.id}')">Remove</button>
+                        ` : `
+                            <span style="color: var(--error);">❌ Error</span>
+                            <button class="file-action remove" onclick="removeFile('${fileObj.id}')">Remove</button>
+                        `}
+                    </div>
+                </div>
+            `).join('');
+
+            fileList.innerHTML = html;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function showUploadActions() {
+            const actions = document.getElementById('uploadActions');
+            actions.style.display = uploadedFiles.length > 0 ? 'flex' : 'none';
+        }
+
+        async function processAllFiles() {
+            const processBtn = document.getElementById('processAllBtn');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+
+            processBtn.disabled = true;
+            processBtn.innerHTML = '<div class="spinner"></div>Processing...';
+            progressContainer.style.display = 'block';
+
+            let processed = 0;
+            const total = uploadedFiles.filter(f => f.status === 'pending').length;
+
+            for (const fileObj of uploadedFiles) {
+                if (fileObj.status === 'pending') {
+                    await processSingleFile(fileObj.id, false);
+                    processed++;
+                    
+                    const progress = (processed / total) * 100;
+                    progressFill.style.width = progress + '%';
+                    progressText.textContent = `Processing ${processed}/${total} files...`;
+                }
+            }
+
+            // Complete processing
+            progressText.textContent = 'Processing complete!';
+            setTimeout(() => {
+                progressContainer.style.display = 'none';
+                processBtn.disabled = false;
+                processBtn.innerHTML = 'Process All Files';
+            }, 1000);
+
+            // Update all figures
+            updateFinancialFigures();
+            showProcessingResults();
+        }
+
+        async function processSingleFile(fileId, updateFigures = true) {
+            const fileObj = uploadedFiles.find(f => f.id == fileId);
+            if (!fileObj || fileObj.status !== 'pending') return;
+
+            fileObj.status = 'processing';
+            renderFileList();
+
+            try {
+                const transactions = await parseCSVFile(fileObj.file);
+                
+                if (transactions.length === 0) {
+                    throw new Error('No transactions found in file');
+                }
+
+                // Detect bank format
+                fileObj.bankFormat = detectBankFormat(transactions[0]);
+                
+                // Process and clean transactions
+                fileObj.transactions = transactions.map(row => processTransaction(row, fileObj.bankFormat));
+                fileObj.status = 'success';
+
+                console.log(`Processed ${fileObj.transactions.length} transactions from ${fileObj.name}`);
+
+                // Add to global processed transactions
+                processedTransactions.push(...fileObj.transactions);
+
+                // Save to localStorage
+                saveTransactionsToStorage();
+
+                if (updateFigures) {
+                    updateFinancialFigures();
+                    showProcessingResults();
+                }
+
+            } catch (error) {
+                console.error('Error processing file:', error);
+                fileObj.status = 'error';
+                fileObj.errors.push(error.message);
+            }
+
+            renderFileList();
+        }
+
+        function parseCSVFile(file) {
+            return new Promise((resolve, reject) => {
+                Papa.parse(file, {
+                    header: true,
+                    dynamicTyping: true,
+                    skipEmptyLines: true,
+                    delimitersToGuess: [',', '\t', '|', ';'],
+                    complete: function(results) {
+                        if (results.errors.length > 0) {
+                            console.warn('CSV parsing warnings:', results.errors);
+                        }
+                        resolve(results.data);
+                    },
+                    error: function(error) {
+                        reject(error);
+                    }
+                });
+            });
+        }
+
+        function detectBankFormat(sampleRow) {
+            const headers = Object.keys(sampleRow);
+            
+            // Try to match against known bank formats
+            for (const [bankName, format] of Object.entries(BANK_FORMATS)) {
+                const matchScore = calculateHeaderMatch(headers, format.headers);
+                if (matchScore > 0.7) {
+                    console.log(`Detected bank format: ${bankName} (${matchScore.toFixed(2)} match)`);
+                    return bankName;
+                }
+            }
+
+            // Generic format detection
+            const dateFields = headers.filter(h => /date/i.test(h));
+            const amountFields = headers.filter(h => /amount|value|debit|credit/i.test(h));
+            const descFields = headers.filter(h => /desc|memo|detail|payee|merchant/i.test(h));
+
+            if (dateFields.length > 0 && amountFields.length > 0 && descFields.length > 0) {
+                console.log('Using generic format detection');
+                return 'GENERIC';
+            }
+
+            throw new Error('Unable to detect bank format. Please check your CSV headers.');
+        }
+
+        function calculateHeaderMatch(fileHeaders, bankHeaders) {
+            let matches = 0;
+            for (const bankHeader of bankHeaders) {
+                if (fileHeaders.some(fh => fh.toLowerCase().includes(bankHeader.toLowerCase()) || 
+                                           bankHeader.toLowerCase().includes(fh.toLowerCase()))) {
+                    matches++;
+                }
+            }
+            return matches / bankHeaders.length;
+        }
+
+        function processTransaction(row, bankFormat) {
+            const format = BANK_FORMATS[bankFormat];
+            let transaction = {
+                id: Date.now() + Math.random(),
+                date: '',
+                amount: 0,
+                description: '',
+                category: 'Other',
+                account: 'Unknown',
+                balance: null,
+                payee: '',
+                originalRow: row
+            };
+
+            try {
+                // Handle generic format
+                if (bankFormat === 'GENERIC') {
+                    transaction = processGenericTransaction(row);
+                } else if (format) {
+                    // Use specific bank format
+                    const headers = Object.keys(row);
+                    
+                    // Extract date
+                    const dateValue = row[headers[format.dateIndex]] || 
+                                    findValueByPattern(row, /date/i);
+                    transaction.date = parseDate(dateValue);
+
+                    // Extract amount
+                    const amountValue = row[headers[format.amountIndex]] || 
+                                      findValueByPattern(row, /amount|value/i);
+                    transaction.amount = parseAmount(amountValue);
+
+                    // Extract description
+                    const descValue = row[headers[format.descriptionIndex]] || 
+                                    findValueByPattern(row, /desc|memo|detail/i);
+                    transaction.description = String(descValue || '').trim();
+
+                    // Extract payee if available
+                    if (format.payeeIndex !== undefined) {
+                        const payeeValue = row[headers[format.payeeIndex]];
+                        transaction.payee = String(payeeValue || '').trim();
+                    }
+
+                    // Extract balance if available
+                    if (format.balanceIndex !== undefined) {
+                        const balanceValue = row[headers[format.balanceIndex]];
+                        transaction.balance = parseAmount(balanceValue);
+                    }
+                }
+
+                // Auto-categorize transaction
+                transaction.category = categorizeTransaction(transaction.description, transaction.payee);
+
+                // Validate required fields
+                if (!transaction.date) {
+                    throw new Error('Missing or invalid date');
+                }
+                if (isNaN(transaction.amount)) {
+                    throw new Error('Missing or invalid amount');
+                }
+
+            } catch (error) {
+                console.warn('Error processing transaction:', error, row);
+                transaction.error = error.message;
+            }
+
+            return transaction;
+        }
+
+        function processGenericTransaction(row) {
+            const headers = Object.keys(row);
+            let transaction = {
+                id: Date.now() + Math.random(),
+                date: '',
+                amount: 0,
+                description: '',
+                category: 'Other',
+                account: 'Unknown',
+                balance: null,
+                payee: '',
+                originalRow: row
+            };
+
+            // Find date field
+            const dateField = headers.find(h => /date/i.test(h));
+            if (dateField) {
+                transaction.date = parseDate(row[dateField]);
+            }
+
+            // Find amount field
+            const amountField = headers.find(h => /amount|value|debit|credit/i.test(h));
+            if (amountField) {
+                transaction.amount = parseAmount(row[amountField]);
+            }
+
+            // Find description field
+            const descField = headers.find(h => /desc|memo|detail|payee|merchant|reference/i.test(h));
+            if (descField) {
+                transaction.description = String(row[descField] || '').trim();
+            }
+
+            // Find payee field
+            const payeeField = headers.find(h => /payee|merchant|vendor/i.test(h));
+            if (payeeField && payeeField !== descField) {
+                transaction.payee = String(row[payeeField] || '').trim();
+            }
+
+            // Find balance field
+            const balanceField = headers.find(h => /balance/i.test(h));
+            if (balanceField) {
+                transaction.balance = parseAmount(row[balanceField]);
+            }
+
+            return transaction;
+        }
+
+        function findValueByPattern(row, pattern) {
+            const key = Object.keys(row).find(k => pattern.test(k));
+            return key ? row[key] : null;
+        }
+
+        function parseDate(dateValue) {
+            if (!dateValue) return '';
+            
+            try {
+                // Handle various date formats
+                let date;
+                if (typeof dateValue === 'string') {
+                    // Try different date formats common in NZ
+                    const formats = [
+                        /(\d{1,2})\/(\d{1,2})\/(\d{4})/, // DD/MM/YYYY
+                        /(\d{4})-(\d{1,2})-(\d{1,2})/, // YYYY-MM-DD
+                        /(\d{1,2})-(\d{1,2})-(\d{4})/, // DD-MM-YYYY
+                    ];
+                    
+                    for (const format of formats) {
+                        const match = dateValue.match(format);
+                        if (match) {
+                            if (format === formats[1]) { // YYYY-MM-DD
+                                date = new Date(match[1], match[2] - 1, match[3]);
+                            } else { // DD/MM/YYYY or DD-MM-YYYY
+                                date = new Date(match[3], match[2] - 1, match[1]);
+                            }
+                            break;
+                        }
+                    }
+                    
+                    if (!date) {
+                        date = new Date(dateValue);
+                    }
+                } else {
+                    date = new Date(dateValue);
+                }
+
+                if (isNaN(date.getTime())) {
+                    return '';
+                }
+
+                return date.toISOString().split('T')[0]; // YYYY-MM-DD format
+            } catch (error) {
+                console.warn('Date parsing error:', error, dateValue);
+                return '';
+            }
+        }
+
+        function parseAmount(amountValue) {
+            if (amountValue === null || amountValue === undefined || amountValue === '') {
+                return 0;
+            }
+
+            // Convert to string and clean
+            let cleanAmount = String(amountValue)
+                .replace(/[,$\s]/g, '') // Remove currency symbols, commas, spaces
+                .replace(/[()]/g, ''); // Remove parentheses
+
+            // Handle negative amounts in parentheses
+            if (String(amountValue).includes('(') && String(amountValue).includes(')')) {
+                cleanAmount = '-' + cleanAmount;
+            }
+
+            const parsed = parseFloat(cleanAmount);
+            return isNaN(parsed) ? 0 : parsed;
+        }
+
+        function categorizeTransaction(description, payee) {
+            const text = `${description} ${payee}`.toLowerCase();
+            
+            // Grocery stores
+            if (/countdown|new world|pak.*save|fresh choice|four square|supermarket/i.test(text)) {
+                return 'Groceries';
+            }
+            
+            // Dining out
+            if (/mcdonald|kfc|burger king|subway|restaurant|cafe|pizza|uber eats|menulog/i.test(text)) {
+                return 'Dining Out';
+            }
+            
+            // Fuel
+            if (/bp|z energy|mobil|caltex|gull|fuel|petrol|gas station/i.test(text)) {
+                return 'Fuel';
+            }
+            
+            // Utilities
+            if (/meridian|contact energy|electric|power|genesis|trustpower|water|gas/i.test(text)) {
+                return 'Utilities';
+            }
+            
+            // Entertainment
+            if (/sky|netflix|spotify|disney|prime|cinema|movie|entertainment/i.test(text)) {
+                return 'Entertainment';
+            }
+            
+            // Transport
+            if (/metlink|at hop|bus|train|taxi|uber|lyft|ferry/i.test(text)) {
+                return 'Transportation';
+            }
+            
+            // Shopping
+            if (/warehouse|kmart|bunnings|mitre|clothing|shoes|amazon|trademe/i.test(text)) {
+                return 'Shopping';
+            }
+            
+            // Banking
+            if (/anz|asb|bnz|kiwibank|westpac|tsb|interest|fee|atm/i.test(text)) {
+                return 'Banking';
+            }
+            
+            // Health
+            if (/pharmacy|doctor|medical|hospital|dentist|physio/i.test(text)) {
+                return 'Healthcare';
+            }
+            
+            // Income indicators
+            if (/salary|wage|pay|income|deposit|transfer in/i.test(text)) {
+                return 'Income';
+            }
+
+            return 'Other';
+        }
+
+        function removeFile(fileId) {
+            const index = uploadedFiles.findIndex(f => f.id == fileId);
+            if (index > -1) {
+                const removedFile = uploadedFiles.splice(index, 1)[0];
+                
+                // Remove transactions from processed list
+                if (removedFile.status === 'success') {
+                    processedTransactions = processedTransactions.filter(t => 
+                        !removedFile.transactions.some(ft => ft.id === t.id)
+                    );
+                    updateFinancialFigures();
+                    saveTransactionsToStorage();
+                }
+                
+                renderFileList();
+                showUploadActions();
+                
+                if (uploadedFiles.length === 0) {
+                    document.getElementById('resultsContainer').style.display = 'none';
+                }
+            }
+        }
+
+        function clearAllFiles() {
+            if (confirm('Are you sure you want to clear all files? This will remove all uploaded data.')) {
+                uploadedFiles = [];
+                processedTransactions = [];
+                totalStats = { transactions: 0, income: 0, expenses: 0, netChange: 0 };
+                
+                renderFileList();
+                showUploadActions();
+                updateFinancialFigures();
+                document.getElementById('resultsContainer').style.display = 'none';
+                
+                // Clear from storage
+                localStorage.removeItem('financeos_transactions');
+            }
+        }
+
+        function updateFinancialFigures() {
+            // Calculate totals
+            totalStats.transactions = processedTransactions.length;
+            totalStats.income = processedTransactions
+                .filter(t => t.amount > 0)
+                .reduce((sum, t) => sum + t.amount, 0);
+            totalStats.expenses = Math.abs(processedTransactions
+                .filter(t => t.amount < 0)
+                .reduce((sum, t) => sum + t.amount, 0));
+            totalStats.netChange = totalStats.income - totalStats.expenses;
+
+            // Update summary cards
+            const summaryCards = document.getElementById('summaryCards');
+            if (processedTransactions.length > 0) {
+                summaryCards.style.display = 'grid';
+                
+                document.getElementById('totalTransactions').textContent = totalStats.transactions;
+                document.getElementById('totalIncome').textContent = formatCurrency(totalStats.income);
+                document.getElementById('totalExpenses').textContent = formatCurrency(totalStats.expenses);
+                
+                const netChangeEl = document.getElementById('netChange');
+                netChangeEl.textContent = formatCurrency(totalStats.netChange);
+                netChangeEl.className = totalStats.netChange >= 0 ? 'value positive' : 'value negative';
+            }
+
+            // Update dashboard figures in localStorage for other pages
+            updateDashboardData();
+        }
+
+        function updateDashboardData() {
+            try {
+                // Get existing dashboard data
+                const existingData = JSON.parse(localStorage.getItem('financeos_dashboard_data') || '{}');
+                
+                // Update with new transaction data
+                existingData.lastUpdate = new Date().toISOString();
+                existingData.totalTransactions = totalStats.transactions;
+                existingData.recentIncome = totalStats.income;
+                existingData.recentExpenses = totalStats.expenses;
+                existingData.netCashFlow = totalStats.netChange;
+                
+                // Calculate monthly spending (approximate)
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                const recentTransactions = processedTransactions.filter(t => {
+                    const transactionDate = new Date(t.date);
+                    return transactionDate >= thirtyDaysAgo;
+                });
+                
+                existingData.monthlySpending = Math.abs(recentTransactions
+                    .filter(t => t.amount < 0)
+                    .reduce((sum, t) => sum + t.amount, 0));
+
+                localStorage.setItem('financeos_dashboard_data', JSON.stringify(existingData));
+                console.log('Dashboard data updated:', existingData);
+            } catch (error) {
+                console.error('Error updating dashboard data:', error);
+            }
+        }
+
+        function saveTransactionsToStorage() {
+            try {
+                localStorage.setItem('financeos_transactions', JSON.stringify(processedTransactions));
+                localStorage.setItem('financeos_last_csv_upload', new Date().toISOString());
+                console.log(`Saved ${processedTransactions.length} transactions to storage`);
+            } catch (error) {
+                console.error('Error saving to storage:', error);
+            }
+        }
+
+        function loadExistingData() {
+            try {
+                const savedTransactions = localStorage.getItem('financeos_transactions');
+                if (savedTransactions) {
+                    processedTransactions = JSON.parse(savedTransactions);
+                    updateFinancialFigures();
+                    
+                    if (processedTransactions.length > 0) {
+                        showProcessingResults();
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading existing data:', error);
+            }
+        }
+
+        function showProcessingResults() {
+            const resultsContainer = document.getElementById('resultsContainer');
+            const resultsTitle = document.getElementById('resultsTitle');
+            const resultsContent = document.getElementById('resultsContent');
+            
+            resultsContainer.style.display = 'block';
+            resultsTitle.style.display = 'block';
+
+            // Show transaction preview
+            const recentTransactions = processedTransactions.slice(-10); // Last 10 transactions
+            
+            const html = `
+                <div class="result-card glass-premium">
+                    <div class="result-header">
+                        <div class="result-title">Recent Transactions</div>
+                        <div class="result-status status-success">Processed</div>
+                    </div>
+                    <div class="transaction-preview">
+                        ${recentTransactions.map(t => `
+                            <div class="transaction-item">
+                                <div class="transaction-details">
+                                    <div class="transaction-description">${t.description}</div>
+                                    <div class="transaction-meta">${t.date} • ${t.category}</div>
+                                </div>
+                                <div class="transaction-amount ${t.amount >= 0 ? 'amount-positive' : 'amount-negative'}">
+                                    ${formatCurrency(Math.abs(t.amount))}
+                                </div>
+                            </div>
+                        `).join('')}
+                        ${processedTransactions.length > 10 ? `
+                            <div style="text-align: center; padding: 12px; color: var(--text-muted); font-size: 12px;">
+                                Showing last 10 of ${processedTransactions.length} transactions
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+
+            resultsContent.innerHTML = html;
+
+            // Add success animation
+            resultsContainer.classList.add('success-animation');
+            setTimeout(() => {
+                resultsContainer.classList.remove('success-animation');
+            }, 600);
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-NZ', {
+                style: 'currency',
+                currency: 'NZD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(Math.abs(amount));
+        }
+
+        function togglePrivacyMode() {
+            const isPrivate = document.body.classList.toggle('privacy-mode');
+            const toggle = document.getElementById('privacyToggle');
+            if (toggle) {
+                toggle.textContent = isPrivate ? '🔓 Show Data' : '🔒 Privacy';
+            }
+            localStorage.setItem('financeos_privacy', isPrivate.toString());
+        }
+
+        // Initialize privacy mode from localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedPrivacy = localStorage.getItem('financeos_privacy');
+            if (savedPrivacy === 'true') {
+                togglePrivacyMode();
+            }
+        });
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + U for upload
+            if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
+                e.preventDefault();
+                document.getElementById('fileInput').click();
+            }
+            
+            // Escape to clear all
+            if (e.key === 'Escape' && uploadedFiles.length > 0) {
+                clearAllFiles();
+            }
+        });
+
+        console.log('FinanceOS CSV Upload System initialized');
+    </script>
+</body>
+</html>
