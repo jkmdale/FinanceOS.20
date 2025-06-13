@@ -931,3 +931,470 @@
 
         /* Mobile Responsive */
         @media (max-width: 768
+px) {
+            .header-content {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .nav {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .nav-button {
+                font-size: 14px;
+                padding: 6px 12px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .accounts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .goals-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .amount {
+                font-size: 24px;
+            }
+
+            .login-container {
+                padding: 40px 30px;
+                min-height: 600px;
+            }
+        }
+
+        /* Utility Classes */
+        .hidden { display: none !important; }
+        .loading { opacity: 0.6; pointer-events: none; }
+        .text-success { color: var(--success); }
+        .text-error { color: var(--error); }
+        .text-warning { color: var(--warning); }
+        .text-info { color: var(--info); }
+
+        /* Privacy Mode */
+        body.privacy-mode .amount,
+        body.privacy-mode .account-balance {
+            filter: blur(8px);
+            transition: filter 0.3s ease;
+        }
+
+        body.privacy-mode .amount:hover,
+        body.privacy-mode .account-balance:hover {
+            filter: blur(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="session-info" id="sessionInfo" style="display: none;">
+        <span>User: demo</span>
+        <button class="logout-button" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-container glass-premium">
+            <div class="login-logo">
+                <span style="color: white; font-size: 48px; font-weight: bold;">$</span>
+            </div>
+            
+            <h1 style="color: white; font-size: 32px; font-weight: 700; margin-bottom: 8px;">Welcome to FinanceOS</h1>
+            <p style="color: rgba(255,255,255,0.7); margin-bottom: 40px;">Your Personal Finance Operating System</p>
+            
+            <form onsubmit="handleLogin(event)">
+                <input type="text" class="login-input" placeholder="Username" id="username" required>
+                
+                <div class="password-field">
+                    <input type="password" class="login-input" placeholder="Password" id="password" required>
+                    <button type="button" class="password-toggle" onclick="togglePassword()">👁️</button>
+                </div>
+                
+                <button type="submit" class="login-button">Sign In</button>
+            </form>
+            
+            <button class="biometric-button" onclick="biometricLogin()">
+                🔒 Sign in with Biometrics
+            </button>
+            
+            <p style="color: rgba(255,255,255,0.5); font-size: 12px; margin-top: 20px;">
+                Demo credentials: admin / password
+            </p>
+        </div>
+    </div>
+
+    <header class="header glass">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <span style="font-size: 24px; color: white;">$</span>
+                </div>
+                <span class="logo-text">FinanceOS</span>
+            </div>
+            
+            <nav class="nav">
+                <a href="index.html" class="nav-button active">Dashboard</a>
+                <a href="csv-upload.html" class="nav-button">Upload CSV</a>
+                <a href="goals.html" class="nav-button">Goals</a>
+                <a href="budget.html" class="nav-button">Budget</a>
+                <button class="privacy-toggle nav-button" id="privacyToggle">🔒 Privacy</button>
+                <button class="logout-button nav-button" onclick="logout()">🚪 Logout</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- CSV Status Banner -->
+        <div class="csv-status" id="csvStatus" style="display: none;">
+            📊 Ready to import bank statements? <a href="csv-upload.html">Upload CSV files here</a> to update all your financial data automatically.
+        </div>
+
+        <!-- Emergency Financial Alert -->
+        <div class="emergency-alert">
+            <div class="alert-title">⚠️ Critical Budget Deficit Alert</div>
+            <div class="alert-text">
+                Monthly expenses exceed income by $3,607. Emergency action required to prevent debt accumulation. 
+                <strong>House Kitty can provide temporary support while you optimize spending.</strong>
+            </div>
+        </div>
+
+        <!-- Financial Summary -->
+        <section class="financial-summary">
+            <div class="section-title">Financial Overview</div>
+            
+            <div class="summary-grid">
+                <div class="summary-card glass-premium">
+                    <h3>Net Worth</h3>
+                    <div class="amount text-success" id="netWorth">$-158,569</div>
+                    <div class="change">Assets - Liabilities</div>
+                </div>
+                
+                <div class="summary-card glass-premium">
+                    <h3>Monthly Income</h3>
+                    <div class="amount text-success" id="monthlyIncome">$6,304</div>
+                    <div class="change">After tax wages</div>
+                </div>
+                
+                <div class="summary-card glass-premium">
+                    <h3>Monthly Expenses</h3>
+                    <div class="amount text-error" id="monthlyExpenses">$9,911</div>
+                    <div class="change">All categories</div>
+                </div>
+                
+                <div class="summary-card glass-premium">
+                    <h3>Emergency Fund</h3>
+                    <div class="amount text-error" id="emergencyFund">$0.17</div>
+                    <div class="change">Critically low</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Account Balances -->
+        <section>
+            <div class="section-header">
+                <div class="section-title">Account Balances</div>
+            </div>
+            
+            <div class="accounts-grid">
+                <div class="account-card glass">
+                    <div class="account-header">
+                        <div class="account-icon gradient-blue">💳</div>
+                        <div class="account-info">
+                            <h3>My Spending</h3>
+                            <div class="account-type">Checking Account</div>
+                        </div>
+                    </div>
+                    <div class="account-balance" id="mySpendingBalance">$25.92</div>
+                    <div class="account-available">$25.92 Available</div>
+                </div>
+                
+                <div class="account-card glass">
+                    <div class="account-header">
+                        <div class="account-icon gradient-green">🏦</div>
+                        <div class="account-info">
+                            <h3>My Savings</h3>
+                            <div class="account-type">Savings Account</div>
+                        </div>
+                    </div>
+                    <div class="account-balance" id="mySavingsBalance">$0.17</div>
+                    <div class="account-available">$0.17 Available</div>
+                </div>
+                
+                <div class="account-card glass">
+                    <div class="account-header">
+                        <div class="account-icon gradient-green">🏠</div>
+                        <div class="account-info">
+                            <h3>House Kitty</h3>
+                            <div class="account-type">Joint Savings</div>
+                        </div>
+                    </div>
+                    <div class="account-balance" id="houseKittyBalance">$65,357.00</div>
+                    <div class="account-available">$65,357.00 Available</div>
+                </div>
+                
+                <div class="account-card glass">
+                    <div class="account-header">
+                        <div class="account-icon gradient-blue">💰</div>
+                        <div class="account-info">
+                            <h3>Mortgage And Billing</h3>
+                            <div class="account-type">Checking Account</div>
+                        </div>
+                    </div>
+                    <div class="account-balance" id="mortgageBillingBalance">$126.35</div>
+                    <div class="account-available">$126.35 Available</div>
+                </div>
+                
+                <div class="account-card glass">
+                    <div class="account-header">
+                        <div class="account-icon gradient-orange">🔒</div>
+                        <div class="account-info">
+                            <h3>Holding</h3>
+                            <div class="account-type">Savings Account</div>
+                        </div>
+                    </div>
+                    <div class="account-balance" id="holdingBalance">$240.40</div>
+                    <div class="account-available">$240.40 Available</div>
+                </div>
+                
+                <div class="account-card glass">
+                    <div class="account-header">
+                        <div class="account-icon gradient-red">💳</div>
+                        <div class="account-info">
+                            <h3>Low Rate Visa</h3>
+                            <div class="account-type">Credit Card</div>
+                        </div>
+                    </div>
+                    <div class="account-balance text-error" id="visaBalance">-$3,251.30</div>
+                    <div class="account-available">$6,748.70 Available</div>
+                </div>
+                
+                <div class="account-card glass">
+                    <div class="account-header">
+                        <div class="account-icon gradient-green">🎯</div>
+                        <div class="account-info">
+                            <h3>ANZ KiwiSaver</h3>
+                            <div class="account-type">Investment</div>
+                        </div>
+                    </div>
+                    <div class="account-balance" id="kiwiSaverBalance">$48,733.44</div>
+                    <div class="account-available">Retirement Savings</div>
+                </div>
+                
+                <div class="account-card glass">
+                    <div class="account-header">
+                        <div class="account-icon gradient-red">🏠</div>
+                        <div class="account-info">
+                            <h3>Home Loans</h3>
+                            <div class="account-type">Mortgage</div>
+                        </div>
+                    </div>
+                    <div class="account-balance text-error">-$271,600.02</div>
+                    <div class="account-available">4.99% Interest Rate</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Financial Goals -->
+        <section>
+            <div class="section-header">
+                <div class="section-title">Financial Goals</div>
+                <a href="goals.html" class="nav-button">View All</a>
+            </div>
+            
+            <div class="goals-grid">
+                <div class="goal-card glass">
+                    <div class="goal-header">
+                        <div class="goal-title">Emergency Fund</div>
+                        <div class="goal-priority priority-critical">Critical</div>
+                    </div>
+                    <div class="goal-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill gradient-green" id="goal-1-progress" style="width: 0.001%"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span id="goal-1-current">$0.17</span>
+                            <span>$15,000 target</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="goal-card glass">
+                    <div class="goal-header">
+                        <div class="goal-title">Visa Debt Payoff</div>
+                        <div class="goal-priority priority-high">High</div>
+                    </div>
+                    <div class="goal-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill gradient-orange" id="goal-2-progress" style="width: 67%"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span id="goal-2-current">$6,748.70</span>
+                            <span>$10,000 target</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="goal-card glass">
+                    <div class="goal-header">
+                        <div class="goal-title">KiwiSaver Growth</div>
+                        <div class="goal-priority priority-medium">Medium</div>
+                    </div>
+                    <div class="goal-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill gradient-blue" id="goal-3-progress" style="width: 49%"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span id="goal-3-current">$48,733.44</span>
+                            <span>$100,000 target</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="goal-card glass">
+                    <div class="goal-header">
+                        <div class="goal-title">Private School Fund</div>
+                        <div class="goal-priority priority-medium">Medium</div>
+                    </div>
+                    <div class="goal-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill gradient-purple" id="goal-4-progress" style="width: 15%"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span id="goal-4-current">$1,500</span>
+                            <span>$10,000 target</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section>
+            <div class="section-title">Quick Actions</div>
+            
+            <div class="actions-grid">
+                <a href="csv-upload.html" class="action-card gradient-purple">
+                    <div class="action-icon">📄</div>
+                    <div class="action-title">Upload CSV</div>
+                    <div class="action-subtitle">Import bank statements</div>
+                </a>
+                
+                <a href="goals.html" class="action-card gradient-blue">
+                    <div class="action-icon">🎯</div>
+                    <div class="action-title">Update Goals</div>
+                    <div class="action-subtitle">Track progress</div>
+                </a>
+                
+                <a href="budget.html" class="action-card gradient-green">
+                    <div class="action-icon">📊</div>
+                    <div class="action-title">View Budget</div>
+                    <div class="action-subtitle">Analyze spending</div>
+                </a>
+                
+                <div class="action-card gradient-orange" onclick="addTransaction()">
+                    <div class="action-icon">💸</div>
+                    <div class="action-title">Add Transaction</div>
+                    <div class="action-subtitle">Manual entry</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Financial Coach -->
+        <section class="ai-coach">
+            <div class="section-title">💬 AI Financial Coach</div>
+            
+            <div class="chat-container glass-premium">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message ai">
+                        🚨 <strong>Urgent:</strong> Your budget shows a $3,607 monthly deficit. Your House Kitty can provide temporary support, but we need to reduce expenses immediately. Start with dining out ($250→$150) and review Sky Network ($163). Would you like specific optimization strategies?
+                    </div>
+                </div>
+                
+                <div class="chat-input">
+                    <input type="text" placeholder="Ask about your finances..." id="chatInput" onkeypress="handleChatKeypress(event)">
+                    <button onclick="sendChatMessage()">Send</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Application State
+        let isAuthenticated = false;
+        let currentUser = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthState();
+            setupEventListeners();
+            loadFinancialData();
+        });
+
+        function checkAuthState() {
+            const authToken = localStorage.getItem('financeos_auth');
+            const loginOverlay = document.getElementById('loginOverlay');
+            const csvStatus = document.getElementById('csvStatus');
+            
+            if (authToken === 'authenticated') {
+                isAuthenticated = true;
+                loginOverlay.style.display = 'none';
+                csvStatus.style.display = 'block';
+                loadFinancialData();
+            } else {
+                loginOverlay.style.display = 'flex';
+                csvStatus.style.display = 'none';
+            }
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Demo authentication
+            if ((username === 'admin' || username === 'demo') && password === 'password') {
+                localStorage.setItem('financeos_auth', 'authenticated');
+                currentUser = { username: username };
+                isAuthenticated = true;
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('csvStatus').style.display = 'block';
+                loadFinancialData();
+            } else {
+                alert('Invalid credentials. Try: admin / password');
+            }
+        }
+
+        function biometricLogin() {
+            // Simulate biometric authentication
+            if (confirm('Simulate biometric authentication?')) {
+                localStorage.setItem('financeos_auth', 'authenticated');
+                currentUser = { username: 'biometric_user' };
+                isAuthenticated = true;
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('csvStatus').style.display = 'block';
+                loadFinancialData();
+            }
+        }
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggle = event.target;
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggle.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggle.textContent = '👁️';
+            }
+        }
+
+        function logo
