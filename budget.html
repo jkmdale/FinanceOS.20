@@ -9,6 +9,104 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    
+    <!-- Include the Data Sync Manager -->
+    <script>
+        /**
+         * FinanceOS Data Sync Manager
+         * Enables automatic updates across all pages when CSV data is uploaded
+         */
+        class FinanceOSDataSync {
+            constructor() {
+                this.updateCallbacks = [];
+                this.lastUpdateCheck = 0;
+                this.setupUpdateListeners();
+                console.log('FinanceOS Data Sync Manager initialized on Budget page');
+            }
+
+            onDataUpdate(callback) {
+                this.updateCallbacks.push(callback);
+            }
+
+            setupUpdateListeners() {
+                // BroadcastChannel for cross-tab updates
+                if (typeof BroadcastChannel !== 'undefined') {
+                    const bc = new BroadcastChannel('financeos_updates');
+                    bc.addEventListener('message', (event) => {
+                        if (event.data.type === 'DATA_UPDATED') {
+                            this.handleDataUpdate(event.data);
+                        }
+                    });
+                }
+
+                // Storage events for cross-tab updates
+                window.addEventListener('storage', (event) => {
+                    if (event.key === 'financeos_data_updated') {
+                        this.handleDataUpdate({ source: 'storage' });
+                    }
+                });
+
+                // Custom events for same-page updates
+                window.addEventListener('financeos_data_updated', (event) => {
+                    this.handleDataUpdate(event.detail);
+                });
+
+                // Polling fallback
+                setInterval(() => this.checkForUpdates(), 5000);
+                window.addEventListener('focus', () => this.checkForUpdates());
+            }
+
+            checkForUpdates() {
+                const lastUpdate = parseInt(localStorage.getItem('financeos_data_updated') || '0');
+                if (lastUpdate > this.lastUpdateCheck) {
+                    this.lastUpdateCheck = lastUpdate;
+                    this.handleDataUpdate({ source: 'polling', timestamp: lastUpdate });
+                }
+            }
+
+            handleDataUpdate(data) {
+                console.log('Budget page: Handling data update:', data);
+                this.updateCallbacks.forEach(callback => {
+                    try {
+                        callback(data);
+                    } catch (error) {
+                        console.error('Error in update callback:', error);
+                    }
+                });
+            }
+
+            showUpdateNotification(message = 'Budget data updated!') {
+                let notification = document.getElementById('data-update-notification');
+                
+                if (!notification) {
+                    notification = document.createElement('div');
+                    notification.id = 'data-update-notification';
+                    notification.style.cssText = `
+                        position: fixed; top: 20px; right: 20px; z-index: 10000;
+                        background: linear-gradient(135deg, #10b981, #059669);
+                        color: white; padding: 15px 20px; border-radius: 12px;
+                        box-shadow: 0 8px 32px rgba(16, 185, 129, 0.3);
+                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                        font-weight: 600; backdrop-filter: blur(20px);
+                        border: 1px solid rgba(255, 255, 255, 0.2);
+                        transform: translateX(400px); transition: transform 0.3s ease;
+                    `;
+                    document.body.appendChild(notification);
+                }
+
+                notification.textContent = message;
+                setTimeout(() => notification.style.transform = 'translateX(0)', 100);
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(400px)';
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+        }
+
+        // Initialize global sync manager
+        window.FinanceOSSync = new FinanceOSDataSync();
+    </script>
+    
     <style>
         /* CSS Variables for Premium Design System */
         :root {
@@ -737,73 +835,24 @@
     </main>
 
     <script>
-        // Budget Data Structure
-        const budgetData = {
-            income: {
-                salary: { budgeted: 6304, actual: 6304, notes: 'Pathway Engineer wages (after tax)' }
-            },
-            expenses: {
-                housing: {
-                    'Mortgage 1': { budgeted: 1190, actual: 1190, notes: '4.99% interest' },
-                    'Mortgage 2': { budgeted: 880, actual: 880, notes: '4.99% interest' },
-                    'Rates': { budgeted: 357, actual: 357, notes: 'Council rates' }
-                },
-                food: {
-                    'Groceries': { budgeted: 550, actual: 620, notes: 'Over budget - bulk buying' },
-                    'Dining Out/Takeaway': { budgeted: 250, actual: 280, notes: 'Weekend splurges' }
-                },
-                utilities: {
-                    'Sky Network': { budgeted: 163, actual: 163, notes: 'Premium package' },
-                    'Mobile Phone': { budgeted: 40, actual: 42, notes: 'Data overage' },
-                    'Internet/Streaming': { budgeted: 10, actual: 15, notes: 'Netflix added' }
-                },
-                insurance: {
-                    'Vero Insurance': { budgeted: 350, actual: 350, notes: 'Home & contents' },
-                    'Partners Life': { budgeted: 140, actual: 140, notes: 'Life insurance' }
-                },
-                childcare: {
-                    'Grow Active Daycare': { budgeted: 508, actual: 508, notes: 'Fixed monthly fee' }
-                },
-                transportation: {
-                    'Fuel': { budgeted: 125, actual: 140, notes: 'Price increases' }
-                },
-                savings: {
-                    'Sharesies': { budgeted: 271, actual: 271, notes: 'Investment platform' },
-                    'Emergency Fund': { budgeted: 0, actual: 0, notes: 'Not currently funding' },
-                    'Education Savings': { budgeted: 300, actual: 300, notes: 'Private school fund' }
-                },
-                discretionary: {
-                    'Shopping/Retail': { budgeted: 150, actual: 180, notes: 'Clothing & household' },
-                    'Entertainment': { budgeted: 50, actual: 60, notes: 'Movies & activities' },
-                    'Travel Fund': { budgeted: 100, actual: 100, notes: 'Holiday savings' }
-                }
-            }
-        };
-
-        // Chart instances
+        // Global Variables
         let budgetChart, expenseChart, trendChart, cashFlowChart;
+        let currentBudgetData = {};
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            checkAuthState();
+            console.log('Budget page initialized');
             setupEventListeners();
-            renderBudgetTable();
+            loadBudgetData();
             initializeCharts();
             updateOverviewCards();
-        });
+            renderBudgetTable();
 
-        function checkAuthState() {
-            const authToken = localStorage.getItem('financeos_auth');
-            if (!authToken) {
-                window.location.href = 'index.html';
-                return;
+            // Register for data updates
+            if (window.FinanceOSSync) {
+                window.FinanceOSSync.onDataUpdate(handleDataUpdate);
             }
-        }
-
-        function logout() {
-            localStorage.removeItem('financeos_auth');
-            window.location.href = 'index.html';
-        }
+        });
 
         function setupEventListeners() {
             // Privacy toggle
@@ -825,414 +874,35 @@
             }
         }
 
-        function togglePrivacyMode() {
-            const isPrivate = document.body.classList.toggle('privacy-mode');
-            const toggle = document.getElementById('privacyToggle');
-            if (toggle) {
-                toggle.textContent = isPrivate ? '🔓 Show Data' : '🔒 Privacy';
-            }
-            localStorage.setItem('financeos_privacy', isPrivate.toString());
-        }
-
-        function updateBudgetMonth() {
-            const selectedMonth = document.getElementById('monthSelector').value;
-            console.log('Selected month:', selectedMonth);
-            // In a real app, this would fetch data for the selected month
+        function handleDataUpdate(data) {
+            console.log('Budget page: Received data update', data);
+            
+            // Refresh all budget data
+            loadBudgetData();
+            updateOverviewCards();
             renderBudgetTable();
             updateCharts();
-        }
-
-        function renderBudgetTable() {
-            const tbody = document.getElementById('budgetTableBody');
-            let html = '';
-
-            // Income section
-            html += `<tr style="background: rgba(16, 185, 129, 0.1);">
-                <td class="category-name">INCOME</td>
-                <td class="amount positive">$${calculateTotal(budgetData.income, 'budgeted')}</td>
-                <td class="amount positive">$${calculateTotal(budgetData.income, 'actual')}</td>
-                <td class="amount">${formatDifference(calculateTotal(budgetData.income, 'actual') - calculateTotal(budgetData.income, 'budgeted'))}</td>
-                <td></td>
-                <td></td>
-            </tr>`;
-
-            Object.entries(budgetData.income).forEach(([category, data]) => {
-                const difference = data.actual - data.budgeted;
-                html += `<tr>
-                    <td class="subcategory-name">${category}</td>
-                    <td class="amount">${formatCurrency(data.budgeted)}</td>
-                    <td class="amount">${formatCurrency(data.actual)}</td>
-                    <td class="amount ${difference >= 0 ? 'positive' : 'negative'}">${formatDifference(difference)}</td>
-                    <td>${renderVarianceBar(difference, data.budgeted)}</td>
-                    <td class="text-muted">${data.notes}</td>
-                </tr>`;
-            });
-
-            // Expense sections
-            Object.entries(budgetData.expenses).forEach(([section, categories]) => {
-                const sectionBudgeted = calculateTotal(categories, 'budgeted');
-                const sectionActual = calculateTotal(categories, 'actual');
-                const sectionDifference = sectionActual - sectionBudgeted;
-
-                html += `<tr style="background: rgba(239, 68, 68, 0.1);">
-                    <td class="category-name">${section.toUpperCase()}</td>
-                    <td class="amount negative">$${sectionBudgeted}</td>
-                    <td class="amount negative">$${sectionActual}</td>
-                    <td class="amount ${sectionDifference <= 0 ? 'positive' : 'negative'}">${formatDifference(sectionDifference)}</td>
-                    <td></td>
-                    <td></td>
-                </tr>`;
-
-                Object.entries(categories).forEach(([category, data]) => {
-                    const difference = data.actual - data.budgeted;
-                    html += `<tr>
-                        <td class="subcategory-name">${category}</td>
-                        <td class="amount">${formatCurrency(data.budgeted)}</td>
-                        <td class="amount">${formatCurrency(data.actual)}</td>
-                        <td class="amount ${difference <= 0 ? 'positive' : 'negative'}">${formatDifference(difference)}</td>
-                        <td>${renderVarianceBar(difference, data.budgeted)}</td>
-                        <td style="color: var(--text-muted); font-size: 12px;">${data.notes}</td>
-                    </tr>`;
-                });
-            });
-
-            // Totals
-            const totalIncome = calculateTotal(budgetData.income, 'actual');
-            const totalExpenses = calculateTotalExpenses('actual');
-            const netCashFlow = totalIncome - totalExpenses;
-
-            html += `<tr style="background: rgba(139, 92, 246, 0.2); font-weight: bold;">
-                <td class="category-name">NET CASH FLOW</td>
-                <td class="amount">${formatCurrency(calculateTotal(budgetData.income, 'budgeted') - calculateTotalExpenses('budgeted'))}</td>
-                <td class="amount ${netCashFlow >= 0 ? 'positive' : 'negative'}">${formatCurrency(netCashFlow)}</td>
-                <td class="amount">${formatDifference(netCashFlow - (calculateTotal(budgetData.income, 'budgeted') - calculateTotalExpenses('budgeted')))}</td>
-                <td></td>
-                <td style="color: var(--text-muted); font-size: 12px;">${netCashFlow < 0 ? 'DEFICIT - Action Required' : 'SURPLUS'}</td>
-            </tr>`;
-
-            tbody.innerHTML = html;
-        }
-
-        function calculateTotal(section, type) {
-            return Object.values(section).reduce((sum, item) => sum + item[type], 0);
-        }
-
-        function calculateTotalExpenses(type) {
-            return Object.values(budgetData.expenses).reduce((sum, section) => {
-                return sum + calculateTotal(section, type);
-            }, 0);
-        }
-
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('en-NZ', {
-                style: 'currency',
-                currency: 'NZD',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
-            }).format(Math.abs(amount));
-        }
-
-        function formatDifference(amount) {
-            const prefix = amount >= 0 ? '+' : '';
-            return prefix + formatCurrency(amount);
-        }
-
-        function renderVarianceBar(difference, budgeted) {
-            if (budgeted === 0) return '';
             
-            const percentage = Math.abs(difference / budgeted) * 100;
-            const width = Math.min(percentage, 100);
-            
-            let colorClass = 'variance-ontrack';
-            if (percentage > 10) {
-                colorClass = difference > 0 ? 'variance-over' : 'variance-under';
-            }
-            
-            return `<div class="variance-bar">
-                <div class="variance-fill ${colorClass}" style="width: ${width}%"></div>
-            </div>`;
-        }
-
-        function updateOverviewCards() {
-            const totalIncome = calculateTotal(budgetData.income, 'actual');
-            const totalExpenses = calculateTotalExpenses('actual');
-            const netCashFlow = totalIncome - totalExpenses;
-            
-            // Calculate budget adherence
-            const totalBudgeted = calculateTotalExpenses('budgeted');
-            const adherence = totalBudgeted > 0 ? ((totalBudgeted - Math.abs(totalExpenses - totalBudgeted)) / totalBudgeted) * 100 : 0;
-
-            document.getElementById('monthlyIncome').textContent = formatCurrency(totalIncome);
-            document.getElementById('monthlyExpenses').textContent = formatCurrency(totalExpenses);
-            document.getElementById('netCashFlow').textContent = formatCurrency(netCashFlow);
-            document.getElementById('budgetAdherence').textContent = Math.round(adherence) + '%';
-        }
-
-        function initializeCharts() {
-            // Set Chart.js default colors for dark theme
-            Chart.defaults.color = 'rgba(255, 255, 255, 0.7)';
-            Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
-            Chart.defaults.backgroundColor = 'rgba(255, 255, 255, 0.05)';
-
-            createBudgetChart();
-            createExpenseChart();
-            createTrendChart();
-            createCashFlowChart();
-        }
-
-        function createBudgetChart() {
-            const ctx = document.getElementById('budgetChart').getContext('2d');
-            
-            const categories = [];
-            const budgeted = [];
-            const actual = [];
-            
-            Object.entries(budgetData.expenses).forEach(([section, items]) => {
-                Object.entries(items).forEach(([category, data]) => {
-                    categories.push(category);
-                    budgeted.push(data.budgeted);
-                    actual.push(data.actual);
-                });
-            });
-
-            budgetChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: categories,
-                    datasets: [
-                        {
-                            label: 'Budgeted',
-                            data: budgeted,
-                            backgroundColor: 'rgba(59, 130, 246, 0.6)',
-                            borderColor: 'rgba(59, 130, 246, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Actual',
-                            data: actual,
-                            backgroundColor: 'rgba(239, 68, 68, 0.6)',
-                            borderColor: 'rgba(239, 68, 68, 1)',
-                            borderWidth: 1
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '$' + value;
-                                }
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                maxRotation: 45
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function createExpenseChart() {
-            const ctx = document.getElementById('expenseChart').getContext('2d');
-            
-            const sectionTotals = {};
-            Object.entries(budgetData.expenses).forEach(([section, items]) => {
-                sectionTotals[section] = calculateTotal(items, 'actual');
-            });
-
-            const colors = [
-                'rgba(139, 92, 246, 0.8)',
-                'rgba(59, 130, 246, 0.8)',
-                'rgba(16, 185, 129, 0.8)',
-                'rgba(245, 158, 11, 0.8)',
-                'rgba(239, 68, 68, 0.8)',
-                'rgba(147, 51, 234, 0.8)',
-                'rgba(249, 115, 22, 0.8)'
-            ];
-
-            expenseChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(sectionTotals).map(s => s.charAt(0).toUpperCase() + s.slice(1)),
-                    datasets: [{
-                        data: Object.values(sectionTotals),
-                        backgroundColor: colors,
-                        borderWidth: 2,
-                        borderColor: 'rgba(255, 255, 255, 0.1)'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                        }
-                    }
-                }
-            });
-        }
-
-        function createTrendChart() {
-            const ctx = document.getElementById('trendChart').getContext('2d');
-            
-            // Mock historical data for 6 months
-            const months = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const spending = [9200, 9400, 9650, 9800, 9850, 9911];
-            const budget = [9000, 9000, 9000, 9000, 9000, 9000];
-
-            trendChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: months,
-                    datasets: [
-                        {
-                            label: 'Actual Spending',
-                            data: spending,
-                            borderColor: 'rgba(239, 68, 68, 1)',
-                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                            tension: 0.4,
-                            fill: true
-                        },
-                        {
-                            label: 'Budget Target',
-                            data: budget,
-                            borderColor: 'rgba(59, 130, 246, 1)',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            borderDash: [5, 5],
-                            fill: false
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            ticks: {
-                                callback: function(value) {
-                                    return '$' + value;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function createCashFlowChart() {
-            const ctx = document.getElementById('cashFlowChart').getContext('2d');
-            
-            const months = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const income = [6304, 6304, 6304, 6304, 6304, 6304];
-            const expenses = [9200, 9400, 9650, 9800, 9850, 9911];
-            const netFlow = income.map((inc, i) => inc - expenses[i]);
-
-            cashFlowChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: months,
-                    datasets: [
-                        {
-                            label: 'Income',
-                            data: income,
-                            backgroundColor: 'rgba(16, 185, 129, 0.6)',
-                            borderColor: 'rgba(16, 185, 129, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Expenses',
-                            data: expenses.map(e => -e),
-                            backgroundColor: 'rgba(239, 68, 68, 0.6)',
-                            borderColor: 'rgba(239, 68, 68, 1)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Net Flow',
-                            data: netFlow,
-                            type: 'line',
-                            borderColor: 'rgba(245, 158, 11, 1)',
-                            backgroundColor: 'rgba(245, 158, 11, 0.2)',
-                            tension: 0.4,
-                            yAxisID: 'y1'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '$' + Math.abs(value);
-                                }
-                            }
-                        },
-                        y1: {
-                            type: 'linear',
-                            display: false,
-                            position: 'right',
-                        }
-                    }
-                }
-            });
-        }
-
-        function updateCharts() {
-            if (budgetChart) budgetChart.update();
-            if (expenseChart) expenseChart.update();
-            if (trendChart) trendChart.update();
-            if (cashFlowChart) cashFlowChart.update();
-        }
-
-        // Action Functions
-        function editBudget() {
-            alert('Budget editing functionality would open here. This would allow you to modify budget amounts for each category.');
-        }
-
-        function showOptimizationPlan() {
-            alert('Budget Optimization Plan:\n\n1. Reduce dining out from $250 to $150 (-$100/month)\n2. Review Sky Network - consider cheaper alternatives (-$80/month)\n3. Optimize grocery shopping from $620 to $550 (-$70/month)\n4. Reduce discretionary shopping from $180 to $150 (-$30/month)\n\nTotal potential savings: $280/month\nRemaining deficit: $3,327/month');
-        }
-
-        function adjustCategory(category) {
-            const newAmount = prompt(`Adjust ${category} budget:\n\nCurrent: $250\nSuggested: $150\n\nEnter new monthly budget:`);
-            if (newAmount && !isNaN(newAmount)) {
-                alert(`${category} budget updated to $${newAmount}/month`);
-                // In a real app, this would update the budget data
+            // Show notification
+            if (window.FinanceOSSync) {
+                window.FinanceOSSync.showUpdateNotification('Budget updated with latest transaction data!');
             }
         }
 
-        function reviewSubscriptions() {
-            alert('Subscription Review:\n\nCurrent: Sky Network $163/month\n\nAlternatives:\n• Netflix + Disney+ + Spark Sport: $45/month\n• TVNZ OnDemand + ThreeNow: Free\n• Neon + Amazon Prime: $35/month\n\nPotential savings: $80-163/month');
-        }
-
-        function viewHouseKittyStrategy() {
-            alert('House Kitty Strategy:\n\nCurrent: $65,357\n\nRecommended allocation:\n• Emergency repairs: $30,000 (keep)\n• Home improvements: $20,000 (keep)\n• Temporary budget support: $15,357 (available)\n\nThis could help bridge your budget deficit while you implement cost reductions.');
-        }
-    </script>
-</body>
-</html>
+        function loadBudgetData() {
+            // Load transactions to calculate actual spending
+            const transactions = JSON.parse(localStorage.getItem('financeos_transactions') || '[]');
+            const accounts = JSON.parse(localStorage.getItem('financeos_accounts') || '[]');
+            
+            console.log('Loaded transactions for budget:', transactions.length);
+            
+            // Calculate actual spending by category
+            const actualSpending = calculateActualSpending(transactions);
+            
+            // Load or create budget data
+            currentBudgetData = {
+                income: {
+                    salary: { budgeted: 6304, actual: 6304, notes: 'Pathway Engineer wages (after tax)' }
+                },
+                expenses: {
+                    housing: {
